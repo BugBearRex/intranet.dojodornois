@@ -188,6 +188,7 @@
         .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
         .toast { color: white; padding: 12px 18px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); background: #1a472a; border-left: 4px solid #2ecc71; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -406,10 +407,13 @@
 
     <!-- JAVASCRIPT ET GESTION DES DONNÉES -->
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-        const TARGET_SHEET = "sophrologie";
-
-        const defaultSeasons = ["2025/2026", "2026/2027"];
+        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_TABLE = 'sophrologie';
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+const TARGET_SHEET = "sophrologie";
+const defaultSeasons = ["2025/2026", "2026/2027"];
         const defaultDatesBySeason = {
             "2025/2026": ["19/06", "12/09", "10/10", "14/11", "12/12", "20/01", "20/02", "20/03", "03/04", "24/04"],
             "2026/2027": ["15/10", "12/11", "10/12", "14/01", "11/02", "18/03", "15/04", "13/05", "10/06"]
@@ -447,9 +451,7 @@
         }
 
         function loadData() {
-            fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
-                .then(response => response.json())
-                .then(data => {
+            supabase.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
                     if (data) {
                         if (data.participants && Array.isArray(data.participants)) {
                             state.participants = data.participants.map(normalizeParticipant);
@@ -524,12 +526,7 @@
                 payload: state
             };
 
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(packet)
-            })
+            supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
             .then(() => showToast("✓ Enregistré dans le Sheet Sophrologie !"))
             .catch(err => console.error("Erreur Cloud:", err));
         }

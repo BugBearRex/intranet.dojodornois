@@ -88,6 +88,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="h-full flex text-slate-800 antialiased">
 
@@ -279,10 +280,13 @@
     <script src="../js/sidebar.js"></script>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-        const TARGET_SHEET = "reunions";
-
-        const defaultReunionRentrée = {
+        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_TABLE = 'reunions';
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+const TARGET_SHEET = "reunions";
+const defaultReunionRentrée = {
             id: 'reu_rentree_2026_v5',
             title: "Réunion de Rentrée du Comité Directeur",
             date: "Vendredi 28 Août 2026 — 20h00",
@@ -786,12 +790,7 @@
             autoSaveCurrent();
             
             try {
-                await fetch(SCRIPT_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ targetSheet: TARGET_SHEET, payload: reunionsDB })
-                });
+                await supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: reunionsDB });
                 showToast("✓ Enregistrement transmis vers Google Sheets !", "success");
             } catch (e) {
                 showToast("✓ Données sauvegardées en local !", "success");

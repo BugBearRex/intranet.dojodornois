@@ -165,6 +165,7 @@
             .app-body { display: block !important; margin: 0 !important; padding: 0 !important; }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -405,10 +406,13 @@
         let immoDB = [];
         let activeImmoForModal = null;
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-        const TARGET_SHEET = "Immobilisations";
-
-        function showToast(message) {
+        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_TABLE = 'immobilisations';
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+const TARGET_SHEET = "Immobilisations";
+function showToast(message) {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = 'toast success';
@@ -458,20 +462,13 @@
                 payload: { immobilisations: immoDB }
             };
 
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(packet)
-            })
+            supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
             .then(() => showToast("✓ Registre des immobilisations synchronisé !"))
             .catch(err => console.error("Erreur Cloud Immo:", err));
         }
 
         function loadImmoData() {
-            fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
-                .then(res => res.json())
-                .then(data => {
+            supabase.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
                     if(data && data.immobilisations && data.immobilisations.length > 0) {
                         immoDB = data.immobilisations;
                     } else {

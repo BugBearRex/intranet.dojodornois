@@ -370,6 +370,7 @@
             font-family: 'Fredoka', sans-serif;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -459,9 +460,13 @@
 
     <script>
         // URL de la WebApp Apps Script
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxnokNVywbKqoPat5DgRrKRGtobkYQvnkFkV59tRFJ4fN3hFVmzJWkETHOO9FzHWNIaog/exec";
-
-        // Variable d'état d'édition
+        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_TABLE = 'planning_reseaux';
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxnokNVywbKqoPat5DgRrKRGtobkYQvnkFkV59tRFJ4fN3hFVmzJWkETHOO9FzHWNIaog/exec";
+const targetSheet = "Planning_Reseaux";
+// Variable d'état d'édition
         let editingIndex = null;
 
         // Données du planning
@@ -660,19 +665,12 @@
         function syncToGoogleSheets() {
             showToast('Envoi vers le Google Sheet en cours...');
 
-            const targetSheet = "Planning_Reseaux";
-
             const payload = {
                 targetSheet: targetSheet,
                 payload: publications
             };
 
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
+            supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: payload.payload })
             .then(() => {
                 alert(`✅ Sauvegarde réussie !\n\nLes données du planning ont été envoyées et synchronisées dans l'onglet "${targetSheet}" de ton Google Sheet.`);
             })
@@ -684,10 +682,7 @@
 
         // Chargement automatique depuis le Google Sheet
         function loadFromGoogleSheets() {
-            const targetSheet = "Planning_Reseaux";
-            fetch(`${GOOGLE_SCRIPT_URL}?sheet=${targetSheet}`)
-            .then(res => res.json())
-            .then(data => {
+            supabase.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
                 if (Array.isArray(data) && data.length > 0) {
                     publications = data;
                     renderTable();

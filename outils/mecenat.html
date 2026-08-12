@@ -150,6 +150,7 @@
             .app-body { display: block !important; margin: 0 !important; padding: 0 !important; }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -419,10 +420,13 @@
     </div>
 
     <script type="text/javascript">
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-        const TARGET_SHEET = "Mecenat";
-
-        const DEFAULT_CEINTURES = [
+        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_TABLE = 'mecenat';
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+const TARGET_SHEET = "Mecenat";
+const DEFAULT_CEINTURES = [
             { id: 1, nom: "⚪ Ceinture Blanche — Pack Découverte", seuil: "< 150 €", bgColor: "#F8FAFC", borderColor: "#94A3B8", desc: "Mention sur le site internet et remerciement officiel newsletter." },
             { id: 2, nom: "🟡 Ceinture Jaune — Pack Supporteur", seuil: "150 € - 300 €", bgColor: "#FEF9C3", borderColor: "#CA8A04", desc: "Logo sur le site web + Affiche officielle des partenaires dans le dojo." },
             { id: 3, nom: "🟠 Ceinture Orange — Pack Engagé", seuil: "300 € - 500 €", bgColor: "#FFEDD5", borderColor: "#EA580C", desc: "Banderole 2x1m dans le dojo + visuels réseaux sociaux." },
@@ -521,11 +525,7 @@
             localStorage.setItem('dojo_mecenes_v8', JSON.stringify(mecenesDB));
             localStorage.setItem('dojo_val_v8', JSON.stringify(valorisationsDB));
 
-            fetch(SCRIPT_URL, {
-                method: "POST", mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ targetSheet: TARGET_SHEET, payload: { mecenes: mecenesDB, valorisations: valorisationsDB } })
-            }).then(() => showToast("✓ Sauvegardé !"))
+            supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: { mecenes: mecenesDB, valorisations: valorisationsDB } }).then(() => showToast("✓ Sauvegardé !"))
             .catch(err => console.error(err));
         }
 
