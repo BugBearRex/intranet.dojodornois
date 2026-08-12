@@ -200,7 +200,7 @@
     // --- INTERCONNEXION CLOUD GOOGLE SHEETS ---
     const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'budget';
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
 const TARGET_SHEET = "budget_previsionnel";
@@ -269,7 +269,7 @@ function showToast(message) {
     };
 
     function loadBudgetData() {
-        supabase.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
+        sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
                 if (data && (data["2026-2027"] || data["2025-2026"])) {
                     budgetDB = data;
                     console.log("✓ Données budgétaires chargées depuis le Cloud.");
@@ -320,7 +320,7 @@ function showToast(message) {
                 payload: budgetDB
             };
 
-            supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
+            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
             .then(() => {
                 showToast("✓ Budget prévisionnel synchronisé sur Google Sheets !");
             })

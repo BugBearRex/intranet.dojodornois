@@ -222,7 +222,7 @@
         // --- INTERCONNEXION GOOGLE SHEETS CLOUD ---
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'notion_board';
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
 const TARGET_SHEET = "base_connaissances";
@@ -245,7 +245,7 @@ function showToast(message) {
                     payload: notionData
                 };
 
-                supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
+                sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
                 .then(() => {
                     showToast("✓ Base de connaissances synchronisée sur Google Sheets !");
                 })
@@ -261,7 +261,7 @@ function showToast(message) {
         }
 
         function loadCloudNotionData() {
-            supabase.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
+            sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
                     if (data && Object.keys(data).length > 0) {
                         notionData = data;
                         console.log("✓ Notes chargées depuis le Cloud Google.");

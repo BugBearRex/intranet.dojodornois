@@ -409,7 +409,7 @@
     <script>
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'sophrologie';
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
 const TARGET_SHEET = "sophrologie";
@@ -451,7 +451,7 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
         }
 
         function loadData() {
-            supabase.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
+            sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
                     if (data) {
                         if (data.participants && Array.isArray(data.participants)) {
                             state.participants = data.participants.map(normalizeParticipant);
@@ -526,7 +526,7 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
                 payload: state
             };
 
-            supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
+            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
             .then(() => showToast("✓ Enregistré dans le Sheet Sophrologie !"))
             .catch(err => console.error("Erreur Cloud:", err));
         }

@@ -725,7 +725,7 @@
 
     const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'compta';
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzZTxJg0NjykMN3V6KkmCKi6dNsQ1vpblOizH7sHQinMM89qUjcFWevr--YQZMiIg9gw/exec";
 const TARGET_SHEET = "compta_v2";
@@ -849,7 +849,7 @@ function showToast(message) {
         };
 
         try {
-            supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
+            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
             .then(res => res.json())
             .then(() => {
                 if (isManual) {
@@ -875,7 +875,7 @@ function showToast(message) {
 
     async function reloadFromGoogleSheets() {
         try {
-            const { data: _sbResult, error: _sbErr } = await supabase.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+            const { data: _sbResult, error: _sbErr } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
             const data = _sbResult ? _sbResult.data : null;
 
             if (data && (data.operations || data.caisseFlux || data.cheques || data.livretOps)) {

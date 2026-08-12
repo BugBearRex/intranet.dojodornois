@@ -282,7 +282,7 @@
     <script>
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'reunions';
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
 const TARGET_SHEET = "reunions";
@@ -790,7 +790,7 @@ const defaultReunionRentrée = {
             autoSaveCurrent();
             
             try {
-                await supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: reunionsDB });
+                await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: reunionsDB });
                 showToast("✓ Enregistrement transmis vers Google Sheets !", "success");
             } catch (e) {
                 showToast("✓ Données sauvegardées en local !", "success");

@@ -332,7 +332,7 @@
     <script>
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'tombola';
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
 const TARGET_SHEET = "tombolas";
@@ -694,7 +694,7 @@ let currentLots = [
         }
 
         function saveTombolaToSheet() {
-            supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: tombolasDB })
+            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: tombolasDB })
             .then(() => showToast("✓ Tombolas sauvegardées vers Google Sheets !"))
             .catch(() => showToast("✓ Sauvegarde locale effectuée !"));
         }

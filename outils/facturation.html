@@ -431,7 +431,7 @@
     <script type="text/javascript">
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'facturation';
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
 const TARGET_SHEET = "factures";
@@ -609,7 +609,7 @@ let facturesDB = {
 
             localStorage.setItem('dojo_factures_backup', JSON.stringify(facturesDB));
 
-            supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: facturesDB })
+            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: facturesDB })
             .then(() => {
                 showToast("✓ Facture enregistrée et synchronisée sur Google Sheets !");
                 renderHistory();
@@ -618,7 +618,7 @@ let facturesDB = {
         }
 
         function loadFacturesData() {
-            supabase.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
+            sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
                     if(data && data.liste) {
                         facturesDB = data;
                     } else {

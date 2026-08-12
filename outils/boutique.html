@@ -290,7 +290,7 @@
 
     const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'boutique';
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
 const TARGET_SHEET = "boutique";
@@ -306,13 +306,13 @@ function showToast(msg) {
     function syncToCloud() {
         localStorage.setItem('dojo_boutique_backup', JSON.stringify(boutiqueData));
         
-        supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: boutiqueData })
+        sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: boutiqueData })
         .then(() => showToast("✓ Boutique synchronisée sur Google Sheets !"))
         .catch(err => console.error("Erreur Cloud Boutique:", err));
     }
 
     function fetchCloudBoutiqueData() {
-        supabase.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
+        sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
                 if (data && (data.catalogue || data.commandes)) {
                     boutiqueData = data;
                     document.getElementById('file-status').innerText = "🔗 Données Boutique Cloud chargées";

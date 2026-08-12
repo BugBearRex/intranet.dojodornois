@@ -215,7 +215,7 @@
     // --- CONFIGURATION DE LA PASSERELLE GOOGLE CLOUD SHEETS ---
     const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'futur_dojo';
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
 const TARGET_SHEET = "futur_dojo";
@@ -252,7 +252,7 @@ let dojoDB = {
             payload: dojoDB
         };
 
-        supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
+        sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
         .then(() => {
             showToast("✓ Synchronisé sur Google Sheets !");
         })
@@ -261,7 +261,7 @@ let dojoDB = {
 
     // --- CHARGEMENT DEPUIS GOOGLE SHEETS ---
     function loadDojoData() {
-        supabase.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
+        sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
                 if (data && (data.devis || data.actes)) {
                     dojoDB = data;
                     if(!dojoDB.devis) dojoDB.devis = [];

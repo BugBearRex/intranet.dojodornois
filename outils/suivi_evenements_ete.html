@@ -273,7 +273,7 @@
     <script>
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'suivi_evenements_ete';
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
 const TARGET_SHEET = "EvenementsEte";
@@ -283,7 +283,7 @@ let categories = JSON.parse(localStorage.getItem('dd_evt_categories')) || ["🥋
         let activeEvtId = null;
 
         function loadFromCloud() {
-            supabase.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
+            sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
                     if (data && data.summer_events) {
                         events = data.summer_events;
                         if (data.categories) categories = data.categories;
@@ -297,7 +297,7 @@ let categories = JSON.parse(localStorage.getItem('dd_evt_categories')) || ["🥋
             localStorage.setItem('dd_evt_categories', JSON.stringify(categories));
             localStorage.setItem('dd_summer_events_v2', JSON.stringify(events));
 
-            supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: { summer_events: events, categories: categories } }).catch(err => console.error(err));
+            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: { summer_events: events, categories: categories } }).catch(err => console.error(err));
 
             renderAll();
         }

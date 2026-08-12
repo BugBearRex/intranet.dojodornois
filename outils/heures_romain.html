@@ -411,7 +411,7 @@
     <script>
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'heures_romain';
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
 const TARGET_SHEET = "suivi_romain";
@@ -802,7 +802,7 @@ const TARGET_SHEET = "suivi_romain";
 
             showToast("☁️ Synchronisation vers Google Sheets...");
 
-            supabase.from(SUPABASE_TABLE).upsert({ id: 1, data: romainData })
+            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: romainData })
             .then(() => showToast("✓ Données d'heures enregistrées vers Google Sheets !"))
             .catch((err) => {
                 console.error(err);
