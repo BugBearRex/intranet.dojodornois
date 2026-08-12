@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des Immobilisations & Registre — Intranet Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --rouge-deep: #8B1429;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --vert: #2ecc71;
+            --vert-fonce: #27ae60;
+            --bleu: #3498db;
+            --bleu-fonce: #2980b9;
+            --sidebar-width: 280px;
+            --topbar-height: 68px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            margin: 0; padding: 0;
+            color: var(--gris-fonce);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- FIX SIDEBAR DÉBORDEMENT --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        .sidebar * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
+        }
+
+        .topbar {
+            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.04); flex-shrink: 0; z-index: 50;
+        }
+
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); line-height: 1; }
+        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+
+        .app-body {
+            flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
+        }
+
+        /* ===== KPI CARDS ===== */
+        .kpi-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+        }
+
+        .kpi-card {
+            background: var(--blanc); padding: 18px; border-radius: 10px; border-left: 4px solid var(--gris-moyen); box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid var(--gris-tres-clair);
+        }
+        .kpi-card.brut { border-left-color: var(--bleu); }
+        .kpi-card.amorti { border-left-color: #e67e22; }
+        .kpi-card.vnc { border-left-color: var(--vert-fonce); }
+        .kpi-card.annee { border-left-color: var(--rouge); }
+
+        .kpi-card h4 { margin: 0 0 6px 0; font-size: 0.75rem; color: var(--gris-moyen); text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-card .value { font-family: 'Fredoka', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--noir-doux); margin: 0; }
+        .kpi-card .subtext { font-size: 0.75rem; color: var(--gris-moyen); margin-top: 4px; }
+
+        /* ===== PANELS & FORM ===== */
+        .main-card {
+            background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.03); padding: 20px; display: flex; flex-direction: column; gap: 16px;
+        }
+
+        .card-header-actions {
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 12px;
+        }
+        .card-header-actions h3 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.15rem; color: var(--noir-doux); }
+
+        .btn {
+            background: var(--rouge); color: white; border: none; padding: 9px 15px; border-radius: 7px; cursor: pointer; font-weight: 500; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: background 0.15s; text-decoration: none;
+        }
+        .btn:hover { background: var(--rouge-hover); }
+        .btn-secondary { background: var(--gris-moyen); color: white; }
+        .btn-secondary:hover { background: var(--gris-fonce); }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-dark:hover { background: #333; }
+        .btn-blue { background: var(--bleu); color: white; }
+        .btn-blue:hover { background: var(--bleu-fonce); }
+        .btn-xs { padding: 4px 8px; font-size: 0.75rem; border-radius: 5px; }
+
+        /* Formulaire Inline */
+        .form-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; background: #fafafa; padding: 16px; border-radius: 8px; border: 1px dashed var(--gris-clair); align-items: flex-end;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--gris-fonce); }
+        .form-control { width: 100%; padding: 8px 11px; border: 1.5px solid var(--gris-tres-clair); border-radius: 6px; font-size: 0.85rem; font-family: 'Roboto', sans-serif; }
+        .form-control:focus { outline: none; border-color: var(--rouge); box-shadow: 0 0 0 3px rgba(196,30,58,0.08); }
+
+        /* Tableaux */
+        .table-container { overflow-x: auto; border: 1px solid var(--gris-tres-clair); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem; }
+        th { background: var(--noir-doux); color: white; padding: 12px; font-weight: 500; }
+        td { padding: 12px; border-bottom: 1px solid var(--gris-tres-clair); background: white; vertical-align: middle; }
+        tr:hover td { background-color: var(--fond); }
+
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: bold; text-transform: uppercase; display: inline-block; }
+        .badge-actif { background: #E8F8F0; color: var(--vert-fonce); }
+        .badge-amorti { background: #FEF3C7; color: #B45309; }
+        .badge-retour { background: var(--rouge-clair); color: var(--rouge-deep); }
+
+        /* Modale Pop-up */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: white; border-radius: 12px; width: 750px; max-width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 16px;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 10px; }
+        .modal-header h3 { font-family: 'Fredoka', sans-serif; margin: 0; color: var(--noir-doux); font-size: 1.2rem; }
+        .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--gris-moyen); }
+
+        /* Toast */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        @media print {
+            body { background: white; padding: 0; color: black; display: block !important; }
+            .no-print, .sidebar, .topbar { display: none !important; }
+            .main-content { padding: 0 !important; overflow: visible !important; }
+            .app-body { display: block !important; margin: 0 !important; padding: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== SIDEBAR DYNAMIQUE ===== -->
+    <div class="sidebar"></div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <div class="topbar no-print">
+            <div class="page-title-area">
+                <h2>Registre des Immobilisations & Amortissements</h2>
+                <p>Suivi comptable du matériel durable du Dojo Dornois (Méthode Linéaire)</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <label style="font-size:0.85rem; font-weight:bold;">Exercice Comptable :</label>
+                <select id="select-annee-analyse" class="form-control" style="width:140px;" onchange="renderAll()"></select>
+                <a href="../index.html" class="btn btn-dark">🏠 Central</a>
+            </div>
+        </div>
+
+        <div class="app-body">
+            
+            <!-- KPI SUMMARY -->
+            <div class="kpi-grid">
+                <div class="kpi-card brut">
+                    <h4>Valeur Brute Totale</h4>
+                    <div class="value" id="kpi-brut">0,00 €</div>
+                    <div class="subtext">Coût d'acquisition hors retours</div>
+                </div>
+                <div class="kpi-card amorti">
+                    <h4>Amortissements Cumulés</h4>
+                    <div class="value" id="kpi-amorti">0,00 €</div>
+                    <div class="subtext" id="kpi-amorti-sub">À la clôture de l'exercice</div>
+                </div>
+                <div class="kpi-card vnc">
+                    <h4>Valeur Résiduelle (VNC)</h4>
+                    <div class="value" id="kpi-vnc">0,00 €</div>
+                    <div class="subtext">Valeur nette d'actif</div>
+                </div>
+                <div class="kpi-card annee">
+                    <h4>Dotation de l'Exercice</h4>
+                    <div class="value" id="kpi-dotation">0,00 €</div>
+                    <div class="subtext" id="kpi-dotation-sub">Annuité calculée</div>
+                </div>
+            </div>
+
+            <!-- FORMULAIRE SAISIE / EDIT -->
+            <div class="main-card no-print">
+                <div class="card-header-actions">
+                    <h3 id="form-title">➕ Saisir une nouvelle Immobilisation (Calcul Automatique)</h3>
+                    <button class="btn btn-secondary btn-xs" id="btn-cancel-edit" style="display:none;" onclick="resetForm()">Annuler la modification</button>
+                </div>
+
+                <input type="hidden" id="edit-id" value="-1">
+
+                <div class="form-grid">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Libellé / Désignation de l'équipement</label>
+                        <input type="text" id="immo-nom" class="form-control" placeholder="Ex: Tente reception 05*10M PE 450 Blanche" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fournisseur</label>
+                        <input type="text" id="immo-fournisseur" class="form-control" placeholder="Ex: Toolport">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Date d'Acquisition</label>
+                        <input type="date" id="immo-date" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Valeur Achat (€ TTC)</label>
+                        <input type="number" step="0.01" id="immo-valeur" class="form-control" placeholder="571.50" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Durée (Années)</label>
+                        <input type="number" min="1" max="20" id="immo-duree" class="form-control" value="5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Compte Immo (Ex: 2184)</label>
+                        <input type="text" id="immo-compte-immo" class="form-control" value="2184">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Compte Amort. (Ex: 28184)</label>
+                        <input type="text" id="immo-compte-amort" class="form-control" value="28184">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Compte Dotation (Ex: 68112)</label>
+                        <input type="text" id="immo-compte-dotat" class="form-control" value="68112">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Statut du Bien</label>
+                        <select id="immo-statut" class="form-control">
+                            <option value="Actif">🟢 En service (Actif)</option>
+                            <option value="Retourné / Annulé">🔴 Retourné / Avoir (Inactif)</option>
+                        </select>
+                    </div>
+
+                    <!-- JOINDRE FACTURE / PIÈCE JOINTE -->
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Facture / Justificatif d'achat (PDF ou Image)</label>
+                        <input type="file" id="immo-facture-file" class="form-control" accept="image/*,.pdf" onchange="traiterFichierFacture(this)">
+                        <input type="hidden" id="immo-facture-data">
+                        <input type="hidden" id="immo-facture-name">
+                        <div id="immo-facture-preview" style="font-size:0.75rem; color:var(--vert-fonce); margin-top:3px; display:none;"></div>
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Localisation / Remarques</label>
+                        <input type="text" id="immo-notes" class="form-control" placeholder="Dojo Dornois – 38 rue de Decize – 58390 DORNES">
+                    </div>
+
+                    <div>
+                        <button class="btn btn-full" style="width:100%; height:38px;" id="btn-submit" onclick="enregistrerImmo()">💾 Calculer & Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLEAU DES IMMOBILISATIONS -->
+            <div class="main-card">
+                <div class="card-header-actions">
+                    <h3>📋 Tableau Récapitulatif des Immobilisations</h3>
+                    <div style="display:flex; gap:8px;" class="no-print">
+                        <button class="btn btn-blue btn-xs" onclick="imprimerRegistreA4()">🖨️ Imprimer le Registre A4</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Désignation & Fournisseur</th>
+                                <th>Facture</th>
+                                <th>Date Achat</th>
+                                <th>Valeur Achat</th>
+                                <th>Durée</th>
+                                <th>Amort. Cumulé</th>
+                                <th>Valeur Résiduelle</th>
+                                <th>Statut</th>
+                                <th style="text-align:center;" class="no-print">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="immo-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALE IMPRESSION FICHE IMMO -->
+    <div class="modal-overlay" id="immoModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📜 Fiche d'Immobilisation & Amortissement</h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            
+            <div id="modal-summary-content" style="background:#fafafa; padding:14px; border-radius:8px; border:1px solid var(--gris-tres-clair); font-size:0.88rem; line-height:1.5;">
+                <!-- Injecté par JS -->
+            </div>
+
+            <div class="form-group">
+                <label>Format pour Impression PDF :</label>
+                <select id="modal-print-mode" class="form-control">
+                    <option value="complete">📊 Plan d'amortissement complet (Toutes les annuités)</option>
+                    <option value="actuelle">📅 Fiche arrêtée à l'exercice sélectionné</option>
+                </select>
+            </div>
+
+            <div class="table-container" style="max-height: 250px;">
+                <table style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th>Exercice</th>
+                            <th>Annuité d'amortissement</th>
+                            <th>Amortissement cumulé</th>
+                            <th>Valeur résiduelle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-amort-tbody"></tbody>
+                </table>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                <button class="btn btn-secondary" onclick="closeModal()">Fermer</button>
+                <button class="btn btn-blue" onclick="lancerImpressionFicheModal()">🖨️ Générer le PDF Officiel</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // DONNÉES DE BASE
+        const initialImmoData = [
+            {
+                id: 101,
+                code: "IMM-2026-001",
+                nom: "Tente reception 05*10M PE 450 Blanche",
+                fournisseur: "Toolport",
+                date: "2026-06-04",
+                valeur: 571.50,
+                duree: 5,
+                cImmo: "2184",
+                cAmort: "28184",
+                cDotat: "68112",
+                statut: "Actif",
+                factureName: "",
+                factureData: "",
+                notes: "Dojo Dornois – 38 rue de Decize – 58390 DORNES"
+            },
+            {
+                id: 102,
+                code: "IMM-2026-002",
+                nom: "Rafraîchisseur d'Air Star Progetti Brezza FRE80",
+                fournisseur: "Star Progetti",
+                date: "2026-05-20",
+                valeur: 890.00,
+                duree: 5,
+                cImmo: "2184",
+                cAmort: "28184",
+                cDotat: "68112",
+                statut: "Retourné / Annulé",
+                factureName: "",
+                factureData: "",
+                notes: "Retourné le 18/06/2026 – Avoir intégral reçu"
+            }
+        ];
+
+        let immoDB = [];
+        let activeImmoForModal = null;
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+        const TARGET_SHEET = "Immobilisations";
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast success';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3500);
+        }
+
+        function populateYearsSelect() {
+            const select = document.getElementById('select-annee-analyse');
+            const currentYear = new Date().getFullYear();
+            select.innerHTML = '';
+            for(let y = currentYear - 2; y <= currentYear + 6; y++) {
+                const label = `${y}/${y+1}`;
+                select.innerHTML += `<option value="${y}" ${y === 2025 ? 'selected' : ''}>${label}</option>`;
+            }
+        }
+
+        // CONVERSION DU FICHIER EN BASE64 POUR STOCKAGE SANS PERTE
+        function traiterFichierFacture(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            if (file.size > 4 * 1024 * 1024) {
+                alert("Le fichier est un peu lourd (max 4 Mo recommandé). Merci de choisir un document plus léger.");
+                input.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('immo-facture-data').value = e.target.result;
+                document.getElementById('immo-facture-name').value = file.name;
+                
+                const preview = document.getElementById('immo-facture-preview');
+                preview.style.display = "block";
+                preview.innerText = `📄 Fichier prêt : ${file.name}`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveImmoData() {
+            localStorage.setItem('dojo_immo_backup', JSON.stringify(immoDB));
+
+            const packet = {
+                targetSheet: TARGET_SHEET,
+                payload: { immobilisations: immoDB }
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(packet)
+            })
+            .then(() => showToast("✓ Registre des immobilisations synchronisé !"))
+            .catch(err => console.error("Erreur Cloud Immo:", err));
+        }
+
+        function loadImmoData() {
+            fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data && data.immobilisations && data.immobilisations.length > 0) {
+                        immoDB = data.immobilisations;
+                    } else {
+                        useFallbackLocalData();
+                    }
+                    renderAll();
+                })
+                .catch(() => {
+                    useFallbackLocalData();
+                    renderAll();
+                });
+        }
+
+        function useFallbackLocalData() {
+            const backup = localStorage.getItem('dojo_immo_backup');
+            if(backup) {
+                immoDB = JSON.parse(backup);
+            } else {
+                immoDB = JSON.parse(JSON.stringify(initialImmoData));
+            }
+        }
+
+        // MOTEUR DE CALCUL AUTOMATIQUE DE L'AMORTISSEMENT LINÉAIRE AVEC PRORATA
+        function calculAmortissementLineaire(item, targetStartYear) {
+            if(item.statut === "Retourné / Annulé") {
+                return { valeurBrute: 0, amortisCumul: 0, vnc: 0, dotationAnnee: 0, tableau: [] };
+            }
+
+            const buyDate = new Date(item.date);
+            const buyYear = buyDate.getFullYear();
+            const buyMonth = buyDate.getMonth();
+
+            let startExYear = buyMonth >= 8 ? buyYear : buyYear - 1;
+
+            const valeur = parseFloat(item.valeur) || 0;
+            const duree = parseInt(item.duree) || 1;
+            const annuitePleine = valeur / duree;
+
+            let moisRestants = 0;
+            if (buyMonth >= 8) {
+                moisRestants = 12 - (buyMonth - 8);
+            } else {
+                moisRestants = 8 - buyMonth;
+            }
+            if (moisRestants <= 0) moisRestants = 12;
+
+            const premiereAnnuite = Math.round((annuitePleine * (moisRestants / 12)) * 100) / 100;
+            const derniereAnnuite = Math.round((valeur - (premiereAnnuite + (annuitePleine * (duree - 1)))) * 100) / 100;
+
+            let tableau = [];
+            let cumul = 0;
+
+            for(let i = 0; i <= duree; i++) {
+                let exYear = startExYear + i;
+                let annuite = 0;
+
+                if (i === 0) {
+                    annuite = premiereAnnuite;
+                } else if (i < duree) {
+                    annuite = annuitePleine;
+                } else {
+                    annuite = derniereAnnuite;
+                }
+
+                if (annuite <= 0 && i === duree) continue;
+
+                cumul += annuite;
+                let vnc = Math.max(0, valeur - cumul);
+
+                tableau.push({
+                    exercice: `${exYear}/${exYear+1}`,
+                    exStartYear: exYear,
+                    annuite: annuite,
+                    cumul: Math.min(valeur, cumul),
+                    vnc: vnc
+                });
+            }
+
+            let targetRow = tableau.find(t => t.exStartYear === targetStartYear);
+            let amortisCumul = 0;
+            let dotationAnnee = 0;
+            let vncCurrent = valeur;
+
+            if (targetRow) {
+                amortisCumul = targetRow.cumul;
+                dotationAnnee = targetRow.annuite;
+                vncCurrent = targetRow.vnc;
+            } else if (targetStartYear > startExYear + duree) {
+                amortisCumul = valeur;
+                dotationAnnee = 0;
+                vncCurrent = 0;
+            }
+
+            return {
+                valeurBrute: valeur,
+                amortisCumul: amortisCumul,
+                vnc: vncCurrent,
+                dotationAnnee: dotationAnnee,
+                tableau: tableau
+            };
+        }
+
+        function renderAll() {
+            const selectedExYear = parseInt(document.getElementById('select-annee-analyse').value) || 2025;
+            const tbody = document.getElementById('immo-tbody');
+            tbody.innerHTML = '';
+
+            let totalBrut = 0;
+            let totalAmorti = 0;
+            let totalVNC = 0;
+            let totalDotation = 0;
+
+            immoDB.forEach((item, idx) => {
+                const calc = calculAmortissementLineaire(item, selectedExYear);
+
+                if(item.statut === "Actif") {
+                    totalBrut += calc.valeurBrute;
+                    totalAmorti += calc.amortisCumul;
+                    totalVNC += calc.vnc;
+                    totalDotation += calc.dotationAnnee;
+                }
+
+                const dateFr = item.date.split('-').reverse().join('/');
+                const tr = document.createElement('tr');
+
+                const isActif = item.statut === "Actif";
+                const badgeClass = isActif ? (calc.vnc === 0 ? 'badge-amorti' : 'badge-actif') : 'badge-retour';
+                const badgeText = isActif ? (calc.vnc === 0 ? 'Fully Amorti' : '🟢 En Service') : '🔴 Annulé / Avoir';
+
+                let btnFactureHtml = `<span style="color:var(--gris-clair); font-size:0.75rem;">Aucune</span>`;
+                if (item.factureData) {
+                    btnFactureHtml = `<button class="btn btn-secondary btn-xs" style="background:#27ae60;" onclick="ouvrirFacture(${idx})" title="Voir la facture (${item.factureName || 'Document'})">📄 Facture</button>`;
+                }
+
+                tr.innerHTML = `
+                    <td><code>${item.code}</code></td>
+                    <td><strong>${item.nom}</strong><br><span style="font-size:0.75rem; color:var(--gris-moyen);">Fournisseur : ${item.fournisseur || 'Non spécifié'}</span></td>
+                    <td>${btnFactureHtml}</td>
+                    <td>${dateFr}</td>
+                    <td><strong>${item.valeur.toFixed(2)} €</strong></td>
+                    <td>${item.duree} ans</td>
+                    <td style="color:#d35400;">${calc.amortisCumul.toFixed(2)} €</td>
+                    <td style="font-weight:bold; color:${calc.vnc > 0 ? 'var(--vert-fonce)' : 'var(--gris-moyen)'}">${calc.vnc.toFixed(2)} €</td>
+                    <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                    <td style="text-align:center;" class="no-print">
+                        <div style="display:flex; justify-content:center; gap:4px;">
+                            <button class="btn btn-blue btn-xs" onclick="ouvrirModalFiche(${idx})" title="Aperçu / Fiche Amortissement">📊</button>
+                            <button class="btn btn-secondary btn-xs" onclick="editerImmo(${idx})" title="Éditer">✏️</button>
+                            <button class="btn btn-secondary btn-xs" style="background:var(--rouge);" onclick="supprimerImmo(${idx})" title="Supprimer">✕</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('kpi-brut').innerText = totalBrut.toFixed(2) + " €";
+            document.getElementById('kpi-amorti').innerText = totalAmorti.toFixed(2) + " €";
+            document.getElementById('kpi-vnc').innerText = totalVNC.toFixed(2) + " €";
+            document.getElementById('kpi-dotation').innerText = totalDotation.toFixed(2) + " €";
+
+            document.getElementById('kpi-amorti-sub').innerText = `À la fin de l'exercice ${selectedExYear}/${selectedExYear+1}`;
+            document.getElementById('kpi-dotation-sub').innerText = `Dotation exercice ${selectedExYear}/${selectedExYear+1}`;
+        }
+
+        function ouvrirFacture(index) {
+            const item = immoDB[index];
+            if (!item || !item.factureData) return;
+
+            const win = window.open();
+            if (item.factureData.startsWith('data:application/pdf')) {
+                win.document.write(`<iframe src="${item.factureData}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+            } else {
+                win.document.write(`<div style="display:flex; justify-content:center; align-items:center; background:#111; min-height:100vh;"><img src="${item.factureData}" style="max-width:95%; max-height:95vh; border-radius:8px; box-shadow:0 0 20px rgba(0,0,0,0.5);"></div>`);
+            }
+        }
+
+        function enregistrerImmo() {
+            const nom = document.getElementById('immo-nom').value.trim();
+            const fournisseur = document.getElementById('immo-fournisseur').value.trim();
+            const date = document.getElementById('immo-date').value;
+            const valeur = parseFloat(document.getElementById('immo-valeur').value);
+            const duree = parseInt(document.getElementById('immo-duree').value);
+            const cImmo = document.getElementById('immo-compte-immo').value.trim() || "2184";
+            const cAmort = document.getElementById('immo-compte-amort').value.trim() || "28184";
+            const cDotat = document.getElementById('immo-compte-dotat').value.trim() || "68112";
+            const statut = document.getElementById('immo-statut').value;
+            const notes = document.getElementById('immo-notes').value.trim();
+            
+            const factureData = document.getElementById('immo-facture-data').value;
+            const factureName = document.getElementById('immo-facture-name').value;
+
+            const editId = parseInt(document.getElementById('edit-id').value);
+
+            if(!nom || !date || isNaN(valeur) || isNaN(duree)) {
+                alert("Merci de remplir au moins les champs : Libellé, Date d'acquisition, Valeur Achat et Durée.");
+                return;
+            }
+
+            if(editId === -1) {
+                const year = new Date(date).getFullYear();
+                const countNext = immoDB.length + 1;
+                const code = `IMM-${year}-${String(countNext).padStart(3, '0')}`;
+
+                immoDB.push({
+                    id: Date.now(),
+                    code, nom, fournisseur, date, valeur, duree, cImmo, cAmort, cDotat, statut, notes, factureName, factureData
+                });
+            } else {
+                const index = immoDB.findIndex(x => x.id === editId);
+                if(index !== -1) {
+                    immoDB[index].nom = nom;
+                    immoDB[index].fournisseur = fournisseur;
+                    immoDB[index].date = date;
+                    immoDB[index].valeur = valeur;
+                    immoDB[index].duree = duree;
+                    immoDB[index].cImmo = cImmo;
+                    immoDB[index].cAmort = cAmort;
+                    immoDB[index].cDotat = cDotat;
+                    immoDB[index].statut = statut;
+                    immoDB[index].notes = notes;
+                    if (factureData) {
+                        immoDB[index].factureData = factureData;
+                        immoDB[index].factureName = factureName;
+                    }
+                }
+            }
+
+            saveImmoData();
+            resetForm();
+            renderAll();
+        }
+
+        function editerImmo(index) {
+            const item = immoDB[index];
+            document.getElementById('edit-id').value = item.id;
+            document.getElementById('immo-nom').value = item.nom;
+            document.getElementById('immo-fournisseur').value = item.fournisseur || '';
+            document.getElementById('immo-date').value = item.date;
+            document.getElementById('immo-valeur').value = item.valeur;
+            document.getElementById('immo-duree').value = item.duree;
+            document.getElementById('immo-compte-immo').value = item.cImmo || '2184';
+            document.getElementById('immo-compte-amort').value = item.cAmort || '28184';
+            document.getElementById('immo-compte-dotat').value = item.cDotat || '68112';
+            document.getElementById('immo-statut').value = item.statut;
+            document.getElementById('immo-notes').value = item.notes || '';
+            
+            document.getElementById('immo-facture-data').value = item.factureData || '';
+            document.getElementById('immo-facture-name').value = item.factureName || '';
+
+            const preview = document.getElementById('immo-facture-preview');
+            if (item.factureName) {
+                preview.style.display = "block";
+                preview.innerText = `📄 Facture actuelle : ${item.factureName}`;
+            } else {
+                preview.style.display = "none";
+            }
+
+            document.getElementById('form-title').innerText = `✏️ Modifier l'Immobilisation (${item.code})`;
+            document.getElementById('btn-submit').innerText = "💾 Enregistrer les modifications";
+            document.getElementById('btn-cancel-edit').style.display = "inline-flex";
+        }
+
+        function supprimerImmo(index) {
+            if(confirm("Confirmer la suppression de cette fiche d'immobilisation ?")) {
+                immoDB.splice(index, 1);
+                saveImmoData();
+                renderAll();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('edit-id').value = "-1";
+            document.getElementById('immo-nom').value = "";
+            document.getElementById('immo-fournisseur').value = "";
+            document.getElementById('immo-valeur').value = "";
+            document.getElementById('immo-duree').value = "5";
+            document.getElementById('immo-notes').value = "";
+            document.getElementById('immo-facture-file').value = "";
+            document.getElementById('immo-facture-data').value = "";
+            document.getElementById('immo-facture-name').value = "";
+            document.getElementById('immo-facture-preview').style.display = "none";
+            document.getElementById('immo-date').valueAsDate = new Date();
+            document.getElementById('form-title').innerText = "➕ Saisir une nouvelle Immobilisation (Calcul Automatique)";
+            document.getElementById('btn-submit').innerText = "💾 Calculer & Enregistrer";
+            document.getElementById('btn-cancel-edit').style.display = "none";
+        }
+
+        function ouvrirModalFiche(index) {
+            activeImmoForModal = immoDB[index];
+            const item = activeImmoForModal;
+            const targetExYear = parseInt(document.getElementById('select-annee-analyse').value) || 2025;
+            const calc = calculAmortissementLineaire(item, targetExYear);
+
+            let factureStatus = item.factureName ? `<span style="color:var(--vert-fonce); font-weight:bold;">📄 ${item.factureName}</span>` : 'Aucune pièce jointe';
+
+            document.getElementById('modal-summary-content').innerHTML = `
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <div><strong>Libellé :</strong> ${item.nom}</div>
+                    <div><strong>Fournisseur :</strong> ${item.fournisseur || 'N/C'}</div>
+                    <div><strong>Date d'acquisition :</strong> ${item.date.split('-').reverse().join('/')}</div>
+                    <div><strong>Date début amort. :</strong> ${item.date.split('-').reverse().join('/')}</div>
+                    <div><strong>Durée d'amortissement :</strong> ${item.duree} ans</div>
+                    <div><strong>Type amortissement :</strong> Linéaire</div>
+                    <div><strong>Valeur d'achat :</strong> ${item.valeur.toFixed(2)} €</div>
+                    <div><strong>Statut :</strong> ${item.statut}</div>
+                    <div><strong>Compte d'immobilisation :</strong> ${item.cImmo || '2184'}</div>
+                    <div><strong>Compte d'amortissement :</strong> ${item.cAmort || '28184'}</div>
+                    <div><strong>Compte de dotation :</strong> ${item.cDotat || '68112'}</div>
+                    <div><strong>Justificatif d'achat :</strong> ${factureStatus}</div>
+                    <div style="grid-column: span 2;"><strong>Localisation :</strong> ${item.notes || 'Dojo Dornois'}</div>
+                </div>
+            `;
+
+            const tbody = document.getElementById('modal-amort-tbody');
+            tbody.innerHTML = '';
+
+            calc.tableau.forEach(row => {
+                tbody.innerHTML += `
+                    <tr style="${row.exStartYear === targetExYear ? 'background:#ffebef; font-weight:bold;' : ''}">
+                        <td>${row.exercice} ${row.exStartYear === targetExYear ? '👈 (Exercice sélectionné)' : ''}</td>
+                        <td>${row.annuite.toFixed(2)} €</td>
+                        <td>${row.cumul.toFixed(2)} €</td>
+                        <td>${row.vnc.toFixed(2)} €</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('immoModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('immoModal').classList.remove('active');
+        }
+
+        function lancerImpressionFicheModal() {
+            if(!activeImmoForModal) return;
+            const mode = document.getElementById('modal-print-mode').value;
+            const targetExYear = parseInt(document.getElementById('select-annee-analyse').value) || 2025;
+            imprimerFicheImmoPDF(activeImmoForModal, mode, targetExYear);
+        }
+
+        function imprimerFicheImmoPDF(item, mode, targetExYear) {
+            const calc = calculAmortissementLineaire(item, targetExYear);
+            let rowsHtml = '';
+
+            let arrayToDisplay = mode === 'complete' ? calc.tableau : calc.tableau.filter(r => r.exStartYear <= targetExYear);
+
+            arrayToDisplay.forEach(r => {
+                rowsHtml += `
+                    <tr style="${r.exStartYear === targetExYear ? 'font-weight:bold; background:#FFEBEF;' : ''}">
+                        <td>${r.exercice}</td>
+                        <td style="text-align:right;">${r.annuite.toFixed(2)} €</td>
+                        <td style="text-align:right;">${r.cumul.toFixed(2)} €</td>
+                        <td style="text-align:right;">${r.vnc.toFixed(2)} €</td>
+                    </tr>
+                `;
+            });
+
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Fiche Immobilisation — ${item.code}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                    <style>
+                        @page { size: A4 portrait; margin: 15mm; }
+                        body { font-family: 'Roboto', sans-serif; color: #1a1a1a; padding: 0; margin: 0; font-size: 9.5pt; line-height: 1.4; }
+                        
+                        .print-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #C41E3A; padding-bottom: 12px; margin-bottom: 20px; }
+                        .brand-area { display: flex; align-items: center; gap: 14px; }
+                        .print-logo { height: 60px; width: 60px; object-fit: contain; background: #C41E3A; padding: 5px; border-radius: 8px; }
+                        .brand-titles h1 { font-family: 'Fredoka', sans-serif; color: #C41E3A; margin: 0; font-size: 20pt; line-height: 1; text-transform: uppercase; }
+                        .brand-titles p { margin: 4px 0 0 0; font-size: 9pt; color: #6B6B6B; font-weight: 500; }
+                        
+                        .print-club-info { text-align: right; font-size: 8pt; color: #3D3D3D; line-height: 1.35; }
+
+                        .doc-badge { background: #1A1A1A; color: white; display: inline-block; padding: 6px 14px; border-radius: 6px; font-family: 'Fredoka', sans-serif; font-size: 11pt; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 15px; }
+
+                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #F4F6F9; padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #C41E3A; }
+                        .info-item { font-size: 9pt; }
+                        .info-item strong { color: #1A1A1A; display: inline-block; min-width: 170px; }
+
+                        .section-title { font-family: 'Fredoka', sans-serif; font-size: 12pt; color: #1A1A1A; margin: 15px 0 8px 0; border-bottom: 1px solid #E8E8E8; padding-bottom: 4px; }
+                        table.plan-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 9pt; }
+                        table.plan-table th, table.plan-table td { border: 1px solid #E8E8E8; padding: 8px 12px; }
+                        table.plan-table th { background: #1A1A1A; color: white; font-family: 'Fredoka', sans-serif; font-weight: normal; text-align: left; }
+
+                        .print-footer { position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid #E8E8E8; padding-top: 8px; text-align: center; font-size: 8pt; color: #6B6B6B; }
+                    </style>
+                </head>
+                <body>
+
+                    <div class="print-header">
+                        <div class="brand-area">
+                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                            <div class="brand-titles">
+                                <h1>Dojo Dornois</h1>
+                                <p>Registre des Immobilisations & Actifs</p>
+                            </div>
+                        </div>
+                        <div class="print-club-info">
+                            <strong>DOJO DORNOIS</strong><br>
+                            38 rue de Decize, 58390 DORNES &bull; dojodornois@gmail.com<br>
+                            FFJDA n° CE 08.58.067.0 &bull; SIRET 45192841000013 &bull; RNA W583001220
+                        </div>
+                    </div>
+
+                    <div class="doc-badge">Fiche d'Immobilisation — Code : ${item.code}</div>
+
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Libellé du bien :</strong> ${item.nom}</div>
+                        <div class="info-item"><strong>Date début amortissement :</strong> ${item.date.split('-').reverse().join('/')}</div>
+                        <div class="info-item"><strong>Fournisseur :</strong> ${item.fournisseur || 'Toolport'}</div>
+                        <div class="info-item"><strong>Type d'amortissement :</strong> Linéaire</div>
+                        <div class="info-item"><strong>Date d'acquisition :</strong> ${item.date.split('-').reverse().join('/')}</div>
+                        <div class="info-item"><strong>Compte d'immobilisation :</strong> ${item.cImmo || '2184'}</div>
+                        <div class="info-item"><strong>Durée d'amortissement :</strong> ${item.duree} ans</div>
+                        <div class="info-item"><strong>Compte d'amortissement :</strong> ${item.cAmort || '28184'}</div>
+                        <div class="info-item"><strong>Valeur d'achat (TTC) :</strong> ${item.valeur.toFixed(2)} €</div>
+                        <div class="info-item"><strong>Compte de dotation :</strong> ${item.cDotat || '68112'}</div>
+                        <div class="info-item"><strong>Pièce jointe :</strong> ${item.factureName ? '📄 Facture archivée (' + item.factureName + ')' : 'Aucune'}</div>
+                        <div class="info-item"><strong>Localisation :</strong> ${item.notes || 'Dojo Dornois – 38 rue de Decize – 58390 DORNES'}</div>
+                    </div>
+
+                    <div class="section-title">Plan d'Amortissement Récapitulatif</div>
+
+                    <table class="plan-table">
+                        <thead>
+                            <tr>
+                                <th>Exercice Comptable</th>
+                                <th style="text-align:right;">Annuité d'Amortissement</th>
+                                <th style="text-align:right;">Amortissement Cumulé</th>
+                                <th style="text-align:right;">Valeur Résiduelle (VNC)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+
+                    <div class="print-footer">
+                        Dojo Dornois &bull; Extrait Officiel du Registre Comptable &bull; Édité le ${new Date().toLocaleDateString('fr-FR')}
+                    </div>
+
+                    <script>
+                        window.onload = function() { setTimeout(() => { window.print(); window.close(); }, 300); };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            win.document.close();
+        }
+
+        function imprimerRegistreA4() {
+            const selectedExYear = parseInt(document.getElementById('select-annee-analyse').value) || 2025;
+            let rowsHtml = '';
+
+            immoDB.forEach(item => {
+                const calc = calculAmortissementLineaire(item, selectedExYear);
+                rowsHtml += `
+                    <tr>
+                        <td>${item.code}</td>
+                        <td>${item.nom}</td>
+                        <td>${item.fournisseur || '-'}</td>
+                        <td>${item.factureName ? 'Oui' : 'Non'}</td>
+                        <td>${item.date.split('-').reverse().join('/')}</td>
+                        <td style="text-align:right;">${item.valeur.toFixed(2)} €</td>
+                        <td>${item.duree} ans</td>
+                        <td style="text-align:right;">${calc.amortisCumul.toFixed(2)} €</td>
+                        <td style="text-align:right;">${calc.vnc.toFixed(2)} €</td>
+                        <td>${item.statut}</td>
+                    </tr>
+                `;
+            });
+
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Registre des Immobilisations ${selectedExYear}/${selectedExYear+1}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+                    <style>
+                        @page { size: A4 landscape; margin: 12mm; }
+                        body { font-family: 'Roboto', sans-serif; color: #1a1a1a; padding: 0; margin: 0; font-size: 8.5pt; }
+                        .print-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #C41E3A; padding-bottom: 10px; margin-bottom: 15px; }
+                        .print-logo { height: 50px; width: 50px; object-fit: contain; background: #C41E3A; padding: 3px; border-radius: 5px; }
+                        .print-club-info { text-align: right; font-size: 7.5pt; color: #3D3D3D; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 8.5pt; }
+                        th, td { border: 1px solid #E8E8E8; padding: 7px 9px; text-align: left; }
+                        th { background: #1A1A1A; color: white; font-family: 'Fredoka', sans-serif; font-weight: normal; }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-header">
+                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                        <div class="print-club-info">
+                            <strong>DOJO DORNOIS</strong> &bull; 38 rue de Decize, 58390 DORNES &bull; RNA W583001220
+                        </div>
+                    </div>
+                    <h2 style="font-family:'Fredoka',sans-serif; color:#C41E3A; margin:0;">Registre Général des Immobilisations (Exercice ${selectedExYear}/${selectedExYear+1})</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Désignation</th>
+                                <th>Fournisseur</th>
+                                <th>Facture</th>
+                                <th>Achat</th>
+                                <th>Valeur Achat</th>
+                                <th>Durée</th>
+                                <th>Amort. Cumulé</th>
+                                <th>Valeur Résiduelle</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                    <script>
+                        window.onload = function() { setTimeout(() => { window.print(); window.close(); }, 300); };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            win.document.close();
+        }
+
+        window.onload = () => {
+            populateYearsSelect();
+            document.getElementById('immo-date').valueAsDate = new Date();
+            loadImmoData();
+        };
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo Manager — Budget Prévisionnel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --vert: #2ecc71;
+            --vert-fonce: #27ae60;
+            --bleu: #3498db;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; transition: all 0.15s ease; }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--fond); margin: 0; padding: 0; color: var(--gris-fonce); display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- SIDEBAR --- */
+        /* --- SIDEBAR --- */
+        .sidebar { width: var(--sidebar-width); background: var(--noir-doux); color: var(--blanc); display: flex; flex-direction: column; height: 100vh; position: relative; box-shadow: 4px 0 15px rgba(0,0,0,0.1); flex-shrink: 0; }
+        .sidebar-brand { padding: 25px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
+        .brand-logo { width: 45px; height: 45px; object-fit: contain; background: var(--rouge); padding: 4px; border-radius: 6px; }
+        .brand-text h1 { font-family: 'Fredoka', sans-serif; color: var(--blanc); margin: 0; font-size: 1.3rem; letter-spacing: 0.5px; }
+        .brand-text p { margin: 2px 0 0 0; color: var(--gris-clair); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        .sidebar-menu { flex: 1; padding: 20px 15px; overflow-y: auto; }
+        .menu-category { font-size: 0.75rem; text-transform: uppercase; color: var(--gris-moyen); font-weight: bold; letter-spacing: 1px; margin: 20px 0 8px 10px; display: block; }
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+        .sidebar-footer { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.1); font-size: 0.8rem; color: var(--gris-moyen); text-align: center; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .topbar { background: var(--blanc); height: 75px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; }
+        .topbar-title-block h2 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0; font-size: 1.4rem; }
+        .topbar-title-block p { margin: 3px 0 0 0; color: var(--gris-moyen); font-size: 0.85rem; }
+        .app-body { flex: 1; padding: 30px; overflow-y: auto; }
+
+        /* --- CONTROLES & CONFIG --- */
+        .config-banner { display: flex; gap: 20px; background: var(--blanc); padding: 15px 25px; border-radius: 8px; border: 1px solid var(--gris-tres-clair); margin-bottom: 25px; align-items: center; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.85rem; font-weight: bold; color: var(--gris-fonce); }
+        select, input { padding: 8px 12px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 0.9rem; font-family: 'Roboto', sans-serif; }
+        
+        .btn { font-family: 'Roboto', sans-serif; font-weight: bold; padding: 9px 15px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-dark:hover { background: #333; }
+        .btn-danger { background: var(--rouge); color: white; }
+        .btn-danger:hover { background: var(--rouge-hover); }
+        .btn-success { background: var(--vert); color: white; }
+        .btn-success:hover { background: var(--vert-fonce); }
+        .btn-blue { background: var(--bleu); color: white; }
+        .btn-blue:hover { background: #2980b9; }
+
+        /* --- TABLEAU DE BUDGET GENERAL --- */
+        .budget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
+        .budget-column { background: var(--blanc); border-radius: 8px; border: 1px solid var(--gris-tres-clair); padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .column-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 10px; margin-bottom: 15px; }
+        .column-header h3 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.2rem; }
+        .color-charges { color: var(--rouge); }
+        .color-produits { color: var(--vert-fonce); }
+
+        /* Structures de lignes et sous-lignes */
+        .line-group { border: 1px solid var(--gris-tres-clair); border-radius: 6px; margin-bottom: 15px; background: #fafbfc; overflow: hidden; }
+        .line-main-header { display: flex; justify-content: space-between; align-items: center; background: var(--gris-tres-clair); padding: 8px 12px; font-weight: bold; }
+        .line-title-input { font-family: 'Fredoka', sans-serif; font-size: 0.95rem; background: transparent; border: none; font-weight: 600; width: 60%; color: var(--noir-doux); }
+        .line-title-input:focus { background: var(--blanc); outline: 1px solid var(--gris-clair); padding: 2px 5px; }
+        
+        .sub-lines-container { padding: 5px 10px; background: var(--blanc); }
+        .sub-line-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--gris-tres-clair); gap: 10px; }
+        .sub-line-item:last-child { border-bottom: none; }
+        .sub-line-label { border: none; background: transparent; font-size: 0.9rem; flex: 1; }
+        .sub-line-label:focus, .sub-line-val:focus { background: #f0f4f8; outline: none; }
+        .sub-line-val { border: none; background: transparent; font-size: 0.9rem; font-weight: bold; width: 80px; text-align: right; }
+        
+        .line-total-footer { text-align: right; font-size: 0.85rem; padding: 6px 12px; color: var(--gris-moyen); font-weight: 500; background: rgba(0,0,0,0.02); border-top: 1px solid var(--gris-tres-clair); }
+
+        /* Totaux généraux */
+        .grand-total-box { display: flex; justify-content: space-between; align-items: center; font-family: 'Fredoka', sans-serif; font-size: 1.2rem; font-weight: bold; padding: 12px; border-radius: 6px; margin-top: 15px; }
+        .bg-charges { background: #fcebe9; color: var(--rouge); border: 1px solid #f5c6cb; }
+        .bg-produits { background: #e8f8f0; color: var(--vert-fonce); border: 1px solid #c3e6cb; }
+        
+        .balance-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 0.95rem; font-weight: bold; border-radius: 4px; margin-top: 5px; }
+        .result-positive { background: #e8f8f0; color: var(--vert-fonce); }
+        .result-negative { background: #fcebe9; color: var(--rouge); }
+
+        .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: white; padding: 15px; border-radius: 8px; border-left: 4px solid var(--gris-clair); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .kpi-card h4 { margin: 0; font-size: 0.8rem; color: var(--gris-moyen); text-transform: uppercase; }
+        .kpi-card .value { font-family: 'Fredoka', sans-serif; font-size: 1.3rem; margin-top: 5px; font-weight: bold; }
+
+        .action-icon { cursor: pointer; opacity: 0.5; font-size: 0.9rem; border: none; background: transparent; }
+        .action-icon:hover { opacity: 1; }
+
+        /* --- TOAST NOTIFICATIONS SYNC CLOUD --- */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+    <!-- Conteneur d'alertes éphémères -->
+    <div class="toast-container" id="toastContainer"></div>
+
+ <div class="sidebar"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-title-block">
+                <h2>Budget Prévisionnel Annuel</h2>
+                <p>Équilibre des comptes, dépenses prévues et anticipation des recettes de la saison</p>
+            </div>
+            <div>
+                <button class="btn btn-blue" onclick="imprimerBudget()">🖨️ Imprimer le Budget (A4 Paysage)</button>
+                <a href="../index.html" class="btn btn-dark">🏠 Bureau Central</a>
+            </div>
+        </div>
+
+        <div class="app-body">
+            <!-- Configuration Saison -->
+            <div class="config-banner">
+                <div class="form-group" style="min-width: 180px;">
+                    <label>Saison Budgétaire</label>
+                    <select id="select-saison" onchange="changerSaison()">
+                        <option value="2026-2027">Saison 2026-2027</option>
+                        <option value="2027-2028">Saison 2027-2028</option>
+                        <option value="2025-2026">Saison 2025-2026</option>
+                    </select>
+                </div>
+                <div style="flex: 1; text-align: right;">
+                    <button class="btn btn-dark" onclick="ajouterLignePrincipale('charges')">➕ Ligne de Charges</button>
+                    <button class="btn btn-success" onclick="ajouterLignePrincipale('produits')">➕ Ligne de Produits</button>
+                </div>
+            </div>
+
+            <!-- Indicateurs Rapides -->
+            <div class="kpi-row">
+                <div class="kpi-card" style="border-left-color: var(--rouge);">
+                    <h4>Total Charges Prévues</h4>
+                    <div class="value" id="kpi-total-charges" style="color: var(--rouge);">0.00 €</div>
+                </div>
+                <div class="kpi-card" style="border-left-color: var(--vert-fonce);">
+                    <h4>Total Produits Prévus</h4>
+                    <div class="value" id="kpi-total-produits" style="color: var(--vert-fonce);">0.00 €</div>
+                </div>
+                <div class="kpi-card" id="kpi-balance-card" style="border-left-color: var(--bleu);">
+                    <h4>Résultat Prévisionnel</h4>
+                    <div class="value" id="kpi-resultat">0.00 €</div>
+                </div>
+            </div>
+
+            <!-- Grille de Budget Colonnes -->
+            <div class="budget-grid">
+                <!-- COLONNE CHARGES -->
+                <div class="budget-column">
+                    <div class="column-header">
+                        <h3 class="color-charges">🔴 Dépenses (Charges)</h3>
+                    </div>
+                    <div id="container-charges"></div>
+                    <div class="grand-total-box bg-charges">
+                        <span>TOTAL CHARGES</span>
+                        <span id="total-charges-val">0.00 €</span>
+                    </div>
+                    <div id="balance-charges-container"></div>
+                </div>
+
+                <!-- COLONNE PRODUITS -->
+                <div class="budget-column">
+                    <div class="column-header">
+                        <h3 class="color-produits">🟢 Recettes (Produits)</h3>
+                    </div>
+                    <div id="container-produits"></div>
+                    <div class="grand-total-box bg-produits">
+                        <span>TOTAL PRODUITS</span>
+                        <span id="total-produits-val">0.00 €</span>
+                    </div>
+                    <div id="balance-produits-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    let budgetDB = {};
+    let currentSaison = "2026-2027";
+
+    // --- INTERCONNEXION CLOUD GOOGLE SHEETS ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+    const TARGET_SHEET = "budget_previsionnel";
+
+    function showToast(message) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast success';
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 3500);
+    }
+
+    const defaultBudgetExample = {
+        charges: [
+            { id: 1, title: "Frais Généraux & Matériel", subLines: [
+                { id: 101, label: "Licences", value: 4600.00 },
+                { id: 102, label: "Achat Matériel", value: 150.00 },
+                { id: 103, label: "Entretien et equipement", value: 530.00 },
+                { id: 104, label: "Fournitures bureau", value: 200.00 },
+                { id: 105, label: "Entretien et réparation", value: 300.00 },
+                { id: 106, label: "Assurance", value: 530.00 },
+                { id: 107, label: "logiciel kalisport", value: 200.00 },
+                { id: 108, label: "Cotisation ligue", value: 170.00 },
+                { id: 109, label: "Frais banque (commissions kalisport)", value: 150.00 }
+            ]},
+            { id: 2, title: "Enseignement & RH", subLines: [
+                { id: 201, label: "Enseignant (cours + compétitions + formations)", value: 15000.00 }
+            ]},
+            { id: 3, title: "Événements & Communication", subLines: [
+                { id: 301, label: "Fête (gouters + noel + fête famille)", value: 2000.00 },
+                { id: 302, label: "Manifestations (stage / compétition)", value: 200.00 },
+                { id: 303, label: "Cadeaux adhérents", value: 800.00 },
+                { id: 304, label: "Publicité (impression flyers)", value: 155.00 },
+                { id: 305, label: "Frais événements (soirée + calendriers)", value: 4500.00 }
+            ]},
+            { id: 4, title: "Déplacements & Logistique", subLines: [
+                { id: 401, label: "Déplacements certificateur comptes", value: 1800.00 },
+                { id: 402, label: "Achats textiles / équipements", value: 2500.00 }
+            ]}
+        ],
+        produits: [
+            { id: 5, title: "Inscriptions & Adhésions", subLines: [
+                { id: 501, label: "Licences", value: 4508.00 },
+                { id: 502, label: "Cotisations (pass sport compris)", value: 10310.00 }
+            ]},
+            { id: 6, title: "Subventions", subLines: [
+                { id: 601, label: "FDVA", value: 2000.00 },
+                { id: 602, label: "ANS", value: 1000.00 },
+                { id: 603, label: "Dornes", value: 900.00 },
+                { id: 604, label: "Departement", value: 392.00 }
+            ]},
+            { id: 7, title: "Partenariats & Activités Club", subLines: [
+                { id: 701, label: "Sponsoring", value: 500.00 },
+                { id: 702, label: "Locations Dojo (Yoga)", value: 200.00 },
+                { id: 703, label: "Stages vacances Dornes", value: 300.00 },
+                { id: 704, label: "Self défense", value: 300.00 },
+                { id: 705, label: "Sophrologie", value: 350.00 },
+                { id: 706, label: "Evenements", value: 7000.00 }
+            ]},
+            { id: 8, title: "Autres Ressources", subLines: [
+                { id: 801, label: "Dons (kms certificateur comptes)", value: 1800.00 },
+                { id: 802, label: "Ventes textiles / équipements", value: 3000.00 },
+                { id: 803, label: "Intérêts Livret A *", value: 1225.00 }
+            ]}
+        ]
+    };
+
+    function loadBudgetData() {
+        fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && (data["2026-2027"] || data["2025-2026"])) {
+                    budgetDB = data;
+                    console.log("✓ Données budgétaires chargées depuis le Cloud.");
+                } else {
+                    useFallbackLocalData();
+                }
+                finalizeInitialization();
+            })
+            .catch(err => {
+                console.warn("Erreur Cloud Budgétaire, bascule locale:", err);
+                useFallbackLocalData();
+                finalizeInitialization();
+            });
+    }
+
+    function useFallbackLocalData() {
+        const localData = localStorage.getItem('dojo_budget_data');
+        if (localData) {
+            budgetDB = JSON.parse(localData);
+        } else {
+            budgetDB = { "2026-2027": JSON.parse(JSON.stringify(defaultBudgetExample)) };
+            localStorage.setItem('dojo_budget_data', JSON.stringify(budgetDB));
+        }
+    }
+
+    function finalizeInitialization() {
+        currentSaison = document.getElementById('select-saison').value;
+        if (!budgetDB[currentSaison]) {
+            budgetDB[currentSaison] = { charges: [], produits: [] };
+        }
+        calculerEtAfficherTout(false); // Premier rendu sans boucle de push réseau
+    }
+
+    function changerSaison() {
+        currentSaison = document.getElementById('select-saison').value;
+        if (!budgetDB[currentSaison]) {
+            budgetDB[currentSaison] = { charges: [], produits: [] };
+        }
+        calculerEtAfficherTout(false);
+    }
+
+    function sauvegarder(declencherCloud = true) {
+        localStorage.setItem('dojo_budget_data', JSON.stringify(budgetDB));
+        
+        if (declencherCloud) {
+            const packet = {
+                targetSheet: TARGET_SHEET,
+                payload: budgetDB
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(packet)
+            })
+            .then(() => {
+                showToast("✓ Budget prévisionnel synchronisé sur Google Sheets !");
+            })
+            .catch(err => console.error("Erreur de sauvegarde Cloud Budget:", err));
+        }
+    }
+
+    function calculerEtAfficherTout(declencherSauvegarde = true) {
+        const saisonData = budgetDB[currentSaison];
+        
+        renderStructure('charges', saisonData.charges);
+        renderStructure('produits', saisonData.produits);
+
+        let totalCharges = 0;
+        saisonData.charges.forEach(line => {
+            line.subLines.forEach(sub => totalCharges += sub.value);
+        });
+
+        let totalProduits = 0;
+        saisonData.produits.forEach(line => {
+            line.subLines.forEach(sub => totalProduits += sub.value);
+        });
+
+        document.getElementById('total-charges-val').innerText = totalCharges.toLocaleString('fr-FR', {minimumFractionDigits: 2}) + " €";
+        document.getElementById('total-produits-val').innerText = totalProduits.toLocaleString('fr-FR', {minimumFractionDigits: 2}) + " €";
+        document.getElementById('kpi-total-charges').innerText = totalCharges.toLocaleString('fr-FR', {minimumFractionDigits: 2}) + " €";
+        document.getElementById('kpi-total-produits').innerText = totalProduits.toLocaleString('fr-FR', {minimumFractionDigits: 2}) + " €";
+
+        const diff = totalProduits - totalCharges;
+        const kpiResultat = document.getElementById('kpi-resultat');
+        const kpiCard = document.getElementById('kpi-balance-card');
+        const balanceChargesContainer = document.getElementById('balance-charges-container');
+        const balanceProduitsContainer = document.getElementById('balance-produits-container');
+
+        balanceChargesContainer.innerHTML = '';
+        balanceProduitsContainer.innerHTML = '';
+
+        if (Math.abs(diff) < 0.01) {
+            kpiResultat.innerText = "Équilibré (0.00 €)";
+            kpiResultat.style.color = "var(--bleu)";
+            kpiCard.style.borderLeftColor = "var(--bleu)";
+        } else if (diff > 0) {
+            kpiResultat.innerText = "+ " + diff.toLocaleString('fr-FR', {minimumFractionDigits: 2}) + " €";
+            kpiResultat.style.color = "var(--vert-fonce)";
+            kpiCard.style.borderLeftColor = "var(--vert-fonce)";
+            
+            balanceChargesContainer.innerHTML = `
+                <div class="balance-row result-positive">
+                    <span>SOLDE EXCÉDENTAIRE (Équilibre)</span>
+                    <span>${diff.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span>
+                </div>
+            `;
+        } else {
+            const absoluDiff = Math.abs(diff);
+            kpiResultat.innerText = "- " + absoluDiff.toLocaleString('fr-FR', {minimumFractionDigits: 2}) + " €";
+            kpiResultat.style.color = "var(--rouge)";
+            kpiCard.style.borderLeftColor = "var(--rouge)";
+
+            balanceProduitsContainer.innerHTML = `
+                <div class="balance-row result-negative">
+                    <span>SOLDE DÉFICITAIRE (Équilibre)</span>
+                    <span>${absoluDiff.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span>
+                </div>
+            `;
+        }
+
+        if (declencherSauvegarde) {
+            sauvegarder(true);
+        }
+    }
+
+    function renderStructure(type, dataset) {
+        const container = document.getElementById(`container-${type}`);
+        container.innerHTML = '';
+
+        if (dataset.length === 0) {
+            container.innerHTML = `<p style="text-align:center; color:var(--gris-moyen); font-size:0.85rem; padding:15px;">Aucune ligne dans cette section.</p>`;
+            return;
+        }
+
+        dataset.forEach(line => {
+            let lineTotal = 0;
+            line.subLines.forEach(s => lineTotal += s.value);
+
+            let subLinesHtml = '';
+            line.subLines.forEach(sub => {
+                subLinesHtml += `
+                    <div class="sub-line-item">
+                        <input type="text" class="sub-line-label" value="${sub.label}" onchange="modifierSousLigne(${line.id}, ${sub.id}, 'label', this.value)">
+                        <input type="number" step="0.01" class="sub-line-val" value="${sub.value}" onchange="modifierSousLigne(${line.id}, ${sub.id}, 'value', this.value)">
+                        <button class="action-icon" onclick="supprimerSousLigne(${line.id}, ${sub.id})">❌</button>
+                    </div>
+                `;
+            });
+
+            const lineHtml = `
+                <div class="line-group">
+                    <div class="line-main-header">
+                        <input type="text" class="line-title-input" value="${line.title}" onchange="modifierLignePrincipale(${line.id}, this.value)">
+                        <div>
+                            <button class="btn btn-dark" style="padding:2px 6px; font-size:0.75rem;" onclick="ajouterSousLigne(${line.id})">➕ Détail</button>
+                            <button class="action-icon" style="opacity:0.7; margin-left:8px;" onclick="supprimerLignePrincipale('${type}', ${line.id})">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="sub-lines-container">
+                        ${subLinesHtml}
+                    </div>
+                    <div class="line-total-footer">
+                        Sous-total : <strong>${lineTotal.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</strong>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += lineHtml;
+        });
+    }
+
+    function ajouterLignePrincipale(type) {
+        const dataset = budgetDB[currentSaison][type];
+        const newLine = {
+            id: Date.now(),
+            title: type === 'charges' ? "Nouvelle ligne de charge" : "Nouvelle ligne de produit",
+            subLines: []
+        };
+        dataset.push(newLine);
+        calculerEtAfficherTout(true);
+    }
+
+    function modifierLignePrincipale(lineId, newTitle) {
+        ['charges', 'produits'].forEach(type => {
+            const line = budgetDB[currentSaison][type].find(l => l.id === lineId);
+            if (line) line.title = newTitle;
+        });
+        calculerEtAfficherTout(true);
+    }
+
+    function supprimerLignePrincipale(type, lineId) {
+        if(confirm("Supprimer définitivement cette catégorie complète et tout son détail ?")) {
+            budgetDB[currentSaison][type] = budgetDB[currentSaison][type].filter(l => l.id !== lineId);
+            calculerEtAfficherTout(true);
+        }
+    }
+
+    function ajouterSousLigne(lineId) {
+        ['charges', 'produits'].forEach(type => {
+            const line = budgetDB[currentSaison][type].find(l => l.id === lineId);
+            if (line) {
+                line.subLines.push({
+                    id: Date.now(),
+                    label: "Nouveau détail",
+                    value: 0.00
+                });
+            }
+        });
+        calculerEtAfficherTout(true);
+    }
+
+    function modifierSousLigne(lineId, subId, clef, value) {
+        ['charges', 'produits'].forEach(type => {
+            const line = budgetDB[currentSaison][type].find(l => l.id === lineId);
+            if (line) {
+                const sub = line.subLines.find(s => s.id === subId);
+                if (sub) {
+                    if (clef === 'value') sub.value = parseFloat(value) || 0;
+                    else sub[clef] = value;
+                }
+            }
+        });
+        calculerEtAfficherTout(true);
+    }
+
+    function supprimerSousLigne(lineId, subId) {
+        ['charges', 'produits'].forEach(type => {
+            const line = budgetDB[currentSaison][type].find(l => l.id === lineId);
+            if (line) {
+                line.subLines = line.subLines.filter(s => s.id !== subId);
+            }
+        });
+        calculerEtAfficherTout(true);
+    }
+
+    /* --- IMPRESSION COMPLÈTE CORRIGÉE --- */
+    function imprimerBudget() {
+        const saisonData = budgetDB[currentSaison];
+        let totalCharges = 0;
+        let totalProduits = 0;
+
+        let htmlCharges = '';
+        saisonData.charges.forEach(l => {
+            let sTotal = 0;
+            let rows = '';
+            l.subLines.forEach(s => {
+                sTotal += s.value;
+                rows += `<tr><td style="padding-left:20px; color:#555;">${s.label}</td><td style="text-align:right; font-weight:500;">${s.value.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</td></tr>`;
+            });
+            totalCharges += sTotal;
+            htmlCharges += `
+                <tr style="background:#f2f2f2; font-weight:bold;"><td style="font-family:'Fredoka';">${l.title}</td><td style="text-align:right;">${sTotal.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</td></tr>
+                ${rows}
+            `;
+        });
+
+        let htmlProduits = '';
+        saisonData.produits.forEach(l => {
+            let sTotal = 0;
+            let rows = '';
+            l.subLines.forEach(s => {
+                sTotal += s.value;
+                rows += `<tr><td style="padding-left:20px; color:#555;">${s.label}</td><td style="text-align:right; font-weight:500;">${s.value.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</td></tr>`;
+            });
+            totalProduits += sTotal;
+            htmlProduits += `
+                <tr style="background:#f2f2f2; font-weight:bold;"><td style="font-family:'Fredoka';">${l.title}</td><td style="text-align:right;">${sTotal.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</td></tr>
+                ${rows}
+            `;
+        });
+
+        const diff = totalProduits - totalCharges;
+        let balanceHtmlCharges = '';
+        let balanceHtmlProduits = '';
+
+        if (Math.abs(diff) >= 0.01) {
+            if (diff > 0) {
+                balanceHtmlCharges = `<tr style="background:#e8f8f0; font-weight:bold; color:#27ae60;"><td>SOLDE EXCÉDENTAIRE (Équilibre)</td><td style="text-align:right;">${diff.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</td></tr>`;
+            } else {
+                balanceHtmlProduits = `<tr style="background:#fcebe9; font-weight:bold; color:#C41E3A;"><td>SOLDE DÉFICITAIRE (Équilibre)</td><td style="text-align:right;">${Math.abs(diff).toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</td></tr>`;
+            }
+        }
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Budget Prévisionnel — ${currentSaison}</title>
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+                <style>
+                    @page { size: A4 landscape; margin: 10mm; }
+                    body { font-family: 'Roboto', sans-serif; color: #1A1A1A; margin:0; padding:0; font-size:8.5pt; }
+                    .print-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #C41E3A; padding-bottom: 8px; margin-bottom: 15px; }
+                    .print-logo-block { display: flex; align-items: center; gap: 15px; }
+                    .print-logo { height: 55px; }
+                    .print-header-titles h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 14pt; color: #1A1A1A; }
+                    .print-header-titles p { margin: 2px 0 0 0; font-size: 8pt; color: #6B6B6B; font-weight: 500; }
+                    .print-club-info { text-align: right; font-size: 8pt; color: #3D3D3D; line-height: 1.4; }
+                    .grid { display: flex; gap: 20px; }
+                    .col { flex: 1; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 8pt; }
+                    th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #E8E8E8; }
+                    th { background-color: #3D3D3D; color: white; font-family: 'Fredoka', sans-serif; }
+                    .total-row { font-weight: bold; background: #e0e0e0 !important; font-size: 9pt; }
+                    .print-footer { position: fixed; bottom: 0; width: 100%; border-top: 1px solid #E8E8E8; padding-top: 5px; text-align: center; font-size: 7pt; color: #6B6B6B; }
+                </style>
+            </head>
+            <body>
+                <div class="print-header">
+                    <div class="print-logo-block">
+                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                        <div class="print-header-titles">
+                            <h2>BUDGET PRÉVISIONNEL</h2>
+                            <p>Saison Sportive ${currentSaison} &bull; Édité le ${new Date().toLocaleDateString('fr-FR')}</p>
+                        </div>
+                    </div>
+                    <div class="print-club-info">
+                        <strong>DOJO DORNOIS</strong><br>
+                        Association Loi 1901 &bull; RNA : W583001220<br>
+                        Siège : Mairie, 1 Place de la Mairie, 58390 DORNES
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="col">
+                        <table>
+                            <thead><tr><th style="background:#C41E3A;">CHARGES (Dépenses)</th><th style="text-align:right; background:#C41E3A; width:110px;">Montant</th></tr></thead>
+                            <tbody>
+                                ${htmlCharges}
+                                <tr class="total-row"><td>TOTAL GENERAL DES CHARGES</td><td style="text-align:right;">${totalCharges.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</td></tr>
+                                ${balanceHtmlCharges}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col">
+                        <table>
+                            <thead><tr><th style="background:#27ae60;">PRODUITS (Recettes)</th><th style="text-align:right; background:#27ae60; width:110px;">Montant</th></tr></thead>
+                            <tbody>
+                                ${htmlProduits}
+                                <tr class="total-row"><td>TOTAL GENERAL DES PRODUITS</td><td style="text-align:right;">${totalProduits.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</td></tr>
+                                ${balanceHtmlProduits}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="print-footer">
+                    Document budgétaire interne &bull; Dojo Dornois (Dornes) &bull; RNA : W583001220 &bull; Certifié conforme et généré via l'Intranet Assos
+                </div>
+                <script>
+                    window.onload = function() { setTimeout(function() { window.print(); window.close(); }, 250); };
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
+    window.onload = loadBudgetData;
+</script>
+<script src="../js/sidebar.js"></script>
+</body>
+</html>

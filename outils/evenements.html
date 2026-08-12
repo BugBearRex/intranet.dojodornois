@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo Manager — Suivi des Événements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --vert: #2ecc71;
+            --vert-fonce: #27ae60;
+            --bleu: #3498db;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --sidebar-width: 270px;
+        }
+
+        * { box-sizing: border-box; transition: all 0.15s ease; }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--fond); margin: 0; padding: 0; color: var(--gris-fonce); display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: var(--sidebar-width); background: var(--noir-doux); color: var(--blanc); display: flex; flex-direction: column; height: 100%; position: relative; box-shadow: 4px 0 15px rgba(0,0,0,0.1); flex-shrink: 0; }
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .topbar { background: var(--blanc); height: 75px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; }
+        .topbar-title-block h2 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0; font-size: 1.4rem; }
+        .topbar-title-block p { margin: 3px 0 0 0; color: var(--gris-moyen); font-size: 0.85rem; }
+        .app-body { flex: 1; padding: 30px; overflow-y: auto; }
+
+        /* --- CONFIG & FILTRES --- */
+        .config-banner { display: flex; gap: 20px; background: var(--blanc); padding: 15px 25px; border-radius: 8px; border: 1px solid var(--gris-tres-clair); margin-bottom: 25px; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.01); }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.85rem; font-weight: bold; color: var(--gris-fonce); }
+        select, input { padding: 8px 12px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 0.9rem; font-family: 'Roboto', sans-serif; }
+        
+        .btn { font-family: 'Roboto', sans-serif; font-weight: bold; padding: 9px 15px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-dark:hover { background: #333; }
+        .btn-success { background: var(--vert); color: white; }
+        .btn-success:hover { background: var(--vert-fonce); }
+        .btn-blue { background: var(--bleu); color: white; }
+        .btn-blue:hover { background: #2980b9; }
+
+        /* --- BLOC KPIs --- */
+        .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: white; padding: 15px; border-radius: 8px; border-left: 4px solid var(--gris-clair); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .kpi-card h4 { margin: 0; font-size: 0.8rem; color: var(--gris-moyen); text-transform: uppercase; }
+        .kpi-card .value { font-family: 'Fredoka', sans-serif; font-size: 1.3rem; margin-top: 5px; font-weight: bold; }
+
+        /* --- TABLEAU ET LIFECYCLE --- */
+        .table-container { background: var(--blanc); border-radius: 8px; border: 1px solid var(--gris-tres-clair); padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #3D3D3D; color: white; padding: 12px; text-align: left; font-family: 'Fredoka', sans-serif; font-size: 0.95rem; }
+        th:nth-child(2), th:nth-child(3), th:nth-child(4) { text-align: right; }
+        th:last-child { text-align: center; }
+        
+        td { padding: 10px 12px; border-bottom: 1px solid var(--gris-tres-clair); vertical-align: middle; }
+        .input-table { width: 100%; border: 1px solid transparent; background: transparent; padding: 6px; font-size: 0.95rem; border-radius: 4px; }
+        .input-table:focus { border-color: var(--gris-clair); background: #f9fbfd; outline: none; }
+        .input-num { text-align: right; font-weight: 500; }
+        .val-resultat { font-family: 'Fredoka', sans-serif; font-weight: bold; text-align: right; font-size: 1rem; }
+        
+        .res-positive { color: var(--vert-fonce); }
+        .res-negative { color: var(--rouge); }
+        .res-nul { color: var(--bleu); }
+
+        .btn-delete { background: transparent; border: none; cursor: pointer; font-size: 1rem; opacity: 0.4; }
+        .btn-delete:hover { opacity: 1; transform: scale(1.1); }
+
+        /* --- TOAST NOTIFICATIONS SYNC CLOUD --- */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+    <!-- Conteneur d'alertes éphémères -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- CONTENEUR SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-title-block">
+                <h2>Bilan & Suivi des Événements</h2>
+                <p>Visualisation rapide de la rentabilité des manifestations et animations du club</p>
+            </div>
+            <div>
+                <button class="btn btn-blue" onclick="imprimerEvenements()">🖨️ Imprimer le Bilan (A4 Paysage)</button>
+                <a href="../index.html" class="btn btn-dark">🏠 Bureau Central</a>
+            </div>
+        </div>
+
+        <div class="app-body">
+            <div class="config-banner">
+                <div class="form-group" style="min-width: 180px;">
+                    <label>Saison Sportive</label>
+                    <select id="select-saison" onchange="changerSaison()">
+                        <option value="2026-2027">Saison 2026-2027</option>
+                        <option value="2027-2028">Saison 2027-2028</option>
+                        <option value="2025-2026">Saison 2025-2026</option>
+                    </select>
+                </div>
+                <div style="flex: 1; text-align: right;">
+                    <button class="btn btn-success" onclick="ajouterEvenement()">➕ Ajouter une Manifestation / Événement</button>
+                </div>
+            </div>
+
+            <div class="kpi-row">
+                <div class="kpi-card" style="border-left-color: var(--rouge);">
+                    <h4>Total Investi (Coûts)</h4>
+                    <div class="value" id="kpi-total-investi" style="color: var(--rouge);">0.00 €</div>
+                </div>
+                <div class="kpi-card" style="border-left-color: var(--vert-fonce);">
+                    <h4>Total Récolté (Recettes)</h4>
+                    <div class="value" id="kpi-total-recolte" style="color: var(--vert-fonce);">0.00 €</div>
+                </div>
+                <div class="kpi-card" id="kpi-resultat-card" style="border-left-color: var(--bleu);">
+                    <h4>Bénéfice Net Total</h4>
+                    <div class="value" id="kpi-total-benefice">0.00 €</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 45%;">Nom de l'Événement / Manifestation</th>
+                            <th style="width: 16%; text-align: right;">Montant Investi (Coût)</th>
+                            <th style="width: 16%; text-align: right;">Montant Récolté</th>
+                            <th style="width: 16%; text-align: right;">Résultat (Net)</th>
+                            <th style="width: 7%; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-events">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        let dataEvenements = {
+            "2025-2026": [],
+            "2026-2027": [],
+            "2027-2028": []
+        };
+
+        // --- INTERCONNEXION CLOUD GOOGLE SHEETS ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+        const TARGET_SHEET = "evenements";
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast success';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3500);
+        }
+
+        function obtenirSaisonCourante() {
+            return document.getElementById('select-saison').value;
+        }
+
+        function recalculerEtSauvegarder() {
+            const saison = obtenirSaisonCourante();
+            const tbody = document.getElementById('tbody-events');
+            const lignes = tbody.querySelectorAll('tr');
+            
+            let listeSaison = [];
+            let totalCout = 0;
+            let totalRecette = 0;
+            let totalBenefice = 0;
+
+            lignes.forEach(tr => {
+                const nom = tr.querySelector('.event-nom').value.trim();
+                const cout = parseFloat(tr.querySelector('.event-cout').value) || 0;
+                const recette = parseFloat(tr.querySelector('.event-recette').value) || 0;
+                const net = recette - cout;
+
+                const cellNet = tr.querySelector('.val-resultat');
+                if (cellNet) {
+                    cellNet.innerText = net.toFixed(2) + " €";
+                    cellNet.className = "val-resultat";
+                    if (net > 0) cellNet.classList.add('res-positive');
+                    else if (net < 0) cellNet.classList.add('res-negative');
+                    else cellNet.classList.add('res-nul');
+                }
+
+                if (nom !== "") {
+                    listeSaison.push({ nom, cout, recette });
+                    totalCout += cout;
+                    totalRecette += recette;
+                    totalBenefice += net;
+                }
+            });
+
+            dataEvenements[saison] = listeSaison;
+            
+            // Double sécurité : sauvegarde locale
+            localStorage.setItem('dd_events_data', JSON.stringify(dataEvenements));
+
+            document.getElementById('kpi-total-investi').innerText = totalCout.toFixed(2) + " €";
+            document.getElementById('kpi-total-recolte').innerText = totalRecette.toFixed(2) + " €";
+            
+            const cardBenefice = document.getElementById('kpi-total-benefice');
+            const blocCardBenefice = document.getElementById('kpi-resultat-card');
+            cardBenefice.innerText = totalBenefice.toFixed(2) + " €";
+
+            if (totalBenefice > 0) {
+                cardBenefice.style.color = "var(--vert-fonce)";
+                blocCardBenefice.style.borderLeftColor = "var(--vert-fonce)";
+            } else if (totalBenefice < 0) {
+                cardBenefice.style.color = "var(--rouge)";
+                blocCardBenefice.style.borderLeftColor = "var(--rouge)";
+            } else {
+                cardBenefice.style.color = "var(--bleu)";
+                blocCardBenefice.style.borderLeftColor = "var(--bleu)";
+            }
+
+            // Envoi automatique au cloud
+            const packet = {
+                targetSheet: TARGET_SHEET,
+                payload: dataEvenements
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(packet)
+            })
+            .then(() => {
+                showToast("✓ Manifestations synchronisées sur Google Sheets !");
+            })
+            .catch(err => console.error("Erreur de sauvegarde Cloud Manifestations:", err));
+        }
+
+        function chargerEvenementsData() {
+            fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && (data["2025-2026"] || data["2026-2027"])) {
+                        dataEvenements = data;
+                        console.log("✓ Données Événements chargées depuis le Cloud Google.");
+                    } else {
+                        useFallbackLocalData();
+                    }
+                    renderView();
+                })
+                .catch(err => {
+                    console.warn("Erreur Cloud Événements, bascule sur la mémoire locale:", err);
+                    useFallbackLocalData();
+                    renderView();
+                });
+        }
+
+        function useFallbackLocalData() {
+            const backup = localStorage.getItem('dd_events_data');
+            if (backup) {
+                dataEvenements = JSON.parse(backup);
+            } else {
+                dataEvenements = {
+                    "2025-2026": [
+                        { nom: "Première Soirée Dojo Dornois", cout: 450, recette: 1250 },
+                        { nom: "Fête des Familles", cout: 200, recette: 550 }
+                    ],
+                    "2026-2027": [
+                        { nom: "Olympiades du Dojo", cout: 350, recette: 920 },
+                        { nom: "Repas Jambon à la broche", cout: 800, recette: 2100 }
+                    ],
+                    "2027-2028": []
+                };
+            }
+        }
+
+        function renderView() {
+            const saison = obtenirSaisonCourante();
+            const tbody = document.getElementById('tbody-events');
+            tbody.innerHTML = '';
+
+            const liste = dataEvenements[saison] || [];
+            
+            liste.forEach((ev) => {
+                creerLigneHtml(ev.nom, ev.cout, ev.recette);
+            });
+
+            if (liste.length === 0) {
+                creerLigneHtml("", 0, 0);
+            }
+
+            // On met à jour les totaux globaux sans renvoyer un doublon vers le réseau
+            calcularTotauxSimples();
+        }
+
+        function calcularTotauxSimples() {
+            const saison = obtenirSaisonCourante();
+            const liste = dataEvenements[saison] || [];
+            let totalCout = 0; let totalRecette = 0; let totalBenefice = 0;
+
+            const tbody = document.getElementById('tbody-events');
+            const lignes = tbody.querySelectorAll('tr');
+            
+            lignes.forEach(tr => {
+                const cout = parseFloat(tr.querySelector('.event-cout').value) || 0;
+                const recette = parseFloat(tr.querySelector('.event-recette').value) || 0;
+                const net = recette - cout;
+
+                const cellNet = tr.querySelector('.val-resultat');
+                if(cellNet) {
+                    cellNet.innerText = net.toFixed(2) + " €";
+                    cellNet.className = "val-resultat";
+                    if (net > 0) cellNet.classList.add('res-positive');
+                    else if (net < 0) cellNet.classList.add('res-negative');
+                    else cellNet.classList.add('res-nul');
+                }
+                totalCout += cout;
+                totalRecette += recette;
+                totalBenefice += net;
+            });
+
+            document.getElementById('kpi-total-investi').innerText = totalCout.toFixed(2) + " €";
+            document.getElementById('kpi-total-recolte').innerText = totalRecette.toFixed(2) + " €";
+            
+            const cardBenefice = document.getElementById('kpi-total-benefice');
+            const blocCardBenefice = document.getElementById('kpi-resultat-card');
+            cardBenefice.innerText = totalBenefice.toFixed(2) + " €";
+
+            if (totalBenefice > 0) {
+                cardBenefice.style.color = "var(--vert-fonce)";
+                blocCardBenefice.style.borderLeftColor = "var(--vert-fonce)";
+            } else if (totalBenefice < 0) {
+                cardBenefice.style.color = "var(--rouge)";
+                blocCardBenefice.style.borderLeftColor = "var(--rouge)";
+            } else {
+                cardBenefice.style.color = "var(--bleu)";
+                blocCardBenefice.style.borderLeftColor = "var(--bleu)";
+            }
+        }
+
+        function creerLigneHtml(nom, cout, recette) {
+            const tbody = document.getElementById('tbody-events');
+            const tr = document.createElement('tr');
+
+            tr.innerHTML = `
+                <td><input type="text" class="input-table event-nom" value="${nom}" placeholder="Nom de l'activité (ex: Loto, Arbre de Noël...)" /></td>
+                <td><input type="number" class="input-table input-num event-cout" value="${cout}" min="0" step="0.01" /></td>
+                <td><input type="number" class="input-table input-num event-recette" value="${recette}" min="0" step="0.01" /></td>
+                <td class="val-resultat">0.00 €</td>
+                <td style="text-align:center;"><button class="btn-delete" title="Supprimer">❌</button></td>
+            `;
+
+            tr.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', recalculerEtSauvegarder);
+            });
+
+            tr.querySelector('.btn-delete').addEventListener('click', () => {
+                tr.remove();
+                recalculerEtSauvegarder();
+                if (tbody.querySelectorAll('tr').length === 0) {
+                    creerLigneHtml("", 0, 0);
+                    recalculerEtSauvegarder();
+                }
+            });
+
+            tbody.appendChild(tr);
+        }
+
+        function ajouterEvenement() {
+            creerLigneHtml("", 0, 0);
+            recalculerEtSauvegarder();
+            const lignes = document.getElementById('tbody-events').querySelectorAll('tr');
+            if(lignes.length > 0) {
+                lignes[lignes.length - 1].querySelector('.event-nom').focus();
+            }
+        }
+
+        function changerSaison() {
+            renderView();
+        }
+
+        function imprimerEvenements() {
+            const saison = obtenirSaisonCourante();
+            const liste = dataEvenements[saison] || [];
+            
+            let lignesHtml = '';
+            let totalCout = 0;
+            let totalRecette = 0;
+
+            liste.forEach(ev => {
+                const net = ev.recette - ev.cout;
+                totalCout += ev.cout;
+                totalRecette += ev.recette;
+                
+                lignesHtml += `
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #E8E8E8; font-weight: 500;">${ev.nom}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #E8E8E8; text-align: right; font-weight: 500;">${ev.cout.toFixed(2)} €</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #E8E8E8; text-align: right; font-weight: 500;">${ev.recette.toFixed(2)} €</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #E8E8E8; text-align: right; font-weight: bold; color: ${net >= 0 ? '#27ae60' : '#C41E3A'};">
+                            ${net >= 0 ? '+' : ''}${net.toFixed(2)} €
+                        </td>
+                    </tr>`;
+            });
+
+            const netTotal = totalRecette - totalCout;
+            const pDateTexte = "Document généré le " + new Date().toLocaleDateString('fr-FR');
+            
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <!DOCTYPE html>
+                <html lang="fr">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Bilan Manifestations — ${saison}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+                    <style>
+                        @page { size: A4 landscape; margin: 15mm; }
+                        body { font-family: 'Roboto', sans-serif; color: #3D3D3D; margin: 0; padding: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        .print-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E8E8E8; padding-bottom: 15px; margin-bottom: 20px; }
+                        .print-logo { height: 65px; width: 65px; object-fit: contain; background: #C41E3A; padding: 5px; border-radius: 6px; }
+                        .print-club-info { text-align: right; font-size: 0.8rem; color: #6B6B6B; line-height: 1.4; }
+                        .print-club-info strong { color: #1A1A1A; font-size: 0.95rem; font-family: 'Fredoka', sans-serif; }
+                        .title-container { position: relative; margin-bottom: 15px; }
+                        .title-stripe { width: 100%; height: 4px; background: #C41E3A; border-radius: 2px; margin-bottom: 8px; }
+                        .doc-title { font-family: 'Fredoka', sans-serif; color: #1A1A1A; font-size: 1.6rem; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+                        .doc-meta { font-size: 0.85rem; color: #6B6B6B; margin-bottom: 25px; font-weight: 500; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+                        th { background: #3D3D3D; color: white; padding: 12px 10px; text-align: left; font-family: 'Fredoka', sans-serif; font-size: 0.95rem; font-weight: 500; }
+                        th:nth-child(2), th:nth-child(3), th:nth-child(4) { text-align: right; }
+                        .total-row td { background: #F4F6F9; font-weight: bold; font-family: 'Fredoka', sans-serif; font-size: 1.05rem; padding: 14px 10px; border-top: 2px solid #3D3D3D; border-bottom: 2px solid #3D3D3D; }
+                        .print-footer { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; font-size: 0.75rem; color: #B8B8B8; border-top: 1px solid #E8E8E8; padding-top: 10px; font-weight: 500; }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-header">
+                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                        <div class="print-club-info">
+                            <strong>DOJO DORNOIS</strong><br>
+                            1 PL. DE LA MAIRIE, 58390 DORNES | DOJODORNOIS@GMAIL.COM<br>
+                            FFJDA N° CE 08.58.067.0 | SIRET 451 928 410 00013 | RNA W583001220
+                        </div>
+                    </div>
+                    <div class="title-container">
+                        <div class="title-stripe"></div>
+                        <h1 class="doc-title">Bilan Récapitulatif des Manifestations</h1>
+                    </div>
+                    <div class="doc-meta">Saison Sportive : ${saison} &bull; ${pDateTexte}</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 45%;">Nom de l'Événement / Manifestation</th>
+                                <th style="width: 18%; text-align: right;">Montant Investi (Coût)</th>
+                                <th style="width: 18%; text-align: right;">Montant Récolté</th>
+                                <th style="width: 19%; text-align: right;">Résultat Net</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${lignesHtml}
+                            <tr class="total-row">
+                                <td>TOTAL GÉNÉRAL NET</td>
+                                <td style="text-align: right;">${totalCout.toFixed(2)} €</td>
+                                <td style="text-align: right;">${totalRecette.toFixed(2)} €</td>
+                                <td style="text-align: right; color: ${netTotal >= 0 ? '#27ae60':'#C41E3A'};">
+                                    ${netTotal >= 0 ? '+' : ''}${netTotal.toFixed(2)} €
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="print-footer">
+                        Dojo Dornois &bull; Judo & Disciplines Associées &bull; RNA : W583001220 &bull; Extrait officiel certifié conforme à Dornes
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                                window.close();
+                            }, 300);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            win.document.close();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            chargerEvenementsData();
+        });
+
+        window.ajouterEvenement = ajouterEvenement;
+        window.changerSaison = changerSaison;
+        window.imprimerEvenements = imprimerEvenements;
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Suivi & Budget Interventions — Intranet Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --rouge-deep: #8B1429;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --sidebar-width: 280px;
+            --topbar-height: 68px;
+            --status-done: #CAFFBF;
+            --status-todo: #FFADAD;
+            --vert-compta: #2A9D8F;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            margin: 0; padding: 0;
+            color: var(--gris-fonce);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- FIX SIDEBAR DÉBORDEMENT --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        .sidebar * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
+        }
+
+        .topbar {
+            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.04); flex-shrink: 0; z-index: 50;
+        }
+
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); line-height: 1; }
+        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+
+        /* ===== SYSTEME D'ONGLETS ===== */
+        .tabs-header {
+            display: flex; background: var(--blanc); padding: 0 28px; border-bottom: 1px solid var(--gris-tres-clair); gap: 8px; flex-shrink: 0;
+        }
+        .tab-btn {
+            padding: 14px 20px; font-family: 'Fredoka', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--gris-moyen); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 8px;
+        }
+        .tab-btn:hover { color: var(--rouge); background: var(--rouge-clair); }
+        .tab-btn.active { color: var(--rouge); border-bottom-color: var(--rouge); background: transparent; }
+
+        .tab-content {
+            display: none; flex: 1; overflow: hidden;
+        }
+        .tab-content.active {
+            display: flex;
+        }
+
+        .workspace-grid {
+            flex: 1; display: grid; grid-template-columns: 380px 1fr; gap: 24px; padding: 24px 28px; overflow: hidden; width: 100%;
+        }
+
+        .full-workspace {
+            flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px;
+        }
+
+        /* Panneaux */
+        .panel {
+            background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.03); padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto;
+        }
+
+        .panel h3 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0 0 5px 0; font-size: 1.1rem; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--gris-fonce); }
+        .form-control { width: 100%; padding: 8px 12px; border: 1.5px solid var(--gris-tres-clair); border-radius: 7px; font-size: 0.875rem; font-family: 'Roboto', sans-serif; }
+        .form-control:focus { outline: none; border-color: var(--rouge); box-shadow: 0 0 0 3px rgba(196,30,58,0.08); }
+        
+        .btn {
+            background: var(--rouge); color: white; border: none; padding: 10px 16px; border-radius: 7px; cursor: pointer; font-weight: 500; font-size: 0.875rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; text-decoration: none;
+        }
+        .btn:hover { background: var(--rouge-hover); }
+        .btn-secondary { background: var(--gris-moyen); color: white; }
+        .btn-secondary:hover { background: var(--gris-fonce); }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-dark:hover { background: #333; }
+        .btn-full { width: 100%; }
+
+        /* Filtres */
+        .filter-row {
+            display: flex; gap: 12px; background: var(--rouge-clair); padding: 12px; border-radius: 8px; border-left: 4px solid var(--rouge); margin-bottom: 5px; align-items: center;
+        }
+        .filter-row .form-group { flex: 1; margin: 0; }
+
+        /* Tableaux */
+        .table-container { flex: 1; overflow-y: auto; border: 1px solid var(--gris-tres-clair); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        th { background: var(--noir-doux); color: white; padding: 12px; font-weight: 500; position: sticky; top: 0; z-index: 10; }
+        td { padding: 12px; border-bottom: 1px solid var(--gris-tres-clair); background: white; }
+        tr:hover td { background-color: var(--fond); }
+        
+        /* Statuts */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: inline-block; cursor: pointer; }
+        .badge-valide { background: var(--status-done); color: #1e4620; }
+        .badge-prevu { background: var(--status-todo); color: #611a1a; }
+
+        /* Accordéon Notes */
+        .notes-accordion {
+            border: 1px solid var(--gris-tres-clair); border-radius: 6px; margin-top: 10px; overflow: hidden;
+        }
+        .notes-header {
+            background: var(--fond); padding: 10px 14px; font-weight: 500; font-size: 0.85rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;
+        }
+        .notes-content {
+            padding: 12px; display: none; background: white; border-top: 1px solid var(--gris-tres-clair);
+        }
+        .notes-content.open { display: block; }
+
+        /* Budget Styles */
+        .budget-summary-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 10px;
+        }
+        .budget-card {
+            padding: 16px; border-radius: 8px; background: var(--fond); border-left: 4px solid var(--gris-moyen);
+        }
+        .budget-card.prev { border-left-color: #3a86c8; }
+        .budget-card.real { border-left-color: var(--vert-compta); }
+        .budget-card.diff { border-left-color: var(--rouge); }
+        .budget-card h4 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--gris-moyen); text-transform: uppercase; }
+        .budget-card p { margin: 0; font-size: 1.4rem; font-weight: 700; font-family: 'Fredoka', sans-serif; }
+
+        /* GESTIONNAIRE DE NOTES (ONGLET 3) */
+        .note-card {
+            border: 1px solid var(--gris-tres-clair); border-radius: 8px; background: white; overflow: hidden; transition: box-shadow 0.2s; margin-bottom: 12px;
+        }
+        .note-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .note-header-bar {
+            background: var(--fond); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; border-bottom: 1px solid transparent;
+        }
+        .note-card.expanded .note-header-bar { border-bottom-color: var(--gris-tres-clair); }
+        .note-title-text { font-family: 'Fredoka', sans-serif; font-size: 1rem; color: var(--noir-doux); display: flex; align-items: center; gap: 8px; }
+        .note-actions { display: flex; align-items: center; gap: 8px; }
+        .note-body { display: none; padding: 16px; background: white; }
+        .note-card.expanded .note-body { display: block; }
+        
+        .files-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--gris-tres-clair); }
+        .file-chip {
+            display: inline-flex; align-items: center; gap: 6px; background: var(--rouge-clair); color: var(--rouge-deep); padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid rgba(196,30,58,0.2); transition: all 0.15s;
+        }
+        .file-chip:hover { background: var(--rouge); color: white; }
+        .file-chip .remove-file { cursor: pointer; font-weight: bold; margin-left: 6px; opacity: 0.7; padding: 2px 4px; border-radius: 3px; }
+        .file-chip .remove-file:hover { opacity: 1; background: rgba(0,0,0,0.15); }
+
+        /* MODALE POP-UP */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: white; border-radius: 12px; width: 550px; max-width: 90%; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 16px;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 10px; }
+        .modal-header h3 { font-family: 'Fredoka', sans-serif; margin: 0; color: var(--noir-doux); }
+        .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--gris-moyen); }
+
+        /* --- TOAST NOTIFICATIONS SYNC CLOUD --- */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        @media print {
+            body { background: white; padding: 0; color: black; display: block !important; }
+            .no-print, .sidebar, .topbar { display: none !important; }
+            .main-content { padding: 0 !important; overflow: visible !important; }
+            .app-body { display: block !important; margin: 0 !important; padding: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <div class="topbar no-print">
+            <div class="page-title-area">
+                <h2>Espace Éducatif & Scolaire (TER / ANS)</h2>
+                <p>Planification, Restitution budgétaire et Prise de notes</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn" id="main-print-btn" onclick="imprimerFiltres()">🖨️ Imprimer la sélection filtrée</button>
+                <a href="../index.html" class="btn btn-dark">🏠 Central</a>
+            </div>
+        </div>
+
+        <div class="tabs-header no-print">
+            <button class="tab-btn active" onclick="switchTab('tab-suivi', this)">🏫 Suivi des Interventions</button>
+            <button class="tab-btn" onclick="switchTab('tab-budget', this)">💰 Budget Demandé vs Réel</button>
+            <button class="tab-btn" onclick="switchTab('tab-notes', this)">📓 Notes Générales du Projet</button>
+        </div>
+
+        <!-- ================= ONGLET 1 : SUIVI & PLANIFICATION ================= -->
+        <div id="tab-suivi" class="tab-content active">
+            <div class="workspace-grid">
+                <!-- FORMULAIRE -->
+                <div class="panel no-print">
+                    <h3 id="form-panel-title">➕ Ajouter une intervention</h3>
+                    <input type="hidden" id="edit-index" value="-1">
+                    
+                    <div class="form-group">
+                        <label>École</label>
+                        <input type="text" id="inter-ecole" class="form-control" placeholder="Ex: Dornes, Chantenay-Saint-Imbert, Lucenay-lès-Aix, Cossaye" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Classe</label>
+                        <input type="text" id="inter-classe" class="form-control" placeholder="Ex: CP, CE1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Date de l'intervention</label>
+                        <input type="date" id="inter-date" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Heures dispensées</label>
+                        <input type="number" id="inter-heures" class="form-control" value="1" min="0.25" step="0.25" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Professeur référent</label>
+                        <select id="inter-prof" class="form-control">
+                            <option value="Romain">Romain</option>
+                            <option value="Philippe">Philippe</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Statut initial</label>
+                        <select id="inter-statut" class="form-control">
+                            <option value="Prévu">🔴 Prévu (En attente)</option>
+                            <option value="Validé">🟢 Validé (Cours fait)</option>
+                        </select>
+                    </div>
+
+                    <div class="notes-accordion">
+                        <div class="notes-header" onclick="toggleNotesAccordion()">
+                            <span>📓 Notes de Séance (Optionnel)</span>
+                            <span id="accordion-arrow">▼</span>
+                        </div>
+                        <div class="notes-content" id="accordion-content">
+                            <textarea id="inter-notes" class="form-control" placeholder="Remarques spécifiques sur ce cours..." style="height: 100px; resize: vertical;"></textarea>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 10px; display: flex; gap: 8px;">
+                        <button class="btn btn-secondary" id="btn-cancel-edit" style="display:none;" onclick="resetForm()">Annuler</button>
+                        <button class="btn btn-full" id="btn-submit-form" onclick="enregistrerIntervention()">⚡ Valider / Enregistrer</button>
+                    </div>
+                </div>
+
+                <!-- TABLEAU -->
+                <div class="panel" style="overflow: hidden;">
+                    <div class="filter-row no-print">
+                        <div style="font-weight: 600; font-size: 0.85rem; color: var(--rouge); text-transform: uppercase; width: 80px;">Filtrer :</div>
+                        <div class="form-group"><select id="filter-ecole" class="form-control" onchange="renderTable()"><option value="">-- Toutes les Écoles --</option></select></div>
+                        <div class="form-group"><select id="filter-classe" class="form-control" onchange="renderTable()"><option value="">-- Toutes les Classes --</option></select></div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>École</th>
+                                    <th>Classe</th>
+                                    <th>Heures</th>
+                                    <th>Intervenant</th>
+                                    <th>Statut</th>
+                                    <th style="width: 140px;" class="no-print">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="interventions-tbody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding: 10px; background: #fafafa; border-radius: 6px; font-size: 0.85rem; font-weight: 500; display: flex; justify-content: space-between;">
+                        <span>Total Heures Validées (ANS) : <strong id="total-heures" style="color:var(--rouge);">0h</strong></span>
+                        <span>Interventions affichées : <strong id="total-seances">0</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ONGLET 2 : BUDGET COMPLET (ANS) ================= -->
+        <div id="tab-budget" class="tab-content">
+            <div class="full-workspace">
+                <div class="budget-summary-grid">
+                    <div class="budget-card prev">
+                        <h4>Budget Total Demandé</h4>
+                        <p id="b-total-prev">0,00 €</p>
+                    </div>
+                    <div class="budget-card real">
+                        <h4>Budget Total Réel</h4>
+                        <p id="b-total-real">0,00 €</p>
+                    </div>
+                    <div class="budget-card diff">
+                        <h4>Écart / Reste</h4>
+                        <p id="b-total-diff">0,00 €</p>
+                    </div>
+                </div>
+
+                <div style="grid-template-columns: 350px 1fr; gap: 24px; flex: 1; display: grid; overflow: hidden;">
+                    <div class="panel no-print">
+                        <h3>📊 Ligne Budgétaire</h3>
+                        <input type="hidden" id="budget-edit-index" value="-1">
+                        
+                        <div class="form-group">
+                            <label>Poste de dépense / Recette</label>
+                            <input type="text" id="budget-poste" class="form-control" placeholder="Ex: Rémunération intervenants, Matériel pédagogique..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select id="budget-type" class="form-control">
+                                <option value="Dépense">🔺 Dépense</option>
+                                <option value="Recette">🔹 Recette / Subvention</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Montant Demandé / Prévisionnel (€)</label>
+                            <input type="number" id="budget-prev" class="form-control" value="0" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Montant Réel Touché / Engagé (€)</label>
+                            <input type="number" id="budget-real" class="form-control" value="0" min="0" step="0.01" required>
+                        </div>
+                        
+                        <div style="margin-top: 10px; display: flex; gap: 8px;">
+                            <button class="btn btn-secondary" id="btn-cancel-budget" style="display:none;" onclick="resetBudgetForm()">Annuler</button>
+                            <button class="btn btn-full" onclick="enregistrerBudget()">💾 Enregistrer le poste</button>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="overflow: hidden;">
+                        <h3>📋 Tableau de synthèse budgétaire</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Poste</th>
+                                        <th>Type</th>
+                                        <th>Prévisionnel / Demandé</th>
+                                        <th>Réel exécuté</th>
+                                        <th>Écart</th>
+                                        <th style="width: 70px;" class="no-print">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="budget-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ONGLET 3 : PRISE DE NOTES GENERALES MULTI-NOTES ================= -->
+        <div id="tab-notes" class="tab-content">
+            <div class="full-workspace">
+                <div style="grid-template-columns: 380px 1fr; gap: 24px; flex: 1; display: grid; overflow: hidden;">
+                    <!-- FORMULAIRE D'AJOUT / ÉDITION DE NOTE -->
+                    <div class="panel no-print">
+                        <h3 id="note-form-title">➕ Ajouter une note</h3>
+                        <input type="hidden" id="note-edit-id" value="">
+                        
+                        <div class="form-group">
+                            <label>Titre de la note</label>
+                            <input type="text" id="note-title-input" class="form-control" placeholder="Ex: Convention Éducation Nationale, Bilan 2026..." required>
+                        </div>
+                        
+                        <div class="form-group" style="flex:1;">
+                            <label>Contenu de la note</label>
+                            <textarea id="note-content-input" class="form-control" style="height: 180px; resize: vertical;" placeholder="Rédigez le texte de votre note ici..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ajouter une pièce jointe (Optionnel)</label>
+                            <input type="file" id="note-file-input" class="form-control" multiple>
+                        </div>
+
+                        <div style="margin-top: 10px; display: flex; gap: 8px;">
+                            <button class="btn btn-secondary" id="btn-cancel-note" style="display:none;" onclick="resetNoteForm()">Annuler</button>
+                            <button class="btn btn-full" id="btn-save-note" onclick="enregistrerNouvelleNote()">💾 Enregistrer la note</button>
+                        </div>
+                    </div>
+
+                    <!-- LISTE DES NOTES ACCORDÉONS -->
+                    <div class="panel" style="overflow-y: auto;">
+                        <h3>📓 Liste des Notes Générales et Documents Joints</h3>
+                        <div id="notes-container-list">
+                            <!-- Les notes seront générées dynamiquement ici -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= MODALE DE FICHE DE SÉANCE ================= -->
+    <div class="modal-overlay" id="sessionModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title">🥋 Fiche de Séance</h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <input type="hidden" id="modal-index" value="-1">
+            <div class="form-group">
+                <label>École & Classe</label>
+                <input type="text" id="modal-ecole-classe" class="form-control" readonly style="background:#f4f6f9;">
+            </div>
+            <div class="form-group">
+                <label>Date & Intervenant</label>
+                <input type="text" id="modal-date-prof" class="form-control" readonly style="background:#f4f6f9;">
+            </div>
+            <div class="form-group">
+                <label>Statut de la séance</label>
+                <select id="modal-statut" class="form-control">
+                    <option value="Prévu">🔴 Prévu (En attente)</option>
+                    <option value="Validé">🟢 Validé (Cours fait)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Notes & Remarques de Séance</label>
+                <textarea id="modal-notes" class="form-control" style="height: 120px; resize: vertical;" placeholder="Ajouter des notes sur cette séance..."></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+                <button class="btn btn-secondary" onclick="closeModal()">Fermer</button>
+                <button class="btn" onclick="sauvegarderDepuisModal()">💾 Enregistrer les modifications</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        const initialDornesSchedule = [
+            // Période 1 (Maternelle PS/MS) - 0.75h (45 min)
+            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-09-15", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-09-17", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-09-22", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-09-24", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-09-29", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 3/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-10-01", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 3/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-10-06", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 4/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-10-08", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 4/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-10-13", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-10-15", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 10h45 à 11h30" },
+
+            // Période 2 (CP & CE1) - 1h
+            { ecole: "Dornes", classe: "CP (Mme Bonnet)", date: "2026-11-03", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CE1 (M. Fauvre)", date: "2026-11-05", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CP (Mme Bonnet)", date: "2026-11-10", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CE1 (M. Fauvre)", date: "2026-11-12", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CP (Mme Bonnet)", date: "2026-11-17", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 3/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CE1 (M. Fauvre)", date: "2026-11-19", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 3/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CP (Mme Bonnet)", date: "2026-11-24", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 4/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CE1 (M. Fauvre)", date: "2026-11-26", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 4/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CP (Mme Bonnet)", date: "2026-12-01", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CE1 (M. Fauvre)", date: "2026-12-03", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 13h45 à 14h45" },
+
+            // Période 3 (CE2 & GS) - 1h
+            { ecole: "Dornes", classe: "CE2 (Mme Floury)", date: "2027-01-05", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "GS (Mme Chatillon)", date: "2027-01-07", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CE2 (Mme Floury)", date: "2027-01-12", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "GS (Mme Chatillon)", date: "2027-01-14", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CE2 (Mme Floury)", date: "2027-01-19", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 3/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "GS (Mme Chatillon)", date: "2027-01-21", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 3/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CE2 (Mme Floury)", date: "2027-01-26", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 4/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "GS (Mme Chatillon)", date: "2027-01-28", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 4/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CE2 (Mme Floury)", date: "2027-02-02", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "GS (Mme Chatillon)", date: "2027-02-04", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 13h45 à 14h45" },
+
+            // Période 4 (CM1 & CM2) - 1h
+            { ecole: "Dornes", classe: "CM1 (M. Bernard P.)", date: "2027-03-02", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CM2 (Mme Bernard M.)", date: "2027-03-04", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CM1 (M. Bernard P.)", date: "2027-03-09", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CM2 (Mme Bernard M.)", date: "2027-03-11", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CM1 (M. Bernard P.)", date: "2027-03-16", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 3/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CM2 (Mme Bernard M.)", date: "2027-03-18", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 3/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CM1 (M. Bernard P.)", date: "2027-03-23", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 4/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CM2 (Mme Bernard M.)", date: "2027-03-25", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 4/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CM1 (M. Bernard P.)", date: "2027-03-30", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 13h45 à 14h45" },
+            { ecole: "Dornes", classe: "CM2 (Mme Bernard M.)", date: "2027-04-01", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 13h45 à 14h45" }
+        ];
+
+        let scolaireDB = {
+            interventions: [],
+            budgetData: [],
+            notesList: []
+        };
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+        const TARGET_SHEET = "scolaire";
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast success';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3500);
+        }
+
+        function saveScolaireData() {
+            localStorage.setItem('dojo_scolaire_backup', JSON.stringify(scolaireDB));
+
+            const packet = {
+                targetSheet: TARGET_SHEET,
+                payload: scolaireDB
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(packet)
+            })
+            .then(() => {
+                showToast("✓ Données scolaires synchronisées sur Google Sheets !");
+            })
+            .catch(err => console.error("Erreur Cloud Scolaire:", err));
+        }
+
+        function loadScolaireData() {
+            fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        scolaireDB = data;
+                    } else {
+                        useFallbackLocalData();
+                    }
+                    finalizeInitialization();
+                })
+                .catch(err => {
+                    useFallbackLocalData();
+                    finalizeInitialization();
+                });
+        }
+
+        function useFallbackLocalData() {
+            const backup = localStorage.getItem('dojo_scolaire_backup');
+            if(backup) {
+                scolaireDB = JSON.parse(backup);
+            } else {
+                scolaireDB.interventions = JSON.parse(JSON.stringify(initialDornesSchedule));
+                scolaireDB.budgetData = [
+                    { poste: "Subvention demandée ANS", type: "Recette", prev: 1500, real: 1200 },
+                    { poste: "Indemnités encadrement (Romain/Philippe)", type: "Dépense", prev: 1200, real: 1100 },
+                    { poste: "Achat petits matériels (Ceintures, kits)", type: "Dépense", prev: 300, real: 280 }
+                ];
+                scolaireDB.notesList = [
+                    {
+                        id: "note-1",
+                        title: "Notes Générales du Projet",
+                        content: "Saisis ici toutes tes informations transversales relatives aux cycles scolaires.",
+                        expanded: true,
+                        files: []
+                    }
+                ];
+            }
+        }
+
+        function finalizeInitialization() {
+            if (!scolaireDB.interventions || scolaireDB.interventions.length === 0) {
+                scolaireDB.interventions = JSON.parse(JSON.stringify(initialDornesSchedule));
+            }
+            if (!scolaireDB.budgetData || scolaireDB.budgetData.length === 0) {
+                scolaireDB.budgetData = [
+                    { poste: "Subvention demandée ANS", type: "Recette", prev: 1500, real: 1200 },
+                    { poste: "Indemnités encadrement (Romain/Philippe)", type: "Dépense", prev: 1200, real: 1100 },
+                    { poste: "Achat petits matériels (Ceintures, kits)", type: "Dépense", prev: 300, real: 280 }
+                ];
+            }
+            if (!scolaireDB.notesList || !Array.isArray(scolaireDB.notesList)) {
+                scolaireDB.notesList = [];
+                if (scolaireDB.notesGenerales) {
+                    scolaireDB.notesList.push({
+                        id: "note-legacy",
+                        title: "Notes Générales du Projet",
+                        content: scolaireDB.notesGenerales,
+                        expanded: true,
+                        files: []
+                    });
+                }
+            }
+
+            populateSelectFilters();
+            renderTable();
+            renderBudget();
+            renderNotesList();
+            document.getElementById('inter-date').valueAsDate = new Date();
+        }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+
+            const printBtn = document.getElementById('main-print-btn');
+            if (tabId === 'tab-suivi') {
+                printBtn.style.display = "block";
+            } else {
+                printBtn.style.display = "none";
+            }
+        }
+
+        function toggleNotesAccordion(forceOpen = false) {
+            const content = document.getElementById('accordion-content');
+            const arrow = document.getElementById('accordion-arrow');
+            if (forceOpen) {
+                content.classList.add('open');
+                arrow.innerText = "▲";
+            } else {
+                content.classList.toggle('open');
+                arrow.innerText = content.classList.contains('open') ? "▲" : "▼";
+            }
+        }
+
+        function enregistrerIntervention() {
+            const ecole = document.getElementById('inter-ecole').value.trim();
+            const classe = document.getElementById('inter-classe').value.trim();
+            const date = document.getElementById('inter-date').value;
+            const heures = parseFloat(document.getElementById('inter-heures').value);
+            const prof = document.getElementById('inter-prof').value;
+            const statut = document.getElementById('inter-statut').value;
+            const notes = document.getElementById('inter-notes').value.trim();
+            const editIndex = parseInt(document.getElementById('edit-index').value);
+
+            if (!ecole || !classe || !date || isNaN(heures)) {
+                alert("Tous les champs requis doivent être remplis.");
+                return;
+            }
+
+            const data = { ecole, classe, date, heures, prof, statut, notes };
+
+            if (editIndex === -1) scolaireDB.interventions.push(data);
+            else scolaireDB.interventions[editIndex] = data;
+
+            saveScolaireData();
+            resetForm();
+            populateSelectFilters();
+            renderTable();
+        }
+
+        function editerIntervention(index) {
+            const item = scolaireDB.interventions[index];
+            document.getElementById('edit-index').value = index;
+            document.getElementById('inter-ecole').value = item.ecole;
+            document.getElementById('inter-classe').value = item.classe;
+            document.getElementById('inter-date').value = item.date;
+            document.getElementById('inter-heures').value = item.heures;
+            document.getElementById('inter-prof').value = item.prof;
+            document.getElementById('inter-statut').value = item.statut;
+            document.getElementById('inter-notes').value = item.notes || '';
+
+            toggleNotesAccordion(true);
+
+            document.getElementById('form-panel-title').innerText = "✏️ Modifier l'intervention";
+            document.getElementById('btn-submit-form').innerText = "💾 Enregistrer les corrections";
+            document.getElementById('btn-cancel-edit').style.display = "inline-flex";
+        }
+
+        // MODALE POP-UP
+        function ouvrirModalSeance(index, e) {
+            if(e) e.stopPropagation();
+            const item = scolaireDB.interventions[index];
+            document.getElementById('modal-index').value = index;
+            document.getElementById('modal-ecole-classe').value = `${item.ecole} — ${item.classe}`;
+            document.getElementById('modal-date-prof').value = `${item.date.split('-').reverse().join('/')} (${item.heures}h) — Intervenant: ${item.prof}`;
+            document.getElementById('modal-statut').value = item.statut;
+            document.getElementById('modal-notes').value = item.notes || '';
+
+            document.getElementById('sessionModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('sessionModal').classList.remove('active');
+        }
+
+        function sauvegarderDepuisModal() {
+            const index = parseInt(document.getElementById('modal-index').value);
+            if(index !== -1) {
+                scolaireDB.interventions[index].statut = document.getElementById('modal-statut').value;
+                scolaireDB.interventions[index].notes = document.getElementById('modal-notes').value.trim();
+                saveScolaireData();
+                renderTable();
+                closeModal();
+            }
+        }
+
+        function toggleStatutDirect(index, e) {
+            e.stopPropagation();
+            scolaireDB.interventions[index].statut = scolaireDB.interventions[index].statut === "Validé" ? "Prévu" : "Validé";
+            saveScolaireData();
+            renderTable();
+        }
+
+        function supprimerIntervention(index, e) {
+            e.stopPropagation();
+            if(confirm("Supprimer cette ligne ?")) {
+                scolaireDB.interventions.splice(index, 1);
+                saveScolaireData();
+                populateSelectFilters();
+                renderTable();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('edit-index').value = "-1";
+            document.getElementById('inter-ecole').value = "";
+            document.getElementById('inter-classe').value = "";
+            document.getElementById('inter-heures').value = "1";
+            document.getElementById('inter-notes').value = "";
+            document.getElementById('form-panel-title').innerText = "➕ Ajouter une intervention";
+            document.getElementById('btn-submit-form').innerText = "⚡ Valider / Enregistrer";
+            document.getElementById('btn-cancel-edit').style.display = "none";
+        }
+
+        function populateSelectFilters() {
+            const fEcole = document.getElementById('filter-ecole');
+            const fClasse = document.getElementById('filter-classe');
+            const curE = fEcole.value; const curC = fClasse.value;
+
+            const ecoles = [...new Set(scolaireDB.interventions.map(i => i.ecole))];
+            const classes = [...new Set(scolaireDB.interventions.map(i => i.classe))];
+
+            fEcole.innerHTML = '<option value="">-- Toutes les Écoles --</option>';
+            ecoles.forEach(e => fEcole.innerHTML += `<option value="${e}" ${e===curE?'selected':''}>${e}</option>`);
+
+            fClasse.innerHTML = '<option value="">-- Toutes les Classes --</option>';
+            classes.forEach(c => fClasse.innerHTML += `<option value="${c}" ${c===curC?'selected':''}>${c}</option>`);
+        }
+
+        function renderTable() {
+            const selEcole = document.getElementById('filter-ecole').value;
+            const selClasse = document.getElementById('filter-classe').value;
+            const tbody = document.getElementById('interventions-tbody');
+            tbody.innerHTML = '';
+            let totalH = 0; let totalS = 0;
+
+            const sorted = scolaireDB.interventions.map((item, idx) => ({...item, originalIdx: idx}))
+                                       .sort((a,b) => new Date(a.date) - new Date(b.date));
+
+            sorted.forEach(item => {
+                if (selEcole && item.ecole !== selEcole) return;
+                if (selClasse && item.classe !== selClasse) return;
+
+                totalS++;
+                if(item.statut === "Validé") totalH += item.heures;
+
+                const dateFr = item.date.split('-').reverse().join('/');
+                const tr = document.createElement('tr');
+                tr.style.cursor = "pointer";
+                tr.onclick = () => editerIntervention(item.originalIdx);
+
+                tr.innerHTML = `
+                    <td><strong>${dateFr}</strong></td>
+                    <td>${item.ecole}</td>
+                    <td><span class="badge" style="background:#e8e8e8; color:#333;">${item.classe}</span></td>
+                    <td>${item.heures}h</td>
+                    <td>${item.prof}</td>
+                    <td>
+                        <span class="badge ${item.statut === 'Validé' ? 'badge-valide':'badge-prevu'}" onclick="toggleStatutDirect(${item.originalIdx}, event)">
+                            ${item.statut === 'Validé' ? '🟢 Validé':'🔴 Prévu'}
+                        </span>
+                    </td>
+                    <td class="no-print">
+                        <div style="display:flex; gap:4px;">
+                            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="ouvrirModalSeance(${item.originalIdx}, event)" title="Voir / Éditer les notes">👁️</button>
+                            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="supprimerIntervention(${item.originalIdx}, event)" title="Supprimer">✕</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('total-heures').innerText = totalH + "h";
+            document.getElementById('total-seances').innerText = totalS;
+        }
+
+        function renderBudget() {
+            const tbody = document.getElementById('budget-tbody');
+            tbody.innerHTML = '';
+
+            let totalPrevRecettes = 0; let totalRealRecettes = 0;
+            let totalPrevDepenses = 0; let totalRealDepenses = 0;
+
+            scolaireDB.budgetData.forEach((item, idx) => {
+                const prev = parseFloat(item.prev) || 0;
+                const real = parseFloat(item.real) || 0;
+                const ecart = real - prev;
+
+                if(item.type === "Recette") {
+                    totalPrevRecettes += prev; totalRealRecettes += real;
+                } else {
+                    totalPrevDepenses += prev; totalRealDepenses += real;
+                }
+
+                const tr = document.createElement('tr');
+                tr.style.cursor = "pointer";
+                tr.onclick = () => editerBudget(idx);
+                tr.innerHTML = `
+                    <td><strong>${item.poste}</strong></td>
+                    <td style="color: ${item.type === 'Recette' ? 'var(--vert-compta)':'var(--rouge)'}">${item.type === 'Recette' ? '🔹 Recette':'🔺 Dépense'}</td>
+                    <td>${prev.toFixed(2)} €</td>
+                    <td>${real.toFixed(2)} €</td>
+                    <td style="font-weight:bold; color:${ecart >= 0 ? 'green':'red'}">${ecart >= 0 ? '+':''}${ecart.toFixed(2)} €</td>
+                    <td class="no-print"><button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="supprimerBudget(${idx}, event)">✕</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const netPrev = totalPrevRecettes - totalPrevDepenses;
+            const netReal = totalRealRecettes - totalRealDepenses;
+            const netDiff = netReal - netPrev;
+
+            document.getElementById('b-total-prev').innerText = netPrev.toFixed(2) + " €";
+            document.getElementById('b-total-real').innerText = netReal.toFixed(2) + " €";
+            document.getElementById('b-total-diff').innerText = (netDiff >= 0 ? '+': '') + netDiff.toFixed(2) + " €";
+            document.getElementById('b-total-diff').style.color = netDiff >= 0 ? 'var(--vert-compta)' : 'var(--rouge)';
+        }
+
+        function enregistrerBudget() {
+            const poste = document.getElementById('budget-poste').value.trim();
+            const type = document.getElementById('budget-type').value;
+            const prev = parseFloat(document.getElementById('budget-prev').value) || 0;
+            const real = parseFloat(document.getElementById('budget-real').value) || 0;
+            const idx = parseInt(document.getElementById('budget-edit-index').value);
+
+            if(!poste) { alert("Le nom du poste est requis."); return; }
+
+            const obj = { poste, type, prev, real };
+            if(idx === -1) scolaireDB.budgetData.push(obj);
+            else scolaireDB.budgetData[idx] = obj;
+
+            saveScolaireData();
+            resetBudgetForm();
+            renderBudget();
+        }
+
+        function editerBudget(index) {
+            const item = scolaireDB.budgetData[index];
+            document.getElementById('budget-edit-index').value = index;
+            document.getElementById('budget-poste').value = item.poste;
+            document.getElementById('budget-type').value = item.type;
+            document.getElementById('budget-prev').value = item.prev;
+            document.getElementById('budget-real').value = item.real;
+            document.getElementById('btn-cancel-budget').style.display = "inline-flex";
+        }
+
+        function supprimerBudget(index, e) {
+            e.stopPropagation();
+            if(confirm("Supprimer cette ligne budgétaire ?")) {
+                scolaireDB.budgetData.splice(index, 1);
+                saveScolaireData();
+                renderBudget();
+            }
+        }
+
+        function resetBudgetForm() {
+            document.getElementById('budget-edit-index').value = "-1";
+            document.getElementById('budget-poste').value = "";
+            document.getElementById('budget-prev').value = "0";
+            document.getElementById('budget-real').value = "0";
+            document.getElementById('btn-cancel-budget').style.display = "none";
+        }
+
+        /* ================= FONCTIONS DU GESTIONNAIRE DE NOTES (ONGLET 3) ================= */
+
+        function openBase64Document(base64Data, fileName) {
+            try {
+                const arr = base64Data.split(',');
+                const mimeMatch = arr[0].match(/:(.*?);/);
+                const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+                const bstr = atob(arr[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                const blob = new Blob([u8arr], { type: mime });
+                const blobUrl = URL.createObjectURL(blob);
+                
+                const win = window.open(blobUrl, '_blank');
+                if(!win) {
+                    alert("Le navigateur a bloqué la fenêtre surgissante. Veuillez autoriser les pop-ups pour cet intranet.");
+                }
+            } catch(e) {
+                console.error("Erreur ouverture document:", e);
+                alert("Impossible d'ouvrir ce fichier.");
+            }
+        }
+
+        function renderNotesList() {
+            const container = document.getElementById('notes-container-list');
+            container.innerHTML = '';
+
+            if(!scolaireDB.notesList || scolaireDB.notesList.length === 0) {
+                container.innerHTML = `<p style="color: var(--gris-moyen); font-size: 0.9rem; text-align: center; margin-top: 20px;">Aucune note enregistrée. Utilisez le formulaire pour en créer une.</p>`;
+                return;
+            }
+
+            scolaireDB.notesList.forEach((note) => {
+                const isExpanded = note.expanded !== false;
+                
+                const card = document.createElement('div');
+                card.className = `note-card ${isExpanded ? 'expanded' : ''}`;
+                
+                let filesHtml = '';
+                if(note.files && note.files.length > 0) {
+                    filesHtml = `<div class="files-list">`;
+                    note.files.forEach((file, fIdx) => {
+                        filesHtml += `
+                            <div class="file-chip" onclick="openBase64Document('${file.data.replace(/'/g, "\\'")}', '${file.name.replace(/'/g, "\\'")}')" title="Cliquer pour ouvrir le document dans un nouvel onglet">
+                                📎 ${file.name}
+                                <span class="remove-file no-print" onclick="supprimerFichierNote('${note.id}', ${fIdx}, event)" title="Supprimer le fichier">✕</span>
+                            </div>
+                        `;
+                    });
+                    filesHtml += `</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="note-header-bar" onclick="toggleNoteAccordion('${note.id}')">
+                        <div class="note-title-text">
+                            <span>${isExpanded ? '▼' : '►'}</span>
+                            <strong>${note.title || 'Note sans titre'}</strong>
+                        </div>
+                        <div class="note-actions no-print" onclick="event.stopPropagation()">
+                            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.75rem;" onclick="editerNote('${note.id}')" title="Éditer">✏️</button>
+                            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.75rem;" onclick="supprimerNote('${note.id}')" title="Supprimer">✕</button>
+                        </div>
+                    </div>
+                    <div class="note-body">
+                        <div style="white-space: pre-wrap; line-height: 1.5; font-size: 0.9rem;">${note.content || '<em>Aucun contenu textuel</em>'}</div>
+                        ${filesHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleNoteAccordion(noteId) {
+            const note = scolaireDB.notesList.find(n => n.id === noteId);
+            if(note) {
+                note.expanded = !note.expanded;
+                renderNotesList();
+            }
+        }
+
+        async function enregistrerNouvelleNote() {
+            const titleInput = document.getElementById('note-title-input').value.trim();
+            const contentInput = document.getElementById('note-content-input').value.trim();
+            const fileInput = document.getElementById('note-file-input');
+            const noteId = document.getElementById('note-edit-id').value;
+
+            if(!titleInput) {
+                alert("Veuillez saisir un titre pour la note.");
+                return;
+            }
+
+            let filePromises = [];
+            if(fileInput.files.length > 0) {
+                for(let file of fileInput.files) {
+                    filePromises.push(new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            resolve({ name: file.name, data: e.target.result });
+                        };
+                        reader.readAsDataURL(file);
+                    }));
+                }
+            }
+
+            const uploadedFiles = await Promise.all(filePromises);
+
+            if(noteId) {
+                const note = scolaireDB.notesList.find(n => n.id === noteId);
+                if(note) {
+                    note.title = titleInput;
+                    note.content = contentInput;
+                    if(uploadedFiles.length > 0) {
+                        note.files = note.files ? note.files.concat(uploadedFiles) : uploadedFiles;
+                    }
+                }
+            } else {
+                const newNote = {
+                    id: "note-" + Date.now(),
+                    title: titleInput,
+                    content: contentInput,
+                    expanded: true,
+                    files: uploadedFiles
+                };
+                scolaireDB.notesList.unshift(newNote);
+            }
+
+            saveScolaireData();
+            resetNoteForm();
+            renderNotesList();
+        }
+
+        function editerNote(noteId) {
+            const note = scolaireDB.notesList.find(n => n.id === noteId);
+            if(note) {
+                document.getElementById('note-edit-id').value = note.id;
+                document.getElementById('note-title-input').value = note.title;
+                document.getElementById('note-content-input').value = note.content;
+                document.getElementById('note-form-title').innerText = "✏️ Modifier la note";
+                document.getElementById('btn-save-note').innerText = "💾 Enregistrer la note";
+                document.getElementById('btn-cancel-note').style.display = "inline-flex";
+            }
+        }
+
+        function supprimerNote(noteId) {
+            if(confirm("Voulez-vous vraiment supprimer cette note ?")) {
+                scolaireDB.notesList = scolaireDB.notesList.filter(n => n.id !== noteId);
+                saveScolaireData();
+                renderNotesList();
+            }
+        }
+
+        function supprimerFichierNote(noteId, fileIndex, e) {
+            e.stopPropagation();
+            e.preventDefault();
+            const note = scolaireDB.notesList.find(n => n.id === noteId);
+            if(note && note.files) {
+                note.files.splice(fileIndex, 1);
+                saveScolaireData();
+                renderNotesList();
+            }
+        }
+
+        function resetNoteForm() {
+            document.getElementById('note-edit-id').value = "";
+            document.getElementById('note-title-input').value = "";
+            document.getElementById('note-content-input').value = "";
+            document.getElementById('note-file-input').value = "";
+            document.getElementById('note-form-title').innerText = "➕ Ajouter une note";
+            document.getElementById('btn-save-note').innerText = "💾 Enregistrer la note";
+            document.getElementById('btn-cancel-note').style.display = "none";
+        }
+
+        function imprimerFiltres() {
+            const selEcole = document.getElementById('filter-ecole').value;
+            const selClasse = document.getElementById('filter-classe').value;
+            let titreFiltre = "Registre Global des Interventions";
+            if(selEcole || selClasse) titreFiltre = `Registre : ${selEcole ? 'École de ' + selEcole : ''} ${selClasse ? '[' + selClasse + ']' : ''}`;
+
+            let lignesHtml = ''; let totalHPrint = 0;
+            scolaireDB.interventions.forEach(item => {
+                if (selEcole && item.ecole !== selEcole) return;
+                if (selClasse && item.classe !== selClasse) return;
+                if(item.statut === "Validé") totalHPrint += item.heures;
+                lignesHtml += `<tr><td>${item.date.split('-').reverse().join('/')}</td><td>${item.ecole}</td><td>${item.classe}</td><td>${item.heures}h</td><td>${item.prof}</td><td>${item.statut}</td><td>${item.notes || '-'}</td></tr>`;
+            });
+
+            const win = window.open('', '_blank');
+            win.document.write(`<html><head><title>Impression</title><style>body{font-family:sans-serif;padding:30px;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background:#1a1a1a;color:#fff;}</style></head><body><h2>${titreFiltre}</h2><table><thead><tr><th>Date</th><th>École</th><th>Classe</th><th>Heures</th><th>Intervenant</th><th>Statut</th><th>Notes</th></tr></thead><tbody>${lignesHtml}</tbody></table><h3>Total heures validées : ${totalHPrint}h</h3></body></html>`);
+            win.document.close();
+            win.print();
+        }
+
+        window.onload = loadScolaireData;
+
+        window.switchTab = switchTab;
+        window.toggleNotesAccordion = toggleNotesAccordion;
+        window.enregistrerIntervention = enregistrerIntervention;
+        window.editerIntervention = editerIntervention;
+        window.ouvrirModalSeance = ouvrirModalSeance;
+        window.closeModal = closeModal;
+        window.sauvegarderDepuisModal = sauvegarderDepuisModal;
+        window.toggleStatutDirect = toggleStatutDirect;
+        window.supprimerIntervention = supprimerIntervention;
+        window.resetForm = resetForm;
+        window.renderTable = renderTable;
+        window.enregistrerBudget = enregistrerBudget;
+        window.editerBudget = editerBudget;
+        window.supprimerBudget = supprimerBudget;
+        window.resetBudgetForm = resetBudgetForm;
+        window.enregistrerNouvelleNote = enregistrerNouvelleNote;
+        window.editerNote = editerNote;
+        window.supprimerNote = supprimerNote;
+        window.supprimerFichierNote = supprimerFichierNote;
+        window.toggleNoteAccordion = toggleNoteAccordion;
+        window.resetNoteForm = resetNoteForm;
+        window.openBase64Document = openBase64Document;
+        window.imprimerFiltres = imprimerFiltres;
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title id="page-title">Générateur de Relevé de Prestations - Romain Flammang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F5F5F5;
+            --blanc: #FFFFFF;
+            --sidebar-width: 280px;
+            --topbar-height: 68px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--fond); 
+            margin: 0; padding: 0; 
+            color: var(--gris-fonce); 
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        .sidebar * { max-width: 100%; box-sizing: border-box; }
+
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
+        }
+
+        .topbar {
+            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; z-index: 50;
+        }
+
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); }
+        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+
+        .btn-dark { background: var(--noir-doux); color: white; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; transition: background 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-dark:hover { background: var(--rouge); }
+
+        .app-body {
+            flex: 1; padding: 24px 28px; overflow-y: auto;
+        }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .panel { background: var(--blanc); padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 4px solid var(--rouge); }
+        
+        h2, h3 { font-family: 'Fredoka', sans-serif; color: var(--rouge); margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        
+        .config-visuels { background-color: #FFF5F5; border: 1px dashed var(--rouge); border-radius: 6px; padding: 15px; margin-bottom: 20px; }
+        .config-title { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .upload-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .upload-box { background: white; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px; }
+        .preview-mini { max-height: 45px; display: block; margin-top: 6px; border: 1px solid var(--gris-tres-clair); padding: 2px; }
+
+        .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .full-width { grid-column: span 2; }
+        
+        label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 0.85rem; color: var(--gris-fonce); }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid var(--gris-clair); border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        
+        /* GESTION DES LIGNES DYNAMIQUES */
+        .lines-builder { background: #FAFAFA; border: 1px solid var(--gris-tres-clair); border-radius: 6px; padding: 12px; margin-bottom: 15px; }
+        .line-item { display: grid; grid-template-columns: 110px 1fr 110px 35px; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .line-item select, .line-item input { padding: 6px 8px; font-size: 0.85rem; }
+        .btn-del { background: #E74C3C; color: white; border: none; border-radius: 4px; height: 34px; cursor: pointer; font-weight: bold; }
+        .btn-add-line { background: #27AE60; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+        .btn-add-deduction { background: var(--rouge); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+
+        .btn-container { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; transition: background 0.2s; }
+        .btn-primary { background-color: var(--rouge); color: white; }
+        .btn-primary:hover { background-color: var(--rouge-hover); }
+        
+        #preview-zone { background: var(--blanc); padding: 40px; border: 1px solid var(--gris-clair); border-radius: 4px; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
+        
+        /* En-tête Impression */
+        .print-header-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border-bottom: 2px solid var(--gris-tres-clair); }
+        .print-header-table td { vertical-align: top; border: none; padding-bottom: 12px; font-size: 9.5pt; line-height: 1.4; }
+        .emitter-cell { width: 40%; text-align: left; }
+        .receiver-cell { width: 40%; text-align: left; padding-left: 15px; border-left: 2px solid var(--gris-tres-clair); }
+        .doc-num-cell { text-align: right; width: 20%; vertical-align: top; }
+        
+        .emitter-title { font-family: 'Fredoka', sans-serif; font-size: 13pt; color: var(--rouge); margin-bottom: 4px; }
+        .receiver-title { font-weight: bold; font-size: 10pt; color: var(--gris-fonce); margin-bottom: 4px; text-transform: uppercase; }
+        
+        .doc-num { font-weight: bold; font-size: 9pt; background: #F5F5F5; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--gris-tres-clair); display: inline-block; white-space: nowrap; text-align: center; }
+        .doc-num .ref-label { font-size: 7.5pt; color: var(--gris-moyen); display: block; text-transform: uppercase; font-weight: normal; margin-bottom: 2px; }
+        .doc-num .ref-value { color: var(--rouge); font-size: 9.5pt; }
+
+        .doc-title-container { text-align: center; margin: 15px 0; border-top: 1px dashed var(--rouge); border-bottom: 1px dashed var(--rouge); padding: 10px 0; width: 100%; }
+        .doc-title { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 14pt; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .intro-text { font-size: 10pt; line-height: 1.45; margin-bottom: 18px; text-align: justify; }
+        
+        /* Tableaux */
+        .prestations-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+        .prestations-table th { background: var(--rouge); color: white; font-weight: bold; padding: 9px; font-size: 9.5pt; text-transform: uppercase; border: 1px solid var(--rouge); text-align: left; }
+        .prestations-table td { padding: 9px; border: 1px solid var(--gris-tres-clair); font-size: 10pt; text-align: left; }
+        .text-right { text-align: right !important; }
+        
+        .row-total { font-weight: bold; background: #FAFAFA; }
+        .row-deduction { color: var(--rouge); font-weight: 500; }
+        .final-net { font-size: 12pt; color: var(--rouge); font-weight: bold; background: #FFF5F5 !important; border: 2px solid var(--rouge) !important; }
+
+        .obs-block { background: #FAFAFA; border-left: 3px solid var(--rouge); padding: 10px 12px; margin: 18px 0; font-size: 9.5pt; line-height: 1.4; border-radius: 0 4px 4px 0; }
+        .obs-title { font-weight: bold; text-transform: uppercase; font-size: 9pt; color: var(--rouge); margin-bottom: 4px; }
+        
+        .fait-a-ligne { font-size: 10.5pt; text-align: left; margin-top: 20px; margin-bottom: 20px; }
+        
+        /* Zone Signature & Tampons */
+        .sig-container-table { width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed; }
+        .sig-container-table td { border: none; vertical-align: middle; padding: 0 5px; }
+        .tampon-cell { text-align: left; width: 38%; }
+        .tampon-paye-cell { text-align: center; width: 24%; }
+        .box-cell { text-align: right; width: 38%; }
+        
+        /* TAILLE DES TAMPONS */
+        .print-tampon, .print-signature-stamp { 
+            max-height: 110px; 
+            max-width: 100%; 
+            object-fit: contain; 
+            mix-blend-mode: multiply; 
+            display: inline-block; 
+        }
+        
+        .print-tampon-paye { 
+            max-height: 85px; 
+            max-width: 100%; 
+            object-fit: contain; 
+            mix-blend-mode: multiply; 
+            display: inline-block; 
+        }
+        
+        .print-footer { width: 100%; text-align: center; margin-top: 35px; padding-top: 12px; border-top: 1px solid var(--gris-tres-clair); font-size: 8.5pt; color: var(--gris-moyen); font-style: italic; }
+
+        @page {
+            size: A4;
+            margin: 12mm 15mm 12mm 15mm;
+        }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            html, body { background: white !important; padding: 0 !important; margin: 0 !important; width: 100% !important; height: auto !important; overflow: visible !important; }
+            .no-print, .sidebar, .topbar { display: none !important; }
+            .main-content { padding: 0 !important; overflow: visible !important; height: auto !important; }
+            .app-body { display: block !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; }
+            .dashboard-grid { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            #preview-zone { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+            
+            .doc-num { border: 1px solid var(--gris-clair) !important; background: #F5F5F5 !important; }
+            .prestations-table th { background: var(--rouge) !important; color: white !important; }
+            .row-total td { background: #FAFAFA !important; }
+            .final-net td { background: #FFF5F5 !important; border: 2px solid var(--rouge) !important; }
+            .obs-block { background: #FAFAFA !important; border-left: 3px solid var(--rouge) !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="topbar no-print">
+            <div class="page-title-area">
+                <h2>Relevés de Prestations Romain Flammang</h2>
+                <p>Édition et calcul des indemnités de l'éducateur sportif</p>
+            </div>
+            <a href="../index.html" class="btn-dark">🏠 Central</a>
+        </div>
+
+        <div class="app-body">
+            <div class="dashboard-grid">
+                
+                <div class="panel no-print">
+                    <div class="config-visuels">
+                        <div class="config-title">💾 Visuels Officiels du Club (Mémorisés)</div>
+                        <div class="upload-grid">
+                            <div class="upload-box">
+                                <label>印 Tampon Club :</label>
+                                <input type="file" id="upload-tampon" accept="image/*" onchange="sauvegarderVisuel('tampon')">
+                                <img id="mini-tampon" class="preview-mini" src="" style="display:none;">
+                            </div>
+                            <div class="upload-box">
+                                <label>💳 Tampon Payé :</label>
+                                <input type="file" id="upload-tampon-paye" accept="image/*" onchange="sauvegarderVisuel('tampon_paye')">
+                                <img id="mini-tampon-paye" class="preview-mini" src="" style="display:none;">
+                            </div>
+                            <div class="upload-box">
+                                <label>✍️ Tampon Signature :</label>
+                                <input type="file" id="upload-sig-stamp" accept="image/*" onchange="sauvegarderVisuel('sig_stamp')">
+                                <img id="mini-sig-stamp" class="preview-mini" src="" style="display:none;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>⚙️ Paramètres du Relevé</h3>
+                    <div class="form-group">
+                        <div>
+                            <label>Saison sportive :</label>
+                            <select id="saison" onchange="actualiserReference()">
+                                <option value="2526">Saison 2025-2026 (2526)</option>
+                                <option value="2627" selected>Saison 2026-2027 (2627)</option>
+                                <option value="2728">Saison 2027-2028 (2728)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Référence Unique :</label>
+                            <input type="text" id="ref_document" value="DD-2627-JUL-RF" oninput="genererApercu()">
+                        </div>
+
+                        <div class="full-width">
+                            <label>Structure de rémunération :</label>
+                            <select id="mode_remun" onchange="basculerModeModele()">
+                                <option value="detail">Saison Actuelle (Lignes détaillées sur-mesure)</option>
+                                <option value="fixe">Saison Prochaine (Forfait Fixe + Extras/Retenues)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Période / Mois concerné :</label>
+                            <input type="text" id="periode" value="Juillet 2026" oninput="actualiserReference()">
+                        </div>
+                        <div>
+                            <label>Date d'édition :</label>
+                            <input type="text" id="date_edition" value="31/07/2026" oninput="genererApercu()">
+                        </div>
+                        
+                        <!-- DETAIL DES LIGNES DYNAMIQUES -->
+                        <div class="full-width">
+                            <label style="margin-bottom:8px; color:var(--rouge);">📝 Désignation des prestations et régulations :</label>
+                            <div class="lines-builder">
+                                <div id="lines-container"></div>
+                                <div style="display:flex; gap:8px; margin-top:8px;">
+                                    <button type="button" class="btn-add-line" onclick="ajouterLigne('ajout', '', '')">➕ Ajouter une Prestation</button>
+                                    <button type="button" class="btn-add-deduction" onclick="ajouterLigne('retenue', '', '')">➖ Ajouter une Déduction / Retenue</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="full-width">
+                            <label>Observations / Notes complémentaires :</label>
+                            <textarea id="observations" rows="3" oninput="genererApercu()">Calcul des indemnités basé sur le calendrier d'interventions validé par le comité de direction.</textarea>
+                        </div>
+                        <div class="full-width">
+                            <label>Mode de règlement prévu :</label>
+                            <input type="text" id="reglement" value="Virement bancaire sous 30 jours" oninput="genererApercu()">
+                        </div>
+                    </div>
+                    
+                    <div class="btn-container">
+                        <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimer / Sauvegarder PDF</button>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="no-print">📄 Aperçu du Relevé Officiel</h3>
+                    <div id="preview-zone">
+                        <div id="render-target"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let imgTampon = localStorage.getItem('club_tampon') || '';
+        let imgTamponPaye = localStorage.getItem('club_tampon_paye') || '';
+        let imgTamponSignature = localStorage.getItem('club_tampon_signature') || '';
+
+        // Lignes par défaut (Saison Actuelle)
+        let lignesPrestations = [
+            { type: 'ajout', desc: 'Séance Juin judo', montant: 1100.00 },
+            { type: 'ajout', desc: 'Challenge Taiso', montant: 25.00 },
+            { type: 'ajout', desc: 'Self Defense', montant: 25.00 },
+            { type: 'ajout', desc: 'Jujitsu (2 interventions)', montant: 50.00 }
+        ];
+
+        function sauvegarderVisuel(type) {
+            let inputId = 'upload-tampon';
+            if (type === 'tampon_paye') inputId = 'upload-tampon-paye';
+            if (type === 'sig_stamp') inputId = 'upload-sig-stamp';
+
+            const file = document.getElementById(inputId).files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (type === 'tampon') { imgTampon = e.target.result; localStorage.setItem('club_tampon', imgTampon); }
+                else if (type === 'tampon_paye') { imgTamponPaye = e.target.result; localStorage.setItem('club_tampon_paye', imgTamponPaye); }
+                else if (type === 'sig_stamp') { imgTamponSignature = e.target.result; localStorage.setItem('club_tampon_signature', imgTamponSignature); }
+                majMinis(); genererApercu();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function majMinis() {
+            if (imgTampon) { document.getElementById('mini-tampon').src = imgTampon; document.getElementById('mini-tampon').style.display = 'block'; }
+            if (imgTamponPaye) { document.getElementById('mini-tampon-paye').src = imgTamponPaye; document.getElementById('mini-tampon-paye').style.display = 'block'; }
+            if (imgTamponSignature) { document.getElementById('mini-sig-stamp').src = imgTamponSignature; document.getElementById('mini-sig-stamp').style.display = 'block'; }
+        }
+
+        function actualiserReference() {
+            const saison = document.getElementById('saison').value;
+            const periode = document.getElementById('periode').value.trim();
+            
+            // Extrait les 3 premières lettres du mois en majuscule
+            let moisCourt = periode.substring(0, 3).toUpperCase();
+            if (!moisCourt) moisCourt = 'MOIS';
+
+            const ref = `DD-${saison}-${moisCourt}-RF`;
+            document.getElementById('ref_document').value = ref;
+            genererApercu();
+        }
+
+        function afficherLignesBuilder() {
+            const container = document.getElementById('lines-container');
+            container.innerHTML = '';
+            lignesPrestations.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'line-item';
+                div.innerHTML = `
+                    <select onchange="updateLigne(${index}, 'type', this.value)">
+                        <option value="ajout" ${item.type === 'ajout' ? 'selected' : ''}>➕ Prestation</option>
+                        <option value="retenue" ${item.type === 'retenue' ? 'selected' : ''}>➖ Retenue</option>
+                    </select>
+                    <input type="text" placeholder="Description de la prestation / motif" value="${item.desc}" oninput="updateLigne(${index}, 'desc', this.value)">
+                    <input type="number" step="0.01" placeholder="Montant (€)" value="${item.montant}" oninput="updateLigne(${index}, 'montant', this.value)">
+                    <button class="btn-del" onclick="supprimerLigne(${index})">🗑️</button>
+                `;
+                container.appendChild(div);
+            });
+            genererApercu();
+        }
+
+        function ajouterLigne(type = 'ajout', desc = '', montant = 0) {
+            lignesPrestations.push({ type, desc, montant });
+            afficherLignesBuilder();
+        }
+
+        function supprimerLigne(index) {
+            lignesPrestations.splice(index, 1);
+            afficherLignesBuilder();
+        }
+
+        function updateLigne(index, field, value) {
+            if (field === 'montant') value = parseFloat(value) || 0;
+            lignesPrestations[index][field] = value;
+            genererApercu();
+        }
+
+        function basculerModeModele() {
+            const mode = document.getElementById('mode_remun').value;
+            if (mode === 'fixe') {
+                lignesPrestations = [
+                    { type: 'ajout', desc: 'Forfait Mensuel Fixe Tout Inclus (Cours, stages, tournois)', montant: 1250.00 }
+                ];
+            } else {
+                lignesPrestations = [
+                    { type: 'ajout', desc: 'Séance Judo - Période de ' + document.getElementById('periode').value, montant: 1100.00 },
+                    { type: 'ajout', desc: 'Stages / Animations complémentaires', montant: 100.00 }
+                ];
+            }
+            afficherLignesBuilder();
+        }
+
+        function formatEuro(val) {
+            return parseFloat(val).toFixed(2) + " €";
+        }
+
+        function genererApercu() {
+            const refDoc = document.getElementById('ref_document').value || 'DD-RELEVE-RF';
+            const periode = document.getElementById('periode').value;
+            const date_edition = document.getElementById('date_edition').value;
+            const observations = document.getElementById('observations').value;
+            const reglement = document.getElementById('reglement').value;
+
+            // Met à jour le titre de la page pour le nom par défaut du fichier PDF d'impression
+            document.title = refDoc;
+
+            let tableauLignesHtml = "";
+            let totalBrut = 0;
+            let totalRetenues = 0;
+
+            lignesPrestations.forEach(item => {
+                const val = parseFloat(item.montant) || 0;
+                if (item.type === 'ajout') {
+                    totalBrut += val;
+                    tableauLignesHtml += `
+                        <tr>
+                            <td>${item.desc || 'Prestation sans nom'}</td>
+                            <td class="text-right">${formatEuro(val)}</td>
+                        </tr>
+                    `;
+                } else {
+                    totalRetenues += val;
+                    tableauLignesHtml += `
+                        <tr class="row-deduction">
+                            <td>❌ Retenue / Déduction : <em>${item.desc || 'Absence / Régulation'}</em></td>
+                            <td class="text-right">- ${formatEuro(val)}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            let netAPayer = totalBrut - totalRetenues;
+            let tamponHtml = imgTampon ? `<img src="${imgTampon}" class="print-tampon">` : '';
+            let tamponPayeHtml = imgTamponPaye ? `<img src="${imgTamponPaye}" class="print-tampon-paye">` : '';
+            let tamponSigHtml = imgTamponSignature ? `<img src="${imgTamponSignature}" class="print-signature-stamp">` : '';
+
+            let obsHtml = '';
+            if (observations) {
+                obsHtml = `
+                <div class="obs-block">
+                    <div class="obs-title">Observations & Justifications réglementaires :</div>
+                    ${observations}
+                </div>`;
+            }
+
+            document.getElementById('render-target').innerHTML = `
+                <table class="print-header-table">
+                    <tr>
+                        <td class="emitter-cell">
+                            <div class="emitter-title">ROMAIN FLAMMANG</div>
+                            <strong>Éducateur Sportif Professionnel</strong><br>
+                            2 Rue des Fossés, 58300 Decize<br>
+                            SIREN : 932 343 395
+                        </td>
+                        <td class="receiver-cell">
+                            <div class="receiver-title">Débité / Destinataire :</div>
+                            <strong>DOJO DORNOIS</strong><br>
+                            1 Place de la Mairie, 58390 Dornes<br>
+                            RNA : W583001220 &bull; SIRET : 45192841000013
+                        </td>
+                        <td class="doc-num-cell">
+                            <div class="doc-num">
+                                <span class="ref-label">Référence Relevé</span>
+                                <span class="ref-value">${refDoc}</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                
+                <div class="doc-title-container">
+                    <h1 class="doc-title">Relevé de Prestations & Suivi d'Indemnités</h1>
+                </div>
+                
+                <div class="intro-text">
+                    Le présent document récapitule les prestations assurées, les compléments d'activités validés ainsi que les régulations appliquées au titre de la période de <strong>${periode}</strong>.
+                </div>
+                
+                <table class="prestations-table">
+                    <thead>
+                        <tr>
+                            <th>Désignation des Activités / Interventions</th>
+                            <th style="width: 25%;" class="text-right">Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableauLignesHtml}
+                        <tr class="row-total">
+                            <td>Sous-total Brut des interventions dues</td>
+                            <td class="text-right">${formatEuro(totalBrut)}</td>
+                        </tr>
+                        <tr class="final-net">
+                            <td>NET À LIQUIDER / MONTANT TOTAL RETENU</td>
+                            <td class="text-right">${formatEuro(netAPayer)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                ${obsHtml}
+
+                <div style="font-size:9.5pt; margin-top:12px;">
+                    <strong>Modalités d'exécution :</strong> Prévu par ${reglement}.
+                </div>
+                
+                <div class="fait-a-ligne">Fait à Dornes, le ${date_edition}</div>
+                
+                <table class="sig-container-table">
+                    <tr>
+                        <td class="tampon-cell">${tamponHtml}</td>
+                        <td class="tampon-paye-cell">${tamponPayeHtml}</td>
+                        <td class="box-cell">${tamponSigHtml}</td>
+                    </tr>
+                </table>
+                
+                <div class="print-footer">Dojo Dornois &bull; Validation interne des prestations intervenants &bull; Extrait SIREN Romain Flammang : 932 343 395</div>
+            `;
+        }
+
+        window.onload = function() { majMinis(); actualiserReference(); afficherLignesBuilder(); };
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

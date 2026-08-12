@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Suivi Sophrologie — Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --violet: #7A5C9B;
+            --violet-fonce: #5A3E78;
+            --violet-clair: #F0EBF5;
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --vert: #2ecc71;
+            --vert-fonce: #27ae60;
+            --orange: #e67e22;
+            
+            --sidebar-width: 280px;
+            --topbar-height: 68px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            margin: 0; padding: 0;
+            color: var(--gris-fonce);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR CONTAINER --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        /* ===== CONTENU PRINCIPAL ===== */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
+        }
+
+        .topbar {
+            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; z-index: 50;
+        }
+
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); }
+        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+
+        .app-body {
+            flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
+        }
+
+        /* ===== BOUTONS ET COMPOSANTS ===== */
+        .btn { font-family: 'Roboto', sans-serif; font-weight: 500; padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+        .btn-violet { background: var(--violet); color: white; }
+        .btn-violet:hover { background: var(--violet-fonce); }
+        .btn-danger { background: var(--rouge); color: white; }
+        .btn-danger:hover { background: var(--rouge-hover); }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-dark:hover { background: #333; }
+        .btn-outline { background: transparent; border: 1px solid var(--gris-moyen); color: var(--gris-fonce); }
+        .btn-outline:hover { background: var(--gris-tres-clair); }
+        
+        .btn-mini-danger {
+            background: transparent; color: var(--rouge); border: 1px solid var(--gris-tres-clair); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer;
+        }
+        .btn-mini-danger:hover { background: var(--rouge); color: var(--blanc); border-color: var(--rouge); }
+
+        .layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; margin-bottom: 20px; }
+        @media(max-width: 1024px) { .layout { grid-template-columns: 1fr; } }
+
+        .main-card { background: var(--blanc); padding: 22px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid var(--gris-tres-clair); }
+
+        /* ===== SEASONS & SEANCES EN GRILLE ===== */
+        .season-section {
+            background: #FAF9FC; border: 1px solid var(--violet-clair); border-radius: 10px; padding: 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 14px;
+        }
+
+        .season-bar {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 10px;
+        }
+        .season-title { font-family: 'Fredoka', sans-serif; font-size: 0.95rem; color: var(--violet-fonce); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+
+        .season-btn {
+            padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--gris-clair); background: white; color: var(--gris-fonce); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .season-btn:hover { border-color: var(--violet); color: var(--violet); }
+        .season-btn.active { background: var(--rouge); color: white; border-color: var(--rouge); box-shadow: 0 2px 6px rgba(196, 30, 58, 0.3); }
+
+        .sessions-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px;
+        }
+
+        .session-card-btn {
+            background: white; border: 1.5px solid var(--gris-clair); border-radius: 8px; padding: 10px 12px; cursor: pointer; text-align: left; transition: all 0.2s; display: flex; flex-direction: column; justify-content: space-between; gap: 6px;
+        }
+        .session-card-btn:hover { border-color: var(--violet); background: #FAF7FC; transform: translateY(-1px); }
+        .session-card-btn.active { background: var(--violet); color: white; border-color: var(--violet); box-shadow: 0 3px 10px rgba(122, 92, 155, 0.3); }
+        
+        .session-card-date { font-family: 'Fredoka', sans-serif; font-size: 0.95rem; font-weight: 600; }
+        .session-card-count { font-size: 0.75rem; opacity: 0.85; font-weight: 500; }
+
+        .session-actions-bar {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 5px;
+        }
+
+        /* ===== PASTILLES COLORÉES DE STATUT ===== */
+        .pastille {
+            display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; flex-shrink: 0;
+        }
+        .pastille-green { background-color: var(--vert); box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.25); }
+        .pastille-orange { background-color: var(--orange); box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.25); }
+        .pastille-violet { background-color: var(--violet); box-shadow: 0 0 0 2px rgba(122, 92, 155, 0.25); }
+
+        .badge {
+            padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; transition: all 0.15s; white-space: nowrap;
+        }
+        .badge:hover { transform: scale(1.02); }
+        .badge-licencie { background: #e8f8f0; color: #1e824c; border: 1.5px solid #2ecc71; }
+        .badge-nonlicencie { background: #fdf2e9; color: #d35400; border: 1.5px solid #e67e22; }
+        .badge-premiere { background: var(--violet-clair); color: var(--violet-fonce); border: 1.5px solid var(--violet); }
+
+        /* KPI CARDS (ONGLET ANALYTIQUE) */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .kpi-card { background: var(--blanc); padding: 18px; border-radius: 10px; border-left: 4px solid var(--violet); border: 1px solid var(--gris-tres-clair); }
+        .kpi-card.green { border-left-color: var(--vert-fonce); }
+        .kpi-card.orange { border-left-color: var(--orange); }
+        .kpi-card.purple { border-left-color: var(--violet); }
+        .kpi-card h4 { margin: 0 0 6px 0; font-size: 0.75rem; color: var(--gris-moyen); text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-card .value { font-family: 'Fredoka', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--noir-doux); margin: 0; }
+        .kpi-card .subtext { font-size: 0.75rem; color: var(--gris-moyen); margin-top: 4px; }
+
+        /* Formulaires */
+        .form-inline { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px dashed var(--gris-clair); }
+        .form-inline input, .form-inline select { padding: 8px 12px; border: 1px solid var(--gris-clair); border-radius: 6px; font-size: 0.88rem; outline: none; }
+        .form-inline input[type="text"] { flex-grow: 1; min-width: 200px; }
+
+        /* Tableaux */
+        .table-responsive { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
+        th, td { padding: 11px 13px; border-bottom: 1px solid var(--gris-tres-clair); vertical-align: middle; }
+        th { background-color: var(--fond); font-family: 'Fredoka', sans-serif; color: var(--gris-fonce); font-weight: 500; }
+        tr:hover { background-color: #fcfbfe; }
+
+        .check-box { width: 18px; height: 18px; cursor: pointer; accent-color: var(--violet); }
+
+        /* Totaux à droite */
+        .summary-box { background: linear-gradient(135deg, var(--violet), var(--violet-fonce)); color: var(--blanc); padding: 20px; border-radius: 10px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 4px 16px rgba(122, 92, 155, 0.2); }
+        .summary-box h3 { margin: 0; font-size: 0.85rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; color: white; }
+        .summary-stat { font-size: 1.8rem; font-weight: bold; font-family: 'Fredoka', sans-serif; margin-top: 4px; }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 5px; flex-wrap: wrap; }
+        .tab-btn { padding: 9px 18px; border-radius: 6px; border: 1px solid var(--gris-clair); background: white; cursor: pointer; font-family: 'Fredoka', sans-serif; font-size: 0.9rem; }
+        .tab-btn.active { background: var(--violet); color: white; border-color: var(--violet); }
+
+        /* MODALE CONFIGURATION IMPRESSION */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+        }
+        .modal-card {
+            background: white; border-radius: 10px; width: 100%; max-width: 850px; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 18px;
+        }
+
+        /* TOAST SYSTEM */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); background: #1a472a; border-left: 4px solid #2ecc71; }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="page-title-area">
+                <h2>🧘‍♂️ Gestion des Ateliers de Sophrologie</h2>
+                <p>Suivi des présences, encaissements, fiches d'émargement et analyse d'impact</p>
+            </div>
+            <button class="btn btn-violet" onclick="openPrintModal()">🖨️ Imprimer Registre / Bilan Paysage A4</button>
+        </div>
+
+        <div class="app-body">
+            <div class="tabs">
+                <button id="btn-tab-session" class="tab-btn active" onclick="switchTab('session')">📅 Pointage Séance Active</button>
+                <button id="btn-tab-global" class="tab-btn" onclick="switchTab('global')">🌐 Vue Globale / Grille de Présences</button>
+                <button id="btn-tab-analytics" class="tab-btn" onclick="switchTab('analytics')">📈 Analyse &amp; Impact Sophrologie</button>
+            </div>
+
+            <!-- ONGLET 1 : ÉMARGEMENT SÉANCE -->
+            <div id="tab-session" class="layout">
+                <div class="main-card">
+                    
+                    <!-- ZONE SEASONS ET SEANCES EN GRILLE -->
+                    <div class="season-section">
+                        <div class="season-bar">
+                            <div class="season-title">🗓️ Saison sportive :</div>
+                            <div id="seasons-buttons-container" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+                            <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem; margin-left:auto;" onclick="addSeasonPrompt()">+ Nouvelle Saison</button>
+                        </div>
+
+                        <div>
+                            <div style="font-size:0.8rem; font-weight:600; color:var(--gris-moyen); margin-bottom:8px;">Séances programmées pour cette saison :</div>
+                            <div class="sessions-grid" id="sessions-grid-container">
+                                <!-- Généré en JS sous forme de cartes 3-4 par ligne -->
+                            </div>
+                        </div>
+
+                        <div class="session-actions-bar">
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <input type="text" id="new-session-date" placeholder="Ex: 15/10, 12/11..." style="padding: 6px 10px; border: 1px solid var(--gris-clair); border-radius: 6px; font-size: 0.85rem; width: 130px;">
+                                <button class="btn btn-violet" style="padding: 6px 12px; font-size: 0.82rem;" onclick="addNewSessionDate()">📅 Planifier une séance</button>
+                            </div>
+                            <button class="btn btn-danger" style="padding: 6px 10px; font-size: 0.82rem;" onclick="deleteActiveSessionDate()">🗑️ Supprimer la séance active</button>
+                        </div>
+                    </div>
+
+                    <!-- Ajouter une nouvelle personne à la séance active -->
+                    <div class="form-inline">
+                        <input type="text" id="new-name" placeholder="NOM Prénom (Ex: MARTIN Jean)">
+                        <select id="new-status">
+                            <option value="licencie">Licencié (2 €)</option>
+                            <option value="nonlicencie">Extérieur (5 €)</option>
+                            <option value="premiere">1ère séance (Offert !)</option>
+                        </select>
+                        <button class="btn btn-violet" onclick="addCustomPerson()">➕ Ajouter au Répertoire Club</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Participant</th>
+                                    <th>Statut Club (Clic pour modifier)</th>
+                                    <th style="text-align: center;">Présence Séance Active</th>
+                                    <th style="text-align: right;">Dû (€)</th>
+                                    <th style="text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="session-table-body">
+                                <!-- Généré en JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Colonne Caisse du jour -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="summary-box">
+                        <div>
+                            <h3>👥 Présents ce jour</h3>
+                            <div class="summary-stat" id="day-present-count">0</div>
+                        </div>
+                        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 0;">
+                        <div>
+                            <h3>💰 Caisse estimée</h3>
+                            <div class="summary-stat" style="color: #2ecc71;" id="day-cash-count">0 €</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--gris-tres-clair); font-size: 0.82rem; color: var(--gris-moyen); line-height: 1.5;">
+                        💡 <strong>Suivi &amp; Présences :</strong><br>
+                        • <strong>Filtrage par Saison :</strong> Les séances sont strictement séparées par saison sportive.<br>
+                        • <strong>Modifications :</strong> Cliquez sur la pastille colorée pour ajuster le tarif d'un participant.<br>
+                        • <strong>Imprimer en Paysage :</strong> Utilisez le bouton en haut à droite pour imprimer le bilan complet de la saison ou l'analyse d'impact.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ONGLET 2 : VUE GLOBALE HISTORIQUE -->
+            <div id="tab-global" class="main-card" style="display: none;">
+                <h2>🌐 Matrice Générale des Présences de la Saison Active</h2>
+                <p style="color: var(--gris-moyen); font-size: 0.82rem; margin-top: -5px;">Vue synoptique avec codes couleurs des statuts. Chaque colonne représente une date planifiée pour la saison active.</p>
+                
+                <div class="table-responsive">
+                    <table style="font-size: 0.82rem;">
+                        <thead id="global-table-head">
+                            <!-- Généré dynamiquement -->
+                        </thead>
+                        <tbody id="global-table-body">
+                            <!-- Liste exhaustive des participants -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ONGLET 3 : ANALYSE ANALYTIQUE & IMPACT -->
+            <div id="tab-analytics" style="display: none; flex-direction: column; gap: 20px;">
+                <div class="kpi-grid">
+                    <div class="kpi-card purple">
+                        <h4>Public Total Touché</h4>
+                        <div class="value" id="kpi-total-people">0</div>
+                        <div class="subtext">participants uniques enregistrés</div>
+                    </div>
+                    <div class="kpi-card green">
+                        <h4>Licenciés Dojo</h4>
+                        <div class="value" id="kpi-licencies-count">0</div>
+                        <div class="subtext" id="kpi-licencies-pct">0% du public total</div>
+                    </div>
+                    <div class="kpi-card orange">
+                        <h4>Participants Extérieurs</h4>
+                        <div class="value" id="kpi-exterieurs-count">0</div>
+                        <div class="subtext" id="kpi-exterieurs-pct">0% du public total</div>
+                    </div>
+                    <div class="kpi-card purple">
+                        <h4>Taux de Récurrence / Fidélité</h4>
+                        <div class="value" id="kpi-loyalty-pct">0 %</div>
+                        <div class="subtext" id="kpi-loyalty-sub">Revenus 2 fois ou plus</div>
+                    </div>
+                </div>
+
+                <div class="main-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gris-tres-clair); padding-bottom:12px; margin-bottom:15px;">
+                        <div>
+                            <h3 style="font-family:'Fredoka',sans-serif; margin:0; font-size:1.15rem; color:var(--noir-doux);">📊 Analyse d'Assiduité &amp; Impact par Adhérent</h3>
+                            <p style="margin:2px 0 0 0; font-size:0.78rem; color:var(--gris-moyen);">Mesure de la régularité et de la fidélisation du public sur la saison active</p>
+                        </div>
+                        <button class="btn btn-violet" onclick="imprimerBilanAnalytiqueA4()">🖨️ Imprimer ce Bilan Analytique A4</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Participant</th>
+                                    <th>Statut Club</th>
+                                    <th style="text-align: center;">Séances Suivies</th>
+                                    <th style="text-align: center;">Taux de Présence</th>
+                                    <th style="text-align: center;">Niveau d'Assiduité</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analytics-table-body">
+                                <!-- Généré en JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALE DE CONFIGURATION FICHE IMPRIMABLE -->
+    <div class="modal-overlay" id="print-modal">
+        <div class="modal-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 10px;">
+                <h3 style="margin: 0; font-family: 'Fredoka', sans-serif; color: var(--noir-doux);">🖨️ Configuration d'Impression Officielle A4</h3>
+                <button class="btn btn-outline" onclick="closePrintModal()">✕ Fermer</button>
+            </div>
+
+            <!-- Options de configuration -->
+            <div style="display: flex; flex-direction: column; gap: 15px; background: var(--fond); padding: 16px; border-radius: 6px; border: 1px solid var(--gris-tres-clair);">
+                <div>
+                    <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 6px;">Type de document à imprimer :</label>
+                    <select id="print-type-select" style="width: 100%; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px;">
+                        <option value="session">📄 Émargement Séance Active uniquement</option>
+                        <option value="season">📊 Bilan Synoptique Complet de la Saison (Toutes les dates)</option>
+                        <option value="analytics">📈 Rapport d'Analyse Analytique &amp; Impact Sophrologie</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 180px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 5px;">Saison :</label>
+                        <input type="text" id="print-season-input" style="width: 100%; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px;" readonly>
+                    </div>
+                    <div style="flex: 1; min-width: 180px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 5px;">Horaires / Remarques :</label>
+                        <input type="text" id="print-time-input" style="width: 100%; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px;" value="19h00 — 20h00">
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                <button class="btn btn-outline" onclick="closePrintModal()">Annuler</button>
+                <button class="btn btn-violet" onclick="triggerPrintWithValues()">📄 Imprimer le Document A4 Paysage</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT ET GESTION DES DONNÉES -->
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+        const TARGET_SHEET = "sophrologie";
+
+        const defaultSeasons = ["2025/2026", "2026/2027"];
+        const defaultDatesBySeason = {
+            "2025/2026": ["19/06", "12/09", "10/10", "14/11", "12/12", "20/01", "20/02", "20/03", "03/04", "24/04"],
+            "2026/2027": ["15/10", "12/11", "10/12", "14/01", "11/02", "18/03", "15/04", "13/05", "10/06"]
+        };
+
+        let state = {
+            seasons: [...defaultSeasons],
+            activeSeason: "2025/2026",
+            seasonDates: JSON.parse(JSON.stringify(defaultDatesBySeason)),
+            activeDate: "19/06",
+            participants: [],
+            presences: {}
+        };
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3500);
+        }
+
+        function normalizeParticipant(p) {
+            let fullName = "";
+            if (p.name) fullName = p.name.trim();
+            else if (p.nom || p.prenom) fullName = `${p.nom || ''} ${p.prenom || ''}`.trim();
+
+            let status = "licencie";
+            const rawStatut = (p.status || p.statut || "").toLowerCase();
+            if (rawStatut.includes("non") || rawStatut.includes("extér") || rawStatut.includes("exter")) status = "nonlicencie";
+            else if (rawStatut.includes("1ère") || rawStatut.includes("premiere") || rawStatut.includes("offert")) status = "premiere";
+
+            return { name: fullName.toUpperCase(), status: status };
+        }
+
+        function loadData() {
+            fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        if (data.participants && Array.isArray(data.participants)) {
+                            state.participants = data.participants.map(normalizeParticipant);
+                        }
+                        if (data.seasons) state.seasons = data.seasons;
+                        if (data.activeSeason) state.activeSeason = data.activeSeason;
+                        
+                        if (data.seasonDates) {
+                            state.seasonDates = data.seasonDates;
+                        } else if (data.dates) {
+                            state.seasonDates[state.activeSeason] = data.dates;
+                        }
+
+                        if (data.activeDate) state.activeDate = data.activeDate;
+                        if (data.presences) state.presences = data.presences;
+                    } else {
+                        useFallbackLocalData();
+                    }
+                    finalizeInitialization();
+                })
+                .catch(err => {
+                    useFallbackLocalData();
+                    finalizeInitialization();
+                });
+        }
+
+        function useFallbackLocalData() {
+            const localBackup = localStorage.getItem('dojo_sophro_backup');
+            if (localBackup) {
+                try {
+                    const parsed = JSON.parse(localBackup);
+                    if (parsed.participants) state.participants = parsed.participants.map(normalizeParticipant);
+                    if (parsed.seasons) state.seasons = parsed.seasons;
+                    if (parsed.activeSeason) state.activeSeason = parsed.activeSeason;
+                    if (parsed.seasonDates) state.seasonDates = parsed.seasonDates;
+                    if (parsed.activeDate) state.activeDate = parsed.activeDate;
+                    if (parsed.presences) state.presences = parsed.presences;
+                } catch(e) {}
+            }
+            if (!state.seasons.length) state.seasons = [...defaultSeasons];
+            if (!state.activeSeason) state.activeSeason = state.seasons[0];
+            if (!state.seasonDates[state.activeSeason]) state.seasonDates[state.activeSeason] = [...defaultDatesBySeason["2025/2026"]];
+            if (!state.activeDate) state.activeDate = state.seasonDates[state.activeSeason][0];
+            if (!state.presences) state.presences = {};
+        }
+
+        function finalizeInitialization() {
+            const uniqueMap = new Map();
+            state.participants.forEach(p => {
+                if (p.name && !uniqueMap.has(p.name)) {
+                    uniqueMap.set(p.name, p);
+                }
+            });
+            state.participants = Array.from(uniqueMap.values());
+
+            Object.keys(state.seasonDates).forEach(s => {
+                state.seasonDates[s].forEach(d => {
+                    if (!state.presences[d]) state.presences[d] = [];
+                });
+            });
+
+            renderSeasons();
+            renderSessionsGrid();
+            renderSession();
+        }
+
+        function saveData() {
+            localStorage.setItem('dojo_sophro_backup', JSON.stringify(state));
+
+            const packet = {
+                targetSheet: TARGET_SHEET,
+                payload: state
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(packet)
+            })
+            .then(() => showToast("✓ Enregistré dans le Sheet Sophrologie !"))
+            .catch(err => console.error("Erreur Cloud:", err));
+        }
+
+        function renderSeasons() {
+            const container = document.getElementById('seasons-buttons-container');
+            container.innerHTML = '';
+
+            state.seasons.forEach(s => {
+                const btn = document.createElement('button');
+                btn.className = `season-btn ${s === state.activeSeason ? 'active' : ''}`;
+                btn.innerText = s;
+                btn.onclick = () => selectSeason(s);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectSeason(s) {
+            state.activeSeason = s;
+            if (!state.seasonDates[s]) {
+                state.seasonDates[s] = [];
+            }
+            if (state.seasonDates[s].length > 0) {
+                state.activeDate = state.seasonDates[s][0];
+            } else {
+                state.activeDate = "";
+            }
+            saveData();
+            renderSeasons();
+            renderSessionsGrid();
+            renderSession();
+        }
+
+        function addSeasonPrompt() {
+            const val = prompt("Saisir la nouvelle saison (ex: 2026/2027) :");
+            if(val && !state.seasons.includes(val.trim())) {
+                const seasonName = val.trim();
+                state.seasons.push(seasonName);
+                state.seasonDates[seasonName] = [];
+                state.activeSeason = seasonName;
+                state.activeDate = "";
+                saveData();
+                renderSeasons();
+                renderSessionsGrid();
+                renderSession();
+            }
+        }
+
+        function renderSessionsGrid() {
+            const container = document.getElementById('sessions-grid-container');
+            container.innerHTML = '';
+
+            const currentDates = state.seasonDates[state.activeSeason] || [];
+
+            if (currentDates.length === 0) {
+                container.innerHTML = `<div style="font-size:0.82rem; color:var(--gris-moyen); font-style:italic;">Aucune séance planifiée pour cette saison.</div>`;
+                return;
+            }
+
+            currentDates.forEach(d => {
+                const countPresents = state.presences[d] ? state.presences[d].length : 0;
+                const isActive = (d === state.activeDate);
+
+                const card = document.createElement('div');
+                card.className = `session-card-btn ${isActive ? 'active' : ''}`;
+                card.onclick = () => selectSessionDate(d);
+                card.innerHTML = `
+                    <div class="session-card-date">Séance du ${d}</div>
+                    <div class="session-card-count">👥 ${countPresents} présent(s)</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function selectSessionDate(date) {
+            state.activeDate = date;
+            if(!state.presences[state.activeDate]) state.presences[state.activeDate] = [];
+            saveData();
+            renderSessionsGrid();
+            renderSession();
+        }
+
+        function addNewSessionDate() {
+            const dateInput = document.getElementById('new-session-date');
+            const newDate = dateInput.value.trim();
+
+            if (!newDate) return;
+
+            if (!state.seasonDates[state.activeSeason]) {
+                state.seasonDates[state.activeSeason] = [];
+            }
+
+            if (!state.seasonDates[state.activeSeason].includes(newDate)) {
+                state.seasonDates[state.activeSeason].push(newDate);
+                state.presences[newDate] = [];
+            }
+            
+            state.activeDate = newDate;
+            dateInput.value = '';
+            saveData();
+            renderSessionsGrid();
+            renderSession();
+        }
+
+        function deleteActiveSessionDate() {
+            const currentDates = state.seasonDates[state.activeSeason] || [];
+            if(currentDates.length === 0) return;
+
+            if(confirm(`Voulez-vous supprimer la séance du ${state.activeDate} et ses pointages ?`)) {
+                const dateToDelete = state.activeDate;
+                delete state.presences[dateToDelete];
+                state.seasonDates[state.activeSeason] = currentDates.filter(d => d !== dateToDelete);
+                state.activeDate = state.seasonDates[state.activeSeason][0] || "";
+                
+                saveData();
+                renderSessionsGrid();
+                renderSession();
+            }
+        }
+
+        function addCustomPerson() {
+            const nameInput = document.getElementById('new-name');
+            const statusSelect = document.getElementById('new-status');
+            const name = nameInput.value.trim().toUpperCase();
+
+            if (!name) {
+                alert("Veuillez saisir un Nom et Prénom.");
+                return;
+            }
+
+            let person = state.participants.find(p => p.name === name);
+            if (!person) {
+                person = { name: name, status: statusSelect.value };
+                state.participants.push(person);
+            } else {
+                person.status = statusSelect.value;
+            }
+
+            if (state.activeDate) {
+                if (!state.presences[state.activeDate]) {
+                    state.presences[state.activeDate] = [];
+                }
+                if (!state.presences[state.activeDate].includes(person.name)) {
+                    state.presences[state.activeDate].push(person.name);
+                }
+            }
+
+            nameInput.value = '';
+            saveData();
+            renderSessionsGrid();
+            renderSession();
+        }
+
+        function deletePerson(name) {
+            if(confirm(`Retirer définitivement ${name} de l'annuaire de sophrologie ?`)) {
+                state.participants = state.participants.filter(p => p.name !== name);
+                Object.keys(state.presences).forEach(d => {
+                    state.presences[d] = state.presences[d].filter(n => n !== name);
+                });
+                saveData();
+                renderSessionsGrid();
+                renderSession();
+            }
+        }
+
+        function toggleStatus(name) {
+            const person = state.participants.find(p => p.name === name);
+            if (person) {
+                if (person.status === 'licencie') person.status = 'nonlicencie';
+                else if (person.status === 'nonlicencie') person.status = 'premiere';
+                else person.status = 'licencie';
+                saveData();
+                renderSession();
+            }
+        }
+
+        function togglePresence(name) {
+            if (!state.activeDate) return;
+            let list = state.presences[state.activeDate] || [];
+            if (list.includes(name)) {
+                state.presences[state.activeDate] = list.filter(n => n !== name);
+            } else {
+                state.presences[state.activeDate].push(name);
+            }
+            saveData();
+            renderSessionsGrid();
+            renderSession();
+        }
+
+        function renderSession() {
+            const tbody = document.getElementById('session-table-body');
+            tbody.innerHTML = '';
+
+            let countPresent = 0;
+            let totalCash = 0;
+
+            state.participants.sort((a, b) => a.name.localeCompare(b.name));
+
+            state.participants.forEach(p => {
+                const isPresent = (state.activeDate && state.presences[state.activeDate] && state.presences[state.activeDate].includes(p.name));
+                
+                let price = 0;
+                let badgeClass = 'badge-premiere';
+                let pastilleClass = 'pastille-violet';
+                let badgeLabel = '1ère fois (Offert !)';
+
+                if (p.status === 'licencie') {
+                    price = 2;
+                    badgeClass = 'badge-licencie';
+                    pastilleClass = 'pastille-green';
+                    badgeLabel = 'Licencié (2 €)';
+                } else if (p.status === 'nonlicencie') {
+                    price = 5;
+                    badgeClass = 'badge-nonlicencie';
+                    pastilleClass = 'pastille-orange';
+                    badgeLabel = 'Extérieur (5 €)';
+                }
+
+                if (isPresent) {
+                    countPresent++;
+                    totalCash += price;
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 500;">${p.name}</td>
+                    <td>
+                        <span class="badge ${badgeClass}" onclick="toggleStatus('${p.name}')" title="Cliquer pour changer le statut">
+                            <span class="pastille ${pastilleClass}"></span> ${badgeLabel}
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="check-box" ${isPresent ? 'checked' : ''} onchange="togglePresence('${p.name}')">
+                    </td>
+                    <td style="text-align: right; font-weight: bold; color: ${isPresent ? 'var(--noir-doux)' : 'var(--gris-clair)'};">
+                        ${isPresent ? price + ' €' : '0 €'}
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-mini-danger" onclick="deletePerson('${p.name}')" title="Retirer du répertoire">🗑️ Suppr.</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('day-present-count').innerText = countPresent;
+            document.getElementById('day-cash-count').innerText = `${totalCash} €`;
+        }
+
+        /* --- RENDU MATRICE GLOBALE AVEC BADGES COLORÉS --- */
+        function renderGlobalMatrix() {
+            const thead = document.getElementById('global-table-head');
+            const tbody = document.getElementById('global-table-body');
+            
+            const currentDates = state.seasonDates[state.activeSeason] || [];
+
+            let headHtml = `<tr><th>Participant</th><th>Statut Club</th>`;
+            currentDates.forEach(d => {
+                headHtml += `<th style="text-align: center;">${d}</th>`;
+            });
+            headHtml += `</tr>`;
+            thead.innerHTML = headHtml;
+
+            tbody.innerHTML = '';
+            state.participants.sort((a, b) => a.name.localeCompare(b.name));
+
+            state.participants.forEach(p => {
+                let badgeClass = 'badge-premiere';
+                let pastilleClass = 'pastille-violet';
+                let badgeLabel = '1ère fois';
+
+                if (p.status === 'licencie') {
+                    badgeClass = 'badge-licencie';
+                    pastilleClass = 'pastille-green';
+                    badgeLabel = 'Licencié';
+                } else if (p.status === 'nonlicencie') {
+                    badgeClass = 'badge-nonlicencie';
+                    pastilleClass = 'pastille-orange';
+                    badgeLabel = 'Extérieur';
+                }
+
+                let rowHtml = `<tr>
+                    <td style="font-weight: 500;">${p.name}</td>
+                    <td>
+                        <span class="badge ${badgeClass}" style="padding: 3px 8px; font-size: 0.72rem;">
+                            <span class="pastille ${pastilleClass}"></span> ${badgeLabel}
+                        </span>
+                    </td>`;
+                
+                currentDates.forEach(d => {
+                    const checked = (state.presences[d] && state.presences[d].includes(p.name)) ? '✅' : '—';
+                    rowHtml += `<td style="text-align: center;">${checked}</td>`;
+                });
+                
+                rowHtml += `</tr>`;
+                tbody.innerHTML += rowHtml;
+            });
+        }
+
+        /* --- CALCULS ANALYTIQUES ET MESURE D'IMPACT --- */
+        function renderAnalytics() {
+            const currentDates = state.seasonDates[state.activeSeason] || [];
+            const totalDates = currentDates.length;
+
+            const totalPeople = state.participants.length;
+            let licenciesCount = 0;
+            let exterieursCount = 0;
+            let loyalCount = 0; // Personnes venues >= 2 séances
+
+            const tbody = document.getElementById('analytics-table-body');
+            tbody.innerHTML = '';
+
+            state.participants.sort((a, b) => a.name.localeCompare(b.name));
+
+            state.participants.forEach(p => {
+                if (p.status === 'licencie') licenciesCount++;
+                else exterieursCount++;
+
+                let attendedCount = 0;
+                currentDates.forEach(d => {
+                    if (state.presences[d] && state.presences[d].includes(p.name)) {
+                        attendedCount++;
+                    }
+                });
+
+                if (attendedCount >= 2) loyalCount++;
+
+                const attendanceRate = totalDates > 0 ? Math.round((attendedCount / totalDates) * 100) : 0;
+
+                let badgeClass = 'badge-premiere';
+                let pastilleClass = 'pastille-violet';
+                let badgeLabel = '1ère fois';
+
+                if (p.status === 'licencie') {
+                    badgeClass = 'badge-licencie'; pastilleClass = 'pastille-green'; badgeLabel = 'Licencié';
+                } else if (p.status === 'nonlicencie') {
+                    badgeClass = 'badge-nonlicencie'; pastilleClass = 'pastille-orange'; badgeLabel = 'Extérieur';
+                }
+
+                let assiduiteLabel = 'Occasionnel (1 séance)';
+                let assiduiteBadgeStyle = 'background:#FAF9FC; color:#666; border:1px solid #ccc;';
+                if (attendedCount === 0) {
+                    assiduiteLabel = 'Aucune séance';
+                    assiduiteBadgeStyle = 'background:#f8f9fa; color:#aaa; border:1px solid #ddd;';
+                } else if (attendedCount >= 4) {
+                    assiduiteLabel = '🥇 Très Assidu (Fidèle)';
+                    assiduiteBadgeStyle = 'background:#e8f8f0; color:#1e824c; border:1px solid #2ecc71; font-weight:bold;';
+                } else if (attendedCount >= 2) {
+                    assiduiteLabel = '🥈 Régulier';
+                    assiduiteBadgeStyle = 'background:#eef2f5; color:#2980b9; border:1px solid #3498db;';
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 500;">${p.name}</td>
+                    <td>
+                        <span class="badge ${badgeClass}" style="padding: 3px 8px; font-size: 0.72rem;">
+                            <span class="pastille ${pastilleClass}"></span> ${badgeLabel}
+                        </span>
+                    </td>
+                    <td style="text-align: center; font-weight: bold;">${attendedCount} / ${totalDates}</td>
+                    <td style="text-align: center; font-weight: bold; color: var(--violet);">${attendanceRate} %</td>
+                    <td style="text-align: center;">
+                        <span style="padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; display: inline-block; ${assiduiteBadgeStyle}">
+                            ${assiduiteLabel}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Mettre à jour les KPIs
+            document.getElementById('kpi-total-people').innerText = totalPeople;
+            document.getElementById('kpi-licencies-count').innerText = licenciesCount;
+            document.getElementById('kpi-licencies-pct').innerText = totalPeople > 0 ? `${Math.round((licenciesCount / totalPeople) * 100)}% du public` : '0%';
+            
+            document.getElementById('kpi-exterieurs-count').innerText = exterieursCount;
+            document.getElementById('kpi-exterieurs-pct').innerText = totalPeople > 0 ? `${Math.round((exterieursCount / totalPeople) * 100)}% du public` : '0%';
+
+            const loyaltyRate = totalPeople > 0 ? Math.round((loyalCount / totalPeople) * 100) : 0;
+            document.getElementById('kpi-loyalty-pct').innerText = `${loyaltyRate} %`;
+            document.getElementById('kpi-loyalty-sub').innerText = `${loyalCount} personne(s) venue(s) ≥ 2 fois`;
+        }
+
+        function switchTab(tab) {
+            document.getElementById('btn-tab-session').classList.remove('active');
+            document.getElementById('btn-tab-global').classList.remove('active');
+            document.getElementById('btn-tab-analytics').classList.remove('active');
+
+            if (tab === 'session') {
+                document.getElementById('btn-tab-session').classList.add('active');
+                document.getElementById('tab-session').style.display = 'grid';
+                document.getElementById('tab-global').style.display = 'none';
+                document.getElementById('tab-analytics').style.display = 'none';
+                renderSession();
+            } else if (tab === 'global') {
+                document.getElementById('btn-tab-global').classList.add('active');
+                document.getElementById('tab-session').style.display = 'none';
+                document.getElementById('tab-global').style.display = 'block';
+                document.getElementById('tab-analytics').style.display = 'none';
+                renderGlobalMatrix();
+            } else {
+                document.getElementById('btn-tab-analytics').classList.add('active');
+                document.getElementById('tab-session').style.display = 'none';
+                document.getElementById('tab-global').style.display = 'none';
+                document.getElementById('tab-analytics').style.display = 'flex';
+                renderAnalytics();
+            }
+        }
+
+        /* --- MODALE ET IMPRESSION OPTIMISÉE PAYSAGE --- */
+        function openPrintModal() {
+            document.getElementById('print-season-input').value = state.activeSeason;
+            document.getElementById('print-modal').style.display = 'flex';
+        }
+
+        function closePrintModal() {
+            document.getElementById('print-modal').style.display = 'none';
+        }
+
+        function triggerPrintWithValues() {
+            const printType = document.getElementById('print-type-select').value;
+            if (printType === 'analytics') {
+                closePrintModal();
+                imprimerBilanAnalytiqueA4();
+                return;
+            }
+
+            const seasonVal = state.activeSeason;
+            const timeVal = document.getElementById('print-time-input').value;
+            const currentDates = state.seasonDates[seasonVal] || [];
+
+            closePrintModal();
+
+            let tableHtml = '';
+            let titleText = '';
+
+            if (printType === 'session') {
+                titleText = `Registre d'Émargement — Séance du ${state.activeDate || 'Session'}`;
+                tableHtml = `
+                    <table class="sheet-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">#</th>
+                                <th style="width: 35%;">NOM et Prénom</th>
+                                <th style="width: 25%;">Statut Club</th>
+                                <th style="width: 15%;">Présence</th>
+                                <th style="width: 20%;">Émargement / Règlement</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                
+                state.participants.forEach((p, idx) => {
+                    const isPresent = (state.activeDate && state.presences[state.activeDate] && state.presences[state.activeDate].includes(p.name));
+                    let statusTxt = "Licencié (2 €)";
+                    if (p.status === 'nonlicencie') statusTxt = "Extérieur (5 €)";
+                    if (p.status === 'premiere') statusTxt = "1ère séance (Offert)";
+
+                    tableHtml += `
+                        <tr>
+                            <td style="text-align:center;">${idx + 1}</td>
+                            <td><strong>${p.name}</strong></td>
+                            <td>${statusTxt}</td>
+                            <td style="text-align:center;">${isPresent ? '<b>PRÉSENT</b>' : '—'}</td>
+                            <td></td>
+                        </tr>
+                    `;
+                });
+                tableHtml += `</tbody></table>`;
+            } else {
+                titleText = `Bilan Synoptique Annuel de Sophrologie — Saison ${seasonVal}`;
+                tableHtml = `
+                    <table class="sheet-table">
+                        <thead>
+                            <tr>
+                                <th>Participant</th>
+                                <th>Statut</th>`;
+                currentDates.forEach(d => {
+                    tableHtml += `<th style="text-align:center;">${d}</th>`;
+                });
+                tableHtml += `</tr></thead><tbody>`;
+
+                state.participants.forEach(p => {
+                    let statusTxt = `<span style="color:#27ae60; font-weight:bold;">🥋 Licencié</span>`;
+                    if (p.status === 'nonlicencie') statusTxt = `<span style="color:#e67e22; font-weight:bold;">👤 Extérieur</span>`;
+                    if (p.status === 'premiere') statusTxt = `<span style="color:#7A5C9B; font-weight:bold;">🟣 1ère fois</span>`;
+
+                    tableHtml += `<tr>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${statusTxt}</td>`;
+                    currentDates.forEach(d => {
+                        const checked = (state.presences[d] && state.presences[d].includes(p.name)) ? '✅' : '—';
+                        tableHtml += `<td style="text-align:center;">${checked}</td>`;
+                    });
+                    tableHtml += `</tr>`;
+                });
+                tableHtml += `</tbody></table>`;
+            }
+
+            launchPrintWindow(titleText, seasonVal, timeVal, tableHtml);
+        }
+
+        /* --- IMPRESSION DÉDIÉE RAPPORT ANALYTIQUE --- */
+        function imprimerBilanAnalytiqueA4() {
+            const seasonVal = state.activeSeason;
+            const currentDates = state.seasonDates[seasonVal] || [];
+            const totalDates = currentDates.length;
+            const totalPeople = state.participants.length;
+
+            let licenciesCount = 0;
+            let exterieursCount = 0;
+            let loyalCount = 0;
+
+            let rowsHtml = '';
+            state.participants.sort((a, b) => a.name.localeCompare(b.name)).forEach(p => {
+                if (p.status === 'licencie') licenciesCount++;
+                else exterieursCount++;
+
+                let attendedCount = 0;
+                currentDates.forEach(d => {
+                    if (state.presences[d] && state.presences[d].includes(p.name)) attendedCount++;
+                });
+
+                if (attendedCount >= 2) loyalCount++;
+
+                const attendanceRate = totalDates > 0 ? Math.round((attendedCount / totalDates) * 100) : 0;
+                
+                let statusLabel = "Licencié Dojo";
+                if (p.status === 'nonlicencie') statusLabel = "Extérieur";
+                if (p.status === 'premiere') statusLabel = "1ère séance";
+
+                let assiduiteLabel = "Occasionnel";
+                if (attendedCount >= 4) assiduiteLabel = "🥇 Très Assidu (Fidèle)";
+                else if (attendedCount >= 2) assiduiteLabel = "🥈 Régulier";
+
+                rowsHtml += `
+                    <tr>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${statusLabel}</td>
+                        <td style="text-align:center; font-weight:bold;">${attendedCount} / ${totalDates}</td>
+                        <td style="text-align:center; font-weight:bold; color:#5A3E78;">${attendanceRate} %</td>
+                        <td style="text-align:center;">${assiduiteLabel}</td>
+                    </tr>
+                `;
+            });
+
+            const loyaltyRate = totalPeople > 0 ? Math.round((loyalCount / totalPeople) * 100) : 0;
+
+            const summaryHtml = `
+                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:20px; background:#F4F6F9; padding:12px; border-radius:6px; border:1px solid #ccc;">
+                    <div style="text-align:center;">
+                        <div style="font-size:7.5pt; color:#666; text-transform:uppercase;">Public Total</div>
+                        <div style="font-size:14pt; font-weight:bold; color:#1A1A1A;">${totalPeople} pers.</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:7.5pt; color:#666; text-transform:uppercase;">Licenciés Dojo</div>
+                        <div style="font-size:14pt; font-weight:bold; color:#27ae60;">${licenciesCount} (${totalPeople > 0 ? Math.round((licenciesCount/totalPeople)*100) : 0}%)</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:7.5pt; color:#666; text-transform:uppercase;">Extérieurs Captés</div>
+                        <div style="font-size:14pt; font-weight:bold; color:#e67e22;">${exterieursCount} (${totalPeople > 0 ? Math.round((exterieursCount/totalPeople)*100) : 0}%)</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:7.5pt; color:#666; text-transform:uppercase;">Fidélisation (≥2 séances)</div>
+                        <div style="font-size:14pt; font-weight:bold; color:#7A5C9B;">${loyaltyRate} % (${loyalCount} pers.)</div>
+                    </div>
+                </div>
+
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th>Participant</th>
+                            <th>Statut Club</th>
+                            <th style="text-align:center;">Séances Suivies</th>
+                            <th style="text-align:center;">Taux de Présence</th>
+                            <th style="text-align:center;">Qualificatif d'Assiduité</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+            `;
+
+            launchPrintWindow(`Rapport d'Analyse & Impact Sophrologie — Saison ${seasonVal}`, seasonVal, "Bilan Global", summaryHtml);
+        }
+
+        function launchPrintWindow(titleText, seasonVal, timeVal, contentHtml) {
+            const printWin = window.open('', '_blank');
+            printWin.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${titleText}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                    <style>
+                        @page { size: A4 landscape; margin: 10mm; }
+                        body { font-family: 'Roboto', sans-serif; color: #1a1a1a; background: #fff; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        .sheet-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #C41E3A; padding-bottom: 10px; margin-bottom: 15px; }
+                        .sheet-logo-left { height: 50px; width: 50px; object-fit: contain; background: #C41E3A; padding: 4px; border-radius: 6px; }
+                        .sheet-logo-right { height: 50px; object-fit: contain; }
+                        .sheet-club-details { text-align: center; font-size: 8pt; color: #3D3D3D; line-height: 1.3; }
+                        .sheet-club-details strong { font-family: 'Fredoka', sans-serif; color: #C41E3A; font-size: 11pt; display: block; }
+                        .sheet-title-box { text-align: center; margin-bottom: 15px; }
+                        .sheet-title-box h1 { font-family: 'Fredoka', sans-serif; color: #5A3E78; font-size: 16pt; margin: 0 0 4px 0; text-transform: uppercase; }
+                        .sheet-title-box p { margin: 0; font-size: 9.5pt; color: #6B6B6B; font-weight: 500; }
+                        .sheet-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 8.5pt; }
+                        .sheet-table th { background: #F0EBF5; color: #5A3E78; font-family: 'Fredoka', sans-serif; padding: 7px 8px; border: 1px solid #B8B8B8; }
+                        .sheet-table td { border: 1px solid #B8B8B8; padding: 6px 8px; }
+                        .sheet-footer { position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid #B8B8B8; padding-top: 6px; text-align: center; font-size: 7.5pt; color: #6B6B6B; line-height: 1.3; }
+                    </style>
+                </head>
+                <body>
+                    <div class="sheet-header">
+                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="sheet-logo-left">
+                        <div class="sheet-club-details">
+                            <strong>DOJO DORNOIS</strong>
+                            Judo, Jujitsu &amp; Atelier Sophrologie<br>
+                            1 Pl. de la Mairie, 58390 Dornes &bull; dojodornois@gmail.com
+                        </div>
+                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/9856dd4fcd6147ccad3af20da7f043b21906e5b6.png" class="sheet-logo-right">
+                    </div>
+
+                    <div class="sheet-title-box">
+                        <h1>${titleText}</h1>
+                        <p>Saison sportive ${seasonVal} &bull; ${timeVal}</p>
+                    </div>
+
+                    ${contentHtml}
+
+                    <div class="sheet-footer">
+                        Dojo Dornois &bull; Association Loi 1901 &bull; RNA : W583001220 &bull; SIRET : 45192841000013<br>
+                        "Entraide et prospérité mutuelle"
+                    </div>
+
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                                window.close();
+                            }, 300);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

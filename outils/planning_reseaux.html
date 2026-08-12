@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning Réseaux Sociaux - Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --dojo-red: #C41E3A;
+            --dojo-dark-red: #8B1429;
+            --dojo-bg: #F8F9FA;
+            --dojo-card-bg: #FFFFFF;
+            --text-color: #1A1A1A;
+            --border-color: #E2E8F0;
+            
+            /* Couleurs Réseaux */
+            --fb-color: #1877F2;
+            --fb-bg: #E7F1FF;
+            --ig-color: #E4405F;
+            --ig-bg: #FDE8EC;
+            --wa-color: #25D366;
+            --wa-bg: #E8F8EF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dojo-bg);
+            color: var(--text-color);
+            line-height: 1.5;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Conteneur principal */
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* En-tête */
+        .page-header {
+            background: var(--dojo-card-bg);
+            padding: 20px 25px;
+            border-radius: 12px;
+            border-left: 6px solid var(--dojo-red);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.8rem;
+            color: var(--text-color);
+        }
+
+        .page-header p {
+            color: #64748B;
+            font-size: 0.95rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Boutons */
+        .btn {
+            font-family: 'Fredoka', sans-serif;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--dojo-red);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dojo-dark-red);
+        }
+
+        .btn-success {
+            background-color: #10B981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn-secondary {
+            background-color: #E2E8F0;
+            color: #334155;
+        }
+
+        .btn-secondary:hover {
+            background-color: #CBD5E1;
+        }
+
+        /* Formulaire de saisie */
+        .form-card {
+            background: var(--dojo-card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-card.edit-mode {
+            border: 2px solid #3B82F6;
+            background: #F0F6FF;
+        }
+
+        .form-card h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--dojo-red);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.5fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .form-control {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.95rem;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--dojo-red);
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Encadrés Réseaux */
+        .network-checkboxes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .network-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            user-select: none;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .network-pill input {
+            display: none;
+        }
+
+        .pill-fb {
+            background-color: var(--fb-bg);
+            color: var(--fb-color);
+            border-color: rgba(24, 119, 242, 0.2);
+        }
+
+        .network-pill input:checked + .pill-fb-label {
+            background-color: var(--fb-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
+        }
+
+        .pill-ig {
+            background-color: var(--ig-bg);
+            color: var(--ig-color);
+            border-color: rgba(228, 64, 95, 0.2);
+        }
+
+        .network-pill input:checked + .pill-ig-label {
+            background-color: var(--ig-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(228, 64, 95, 0.3);
+        }
+
+        .pill-wa {
+            background-color: var(--wa-bg);
+            color: var(--wa-color);
+            border-color: rgba(37, 211, 102, 0.2);
+        }
+
+        .network-pill input:checked + .pill-wa-label {
+            background-color: var(--wa-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+        }
+
+        /* Style étiquettes */
+        .badge-net {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-right: 4px;
+            margin-bottom: 3px;
+        }
+
+        .badge-fb { background: var(--fb-bg); color: var(--fb-color); }
+        .badge-ig { background: var(--ig-bg); color: var(--ig-color); }
+        .badge-wa { background: var(--wa-bg); color: var(--wa-color); }
+
+        /* Tableau des publications */
+        .table-card {
+            background: var(--dojo-card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #F1F5F9;
+            color: #475569;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            padding: 14px 16px;
+            font-size: 0.95rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+            font-size: 0.92rem;
+        }
+
+        tr:hover {
+            background-color: #F8FAFC;
+        }
+
+        /* Statuts */
+        .status-select {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .status-todo { background: #FEF3C7; color: #92400E; }
+        .status-draft { background: #E0F2FE; color: #0369A1; }
+        .status-ready { background: #E0E7FF; color: #3730A3; }
+        .status-published { background: #D1FAE5; color: #065F46; }
+
+        /* Actions de ligne */
+        .row-actions {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .btn-icon {
+            background: #F1F5F9;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            background: #E2E8F0;
+        }
+
+        .btn-edit:hover {
+            background: #DBEAFE;
+            color: #2563EB;
+        }
+
+        .btn-delete:hover {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        /* Notif Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1E293B;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1000;
+            font-family: 'Fredoka', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>📅 Planning de Publications Réseaux Sociaux</h1>
+                <p>Préparez, ordonnez et planifiez les contenus du Dojo Dornois sur Facebook, Instagram et WhatsApp.</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="exportJSON()">💾 Exporter JSON</button>
+                <button class="btn btn-success" onclick="syncToGoogleSheets()">☁️ Sauvegarder sur Google Sheet</button>
+            </div>
+        </div>
+
+        <div class="form-card" id="formCard">
+            <h2 id="formTitle">➕ Ajouter une nouvelle publication</h2>
+            <form id="pubForm" onsubmit="savePublication(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="pubTitle">Titre de la publication / Sujet *</label>
+                        <input type="text" id="pubTitle" class="form-control" placeholder="ex: Reprise du Taïso Senior & Inscriptions" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pubDate">Date / Période *</label>
+                        <input type="text" id="pubDate" class="form-control" placeholder="ex: Lundi 24 Août ou S36" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Réseaux cibles *</label>
+                        <div class="network-checkboxes">
+                            <label class="network-pill pill-fb">
+                                <input type="checkbox" id="netFB" value="Facebook">
+                                <span class="pill-fb-label">📘 Facebook</span>
+                            </label>
+                            <label class="network-pill pill-ig">
+                                <input type="checkbox" id="netIG" value="Instagram">
+                                <span class="pill-ig-label">📸 Instagram</span>
+                            </label>
+                            <label class="network-pill pill-wa">
+                                <input type="checkbox" id="netWA" value="WhatsApp">
+                                <span class="pill-wa-label">💬 WhatsApp</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="pubDesc">Descriptif / Brouillon / Éléments de rédaction</label>
+                    <textarea id="pubDesc" class="form-control" placeholder="Détails du texte, rappels d'horaires, emojis, photo/visuel à joindre..."></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" id="btnCancelEdit" style="display: none;" onclick="cancelEdit()">❌ Annuler</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmit">➕ Ajouter au planning</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-card">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 70px; text-align: center;">Ordre</th>
+                            <th style="width: 140px;">Date / Période</th>
+                            <th style="width: 220px;">Titre</th>
+                            <th style="width: 170px;">Réseaux</th>
+                            <th>Descriptif / Contenu</th>
+                            <th style="width: 160px;">Statut</th>
+                            <th style="width: 110px; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pubTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Action effectuée avec succès !</div>
+
+    <script src="../js/sidebar.js" default-active="planning_reseaux"></script>
+
+    <script>
+        // URL de la WebApp Apps Script
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxnokNVywbKqoPat5DgRrKRGtobkYQvnkFkV59tRFJ4fN3hFVmzJWkETHOO9FzHWNIaog/exec";
+
+        // Variable d'état d'édition
+        let editingIndex = null;
+
+        // Données du planning
+        let publications = JSON.parse(localStorage.getItem('dojo_pub_planning')) || [
+            {
+                id: 1,
+                date: "Lundi 24 Août",
+                title: "Rentrée du Judo & Inscriptions",
+                networks: ["Facebook", "Instagram", "WhatsApp"],
+                desc: "Rappel des 3 séances d'essai gratuites, visuel de reprise et lien vers le livret d'accueil.",
+                status: "À rédiger"
+            },
+            {
+                id: 2,
+                date: "Mercredi 26 Août",
+                title: "Focus Stage Multi-Activités",
+                networks: ["Facebook", "Instagram"],
+                desc: "Programme complet du stage été avec horaires et rappel du repas à prévoir.",
+                status: "Brouillon"
+            }
+        ];
+
+        // Charger le tableau au démarrage et lire depuis Google Sheet
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTable();
+            loadFromGoogleSheets();
+        });
+
+        function renderTable() {
+            const tbody = document.getElementById('pubTableBody');
+            tbody.innerHTML = '';
+
+            if (publications.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: #94A3B8;">Aucune publication planifiée pour le moment.</td></tr>`;
+                return;
+            }
+
+            publications.forEach((pub, index) => {
+                const tr = document.createElement('tr');
+                
+                // Formater les badges réseaux
+                let netBadges = '';
+                if (pub.networks.includes('Facebook')) netBadges += `<span class="badge-net badge-fb">📘 Facebook</span>`;
+                if (pub.networks.includes('Instagram')) netBadges += `<span class="badge-net badge-ig">📸 Instagram</span>`;
+                if (pub.networks.includes('WhatsApp')) netBadges += `<span class="badge-net badge-wa">💬 WhatsApp</span>`;
+
+                // Class CSS du statut
+                let statusClass = 'status-todo';
+                if (pub.status === 'Brouillon') statusClass = 'status-draft';
+                if (pub.status === 'Prêt / Programmé') statusClass = 'status-ready';
+                if (pub.status === 'Publié') statusClass = 'status-published';
+
+                tr.innerHTML = `
+                    <td style="text-align: center;">
+                        <button class="btn-icon" onclick="moveRow(${index}, -1)" ${index === 0 ? 'disabled style="opacity:0.3;"' : ''}>⬆️</button>
+                        <button class="btn-icon" onclick="moveRow(${index}, 1)" ${index === publications.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>⬇️</button>
+                    </td>
+                    <td><strong>${escapeHtml(pub.date)}</strong></td>
+                    <td style="font-weight: 600; color: var(--dojo-red);">${escapeHtml(pub.title)}</td>
+                    <td>${netBadges || '<span style="color:#94A3B8;">Aucun</span>'}</td>
+                    <td style="color: #475569; white-space: pre-wrap;">${escapeHtml(pub.desc)}</td>
+                    <td>
+                        <select class="status-select ${statusClass}" onchange="updateStatus(${index}, this.value)">
+                            <option value="À rédiger" ${pub.status === 'À rédiger' ? 'selected' : ''}>⏳ À rédiger</option>
+                            <option value="Brouillon" ${pub.status === 'Brouillon' ? 'selected' : ''}>📝 Brouillon</option>
+                            <option value="Prêt / Programmé" ${pub.status === 'Prêt / Programmé' ? 'selected' : ''}>📌 Programmé</option>
+                            <option value="Publié" ${pub.status === 'Publié' ? 'selected' : ''}>✅ Publié</option>
+                        </select>
+                    </td>
+                    <td style="text-align: center;">
+                        <div class="row-actions">
+                            <button class="btn-icon btn-edit" onclick="editRow(${index})" title="Modifier">✏️</button>
+                            <button class="btn-icon btn-delete" onclick="deleteRow(${index})" title="Supprimer">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            saveLocal();
+        }
+
+        // Enregistrer une publication (Création ou Modification)
+        function savePublication(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('pubTitle').value.trim();
+            const date = document.getElementById('pubDate').value.trim();
+            const desc = document.getElementById('pubDesc').value.trim();
+
+            const networks = [];
+            if (document.getElementById('netFB').checked) networks.push('Facebook');
+            if (document.getElementById('netIG').checked) networks.push('Instagram');
+            if (document.getElementById('netWA').checked) networks.push('WhatsApp');
+
+            if (networks.length === 0) {
+                alert('Veuillez sélectionner au moins un réseau social.');
+                return;
+            }
+
+            if (editingIndex !== null) {
+                // Mode Modification
+                publications[editingIndex].title = title;
+                publications[editingIndex].date = date;
+                publications[editingIndex].networks = networks;
+                publications[editingIndex].desc = desc;
+                showToast('Publication modifiée avec succès !');
+            } else {
+                // Mode Création
+                const newPub = {
+                    id: Date.now(),
+                    title,
+                    date,
+                    networks,
+                    desc,
+                    status: 'À rédiger'
+                };
+                publications.push(newPub);
+                showToast('Publication ajoutée au planning !');
+            }
+
+            cancelEdit();
+            renderTable();
+        }
+
+        // Lancer la modification d'une ligne
+        function editRow(index) {
+            editingIndex = index;
+            const pub = publications[index];
+
+            document.getElementById('pubTitle').value = pub.title;
+            document.getElementById('pubDate').value = pub.date;
+            document.getElementById('pubDesc').value = pub.desc;
+
+            document.getElementById('netFB').checked = pub.networks.includes('Facebook');
+            document.getElementById('netIG').checked = pub.networks.includes('Instagram');
+            document.getElementById('netWA').checked = pub.networks.includes('WhatsApp');
+
+            // Ajuster le formulaire en mode édition
+            document.getElementById('formCard').classList.add('edit-mode');
+            document.getElementById('formTitle').innerHTML = `✏️ Modifier la publication : <span style="color:var(--text-color);">${escapeHtml(pub.title)}</span>`;
+            document.getElementById('btnSubmit').innerHTML = '💾 Enregistrer la modification';
+            document.getElementById('btnCancelEdit').style.display = 'inline-flex';
+
+            // Faire défiler vers le formulaire
+            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Annuler le mode édition
+        function cancelEdit() {
+            editingIndex = null;
+            document.getElementById('pubForm').reset();
+            document.getElementById('formCard').classList.remove('edit-mode');
+            document.getElementById('formTitle').innerText = '➕ Ajouter une nouvelle publication';
+            document.getElementById('btnSubmit').innerHTML = '➕ Ajouter au planning';
+            document.getElementById('btnCancelEdit').style.display = 'none';
+        }
+
+        // Monter ou descendre une ligne
+        function moveRow(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= publications.length) return;
+
+            const temp = publications[index];
+            publications[index] = publications[newIndex];
+            publications[newIndex] = temp;
+
+            renderTable();
+        }
+
+        // Mettre à jour le statut
+        function updateStatus(index, newStatus) {
+            publications[index].status = newStatus;
+            renderTable();
+            showToast('Statut mis à jour !');
+        }
+
+        // Supprimer une ligne
+        function deleteRow(index) {
+            if (confirm('Voulez-vous vraiment supprimer cette publication du planning ?')) {
+                if (editingIndex === index) {
+                    cancelEdit();
+                }
+                publications.splice(index, 1);
+                renderTable();
+                showToast('Publication supprimée.');
+            }
+        }
+
+        // Sauvegarde LocalStorage
+        function saveLocal() {
+            localStorage.setItem('dojo_pub_planning', JSON.stringify(publications));
+        }
+
+        // Sauvegarde vers le Google Sheet (Onglet "Planning_Reseaux")
+        function syncToGoogleSheets() {
+            showToast('Envoi vers le Google Sheet en cours...');
+
+            const targetSheet = "Planning_Reseaux";
+
+            const payload = {
+                targetSheet: targetSheet,
+                payload: publications
+            };
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                alert(`✅ Sauvegarde réussie !\n\nLes données du planning ont été envoyées et synchronisées dans l'onglet "${targetSheet}" de ton Google Sheet.`);
+            })
+            .catch(error => {
+                console.error('Erreur :', error);
+                alert('⚠️ Une erreur est survenue lors de l\'envoi vers le Google Sheet.');
+            });
+        }
+
+        // Chargement automatique depuis le Google Sheet
+        function loadFromGoogleSheets() {
+            const targetSheet = "Planning_Reseaux";
+            fetch(`${GOOGLE_SCRIPT_URL}?sheet=${targetSheet}`)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    publications = data;
+                    renderTable();
+                }
+            })
+            .catch(err => {
+                console.log("Premier chargement ou feuille vierge dans le Sheet.");
+            });
+        }
+
+        // Export JSON de secours
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(publications, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `planning_reseaux_dojo_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // Utilitaire anti-injection HTML
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/\"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2500);
+        }
+    </script>
+</body>
+</html>

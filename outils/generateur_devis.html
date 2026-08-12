@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Générateur de Devis — Intranet Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --rouge-deep: #8B1429;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F5F5F5;
+            --blanc: #FFFFFF;
+            --sidebar-width: 280px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            margin: 0; padding: 0;
+            color: var(--gris-fonce);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-navbar {
+            background-color: var(--blanc);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border-bottom: 1px solid var(--gris-tres-clair);
+            flex-shrink: 0;
+        }
+        .top-navbar h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3rem;
+            margin: 0;
+            color: var(--noir-doux);
+        }
+
+        .dashboard-body {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .panel-config {
+            background-color: var(--blanc);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid var(--gris-tres-clair);
+            height: max-content;
+        }
+
+        .panel-title {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--rouge);
+            font-size: 1.15rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--fond);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .full-width { grid-column: span 2; }
+        label { display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 5px; color: var(--noir-doux); }
+        input, select, textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--gris-clair);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--blanc);
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--rouge);
+            outline: none;
+        }
+
+        .lignes-container {
+            margin-top: 15px;
+            border: 1px solid var(--gris-tres-clair);
+            border-radius: 6px;
+            padding: 12px;
+            background-color: var(--fond);
+        }
+        .ligne-block {
+            background: var(--blanc);
+            border: 1px solid var(--gris-clair);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .ligne-item {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr 40px;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .sub-lignes-container {
+            margin-left: 20px;
+            padding-left: 10px;
+            border-left: 2px dashed var(--gris-clair);
+        }
+        .sub-ligne-item {
+            display: grid;
+            grid-template-columns: 4fr 1fr 2fr 40px;
+            gap: 8px;
+            margin-bottom: 4px;
+            align-items: center;
+        }
+        .btn-action-ligne {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .btn {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-primary { background-color: var(--rouge); color: white; }
+        .btn-primary:hover { background-color: var(--rouge-hover); }
+        .btn-secondary { background-color: var(--gris-moyen); color: white; }
+        .btn-secondary:hover { background-color: var(--gris-fonce); }
+
+        /* Aperçu écran */
+        .panel-preview {
+            background-color: var(--blanc);
+            border: 1px solid var(--gris-clair);
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 35px;
+            min-height: 297mm;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .preview-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--rouge); 
+            padding-bottom: 12px; 
+            margin-bottom: 20px;
+        }
+        .preview-logo-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .preview-logo { width: 68px; height: 68px; object-fit: contain; background-color: var(--rouge); padding: 5px; border-radius: 10px; }
+        .preview-club-info { font-size: 8.5pt; color: var(--noir-doux); line-height: 1.35; }
+        .preview-club-info strong { font-family: 'Fredoka', sans-serif; font-size: 14pt; color: var(--rouge); display: block; }
+        
+        .doc-num-badge {
+            background-color: var(--fond);
+            border: 1px solid var(--gris-clair);
+            border-radius: 6px;
+            padding: 8px 12px;
+            text-align: right;
+        }
+        .doc-num-badge .label { font-size: 7.5pt; text-transform: uppercase; color: var(--gris-moyen); display: block; }
+        .doc-num-badge .val { font-family: 'Fredoka', sans-serif; font-size: 11pt; color: var(--rouge); font-weight: bold; }
+
+        .preview-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; font-size: 9pt; }
+        .preview-meta-box { 
+            background-color: #FAFAFA; 
+            padding: 12px; 
+            border-radius: 6px; 
+            border-left: 4px solid var(--rouge);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            line-height: 1.5;
+        }
+        .preview-meta-box strong {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--rouge);
+            font-size: 9.5pt;
+            display: block;
+            margin-bottom: 4px;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            padding-bottom: 2px;
+        }
+        
+        .preview-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 9pt; }
+        .preview-table th { background-color: var(--rouge); color: white; padding: 8px 10px; font-weight: 600; text-align: left; border: none; }
+        .preview-table th:nth-child(2) { text-align: center; }
+        .preview-table th:nth-child(3), .preview-table th:nth-child(4) { text-align: right; }
+        
+        .preview-table td { padding: 8px 10px; border-bottom: 1px solid var(--gris-tres-clair); color: var(--noir-doux); line-height: 1.35; }
+        .preview-table tr.main-row td { font-weight: bold; }
+        .preview-table tr.main-row td:nth-child(2) { text-align: center; }
+        .preview-table tr.main-row td:nth-child(3), .preview-table tr.main-row td:nth-child(4) { text-align: right; }
+        
+        .preview-table tr.sub-row td { font-size: 8.5pt; color: #555555; font-style: italic; padding-left: 25px; }
+        .preview-table tr.sub-row:nth-of-type(even) td { background-color: #FDFDFD; }
+        .preview-table tr.sub-row:nth-of-type(odd) td { background-color: #F5F5F5; }
+        .preview-table tr.sub-row td:nth-child(2) { text-align: center; }
+        .preview-table tr.sub-row td:nth-child(3), .preview-table tr.sub-row td:nth-child(4) { text-align: right; }
+        
+        .preview-totals-box { width: 230px; margin-left: auto; margin-top: 15px; font-size: 9.5pt; }
+        .preview-totals-row.final { font-weight: bold; color: var(--rouge); font-size: 11pt; display: flex; justify-content: space-between; border-top: 2px solid var(--rouge); padding-top: 8px; }
+
+        .signatures-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; }
+        .sig-box { border: 1px dashed var(--gris-clair); padding: 12px; border-radius: 6px; min-height: 180px; font-size: 8.5pt; position: relative; }
+        .stamps-wrapper { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; align-items: center; justify-content: center; }
+        .stamp-img-preview { max-height: 110px; max-width: 95%; object-fit: contain; display: block; margin: 0 auto; }
+
+        .preview-footer { margin-top: 25px; border-top: 1px solid var(--gris-tres-clair); padding-top: 8px; text-align: center; font-size: 8pt; color: var(--gris-moyen); text-transform: uppercase; }
+
+        @media print {
+            body { background: white; padding: 0; color: black; display: block !important; }
+            .no-print, .sidebar, .top-navbar { display: none !important; }
+            .main-content { padding: 0 !important; overflow: visible !important; }
+            .dashboard-body { display: block !important; margin: 0 !important; padding: 0 !important; }
+            .panel-config { display: none !important; }
+            .panel-preview { border: none !important; box-shadow: none !important; padding: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CONTENEUR SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
+    <div class="main-content">
+        <div class="top-navbar no-print">
+            <h1>✉️ Éditeur de Devis Officiels</h1>
+            <span style="font-size:0.85rem; font-weight:500; color:var(--gris-moyen);">Charte Dojo Dornois v7.0</span>
+        </div>
+
+        <div class="dashboard-body">
+            <!-- PANNEAU CONFIGURATION -->
+            <div class="panel-config no-print">
+                <h3 class="panel-title">⚙️ Informations Générales</h3>
+                
+                <div class="form-grid">
+                    <div>
+                        <label>Numéro de Devis</label>
+                        <input type="text" id="devRef" value="DEV-2026-001" oninput="majApercu()">
+                    </div>
+                    <div>
+                        <label>Date du Document</label>
+                        <input type="text" id="devDate" value="01/07/2026" oninput="majApercu()">
+                    </div>
+                    <div class="full-width">
+                        <label>Destinataire (Nom, Adresse, Coordonnées)</label>
+                        <textarea id="devDest" rows="3" oninput="majApercu()">Territoire Éducatif Rural (TER)&#10;À l'attention de Mme GUIPON&#10;Secteur Dornes / Lucenay / Cossaye</textarea>
+                    </div>
+                    <div class="full-width">
+                        <label>Objet du Devis</label>
+                        <input type="text" id="devObjet" value="Interventions et initiations Judo en milieu scolaire - Année 1" oninput="majApercu()">
+                    </div>
+                    <div>
+                        <label>Tampon du Club (Image)</label>
+                        <input type="file" id="clubStampInput" accept="image/*" onchange="chargerTamponClub(event)">
+                    </div>
+                    <div>
+                        <label>Tampon Signature (Image)</label>
+                        <input type="file" id="sigStampInput" accept="image/*" onchange="chargerTamponSig(event)">
+                    </div>
+                </div>
+
+                <h3 class="panel-title" style="margin-top:25px;">📦 Prestations & Lignes</h3>
+                <div class="lignes-container" id="zone-lignes"></div>
+                <button class="btn btn-secondary" style="padding:6px 12px; margin-top:10px; font-size:0.8rem;" onclick="ajouterLignePrincipale()">➕ Ajouter une prestation</button>
+
+                <div style="margin-top: 30px; display:flex; gap:12px;">
+                    <button class="btn btn-primary" onclick="imprimerDevis()">🖨️ Imprimer / Exporter A4 PDF</button>
+                </div>
+            </div>
+
+            <!-- APERÇU RENDU -->
+            <div>
+                <h3 class="no-print" style="font-family:'Fredoka'; margin-top:0; color:var(--gris-fonce); font-size:1rem;">Aperçu du Rendu Réel</h3>
+                <div class="panel-preview" id="render-zone">
+                    <div>
+                        <!-- EN-TÊTE COMPACT AVEC BADGE NUMÉRO -->
+                        <div class="preview-header">
+                            <div class="preview-logo-box">
+                                <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="preview-logo">
+                                <div class="preview-club-info">
+                                    <strong>DOJO DORNOIS</strong>
+                                    1 Place de la Mairie, 58390 Dornes<br>
+                                    FFJDA n° CE 08.58.067.0 • SIRET 451 928 410 00013<br>
+                                    RNA W583001220 • dojodornois@gmail.com
+                                </div>
+                            </div>
+                            <div class="doc-num-badge">
+                                <span class="label">Devis Référence</span>
+                                <span class="val" id="txt-preview-ref">DEV-2026-001</span>
+                            </div>
+                        </div>
+
+                        <div class="preview-meta-grid">
+                            <div class="preview-meta-box">
+                                <strong>ÉMETTEUR</strong>
+                                Dojo Dornois<br>
+                                1 Place de la Mairie<br>
+                                58390 DORNES
+                            </div>
+                            <div class="preview-meta-box">
+                                <strong>DESTINATAIRE</strong>
+                                <span id="txt-preview-dest">-</span>
+                            </div>
+                        </div>
+
+                        <div style="font-size:9pt; margin-bottom:15px; color:var(--noir-doux); line-height: 1.4;">
+                            <strong>Date d'émission :</strong> <span id="txt-preview-date">01/07/2026</span> (Validité : 3 mois)<br>
+                            <strong>Objet :</strong> <span id="txt-preview-objet">-</span>
+                        </div>
+
+                        <table class="preview-table">
+                            <thead>
+                                <tr>
+                                    <th>Désignation de la prestation</th>
+                                    <th style="width: 80px;">Qté / Base</th>
+                                    <th style="width: 90px;">Tarif Net</th>
+                                    <th style="width: 100px;">Total Net</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-preview-body"></tbody>
+                        </table>
+
+                        <div class="preview-totals-box">
+                            <div class="preview-totals-row final">
+                                <span>Total Net à payer :</span>
+                                <span id="total-ttc-val">0.00 €</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BLOC DE BAS DE PAGE FIXE POUR IMPRESSION -->
+                    <div>
+                        <div style="font-size: 8pt; margin-top: 15px; font-style: italic; color: #3D3D3D;">
+                            Exonération de TVA - Association loi 1901 à but non lucratif (Art. 293 B du CGI).<br>
+                            Pour accepter ce devis, veuillez le retourner signé et revêtu de la mention manuscrite « Bon pour accord ».
+                        </div>
+
+                        <div class="signatures-preview">
+                            <div class="sig-box">
+                                <strong>Pour le Dojo Dornois :</strong>
+                                <div class="stamps-wrapper">
+                                    <img id="clubStampPreviewImg" class="stamp-img-preview" style="display:none;">
+                                    <img id="sigStampPreviewImg" class="stamp-img-preview" style="display:none;">
+                                </div>
+                            </div>
+                            <div class="sig-box">
+                                <strong id="sig-dest-title">Pour le Destinataire :</strong><br><br>
+                                Date & Mention manuscrite :
+                            </div>
+                        </div>
+
+                        <div class="preview-footer">
+                            Dojo Dornois • Association Loi 1901 • RNA : W583001220 • SIRET : 451 928 410 00013
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let clubStampUrl = "";
+        let sigStampUrl = "";
+
+        let lignesData = [
+            {
+                desc: "Prestations professeur 6 classes x 5 cours x 35€", qte: "1", tarif: 1050.00,
+                subs: [
+                    { desc: "3 classes Lucenay les Aix x 5 cours x 35€", qte: "1", total: 525.00 },
+                    { desc: "3 classes Cossaye x 5 cours x 35€", qte: "1", total: 525.00 }
+                ]
+            },
+            {
+                desc: "Frais de déplacement professeur x 5 cours (Lucenay et Cossaye)", qte: "1", tarif: 80.00,
+                subs: [
+                    { desc: "5 AR Lucenay les Aix (23 kms x 0,35€)", qte: "1", total: 40.00 },
+                    { desc: "5 AR Cossaye (22,6 kms x 0,35€)", qte: "1", total: 40.00 }
+                ]
+            },
+            {
+                desc: "Frais entretien du matériel mis à disposition et transport", qte: "1", tarif: 150.00,
+                subs: [
+                    { desc: "Frais entretien du matériel mis à disposition", qte: "1", total: 110.00 },
+                    { desc: "5 AR Lucenay les Aix (11 kms x 0,35€)", qte: "1", total: 19.00 },
+                    { desc: "5 AR Cossaye (12 kms x 0,35€)", qte: "1", total: 21.00 }
+                ]
+            },
+            { desc: "Formation professeurs des écoles au cycle Judo", qte: "1", tarif: 191.00, subs: [] },
+            { desc: "Organisation journée inter-écoles en clôture du cycle Judo", qte: "1", tarif: 183.00, subs: [] },
+            { desc: "Frais de coordination et de communication autour du projet", qte: "1", tarif: 50.00, subs: [] },
+            { desc: "Déduction part ANS si subvention accordée", qte: "1", tarif: -852.00, subs: [] }
+        ];
+
+        function chargerTamponClub(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    clubStampUrl = e.target.result;
+                    const img = document.getElementById('clubStampPreviewImg');
+                    img.src = clubStampUrl;
+                    img.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function chargerTamponSig(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    sigStampUrl = e.target.result;
+                    const img = document.getElementById('sigStampPreviewImg');
+                    img.src = sigStampUrl;
+                    img.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function initialiserLignes() {
+            const container = document.getElementById('zone-lignes');
+            container.innerHTML = "";
+            
+            lignesData.forEach((l, idx) => {
+                const block = document.createElement('div');
+                block.className = "ligne-block";
+                
+                block.innerHTML = `
+                    <div class="ligne-item">
+                        <input type="text" value="${l.desc}" placeholder="Prestation principale" oninput="majLignePrincipale(${idx}, 'desc', this.value)">
+                        <input type="text" value="${l.qte}" placeholder="Qté" oninput="majLignePrincipale(${idx}, 'qte', this.value)">
+                        <input type="number" value="${l.tarif}" step="0.01" placeholder="Tarif Net" oninput="majLignePrincipale(${idx}, 'tarif', this.value)">
+                        <button class="btn-action-ligne" onclick="supprimerLignePrincipale(${idx})" title="Supprimer">🗑️</button>
+                    </div>
+                    <div class="sub-lignes-container" id="subs-${idx}"></div>
+                    <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; margin-top:5px;" onclick="ajouterSousLigne(${idx})">➕ Ajouter un détail</button>
+                `;
+                
+                container.appendChild(block);
+                
+                const subsContainer = document.getElementById(`subs-${idx}`);
+                l.subs.forEach((sub, sIdx) => {
+                    const subDiv = document.createElement('div');
+                    subDiv.className = "sub-ligne-item";
+                    subDiv.innerHTML = `
+                        <input type="text" value="${sub.desc}" placeholder="Détail du calcul" oninput="majSousLigne(${idx}, ${sIdx}, 'desc', this.value)" style="font-size:0.85rem;">
+                        <input type="text" value="${sub.qte}" placeholder="1" oninput="majSousLigne(${idx}, ${sIdx}, 'qte', this.value)" style="font-size:0.85rem; text-align:center;">
+                        <input type="number" value="${sub.total}" step="0.01" placeholder="Total Net" oninput="majSousLigne(${idx}, ${sIdx}, 'total', this.value)" style="font-size:0.85rem;">
+                        <button class="btn-action-ligne" onclick="supprimerSousLigne(${idx}, ${sIdx})">×</button>
+                    `;
+                    subsContainer.appendChild(subDiv);
+                });
+            });
+            majApercu();
+        }
+
+        function ajouterLignePrincipale() {
+            lignesData.push({ desc: "", qte: "1", tarif: 0.00, subs: [] });
+            initialiserLignes();
+        }
+
+        function supprimerLignePrincipale(idx) {
+            lignesData.splice(idx, 1);
+            initialiserLignes();
+        }
+
+        function ajouterSousLigne(idx) {
+            lignesData[idx].subs.push({ desc: "", qte: "1", total: 0.00 });
+            initialiserLignes();
+        }
+
+        function supprimerSousLigne(idx, sIdx) {
+            lignesData[idx].subs.splice(sIdx, 1);
+            initialiserLignes();
+        }
+
+        function majLignePrincipale(idx, champ, valeur) {
+            if (champ === 'tarif') lignesData[idx].tarif = parseFloat(valeur) || 0;
+            else lignesData[idx][champ] = valeur;
+            majApercu();
+        }
+
+        function majSousLigne(idx, sIdx, champ, valeur) {
+            if (champ === 'total') lignesData[idx].subs[sIdx].total = parseFloat(valeur) || 0;
+            else lignesData[idx].subs[sIdx][champ] = valeur;
+            majApercu();
+        }
+
+        function majApercu() {
+            document.getElementById('txt-preview-ref').innerText = document.getElementById('devRef').value;
+            document.getElementById('txt-preview-date').innerText = document.getElementById('devDate').value;
+            document.getElementById('txt-preview-objet').innerText = document.getElementById('devObjet').value;
+            
+            const destRaw = document.getElementById('devDest').value;
+            document.getElementById('txt-preview-dest').innerHTML = destRaw.replace(/\n/g, '<br>');
+
+            const firstLineDest = destRaw.split('\n')[0].trim();
+            const titleDest = firstLineDest ? `Pour ${firstLineDest} :` : "Pour le Destinataire :";
+            document.getElementById('sig-dest-title').innerText = titleDest;
+
+            const tbody = document.getElementById('table-preview-body');
+            tbody.innerHTML = "";
+            let totalGeneral = 0;
+
+            lignesData.forEach(l => {
+                totalGeneral += l.tarif;
+                
+                let tr = document.createElement('tr');
+                tr.className = "main-row";
+                tr.innerHTML = `
+                    <td>${l.desc || 'Prestation'}</td>
+                    <td>${l.qte}</td>
+                    <td>${l.tarif.toFixed(2)} €</td>
+                    <td>${l.tarif.toFixed(2)} €</td>
+                `;
+                tbody.appendChild(tr);
+
+                l.subs.forEach(sub => {
+                    let subTr = document.createElement('tr');
+                    subTr.className = "sub-row";
+                    subTr.innerHTML = `
+                        <td>${sub.desc || 'Détail'}</td>
+                        <td>${sub.qte}</td>
+                        <td>${sub.total.toFixed(2)} €</td>
+                        <td>${sub.total.toFixed(2)} €</td>
+                    `;
+                    tbody.appendChild(subTr);
+                });
+            });
+
+            document.getElementById('total-ttc-val').innerText = totalGeneral.toFixed(2) + " €";
+        }
+
+        function imprimerDevis() {
+            const refDevis = document.getElementById('devRef').value;
+            const dateDoc = document.getElementById('devDate').value;
+            const objet = document.getElementById('devObjet').value;
+            const destRaw = document.getElementById('devDest').value;
+            const destHtml = destRaw.replace(/\n/g, '<br>');
+            
+            const firstLineDest = destRaw.split('\n')[0].trim();
+            const titleDest = firstLineDest ? `Pour ${firstLineDest} :` : "Pour le Destinataire :";
+
+            let tableRowsHtml = "";
+            let totalGeneral = 0;
+
+            lignesData.forEach(l => {
+                totalGeneral += l.tarif;
+                tableRowsHtml += `
+                    <tr style="font-weight: bold; page-break-inside: avoid;">
+                        <td style="padding: 9px 12px; border-bottom: 1px solid #E8E8E8; text-align: left;">${l.desc || 'Prestation'}</td>
+                        <td style="text-align:center; padding: 9px 12px; border-bottom: 1px solid #E8E8E8;">${l.qte}</td>
+                        <td style="text-align:right; padding: 9px 12px; border-bottom: 1px solid #E8E8E8;">${l.tarif.toFixed(2)} €</td>
+                        <td style="text-align:right; padding: 9px 12px; border-bottom: 1px solid #E8E8E8;">${l.tarif.toFixed(2)} €</td>
+                    </tr>
+                `;
+                l.subs.forEach((sub, sIdx) => {
+                    let bgColor = (sIdx % 2 === 0) ? '#F5F5F5' : '#FDFDFD';
+                    tableRowsHtml += `
+                        <tr style="font-size: 8.5pt; color: #555555; font-style: italic; page-break-inside: avoid;">
+                            <td style="padding: 7px 12px 7px 25px; border-bottom: 1px solid #E8E8E8; text-align: left; background-color: ${bgColor};">${sub.desc || 'Détail'}</td>
+                            <td style="text-align:center; padding: 7px 12px; border-bottom: 1px solid #E8E8E8; background-color: ${bgColor};">${sub.qte}</td>
+                            <td style="text-align:right; padding: 7px 12px; border-bottom: 1px solid #E8E8E8; background-color: ${bgColor};">${sub.total.toFixed(2)} €</td>
+                            <td style="text-align:right; padding: 7px 12px; border-bottom: 1px solid #E8E8E8; background-color: ${bgColor};">${sub.total.toFixed(2)} €</td>
+                        </tr>
+                    `;
+                });
+            });
+
+            const clubStampHtml = clubStampUrl ? `<img src="${clubStampUrl}" style="max-height: 130px; max-width: 280px; object-fit: contain; display: block; margin: 0 auto;">` : '';
+            const sigStampHtml = sigStampUrl ? `<img src="${sigStampUrl}" style="max-height: 130px; max-width: 280px; object-fit: contain; display: block; margin: 0 auto;">` : '';
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="fr">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>DEVIS ${refDevis}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                    <style>
+                        @page {
+                            size: A4 portrait;
+                            margin: 12mm 15mm 20mm 15mm;
+                            
+                            @bottom-left {
+                                content: "Dojo Dornois • Association Loi 1901 • RNA : W583001220 • SIRET : 451 928 410 00013 • TVA non applicable, art. 293 B du CGI";
+                                font-family: 'Roboto', sans-serif;
+                                font-size: 7.5pt;
+                                color: #6B6B6B;
+                                border-top: 1px solid #E8E8E8;
+                                padding-top: 6px;
+                                text-transform: uppercase;
+                            }
+                            
+                            @bottom-right {
+                                content: "Page " counter(page) " / " counter(pages);
+                                font-family: 'Fredoka', sans-serif;
+                                font-weight: 600;
+                                font-size: 9.5pt;
+                                color: #C41E3A;
+                                border-top: 1px solid #E8E8E8;
+                                padding-top: 6px;
+                                white-space: nowrap;
+                            }
+                        }
+                        
+                        body { 
+                            font-family: 'Roboto', sans-serif; 
+                            background-color: #FFFFFF; 
+                            color: #1A1A1A; 
+                            margin: 0; 
+                            padding: 0;
+                            font-size: 9.5pt;
+                        }
+
+                        table.print-page-layout {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+
+                        thead.print-page-header {
+                            display: table-header-group;
+                        }
+
+                        tbody.print-page-content {
+                            display: table-row-group;
+                        }
+
+                        .print-header-content { 
+                            display: flex; 
+                            justify-content: space-between; 
+                            align-items: center; 
+                            border-bottom: 2px solid #C41E3A; 
+                            padding-bottom: 12px; 
+                            margin-bottom: 20px; 
+                        }
+                        .print-logo-box { display: flex; align-items: center; gap: 15px; }
+                        .print-logo { width: 70px; height: 70px; object-fit: contain; background-color: #C41E3A; padding: 5px; border-radius: 8px; }
+                        .print-club-info { font-size: 8.5pt; color: #1A1A1A; line-height: 1.35; }
+                        .print-club-info strong { font-family: 'Fredoka', sans-serif; font-size: 15pt; color: #C41E3A; display: block; }
+                        
+                        .doc-num-badge {
+                            background-color: #F5F5F5;
+                            border: 1px solid #B8B8B8;
+                            border-radius: 6px;
+                            padding: 8px 12px;
+                            text-align: right;
+                        }
+                        .doc-num-badge .label { font-size: 7.5pt; text-transform: uppercase; color: #6B6B6B; display: block; }
+                        .doc-num-badge .val { font-family: 'Fredoka', sans-serif; font-size: 11pt; color: #C41E3A; font-weight: bold; }
+
+                        .print-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 20px; font-size: 9.5pt; }
+                        .print-meta-box { 
+                            background-color: #FAFAFA; 
+                            padding: 12px; 
+                            border-radius: 6px; 
+                            border-left: 4px solid #C41E3A;
+                            line-height: 1.5;
+                        }
+                        .print-meta-box strong {
+                            font-family: 'Fredoka', sans-serif;
+                            color: #C41E3A;
+                            font-size: 10pt;
+                            display: block;
+                            margin-bottom: 4px;
+                            border-bottom: 1px solid #E8E8E8;
+                            padding-bottom: 2px;
+                        }
+                        
+                        table.items-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 9.5pt; }
+                        tr { page-break-inside: avoid; }
+                        th { background-color: #C41E3A; color: #FFFFFF; font-weight: 600; padding: 10px 12px; text-align: left; border: none; }
+                        
+                        .print-totals-box { width: 240px; margin-left: auto; margin-top: 20px; page-break-inside: avoid; }
+                        .print-totals-row.final { font-weight: bold; color: #C41E3A; font-size: 11.5pt; display: flex; justify-content: space-between; border-top: 2px solid #C41E3A; padding-top: 8px; }
+                        
+                        .signatures-container { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; page-break-inside: avoid; }
+                        .signature-box { border: 1px dashed #B8B8B8; padding: 12px; border-radius: 6px; min-height: 200px; font-size: 9pt; }
+                        .stamps-wrapper { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; align-items: center; justify-content: center; width: 100%; }
+                    </style>
+                </head>
+                <body>
+                    <table class="print-page-layout">
+                        <thead class="print-page-header">
+                            <tr>
+                                <td>
+                                    <div class="print-header-content">
+                                        <div class="print-logo-box">
+                                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                                            <div class="print-club-info">
+                                                <strong>DOJO DORNOIS</strong>
+                                                1 PLACE DE LA MAIRIE, 58390 DORNES | DOJODORNOIS@GMAIL.COM<br>
+                                                FFJDA N° CE 08.58.067.0 | SIRET 451 928 410 00013 | RNA W583001220
+                                            </div>
+                                        </div>
+                                        <div class="doc-num-badge">
+                                            <span class="label">DEVIS RÉFÉRENCE</span>
+                                            <span class="val">${refDevis}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </thead>
+
+                        <tbody class="print-page-content">
+                            <tr>
+                                <td>
+                                    <div class="print-meta-grid">
+                                        <div class="print-meta-box">
+                                            <strong>ÉMETTEUR</strong>
+                                            Dojo Dornois<br>
+                                            1 Place de la Mairie<br>
+                                            58390 DORNES
+                                        </div>
+                                        <div class="print-meta-box">
+                                            <strong>DESTINATAIRE</strong>
+                                            ${destHtml}
+                                        </div>
+                                    </div>
+
+                                    <div style="font-size:9.5pt; margin-bottom:20px; color:#1A1A1A; line-height:1.5;">
+                                        <strong>DATE :</strong> ${dateDoc} (Validité : 3 mois)<br>
+                                        <strong>OBJET :</strong> ${objet}
+                                    </div>
+
+                                    <table class="items-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align: left;">Désignation de la prestation</th>
+                                                <th style="text-align: center; width: 80px;">Qté / Base</th>
+                                                <th style="text-align: right; width: 90px;">Tarif Net</th>
+                                                <th style="text-align: right; width: 100px;">Total Net</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${tableRowsHtml}
+                                        </tbody>
+                                    </table>
+
+                                    <div class="print-totals-box">
+                                        <div class="print-totals-row final">
+                                            <span>Total Net à payer :</span>
+                                            <span>${totalGeneral.toFixed(2)} €</span>
+                                        </div>
+                                    </div>
+
+                                    <div style="font-size: 8.5pt; margin-top: 20px; font-style: italic; color: #3D3D3D;">
+                                        Exonération de TVA - Association loi 1901 à but non lucratif (Art. 293 B du CGI).<br>
+                                        Pour accepter ce devis, veuillez le retourner signé et revêtu de la mention manuscrite « Bon pour accord ».
+                                    </div>
+
+                                    <div class="signatures-container">
+                                        <div class="signature-box">
+                                            <strong>Pour le Dojo Dornois :</strong>
+                                            <div class="stamps-wrapper">
+                                                ${clubStampHtml}
+                                                ${sigStampHtml}
+                                            </div>
+                                        </div>
+                                        <div class="signature-box">
+                                            <strong>${titleDest}</strong><br><br>
+                                            Date & Mention manuscrite :
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                                window.close();
+                            }, 300);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        window.addEventListener('DOMContentLoaded', initialiserLignes);
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

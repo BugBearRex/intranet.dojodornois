@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur QR Code — Dojo Dornois</title>
+
+    <!-- POLICES OFFICIELLES CHARTE DOJO DORNOIS -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- TAILWIND CSS & FONTAWESOME -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- LIBRAIRIE QR CODE STYLING (Pour les logos et formes) -->
+    <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+
+    <style>
+        /* ==========================================================================
+           CHARTE GRAPHIQUE OFFICIELLE (DOJO DORNOIS)
+           ========================================================================== */
+        :root {
+            --rouge: #C41E3A;
+            --noir-doux: #1A1A1A;
+            --fond: #F4F6F9;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+        }
+        h1, h2, h3, .font-fredoka {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .card-charte { 
+            background: #FFF; 
+            border-radius: 10px; 
+            border: 1px solid #E8E8E8; 
+            padding: 24px; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04); 
+        }
+        /* Customisation des inputs type color */
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 100%;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
+    </style>
+</head>
+<body class="h-full flex text-slate-800 antialiased">
+
+    <!-- EMPLACEMENT DE TA SIDEBAR UNIFIÉE -->
+    <div class="sidebar no-print"></div>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden main-content h-screen">
+        
+        <!-- Topbar Officielle -->
+        <header class="no-print bg-white border-b border-slate-200 px-6 py-3.5 flex items-center justify-between shrink-0">
+            <div>
+                <h1 class="font-fredoka text-xl font-bold text-[#1A1A1A]">Générateur de QR Code Officiel</h1>
+                <p class="text-xs text-slate-500">Outil de communication • Dojo Dornois</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="downloadQR()" class="px-4 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-medium flex items-center gap-2 shadow-sm transition-colors">
+                    <i class="fa-solid fa-download"></i> Exporter en PNG
+                </button>
+            </div>
+        </header>
+
+        <!-- Zone de travail -->
+        <main class="flex-1 overflow-y-auto p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-6xl mx-auto">
+                
+                <!-- COLONNE GAUCHE : PARAMÈTRES (Prend 7 colonnes sur 12) -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <div class="card-charte">
+                        <h2 class="font-fredoka text-lg font-bold text-[#C41E3A] mb-4 border-b-2 border-slate-100 pb-2">1. Contenu du QR Code</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Lien Web (URL) ou Texte à encoder :</label>
+                                <input type="text" id="data" value="https://dojodornois.fr" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#C41E3A] focus:ring-1 focus:ring-[#C41E3A] transition" oninput="generateQR()">
+                                <p class="text-[11px] text-slate-500 mt-1">Exemples : https://dojodornois.fr, lien d'un formulaire d'inscription, lien Kalisport...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-charte">
+                        <h2 class="font-fredoka text-lg font-bold text-[#C41E3A] mb-4 border-b-2 border-slate-100 pb-2">2. Personnalisation Graphique</h2>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <!-- Couleurs -->
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Couleur Principale :</label>
+                                <input type="color" id="dotsColor" value="#C41E3A" onchange="generateQR()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Couleur de fond :</label>
+                                <input type="color" id="bgColor" value="#FFFFFF" onchange="generateQR()">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <!-- Formes -->
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Style des points :</label>
+                                <select id="dotsType" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#C41E3A]" onchange="generateQR()">
+                                    <option value="rounded">Arrondis (Moderne)</option>
+                                    <option value="square">Carrés (Classique)</option>
+                                    <option value="dots">Ronds (Épuré)</option>
+                                    <option value="classy">Élégant</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Style des coins (Extérieurs) :</label>
+                                <select id="cornersType" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#C41E3A]" onchange="generateQR()">
+                                    <option value="extra-rounded">Très arrondis</option>
+                                    <option value="square">Carrés</option>
+                                    <option value="dot">Ronds</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-100 pt-4">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Logo Central (Optionnel) :</label>
+                            <input type="file" id="logoUpload" accept="image/png, image/jpeg" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-rose-50 file:text-[#C41E3A] hover:file:bg-rose-100 transition cursor-pointer">
+                            <div class="flex items-center gap-2 mt-3">
+                                <button onclick="useDefaultLogo()" class="px-3 py-1.5 border border-slate-200 text-slate-600 rounded-md text-xs hover:bg-slate-50 transition">
+                                    <i class="fa-solid fa-rotate-right mr-1"></i> Remettre le logo du club
+                                </button>
+                                <button onclick="removeLogo()" class="px-3 py-1.5 border border-slate-200 text-slate-600 rounded-md text-xs hover:bg-slate-50 transition">
+                                    <i class="fa-solid fa-trash mr-1"></i> Sans logo
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- COLONNE DROITE : APERÇU (Prend 5 colonnes sur 12) -->
+                <div class="lg:col-span-5">
+                    <div class="card-charte sticky top-6 flex flex-col items-center justify-center min-h-[400px]">
+                        <h3 class="font-fredoka text-sm text-slate-500 uppercase tracking-widest mb-6">Aperçu en direct</h3>
+                        
+                        <!-- Conteneur du QR Code généré -->
+                        <div id="qr-canvas" class="bg-white p-4 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-slate-100 flex items-center justify-center mb-6">
+                            <!-- Le QR code s'injecte ici -->
+                        </div>
+                        
+                        <button onclick="downloadQR()" class="w-full py-3 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors">
+                            <i class="fa-solid fa-download"></i> Télécharger (PNG Haute Qualité)
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- SCRIPT DE LA SIDEBAR (Doit pointer vers ton fichier habituel) -->
+    <script src="../js/sidebar.js"></script>
+
+    <!-- SCRIPT DU GÉNÉRATEUR -->
+    <script>
+        let qrCode;
+        // Logo officiel du Dojo Dornois par défaut (issu de ta charte)
+        const defaultLogo = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png";
+        let currentLogo = defaultLogo;
+
+        // Gestion de l'upload d'un logo personnalisé
+        document.getElementById('logoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentLogo = event.target.result;
+                    generateQR();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Remettre le logo du club
+        function useDefaultLogo() {
+            currentLogo = defaultLogo;
+            document.getElementById('logoUpload').value = ""; // Réinitialise l'input file
+            generateQR();
+        }
+
+        // Retirer le logo
+        function removeLogo() {
+            currentLogo = "";
+            document.getElementById('logoUpload').value = ""; // Réinitialise l'input file
+            generateQR();
+        }
+
+        // Fonction de génération dynamique
+        function generateQR() {
+            const data = document.getElementById("data").value || "https://dojodornois.fr";
+            const dotsColor = document.getElementById("dotsColor").value;
+            const bgColor = document.getElementById("bgColor").value;
+            const dotsType = document.getElementById("dotsType").value;
+            const cornersType = document.getElementById("cornersType").value;
+
+            // Nettoyage de l'ancien canvas
+            document.getElementById("qr-canvas").innerHTML = "";
+
+            // Création de l'objet QR Code avec les paramètres
+            qrCode = new QRCodeStyling({
+                width: 300, // Haute résolution
+                height: 300,
+                data: data,
+                image: currentLogo,
+                dotsOptions: {
+                    color: dotsColor,
+                    type: dotsType
+                },
+                backgroundOptions: {
+                    color: bgColor,
+                },
+                imageOptions: {
+                    crossOrigin: "anonymous",
+                    margin: 10,
+                    imageSize: 0.4 // Le logo occupe 40% du centre
+                },
+                cornersSquareOptions: {
+                    type: cornersType,
+                    color: dotsColor
+                },
+                cornersDotOptions: {
+                    type: "dot", // Les petits points dans les coins sont ronds par défaut pour un look moderne
+                    color: dotsColor
+                }
+            });
+
+            // Affichage dans la page
+            qrCode.append(document.getElementById("qr-canvas"));
+        }
+
+        // Fonction de téléchargement
+        function downloadQR() {
+            if(qrCode) {
+                qrCode.download({ name: "QR-Code-Dojo-Dornois", extension: "png" });
+            }
+        }
+
+        // Initialisation automatique au chargement
+        window.onload = () => {
+            generateQR();
+        };
+    </script>
+</body>
+</html>

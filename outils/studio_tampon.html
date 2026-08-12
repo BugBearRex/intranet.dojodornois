@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio & Générateur de Tampons Officiels — Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- BIBLIOTHÈQUE CONVERSION CANVAS -> PNG TRANSPARENT HD -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --sidebar-width: 280px;
+            --topbar-height: 68px;
+            --stamp-color: #1A1A1A;
+            --stamp-title-color: #C41E3A;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            margin: 0; padding: 0;
+            color: var(--gris-fonce);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR UNIFIÉE */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        .sidebar * { max-width: 100%; box-sizing: border-box; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
+        }
+
+        .topbar {
+            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; z-index: 50;
+        }
+
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); }
+        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+
+        .app-body {
+            flex: 1; padding: 20px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
+        }
+
+        .btn {
+            background: var(--rouge); color: white; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.875rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; text-decoration: none;
+        }
+        .btn:hover { background: var(--rouge-hover); }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-dark:hover { background: #333; }
+
+        /* PANNEAU DE CONTRÔLE AVEC SÉLECTEURS DE FICHIERS */
+        .controls-card {
+            background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); padding: 18px 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: flex-end;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--gris-fonce); }
+        .form-control { width: 100%; padding: 8px 12px; border: 1.5px solid var(--gris-tres-clair); border-radius: 6px; font-size: 0.875rem; }
+
+        /* GALERIE DE STYLES DE TAMPONS */
+        .stamps-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px;
+        }
+
+        .stamp-card {
+            background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.03); padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 20px; min-height: 280px; position: relative;
+        }
+
+        .stamp-card-title {
+            font-family: 'Fredoka', sans-serif; font-size: 1rem; color: var(--noir-doux); width: 100%; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 8px; margin: 0; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .stamp-stage {
+            flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; padding: 15px; background-image: radial-gradient(#e0e0e0 1px, transparent 1px); background-size: 12px 12px; border-radius: 8px; overflow: hidden;
+        }
+
+        .stamp-render-box {
+            background: transparent !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+            user-select: none;
+            padding: 10px;
+        }
+
+        /* CONTENEUR DU LOGO SELECTIONNÉ */
+        .logo-box-official {
+            background-color: #C41E3A;
+            width: 72px; height: 72px;
+            border-radius: 12px;
+            padding: 5px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(196, 30, 58, 0.25);
+        }
+
+        .logo-box-official img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-placeholder {
+            font-size: 0.65rem; color: white; text-align: center; font-weight: bold;
+        }
+
+        /* MODEL 1 : OFFICIAL EXECUTIVE PRO */
+        .stamp-model-1 {
+            border: 3.5px double var(--stamp-color, #1A1A1A);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--stamp-color, #1A1A1A);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            max-width: 480px;
+            background: transparent !important;
+        }
+
+        .stamp-model-1 .info-block {
+            font-size: 8.5pt;
+            line-height: 1.35;
+            text-align: left;
+        }
+        .stamp-model-1 .club-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 13pt;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            color: var(--stamp-title-color, #C41E3A);
+        }
+
+        /* MODEL 2 : CIRCULAIRE TRADITIONNEL */
+        .stamp-model-2 {
+            width: 175px; height: 175px;
+            border: 3px dashed var(--stamp-color, #1A1A1A);
+            border-radius: 50%;
+            padding: 8px;
+            color: var(--stamp-color, #1A1A1A);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: transparent !important;
+        }
+        .stamp-model-2 .inner-circle {
+            width: 100%; height: 100%;
+            border: 1.5px solid var(--stamp-color, #1A1A1A);
+            border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 6px;
+            background: transparent !important;
+        }
+        .stamp-model-2 .circle-logo-mini {
+            background: #C41E3A;
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            padding: 3px;
+            margin-bottom: 3px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .stamp-model-2 .circle-logo-mini img { width: 100%; height: 100%; object-fit: contain; }
+        .stamp-model-2 .circle-title { font-family: 'Fredoka', sans-serif; font-size: 8.5pt; font-weight: bold; text-transform: uppercase; color: var(--stamp-title-color, #C41E3A); }
+        .stamp-model-2 .circle-sub { font-size: 6.5pt; text-transform: uppercase; margin-top: 1px; }
+
+        /* MODEL 3 : TAMPON "PAYÉ" */
+        .stamp-model-paye {
+            border: 4px double #2ECC71;
+            border-radius: 8px;
+            padding: 8px 22px;
+            color: #2ECC71;
+            font-family: 'Fredoka', sans-serif;
+            text-align: center;
+            text-transform: uppercase;
+            background: transparent !important;
+        }
+        .stamp-model-paye .status-text { font-size: 20pt; font-weight: 700; letter-spacing: 2px; line-height: 1; }
+        .stamp-model-paye .status-date { font-size: 8.5pt; margin-top: 4px; font-weight: 600; letter-spacing: 1px; font-family: 'Roboto', sans-serif; }
+
+        /* MODEL 4 : TAMPON "ACQUITTÉ" */
+        .stamp-model-acquitte {
+            border: 4px double #1A2A3A;
+            border-radius: 8px;
+            padding: 8px 22px;
+            color: #1A2A3A;
+            font-family: 'Fredoka', sans-serif;
+            text-align: center;
+            text-transform: uppercase;
+            background: transparent !important;
+        }
+        .stamp-model-acquitte .status-text { font-size: 20pt; font-weight: 700; letter-spacing: 2px; line-height: 1; }
+        .stamp-model-acquitte .status-date { font-size: 8.5pt; margin-top: 4px; font-weight: 600; letter-spacing: 1px; font-family: 'Roboto', sans-serif; }
+
+        /* MODEL 5 : COMMANDE VALIDÉE */
+        .stamp-model-commande {
+            border: 3px solid #2980B9;
+            padding: 8px 16px;
+            color: #2980B9;
+            font-family: 'Fredoka', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 6px;
+            background: transparent !important;
+        }
+        .stamp-model-commande .icon { font-size: 22pt; }
+        .stamp-model-commande .text-group { text-align: left; }
+        .stamp-model-commande .title { font-size: 13pt; font-weight: bold; text-transform: uppercase; line-height: 1; }
+        .stamp-model-commande .sub { font-size: 7.5pt; text-transform: uppercase; margin-top: 2px; font-family: 'Roboto', sans-serif; font-weight: bold; }
+
+        /* MODEL 6 : SUBVENTIONNÉ */
+        .stamp-model-subvention {
+            border: 3px dashed #E67E22;
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #E67E22;
+            font-family: 'Fredoka', sans-serif;
+            text-align: center;
+            text-transform: uppercase;
+            background: transparent !important;
+        }
+        .stamp-model-subvention .title { font-size: 12pt; font-weight: bold; line-height: 1; }
+        .stamp-model-subvention .sub { font-size: 7.5pt; margin-top: 3px; font-family: 'Roboto', sans-serif; font-weight: bold; }
+
+        /* MODEL 7 : COPIE CERTIFIÉE CONFORME */
+        .stamp-model-certifie {
+            border: 2px solid var(--stamp-color, #1A1A1A);
+            padding: 10px 14px;
+            color: var(--stamp-color, #1A1A1A);
+            font-size: 8.5pt;
+            text-align: left;
+            width: 280px;
+            border-radius: 4px;
+            background: transparent !important;
+        }
+        .stamp-model-certifie .header { font-family: 'Fredoka', sans-serif; font-size: 10pt; font-weight: bold; text-transform: uppercase; border-bottom: 1.5px solid var(--stamp-color, #1A1A1A); padding-bottom: 4px; margin-bottom: 6px; text-align: center; color: var(--stamp-title-color, #C41E3A); }
+
+        /* MODEL 8 : CLASSÉ / ARCHIVÉ */
+        .stamp-model-archive {
+            border: 3px solid #7F8C8D;
+            border-radius: 6px;
+            padding: 6px 18px;
+            color: #7F8C8D;
+            font-family: 'Fredoka', sans-serif;
+            text-align: center;
+            text-transform: uppercase;
+            background: transparent !important;
+        }
+        .stamp-model-archive .title { font-size: 14pt; font-weight: bold; letter-spacing: 1px; }
+        .stamp-model-archive .sub { font-size: 7.5pt; font-family: 'Roboto', sans-serif; margin-top: 2px; }
+
+        /* MODEL 9 : SIGNATURE PRÉSIDENT */
+        .stamp-model-sig {
+            border: 2px dashed var(--stamp-color, #C41E3A);
+            border-radius: 8px;
+            padding: 10px 18px;
+            text-align: center;
+            color: var(--stamp-color, #1A1A1A);
+            min-width: 260px;
+            background: transparent !important;
+        }
+        .stamp-model-sig .sig-title { font-size: 8.5pt; font-weight: bold; text-transform: uppercase; color: var(--stamp-title-color, #C41E3A); }
+        .stamp-model-sig .sig-name { font-family: 'Fredoka', sans-serif; font-size: 11pt; font-weight: bold; margin-top: 2px; }
+        .stamp-model-sig .sig-img-container { max-height: 60px; margin-top: 4px; display: flex; justify-content: center; }
+        .stamp-model-sig .sig-img-container img { max-height: 60px; object-fit: contain; }
+
+        /* TOAST NOTIFICATION */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="page-title-area">
+                <h2>Studio & Générateur de Tampons Officiels</h2>
+                <p>Création et exportation de tampons haute définition avec fond transparent (PNG)</p>
+            </div>
+            <a href="../index.html" class="btn btn-dark">🏠 Central Intranet</a>
+        </div>
+
+        <div class="app-body">
+            
+            <!-- PANNEAU DE CONTRÔLE AVEC CHARGEMENT DE FICHIERS -->
+            <div class="controls-card">
+                
+                <div class="form-group">
+                    <label>🖼️ Importer le Logo (PNG/SVG) :</label>
+                    <input type="file" id="inputLogoFile" accept="image/*" class="form-control" onchange="handleLogoUpload(event)">
+                </div>
+
+                <div class="form-group">
+                    <label>✍️ Importer ta Signature (PNG) :</label>
+                    <input type="file" id="inputSigFile" accept="image/*" class="form-control" onchange="handleSigUpload(event)">
+                </div>
+
+                <div class="form-group">
+                    <label>Couleur Titre Global :</label>
+                    <select id="ctrl-color-title" class="form-control" onchange="applyGlobalStyles()">
+                        <option value="#C41E3A">🔴 Rouge Signature Dojo (#C41E3A)</option>
+                        <option value="#1A1A1A">⚫ Noir Doux (#1A1A1A)</option>
+                        <option value="#1A2A3A">🔵 Bleuté Encre (#1A2A3A)</option>
+                        <option value="#2ECC71">🟢 Vert Validé (#2ECC71)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Couleur Cadre Global :</label>
+                    <select id="ctrl-color-body" class="form-control" onchange="applyGlobalStyles()">
+                        <option value="#1A1A1A">⚫ Noir Doux (#1A1A1A)</option>
+                        <option value="#C41E3A">🔴 Rouge Signature Dojo (#C41E3A)</option>
+                        <option value="#1A2A3A">🔵 Bleuté Encre (#1A2A3A)</option>
+                        <option value="#2ECC71">🟢 Vert Validé (#2ECC71)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Angle de Tamponnage :</label>
+                    <input type="range" id="ctrl-angle" min="-12" max="12" value="-3" class="form-control" oninput="applyGlobalStyles()">
+                </div>
+
+                <div class="form-group">
+                    <label>Date affichée sur Tampons :</label>
+                    <input type="text" id="ctrl-date" value="" class="form-control" oninput="updateCustomTexts()">
+                </div>
+            </div>
+
+            <!-- GALERIE DES TAMPONS PRÊTS À TÉLÉCHARGER -->
+            <div class="stamps-grid">
+                
+                <!-- TAMPON 1 : EXECUTIVE PRO COMPLET -->
+                <div class="stamp-card">
+                    <div class="stamp-card-title">
+                        <span>1. Official Executive Pro</span>
+                        <span style="font-size:0.75rem; color:var(--gris-moyen);">En-tête & Factures</span>
+                    </div>
+                    <div class="stamp-stage">
+                        <div class="stamp-render-box" id="stamp-target-1">
+                            <div class="stamp-model-1">
+                                <div class="logo-box-official">
+                                    <img class="img-logo-target" src="" alt="Logo" style="display:none;">
+                                    <span class="logo-placeholder" id="ph-logo-1">LOGO<br>DOJO</span>
+                                </div>
+                                <div class="info-block">
+                                    <div class="club-title">DOJO DORNOIS</div>
+                                    1 Place de la Mairie • 58390 DORNES<br>
+                                    FFJDA n° CE 08.58.067.0 • Agrément 58.S.471<br>
+                                    <strong>SIRET :</strong> 451 928 410 00013 • <strong>RNA :</strong> W583001220<br>
+                                    dojodornois@gmail.com • 06.07.13.91.86
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" style="width:100%;" onclick="telechargerTampon('stamp-target-1', 'Tampon_DojoDornois_Executive')">📥 Télécharger PNG Transparent</button>
+                </div>
+
+                <!-- TAMPON 2 : CIRCULAIRE TRADITIONNEL -->
+                <div class="stamp-card">
+                    <div class="stamp-card-title">
+                        <span>2. Sceau Circulaire Officiel</span>
+                        <span style="font-size:0.75rem; color:var(--gris-moyen);">Authentification</span>
+                    </div>
+                    <div class="stamp-stage">
+                        <div class="stamp-render-box" id="stamp-target-2">
+                            <div class="stamp-model-2">
+                                <div class="inner-circle">
+                                    <div class="circle-logo-mini">
+                                        <img class="img-logo-target" src="" alt="Logo" style="display:none;">
+                                        <span class="logo-placeholder" id="ph-logo-2" style="font-size:0.55rem;">LOGO</span>
+                                    </div>
+                                    <div class="circle-title">DOJO DORNOIS</div>
+                                    <div class="circle-sub">SIRET 45192841000013</div>
+                                    <div class="circle-sub">58390 DORNES</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" style="width:100%;" onclick="telechargerTampon('stamp-target-2', 'Tampon_DojoDornois_Circulaire')">📥 Télécharger PNG Transparent</button>
+                </div>
+
+                <!-- TAMPON 3 : MENTION PAYÉ -->
+                <div class="stamp-card">
+                    <div class="stamp-card-title">
+                        <span>3. Tampon "PAYÉ" (Règlement Effectué)</span>
+                        <span style="font-size:0.75rem; color:var(--gris-moyen);">Paiements émis</span>
+                    </div>
+                    <div class="stamp-stage">
+                        <div class="stamp-render-box" id="stamp-target-3">
+                            <div class="stamp-model-paye">
+                                <div class="status-text">PAYÉ</div>
+                                <div class="status-date"><span class="render-date-inline">30/07/2026</span> • Dojo Dornois</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" style="width:100%;" onclick="telechargerTampon('stamp-target-3', 'Tampon_DojoDornois_PAYE')">📥 Télécharger PNG Transparent</button>
+                </div>
+
+                <!-- TAMPON 4 : MENTION ACQUITTÉ -->
+                <div class="stamp-card">
+                    <div class="stamp-card-title">
+                        <span>4. Tampon "ACQUITTÉ" (Créance Réglée)</span>
+                        <span style="font-size:0.75rem; color:var(--gris-moyen);">Factures encaissées</span>
+                    </div>
+                    <div class="stamp-stage">
+                        <div class="stamp-render-box" id="stamp-target-4">
+                            <div class="stamp-model-acquitte">
+                                <div class="status-text">ACQUITTÉ</div>
+                                <div class="status-date"><span class="render-date-inline">30/07/2026</span> • Dojo Dornois</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" style="width:100%;" onclick="telechargerTampon('stamp-target-4', 'Tampon_DojoDornois_ACQUITTE')">📥 Télécharger PNG Transparent</button>
+                </div>
+
+                <!-- TAMPON 5 : VALIDATION INTERNE / COMMANDE -->
+                <div class="stamp-card">
+                    <div class="stamp-card-title">
+                        <span>5. Validation & Engagement</span>
+                        <span style="font-size:0.75rem; color:var(--gris-moyen);">Bons de commande & Devis</span>
+                    </div>
+                    <div class="stamp-stage">
+                        <div class="stamp-render-box" id="stamp-target-5">
+                            <div class="stamp-model-commande">
+                                <div class="icon">✓</div>
+                                <div class="text-group">
+                                    <div class="title">ENGAGEMENT VALIDÉ</div>
+                                    <div class="sub">Comité de Direction • Dojo Dornois</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" style="width:100%;" onclick="telechargerTampon('stamp-target-5', 'Tampon_DojoDornois_Valide')">📥 Télécharger PNG Transparent</button>
+                </div>
+
+                <!-- TAMPON 6 : SUBVENTIONNÉ -->
+                <div class="stamp-card">
+                    <div class="stamp-card-title">
+                        <span>6. Dépense Subventionnée</span>
+                        <span style="font-size:0.75rem; color:var(--gris-moyen);">Dossiers de Subvention</span>
+                    </div>
+                    <div class="stamp-stage">
+                        <div class="stamp-render-box" id="stamp-target-6">
+                            <div class="stamp-model-subvention">
+                                <div class="title">DÉPENSE SUBVENTIONNÉE</div>
+                                <div class="sub">Projet Associatif • Dojo Dornois</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" style="width:100%;" onclick="telechargerTampon('stamp-target-6', 'Tampon_DojoDornois_Subventionne')">📥 Télécharger PNG Transparent</button>
+                </div>
+
+                <!-- TAMPON 7 : COPIE CERTIFIÉE CONFORME -->
+                <div class="stamp-card">
+                    <div class="stamp-card-title">
+                        <span>7. Certification de Copie</span>
+                        <span style="font-size:0.75rem; color:var(--gris-moyen);">Administratif</span>
+                    </div>
+                    <div class="stamp-stage">
+                        <div class="stamp-render-box" id="stamp-target-7">
+                            <div class="stamp-model-certifie">
+                                <div class="header">COPIE CERTIFIÉE CONFORME</div>
+                                <div><strong>Organisme :</strong> Dojo Dornois (RNA W583001220)</div>
+                                <div><strong>Date :</strong> <span class="render-date-inline">30/07/2026</span></div>
+                                <div style="margin-top:4px; font-style:italic;">Pour valoir ce que de droit.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" style="width:100%;" onclick="telechargerTampon('stamp-target-7', 'Tampon_DojoDornois_Certifie')">📥 Télécharger PNG Transparent</button>
+                </div>
+
+                <!-- TAMPON 8 : CLASSÉ / ARCHIVÉ -->
+                <div class="stamp-card">
+                    <div class="stamp-card-title">
+                        <span>8. Classé / Archivé</span>
+                        <span style="font-size:0.75rem; color:var(--gris-moyen);">Secrétariat</span>
+                    </div>
+                    <div class="stamp-stage">
+                        <div class="stamp-render-box" id="stamp-target-8">
+                            <div class="stamp-model-archive">
+                                <div class="title">CLASSÉ & ARCHIVÉ</div>
+                                <div class="sub">Bureau Intranet • Dojo Dornois</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" style="width:100%;" onclick="telechargerTampon('stamp-target-8', 'Tampon_DojoDornois_Archive')">📥 Télécharger PNG Transparent</button>
+                </div>
+
+                <!-- TAMPON 9 : SIGNATURE PRÉSIDENT -->
+                <div class="stamp-card">
+                    <div class="stamp-card-title">
+                        <span>9. Signature Président (Jordan Loudenot)</span>
+                        <span style="font-size:0.75rem; color:var(--gris-moyen);">Émargement</span>
+                    </div>
+                    <div class="stamp-stage">
+                        <div class="stamp-render-box" id="stamp-target-9">
+                            <div class="stamp-model-sig">
+                                <div class="sig-title">Le Président — Dojo Dornois</div>
+                                <div class="sig-name">Jordan LOUDENOT</div>
+                                <div class="sig-img-container">
+                                    <img id="jordan-sig-img" src="" alt="Signature" style="display:none;">
+                                    <span id="ph-sig-text" style="font-size:0.8rem; color:var(--gris-moyen); margin-top:10px;">(Chargez votre signature ci-dessus)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" style="width:100%;" onclick="telechargerTampon('stamp-target-9', 'Signature_Jordan_Loudenot_President')">📥 Télécharger PNG Transparent</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast success';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3500);
+        }
+
+        // LECTURE ET SAUVEGARDE DU LOGO LOCAL
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    applyLogoDataUrl(dataUrl);
+                    localStorage.setItem('club_logo_upload', dataUrl);
+                    showToast("✓ Logo chargé avec succès !");
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function applyLogoDataUrl(dataUrl) {
+            document.querySelectorAll('.img-logo-target').forEach(img => {
+                img.src = dataUrl;
+                img.style.display = 'block';
+            });
+            if(document.getElementById('ph-logo-1')) document.getElementById('ph-logo-1').style.display = 'none';
+            if(document.getElementById('ph-logo-2')) document.getElementById('ph-logo-2').style.display = 'none';
+        }
+
+        // LECTURE ET SAUVEGARDE DE LA SIGNATURE LOCALE
+        function handleSigUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    applySigDataUrl(dataUrl);
+                    localStorage.setItem('club_signature', dataUrl);
+                    showToast("✓ Signature chargée avec succès !");
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function applySigDataUrl(dataUrl) {
+            const img = document.getElementById('jordan-sig-img');
+            if (img) {
+                img.src = dataUrl;
+                img.style.display = 'block';
+                if(document.getElementById('ph-sig-text')) document.getElementById('ph-sig-text').style.display = 'none';
+            }
+        }
+
+        function applyGlobalStyles() {
+            const titleColor = document.getElementById('ctrl-color-title').value;
+            const bodyColor = document.getElementById('ctrl-color-body').value;
+            const angle = document.getElementById('ctrl-angle').value;
+
+            document.documentElement.style.setProperty('--stamp-title-color', titleColor);
+            document.documentElement.style.setProperty('--stamp-color', bodyColor);
+
+            const boxes = document.querySelectorAll('.stamp-render-box');
+            boxes.forEach(box => {
+                box.style.transform = `rotate(${angle}deg)`;
+            });
+        }
+
+        function updateCustomTexts() {
+            const date = document.getElementById('ctrl-date').value;
+            document.querySelectorAll('.render-date-inline').forEach(el => {
+                el.innerText = date;
+            });
+        }
+
+        function telechargerTampon(elementId, filename) {
+            const target = document.getElementById(elementId);
+            const currentTransform = target.style.transform;
+            target.style.transform = 'none';
+
+            html2canvas(target, {
+                backgroundColor: null,
+                scale: 3,
+                logging: false
+            }).then(canvas => {
+                target.style.transform = currentTransform;
+
+                const link = document.createElement('a');
+                link.download = `${filename}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                showToast(`✓ Tampon HD exporté avec succès (${filename}.png) !`);
+            }).catch(err => {
+                target.style.transform = currentTransform;
+                console.error("Erreur d'exportation tampon:", err);
+                alert("Erreur lors de la génération du fichier PNG.");
+            });
+        }
+
+        window.onload = () => {
+            const today = new Date().toLocaleDateString('fr-FR');
+            document.getElementById('ctrl-date').value = today;
+
+            // Chargement automatique des visuels sauvegardés s'ils existent déjà
+            const savedLogo = localStorage.getItem('club_logo_upload');
+            if(savedLogo) applyLogoDataUrl(savedLogo);
+
+            const savedSig = localStorage.getItem('club_signature');
+            if(savedSig) applySigDataUrl(savedSig);
+
+            applyGlobalStyles();
+            updateCustomTexts();
+        };
+    </script>
+
+    <!-- SCRIPT SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+</body>
+</html>

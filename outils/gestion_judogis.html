@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des Judogis — Intranet Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=400;600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --rouge-deep: #8B1429;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            
+            --sidebar-width: 280px;
+            --topbar-height: 68px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            margin: 0; padding: 0;
+            color: var(--gris-fonce);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- FIX SIDEBAR DÉBORDEMENT --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        .sidebar * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+
+        /* ===== CONTENU PRINCIPAL ===== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .topbar {
+            background: var(--blanc);
+            height: var(--topbar-height);
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            flex-shrink: 0;
+            z-index: 50;
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+
+        .page-title-area h2 {
+            font-family: 'Fredoka', sans-serif;
+            margin: 0;
+            font-size: 1.35rem;
+            color: var(--noir-doux);
+            line-height: 1;
+        }
+
+        .page-title-area p {
+            margin: 2px 0 0 0;
+            font-size: 0.78rem;
+            color: var(--gris-moyen);
+        }
+
+        /* ===== SYSTEME D'ONGLETS ===== */
+        .tabs-header {
+            display: flex;
+            background: var(--blanc);
+            padding: 10px 28px 0 28px;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            gap: 10px;
+        }
+
+        .tab-btn {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: var(--gris-moyen);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: var(--rouge);
+            background: var(--rouge-clair);
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+
+        .tab-btn.active {
+            color: var(--rouge);
+            border-bottom-color: var(--rouge);
+            font-weight: 600;
+        }
+
+        .dashboard-body {
+            flex: 1;
+            padding: 24px 28px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gris-tres-clair) transparent;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== COIN INTERFACE COMPOSANTS ===== */
+        .card {
+            background: var(--blanc);
+            border-radius: 10px;
+            border: 1px solid var(--gris-tres-clair);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            color: var(--rouge);
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* ===== STYLES DES TABLEAUX ===== */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: var(--fond);
+            color: var(--noir-doux);
+            font-weight: 600;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--gris-tres-clair);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            color: var(--gris-fonce);
+        }
+
+        tr:hover td {
+            background-color: rgba(244, 246, 249, 0.5);
+        }
+
+        /* ===== CONTROLES & FORMULAIRES ===== */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gris-fonce);
+        }
+
+        .form-control {
+            padding: 9px 12px;
+            border: 1.5px solid var(--gris-tres-clair);
+            border-radius: 7px;
+            font-size: 0.875rem;
+            background: var(--blanc);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--rouge);
+            box-shadow: 0 0 0 3px rgba(196,30,58,0.08);
+        }
+
+        .btn {
+            background: var(--rouge);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s;
+            height: 38px;
+            justify-content: center;
+        }
+
+        .btn:hover { background: var(--rouge-hover); }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-secondary { background: var(--gris-moyen); }
+        .btn-secondary:hover { background: var(--gris-fonce); }
+
+        .actions-cell {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-action {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            color: white;
+        }
+        .btn-edit { background: #f1c40f; color: var(--noir-doux); font-weight: 500; }
+        .btn-edit:hover { background: #f39c12; }
+        .btn-delete { background: #e74c3c; }
+        .btn-delete:hover { background: #c0392b; }
+
+        /* ===== INVENTAIRE BADGES ===== */
+        .grid-inventaire {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .stock-badge {
+            background: var(--fond);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .stock-badge.complet {
+            background: var(--rouge-clair);
+            color: var(--rouge);
+        }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        @media print {
+            body { background: white; padding: 0; color: black; display: block !important; }
+            .no-print, .sidebar, .topbar { display: none !important; }
+            .main-content { padding: 0 !important; overflow: visible !important; }
+            .dashboard-body { display: block !important; margin: 0 !important; padding: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== SIDEBAR DYNAMIQUE ===== -->
+    <div class="sidebar"></div>
+
+    <!-- ===== MAIN CONTENT AREA ===== -->
+    <div class="main-content">
+        <div class="topbar no-print">
+            <div class="topbar-left">
+                <div class="page-title-area">
+                    <h2>Gestion Vestiaire & Judogis</h2>
+                    <p>Suivi des prêts de tenues et inventaire du stock club</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglets de Navigation -->
+        <div class="tabs-header no-print">
+            <button class="tab-btn active" onclick="switchTab('tab-prets', this)">🤝 Suivi des Prêts</button>
+            <button class="tab-btn" onclick="switchTab('tab-inventaire', this)">📊 Inventaire du Stock</button>
+        </div>
+
+        <div class="dashboard-body">
+
+            <!-- ================= ONGLET 1 : LES PRÊTS ================= -->
+            <div id="tab-prets" class="tab-content active">
+                <!-- Formulaire d'ajout / modification -->
+                <div class="card no-print">
+                    <div class="card-title" id="form-pret-title">📝 Enregistrer un nouveau prêt</div>
+                    <form id="form-pret" onsubmit="handlePretSubmit(event)">
+                        <input type="hidden" id="pret-id">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nom & Prénom du Judoka</label>
+                                <input type="text" id="pret-nom" class="form-control" placeholder="Ex: Roman Loudenot" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Taille Veste (cm)</label>
+                                <select id="pret-taille-veste" class="form-control">
+                                    <!-- Rempli dynamiquement en JS -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Taille Pantalon (cm)</label>
+                                <select id="pret-taille-pantalon" class="form-control">
+                                    <!-- Rempli dynamiquement en JS -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Date du prêt</label>
+                                <input type="date" id="pret-date" class="form-control" required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn" id="btn-save-pret">💾 Enregistrer le prêt</button>
+                                <button type="button" class="btn btn-secondary" id="btn-cancel-pret" style="display:none;" onclick="resetPretForm()">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Tableau des judogis prêtés -->
+                <div class="card">
+                    <div class="card-title">🥋 Liste des tenues actuellement prêtées</div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Judoka</th>
+                                    <th>Taille Veste</th>
+                                    <th>Taille Pantalon</th>
+                                    <th>Date d'attribution</th>
+                                    <th class="no-print">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-prets">
+                                <!-- Rempli dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= ONGLET 2 : INVENTAIRE ================= -->
+            <div id="tab-inventaire" class="tab-content">
+                <div class="grid-inventaire">
+                    <!-- Section Vestes -->
+                    <div class="card">
+                        <div class="card-title">🧥 Stock des Vestes</div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Taille</th>
+                                        <th>Quantité disponible</th>
+                                        <th class="no-print">Action rapide</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-stock-vestes">
+                                    <!-- Rempli en JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Section Pantalons -->
+                    <div class="card">
+                        <div class="card-title">🩳 Stock des Pantalons</div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Taille</th>
+                                        <th>Quantité disponible</th>
+                                        <th class="no-print">Action rapide</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-stock-pantalons">
+                                    <!-- Rempli en JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Nouvelle Section Globale : Judogis Complets -->
+                    <div class="card">
+                        <div class="card-title">🥋 Judogis Complets Disponibles <span style="font-size: 0.8rem; color: var(--gris-moyen); font-family: 'Roboto', sans-serif;">(Vestes + Pantalons de même taille)</span></div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Taille</th>
+                                        <th>Tenues complètes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-stock-complets">
+                                    <!-- Rempli en JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // --- SWITCHER ONGLET ---
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // --- GLOBAL LOGISTIQUE DATABASE COMPONENT ---
+        let logistiqueDB = {
+            prets: [],
+            stockVestes: {},
+            stockPantalons: {}
+        };
+
+        const taillesDefaut = [
+            "100 cm", "110 cm", "120 cm", "130 cm", "140 cm", "150 cm", 
+            "160 cm", "165 cm", "170 cm", "175 cm", "180 cm", "185 cm", 
+            "190 cm", "195 cm", "200 cm"
+        ];
+
+        // --- INTERCONNEXION CLOUD GOOGLE SHEETS ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+        const TARGET_SHEET = "logistique";
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast success';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3500);
+        }
+
+        function saveLogistiqueData() {
+            localStorage.setItem('dojo_logistique_unified', JSON.stringify(logistiqueDB));
+
+            const packet = {
+                targetSheet: TARGET_SHEET,
+                payload: logistiqueDB
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(packet)
+            })
+            .then(() => {
+                showToast("✓ Inventaire synchronisé sur Google Sheets !");
+            })
+            .catch(err => console.error("Erreur de sauvegarde Cloud Logistique:", err));
+        }
+
+        function loadLogistiqueData() {
+            fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && (data.prets || data.stockVestes || data.stockPantalons)) {
+                        logistiqueDB = data;
+                        console.log("✓ Données Logistique chargées depuis le Cloud.");
+                    } else {
+                        useFallbackLocalData();
+                    }
+                    finalizeInitialization();
+                })
+                .catch(err => {
+                    console.warn("Erreur Cloud Logistique, bascule sur la mémoire locale:", err);
+                    useFallbackLocalData();
+                    finalizeInitialization();
+                });
+        }
+
+        function useFallbackLocalData() {
+            const unifiedBackup = localStorage.getItem('dojo_logistique_unified');
+            if (unifiedBackup) {
+                logistiqueDB = JSON.parse(unifiedBackup);
+            } else {
+                logistiqueDB.prets = JSON.parse(localStorage.getItem('dd_judogis_prets')) || [
+                    { id: 1, nom: "Natéo Loudenot", veste: "120 cm", pantalon: "120 cm", date: "2025-09-06" },
+                    { id: 2, nom: "Félix Dupont", veste: "130 cm", pantalon: "140 cm", date: "2025-10-12" }
+                ];
+                logistiqueDB.stockVestes = JSON.parse(localStorage.getItem('dd_stock_vestes')) || {
+                    "100 cm": 5, "110 cm": 8, "120 cm": 12, "130 cm": 6, "140 cm": 4, "150 cm": 3, 
+                    "160 cm": 2, "165 cm": 0, "170 cm": 1, "175 cm": 0, "180 cm": 2, "185 cm": 0, 
+                    "190 cm": 0, "195 cm": 0, "200 cm": 1
+                };
+                logistiqueDB.stockPantalons = JSON.parse(localStorage.getItem('dd_stock_pantalons')) || {
+                    "100 cm": 4, "110 cm": 7, "120 cm": 10, "130 cm": 5, "140 cm": 5, "150 cm": 2, 
+                    "160 cm": 3, "165 cm": 1, "170 cm": 1, "175 cm": 0, "180 cm": 1, "185 cm": 0, 
+                    "190 cm": 0, "195 cm": 0, "200 cm": 1
+                };
+            }
+        }
+
+        function finalizeInitialization() {
+            initFormSelects();
+            document.getElementById('pret-date').valueAsDate = new Date();
+            renderPrets();
+            renderStock();
+        }
+
+        // --- REMPLISSAGE DES SELECTS DU FORMULAIRE ---
+        function initFormSelects() {
+            const vSelect = document.getElementById('pret-taille-veste');
+            const pSelect = document.getElementById('pret-taille-pantalon');
+            
+            vSelect.innerHTML = '<option value="Aucune">Aucune veste</option>';
+            pSelect.innerHTML = '<option value="Aucun">Aucun pantalon</option>';
+            
+            taillesDefaut.forEach(taille => {
+                vSelect.innerHTML += `<option value="${taille}">${taille}</option>`;
+                pSelect.innerHTML += `<option value="${taille}">${taille}</option>`;
+            });
+        }
+
+        // --- RENDUS DES TABLEAUX ---
+        function renderPrets() {
+            const tbody = document.getElementById('tbody-prets');
+            tbody.innerHTML = '';
+            if(!logistiqueDB.prets || logistiqueDB.prets.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gris-moyen);">Aucun prêt en cours actuellement.</td></tr>`;
+                return;
+            }
+            logistiqueDB.prets.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${p.nom}</strong></td>
+                    <td>${p.veste}</td>
+                    <td>${p.pantalon}</td>
+                    <td>${p.date.split('-').reverse().join('/')}</td>
+                    <td class="actions-cell no-print">
+                        <button class="btn-action btn-edit" onclick="editPret(${p.id})">✏️ Modifier</button>
+                        <button class="btn-action btn-delete" onclick="deletePret(${p.id})">❌ Récupéré</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderStock() {
+            // Vestes
+            const tbodyV = document.getElementById('tbody-stock-vestes');
+            tbodyV.innerHTML = '';
+            taillesDefaut.forEach(taille => {
+                const qte = logistiqueDB.stockVestes[taille] || 0;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${taille}</strong></td>
+                    <td><span class="stock-badge">${qte} en stock</span></td>
+                    <td class="actions-cell no-print">
+                        <button class="btn-action btn-edit" onclick="changeStock('veste', '${taille}', 1)">➕</button>
+                        <button class="btn-action btn-delete" onclick="changeStock('veste', '${taille}', -1)">➖</button>
+                    </td>
+                `;
+                tbodyV.appendChild(tr);
+            });
+
+            // Pantalons
+            const tbodyP = document.getElementById('tbody-stock-pantalons');
+            tbodyP.innerHTML = '';
+            taillesDefaut.forEach(taille => {
+                const qte = logistiqueDB.stockPantalons[taille] || 0;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${taille}</strong></td>
+                    <td><span class="stock-badge">${qte} en stock</span></td>
+                    <td class="actions-cell no-print">
+                        <button class="btn-action btn-edit" onclick="changeStock('pantalon', '${taille}', 1)">➕</button>
+                        <button class="btn-action btn-delete" onclick="changeStock('pantalon', '${taille}', -1)">➖</button>
+                    </td>
+                `;
+                tbodyP.appendChild(tr);
+            });
+
+            // Judogis Complets (Calcul automatique)
+            const tbodyC = document.getElementById('tbody-stock-complets');
+            tbodyC.innerHTML = '';
+            taillesDefaut.forEach(taille => {
+                const qteVeste = logistiqueDB.stockVestes[taille] || 0;
+                const qtePantalon = logistiqueDB.stockPantalons[taille] || 0;
+                const complets = Math.min(qteVeste, qtePantalon);
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${taille}</strong></td>
+                    <td><span class="stock-badge complet">${complets} complet(s)</span></td>
+                `;
+                tbodyC.appendChild(tr);
+            });
+        }
+
+        // --- OPERATIONS STOCK ---
+        function changeStock(type, taille, offset) {
+            if (type === 'veste') {
+                logistiqueDB.stockVestes[taille] = Math.max(0, (logistiqueDB.stockVestes[taille] || 0) + offset);
+            } else {
+                logistiqueDB.stockPantalons[taille] = Math.max(0, (logistiqueDB.stockPantalons[taille] || 0) + offset);
+            }
+            saveLogistiqueData();
+            renderStock();
+            showToast("Quantité de l'inventaire ajustée.");
+        }
+
+        // --- ENREGISTRER / MODIFIER UN PRÊT ---
+        function handlePretSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('pret-id').value;
+            const nom = document.getElementById('pret-nom').value.trim();
+            const veste = document.getElementById('pret-taille-veste').value;
+            const pantalon = document.getElementById('pret-taille-pantalon').value;
+            const date = document.getElementById('pret-date').value;
+
+            if(id) {
+                logistiqueDB.prets = logistiqueDB.prets.map(p => p.id == id ? { id: parseInt(id), nom, veste, pantalon, date } : p);
+                showToast("Prêt mis à jour avec succès !");
+            } else {
+                logistiqueDB.prets.push({ id: Date.now(), nom, veste, pantalon, date });
+                showToast("Nouveau prêt enregistré !");
+            }
+
+            saveLogistiqueData();
+            resetPretForm();
+            renderPrets();
+        }
+
+        function editPret(id) {
+            const pret = logistiqueDB.prets.find(p => p.id === id);
+            if(!pret) return;
+
+            document.getElementById('pret-id').value = pret.id;
+            document.getElementById('pret-nom').value = pret.nom;
+            document.getElementById('pret-taille-veste').value = pret.veste;
+            document.getElementById('pret-taille-pantalon').value = pret.pantalon;
+            document.getElementById('pret-date').value = pret.date;
+
+            document.getElementById('form-pret-title').innerText = "✏️ Modifier le prêt de " + pret.nom;
+            document.getElementById('btn-save-pret').innerText = "💾 Mettre à jour";
+            document.getElementById('btn-cancel-pret').style.display = "inline-flex";
+        }
+
+        function deletePret(id) {
+            if(confirm("Confirmer le retour du judogi au club ? Cela le supprimera des prêts en cours.")) {
+                logistiqueDB.prets = logistiqueDB.prets.filter(p => p.id !== id);
+                saveLogistiqueData();
+                renderPrets();
+                showToast("Le judogi a été réintégré.");
+            }
+        }
+
+        function resetPretForm() {
+            document.getElementById('pret-id').value = "";
+            document.getElementById('pret-nom').value = "";
+            document.getElementById('pret-taille-veste').value = "120 cm";
+            document.getElementById('pret-taille-pantalon').value = "120 cm";
+            document.getElementById('pret-date').valueAsDate = new Date();
+
+            document.getElementById('form-pret-title').innerText = "📝 Enregistrer un nouveau prêt";
+            document.getElementById('btn-save-pret').innerText = "💾 Enregistrer le prêt";
+            document.getElementById('btn-cancel-pret').style.display = "none";
+        }
+
+        window.onload = loadLogistiqueData;
+
+        window.switchTab = switchTab;
+        window.changeStock = changeStock;
+        window.handlePretSubmit = handlePretSubmit;
+        window.editPret = editPret;
+        window.deletePret = deletePret;
+        window.resetPretForm = resetPretForm;
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

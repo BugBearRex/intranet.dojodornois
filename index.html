@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Intranet Dojo Dornois</title>
+    <link rel="icon" type="image/png" href="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: rgba(196, 30, 58, 0.1);
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --topbar-height: 75px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            /* PAVAGE HEXAGONAL ROUGE NETTEMENT PLUS VISIBLE (Opacité 0.18, trait 1.8) */
+            background-image: url("data:image/svg+xml,%3Csvg width='56' height='100' viewBox='0 0 56 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 68L28 84L56 68L56 84L28 100Z' fill='none' stroke='%23C41E3A' stroke-opacity='0.18' stroke-width='1.8'/%3E%3C/svg%3E");
+            margin: 0; padding: 0;
+            color: var(--gris-fonce);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .topbar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            height: var(--topbar-height);
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 20px; }
+        .topbar h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.4rem; color: var(--noir-doux); text-shadow: 0 1px 2px rgba(255,255,255,0.8); }
+        .topbar p { margin: 2px 0 0 0; font-size: 0.8rem; color: var(--gris-moyen); font-weight: 500; }
+
+        .jarvis-status {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(196, 30, 58, 0.08);
+            padding: 6px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700; color: var(--rouge);
+            border: 1px solid rgba(196, 30, 58, 0.2);
+            box-shadow: 0 0 10px rgba(196, 30, 58, 0.1) inset;
+        }
+        .pulse-dot {
+            width: 8px; height: 8px; background: var(--rouge); border-radius: 50%;
+            box-shadow: 0 0 8px var(--rouge);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.5; transform: scale(0.8); } }
+
+        .search-container { position: relative; width: 320px; }
+        .search-input { 
+            width: 100%; padding: 10px 14px 10px 40px; 
+            border: 1px solid var(--glass-border); border-radius: 25px; 
+            font-size: 0.875rem; background: rgba(255,255,255,0.6); 
+            transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .search-input:focus { outline: none; background: #FFF; border-color: var(--rouge); box-shadow: 0 0 10px rgba(196, 30, 58, 0.15); }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--rouge); opacity: 0.7; }
+
+        .dashboard-body { flex: 1; padding: 24px 28px; overflow-y: auto; }
+        .catalog-controls { display: flex; gap: 12px; margin-bottom: 20px; }
+
+        .main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+        
+        .catalog-card, .info-card { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px; border: 1px solid var(--glass-border); 
+            padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .catalog-card:hover { box-shadow: 0 15px 40px rgba(196, 30, 58, 0.08); }
+
+        .catalog-section { margin-bottom: 28px; }
+        .catalog-category-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px dashed rgba(196, 30, 58, 0.2); padding-bottom: 8px; margin-bottom: 14px; }
+        .catalog-category-title { font-family: 'Fredoka', sans-serif; font-size: 1.15rem; color: var(--rouge); margin: 0; text-shadow: 0 1px 1px rgba(255,255,255,0.8); }
+
+        .catalog-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; min-height: 50px; padding: 8px; border: 1.5px transparent dashed; border-radius: 8px; transition: all 0.3s ease; }
+        body.edit-mode .catalog-list { border-color: rgba(196, 30, 58, 0.3); background: rgba(196,30,58,0.03); }
+
+        .app-tool-link {
+            display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 8px;
+            text-decoration: none; color: var(--gris-fonce); font-size: 0.875rem; font-weight: 500; 
+            background: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.4);
+            border-left: 4px solid transparent; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); user-select: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .app-tool-link:hover { 
+            background: #FFF; color: var(--rouge); border-left-color: var(--rouge); 
+            transform: translateY(-2px); box-shadow: 0 6px 15px rgba(196, 30, 58, 0.1); 
+        }
+
+        body.edit-mode .app-tool-link { cursor: grab; border: 1px dashed var(--rouge); }
+        body.edit-mode .app-tool-link.drag-over { border-color: var(--rouge); background: var(--rouge-clair); transform: scale(1.03); }
+
+        .btn-delete-tool { display: none; background: #e74c3c; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; cursor: pointer; box-shadow: 0 2px 5px rgba(231, 76, 60, 0.4); }
+        body.edit-mode .btn-delete-tool { display: inline-flex; align-items: center; justify-content: center; }
+
+        .btn { background: var(--rouge); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(196, 30, 58, 0.2); }
+        .btn:hover { background: var(--rouge-hover); transform: translateY(-1px); box-shadow: 0 6px 15px rgba(196, 30, 58, 0.3); }
+        .btn-secondary { background: rgba(255,255,255,0.9); color: var(--gris-fonce); border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+        .btn-secondary:hover { background: #FFF; color: var(--rouge); border-color: rgba(196, 30, 58, 0.3); }
+        .btn-active-edit { background: #e67e22; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3); }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; transition: opacity 0.3s; }
+        .modal-overlay.open { display: flex; }
+        .modal-box { background: rgba(255,255,255,0.95); border-radius: 14px; padding: 28px; max-width: 500px; width: 95%; box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.4); }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--gris-fonce); }
+        .form-control { width: 100%; padding: 10px 14px; border: 1.5px solid var(--gris-tres-clair); border-radius: 8px; font-size: 0.9rem; transition: border-color 0.2s; }
+        .form-control:focus { outline: none; border-color: var(--rouge); box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay" id="toolModal">
+        <div class="modal-box">
+            <h2 style="font-family:'Fredoka',sans-serif; margin-top:0;">➕ Ajouter un Outil</h2>
+            <div class="form-group">
+                <label>Nom du module (avec Émoji au début)</label>
+                <input type="text" id="new-tool-name" class="form-control" placeholder="Ex: 🥋 Suivi Licences">
+            </div>
+            <div class="form-group">
+                <label>Nom du fichier HTML (dans outils/)</label>
+                <input type="text" id="new-tool-filename" class="form-control" placeholder="Ex: licences.html">
+            </div>
+            <div class="form-group">
+                <label>Catégorie Cible</label>
+                <select id="new-tool-category" class="form-control"></select>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+                <button class="btn btn-secondary" onclick="closeModal('toolModal')">Annuler</button>
+                <button class="btn" onclick="saveNewTool()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="catModal">
+        <div class="modal-box">
+            <h2 style="font-family:'Fredoka',sans-serif; margin-top:0;">📁 Créer une Catégorie</h2>
+            <div class="form-group">
+                <label>Titre de la catégorie (avec Émoji au début)</label>
+                <input type="text" id="new-cat-title" class="form-control" placeholder="Ex: 📊 Statistiques & Analyses">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+                <button class="btn btn-secondary" onclick="closeModal('catModal')">Annuler</button>
+                <button class="btn" onclick="saveNewCategory()">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-left">
+                <div>
+                    <h2>Dashboard Central</h2>
+                    <p>Intranet Officiel du Dojo Dornois</p>
+                </div>
+                <div class="jarvis-status">
+                    <div class="pulse-dot"></div>
+                    Système en ligne. Bonjour Jordan.
+                </div>
+            </div>
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchTool" placeholder="Rechercher un outil..." oninput="filterTools()">
+            </div>
+        </div>
+
+        <div class="dashboard-body">
+            <div class="catalog-controls">
+                <button class="btn" id="btnToggleEdit" onclick="toggleEditMode()">⚙️ Mode Édition / Organiser</button>
+                <button class="btn btn-secondary" onclick="openNewToolModal()">➕ Créer un outil</button>
+                <button class="btn btn-secondary" onclick="openModal('catModal')">📁 Ajouter une catégorie</button>
+            </div>
+
+            <div class="main-grid">
+                <div class="catalog-card" id="catalogCard"></div>
+                <div>
+                    <div class="info-card">
+                        <h3 style="font-family:'Fredoka',sans-serif; margin-top:0; color:var(--rouge);">📌 Mode d'emploi</h3>
+                        <p style="font-size:0.85rem; color:var(--gris-moyen); line-height: 1.6;">
+                            • Clique sur <strong>Mode Édition</strong> pour renommer une catégorie, glisser un outil sur un autre pour réordonner ou changer de catégorie.<br>
+                            • La barre latérale est synchronisée sur ta charte graphique officielle.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+
+    <script>
+    const tousLesOutilsDojoDefaut = [
+        {
+            id: "compta",
+            titre: "💰 Comptabilité & Finances",
+            outils: [
+                { name: "💰 Trésorerie & Compta", url: "outils/compta.html" },
+                { name: "📊 Suivi Budget", url: "outils/budget.html" },
+                { name: "🚗 Notes de Frais", url: "outils/generateur_frais.html" },
+                { name: "🪙 Mécénat", url: "outils/mecenat.html" },
+                { name: "🖨️ Facturation", url: "outils/facturation.html" },
+                { name: "🏷️ Achats Publicitaires", url: "outils/achats_pub.html" }
+            ]
+        },
+        {
+            id: "admin",
+            titre: "📑 Administration, Devis & Documents",
+            outils: [
+                { name: "📝 Éditeur Documents", url: "outils/generateur_documents.html" },
+                { name: "💼 Générateur de Devis", url: "outils/generateur_devis.html" },
+                { name: "📜 Attestations & Reçus", url: "outils/generateur_recus.html" },
+                { name: "✉️ Courriers Officiels", url: "outils/generateur_courriers.html" },
+                { name: "📨 Convocations Club", url: "outils/generateur_convocations.html" },
+                { name: "📑 Comptes-Rendus", url: "outils/generateur_cr.html" },
+                { name: "📖 Livret Accueil", url: "outils/livretaccueil.html" }
+            ]
+        },
+        {
+            id: "materiel",
+            titre: "🥋 Gestion Club & Matériel",
+            outils: [
+                { name: "🥋 Gestion Judogis", url: "outils/gestion_judogis.html" },
+                { name: "⚙️ Immobilisations & Matériels", url: "outils/immobilisations.html" },
+                { name: "📦 Stocks & Logistique", url: "outils/logistique.html" },
+                { name: "🛍️ Boutique & Ventes", url: "outils/boutique.html" }
+            ]
+        },
+        {
+            id: "communication",
+            titre: "🎨 Communication, Design & Studio",
+            outils: [
+                { name: "📜 Charte Graphique", url: "outils/chartegraphique.html" },
+                { name: "🖊️ Studio Tampon", url: "outils/studio_tampon.html" },
+                { name: "🎨 Studio Icônes Dojo", url: "outils/studio_icones_dojo.html" },
+                { name: "📁 Icônes Dossiers Dojo", url: "outils/icones_dossiers_dojo.html" },
+                { name: "✉️ Newsletter Club", url: "outils/newsletter.html" },
+                { name: "📅 Calendrier Club", url: "outils/generateur_calendrier.html" }
+            ]
+        },
+        {
+            id: "activites",
+            titre: "🥋 Activités, Écoles & Événements",
+            outils: [
+                { name: "🥋 Équipe Technique", url: "outils/suivi_romain.html" },
+                { name: "🎈 Événements Club", url: "outils/evenements.html" },
+                { name: "🎟️ Compta Événements", url: "outils/compta_evenements.html" },
+                { name: "🏫 Suivi Écoles", url: "outils/suivi_ecoles.html" },
+                { name: "🌼 Suivi Événements Été", url: "outils/suivi_evenements_ete.html" },
+                { name: "🧘 Sophrologie", url: "outils/sophrologie.html" }
+            ]
+        },
+        {
+            id: "pilotage",
+            titre: "⚙️ Pilotage, Projets & Notes",
+            outils: [
+                { name: "📓 Workspace Notes", url: "outils/notion_board.html" },
+                { name: "🚀 Futur Dojo / Projets", url: "outils/futur_dojo.html" }
+            ]
+        }
+    ];
+
+    let structureCategories = [];
+    let isEditMode = false;
+    let draggedInfo = null;
+
+    function chargerInitialisation() {
+        const saved = localStorage.getItem('dd_catalog_structure_v5');
+        if (saved) {
+            structureCategories = JSON.parse(saved);
+        } else {
+            structureCategories = tousLesOutilsDojoDefaut;
+            saveState();
+        }
+        renderCatalog();
+    }
+
+    function saveState() {
+        localStorage.setItem('dd_catalog_structure_v5', JSON.stringify(structureCategories));
+        if (window.switchSidebarCat) {
+            const active = localStorage.getItem('dd_sidebar_active_cat') || 0;
+            window.switchSidebarCat(parseInt(active));
+        }
+    }
+
+    function renderCatalog() {
+        const container = document.getElementById('catalogCard');
+        container.innerHTML = '';
+
+        structureCategories.forEach((cat, catIdx) => {
+            const section = document.createElement('div');
+            section.className = 'catalog-section';
+
+            section.innerHTML = `
+                <div class="catalog-category-header">
+                    <h3 class="catalog-category-title" contenteditable="${isEditMode}" onblur="updateCatTitle(${catIdx}, this)">${cat.titre}</h3>
+                    ${isEditMode ? `<button style="background:none; border:none; color:#e74c3c; cursor:pointer; font-size:0.8rem;" onclick="deleteCategory(${catIdx})">🗑️ Supprimer</button>` : ''}
+                </div>
+                <div class="catalog-list" data-cat-idx="${catIdx}" ondragover="allowDrop(event)" ondrop="dropOnContainer(event, ${catIdx})"></div>
+            `;
+
+            const listEl = section.querySelector('.catalog-list');
+
+            cat.outils.forEach((tool, toolIdx) => {
+                const item = document.createElement('div');
+                item.className = 'app-tool-link';
+                item.draggable = isEditMode;
+
+                item.ondragstart = (e) => {
+                    if (!isEditMode) return;
+                    draggedInfo = { catIdx, toolIdx };
+                    e.dataTransfer.setData('text/plain', '');
+                };
+
+                item.ondragover = (e) => {
+                    if (!isEditMode) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    item.classList.add('drag-over');
+                };
+
+                item.ondragleave = () => {
+                    item.classList.remove('drag-over');
+                };
+
+                item.ondrop = (e) => {
+                    if (!isEditMode) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    item.classList.remove('drag-over');
+                    dropOnItem(catIdx, toolIdx);
+                };
+
+                item.onclick = () => {
+                    if (!isEditMode) window.location.href = tool.url;
+                };
+
+                item.innerHTML = `
+                    <span>${tool.name}</span>
+                    <button class="btn-delete-tool" onclick="event.stopPropagation(); deleteTool(${catIdx}, ${toolIdx})">✕</button>
+                `;
+
+                listEl.appendChild(item);
+            });
+
+            container.appendChild(section);
+        });
+    }
+
+    function toggleEditMode() {
+        isEditMode = !isEditMode;
+        document.body.classList.toggle('edit-mode', isEditMode);
+        const btn = document.getElementById('btnToggleEdit');
+        btn.innerText = isEditMode ? "💾 Sauvegarder" : "⚙️ Mode Édition / Organiser";
+        btn.classList.toggle('btn-active-edit', isEditMode);
+
+        if (!isEditMode) saveState();
+        renderCatalog();
+    }
+
+    function updateCatTitle(catIdx, el) {
+        structureCategories[catIdx].titre = el.innerText.trim();
+        saveState();
+    }
+
+    function deleteTool(catIdx, toolIdx) {
+        if (confirm("Supprimer cet outil ?")) {
+            structureCategories[catIdx].outils.splice(toolIdx, 1);
+            saveState();
+            renderCatalog();
+        }
+    }
+
+    function deleteCategory(catIdx) {
+        if (confirm("Supprimer cette catégorie et ses outils ?")) {
+            structureCategories.splice(catIdx, 1);
+            saveState();
+            renderCatalog();
+        }
+    }
+
+    function allowDrop(e) { e.preventDefault(); }
+
+    function dropOnItem(targetCatIdx, targetToolIdx) {
+        if (!draggedInfo) return;
+        const { catIdx, toolIdx } = draggedInfo;
+        
+        const movedTool = structureCategories[catIdx].outils.splice(toolIdx, 1)[0];
+        structureCategories[targetCatIdx].outils.splice(targetToolIdx, 0, movedTool);
+
+        draggedInfo = null;
+        saveState();
+        renderCatalog();
+    }
+
+    function dropOnContainer(e, targetCatIdx) {
+        e.preventDefault();
+        if (!draggedInfo) return;
+
+        const { catIdx, toolIdx } = draggedInfo;
+        const movedTool = structureCategories[catIdx].outils.splice(toolIdx, 1)[0];
+        structureCategories[targetCatIdx].outils.push(movedTool);
+
+        draggedInfo = null;
+        saveState();
+        renderCatalog();
+    }
+
+    function openNewToolModal() {
+        const select = document.getElementById('new-tool-category');
+        select.innerHTML = '';
+        structureCategories.forEach((cat, idx) => {
+            select.innerHTML += `<option value="${idx}">${cat.titre}</option>`;
+        });
+        openModal('toolModal');
+    }
+
+    function saveNewTool() {
+        const name = document.getElementById('new-tool-name').value.trim();
+        let filename = document.getElementById('new-tool-filename').value.trim();
+        const catIdx = document.getElementById('new-tool-category').value;
+
+        if (!name || !filename) return;
+        if (!filename.endsWith('.html')) filename += '.html';
+
+        structureCategories[catIdx].outils.push({ name, url: `outils/${filename}` });
+        saveState();
+        closeModal('toolModal');
+        renderCatalog();
+    }
+
+    function saveNewCategory() {
+        const title = document.getElementById('new-cat-title').value.trim();
+        if (!title) return;
+
+        structureCategories.push({
+            id: 'cat_' + Date.now(),
+            titre: title,
+            outils: []
+        });
+
+        saveState();
+        closeModal('catModal');
+        renderCatalog();
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    function filterTools() {
+        const q = document.getElementById('searchTool').value.toLowerCase();
+        document.querySelectorAll('.app-tool-link').forEach(el => {
+            el.style.display = el.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', chargerInitialisation);
+    </script>
+</body>
+</html>

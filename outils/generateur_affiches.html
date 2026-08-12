@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'Affiches Officiel - Dojo Dornois</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --rouge: #C41E3A; --rouge-hover: #A3182E; --rouge-clair: #FFEBEF;
+            --noir-doux: #1A1A1A; --gris-fonce: #3D3D3D; --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8; --gris-tres-clair: #E8E8E8; --fond: #F4F6F9;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--fond); color: var(--gris-fonce); margin: 0; padding: 0; font-size: 15px; display: flex; height: 100vh; overflow: hidden; }
+        .font-fredoka { font-family: 'Fredoka', sans-serif; }
+
+        /* VUE AFFICHE */
+        .poster-viewport { 
+            background-color: #ffffff; 
+            color: #1a1a1a; 
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); 
+            position: relative; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            flex-shrink: 0;
+            margin: 0 auto;
+        }
+
+        /* DIMENSIONS EXACTES WEB */
+        .format-a4 { width: 794px; height: 1123px; font-size: 16px; }
+        .format-facebook { width: 800px; height: 1000px; font-size: 16.1px; }
+
+        .preview-wrapper { width: 100%; height: 100%; overflow: auto; padding: 40px; display: flex; justify-content: center; align-items: flex-start; }
+        .preview-scaler { transform: scale(0.60); transform-origin: top center; transition: transform 0.2s; width: 100%; display: flex; justify-content: center; margin-bottom: -450px; }
+
+        /* SCROLLBAR CUSTOM */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+        /* DRAG AND DROP VISUALS (MENU GAUCHE) */
+        .ghost-dragging { opacity: 0.4; background-color: #f1f5f9; border: 2px dashed #C41E3A; }
+
+        /* DRAG AND DROP VISUALS (APERÇU DIRECT) */
+        .preview-block { position: relative; cursor: grab; user-select: none; transition: all 0.15s ease; border-radius: 8px; }
+        .preview-block::after {
+            content: '🖐️ Maintenir pour déplacer';
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(52, 152, 219, 0.85);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Fredoka', sans-serif; font-size: 22px; font-weight: bold; color: white;
+            opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 50; border-radius: 12px;
+            backdrop-filter: blur(2px);
+        }
+        .preview-block:hover::after { opacity: 1; }
+        .preview-block:active { cursor: grabbing; }
+        .preview-dragging { opacity: 0.1 !important; transform: scale(0.98); }
+        .drop-target-above { box-shadow: 0 -8px 0 0 #3498DB !important; border-top-left-radius: 0 !important; border-top-right-radius: 0 !important; }
+        .drop-target-below { box-shadow: 0 8px 0 0 #3498DB !important; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+
+        /* PARAMETRES D'IMPRESSION NATIVE */
+        @media print {
+            .no-print { display: none !important; }
+            html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
+            .preview-wrapper { padding: 0 !important; display: block !important; overflow: visible !important; }
+            .preview-scaler { transform: scale(1) !important; margin: 0 !important; display: block !important; width: 100% !important; }
+            .poster-viewport { box-shadow: none !important; border: none !important; margin: 0 auto !important; page-break-after: avoid; page-break-inside: avoid; }
+            .preview-block::after { display: none !important; }
+            .preview-block { cursor: default !important; transform: none !important; box-shadow: none !important; }
+        }
+    </style>
+    
+    <style id="dynamic-print-size">
+        @page { size: 210mm 297mm; margin: 0; }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden antialiased">
+
+    <header class="no-print bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0 z-20 shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="bg-[#C41E3A] w-11 h-11 rounded-xl flex items-center justify-center shadow-md">
+                <i class="fa-solid fa-wand-magic-sparkles text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-fredoka text-lg font-bold text-slate-900 leading-tight">Studio Affiches Officiel</h1>
+                <p class="text-[11px] text-slate-500 uppercase tracking-wide font-bold">Dojo Dornois (Édition Magnétique Intégrale)</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="openHistoryModal()" class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-2 transition">
+                <i class="fa-solid fa-clock-rotate-left text-amber-600"></i> Mes Affiches (<span id="history-count">0</span>)
+            </button>
+            <button onclick="openCodeModal()" class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-2 transition">
+                <i class="fa-solid fa-code text-[#C41E3A]"></i> Code HTML
+            </button>
+            <button onclick="saveCurrentPoster()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold flex items-center gap-2 shadow-md transition">
+                <i class="fa-solid fa-floppy-disk"></i> Sauvegarder
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden bg-slate-800">
+        <div class="no-print w-[450px] bg-white border-r border-slate-200 flex flex-col h-full shrink-0 shadow-2xl z-10 relative">
+            <div class="flex border-b border-slate-200 bg-slate-50 text-xs font-medium shrink-0">
+                <button onclick="switchEditorTab('content')" id="tab-btn-content" class="flex-1 py-3.5 border-b-2 border-[#C41E3A] text-[#C41E3A] font-fredoka flex justify-center items-center gap-2 font-bold transition">
+                    <i class="fa-solid fa-pen-to-square"></i> Agencement
+                </button>
+                <button onclick="switchEditorTab('blocks')" id="tab-btn-blocks" class="flex-1 py-3.5 text-slate-500 hover:text-slate-800 font-fredoka flex justify-center items-center gap-2 transition">
+                    <i class="fa-solid fa-layer-group"></i> Nouveaux Blocs
+                </button>
+                <button onclick="switchEditorTab('format')" id="tab-btn-format" class="flex-1 py-3.5 text-slate-500 hover:text-slate-800 font-fredoka flex justify-center items-center gap-2 transition">
+                    <i class="fa-solid fa-gear"></i> Paramètres
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-5 space-y-5 bg-[#F4F6F9]">
+                <div id="editor-tab-content" class="space-y-5 block">
+                    <div class="space-y-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="bg-blue-50 border border-blue-100 p-2 rounded text-[10px] text-blue-800 font-medium mb-2">
+                            <i class="fa-solid fa-circle-info"></i> Laissez ces champs vides si vous souhaitez que le premier bloc remonte tout en haut.
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nom (Interne)</label>
+                            <input type="text" id="poster-name-input" value="Affiche Événement Judo" oninput="updatePosterTitle()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#C41E3A] font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Titre Principal</label>
+                            <input type="text" id="input-main-title" value="" placeholder="Ex: GRAND STAGE" oninput="renderPoster()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#C41E3A] font-bold font-fredoka">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Sous-titre / Accroche</label>
+                            <input type="text" id="input-subtitle" value="" placeholder="Ex: Ouvert à tous" oninput="renderPoster()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#C41E3A] font-medium">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold text-slate-800 font-fredoka uppercase tracking-wider"><i class="fa-solid fa-grip-vertical text-[#C41E3A] mr-1"></i> Organisation des blocs</span>
+                        </div>
+                        <div class="bg-indigo-50 border border-indigo-200 p-3 rounded-lg mb-4 text-indigo-800 text-xs font-medium flex items-start gap-2 shadow-sm">
+                            <i class="fa-solid fa-lightbulb mt-0.5 text-indigo-500"></i>
+                            <p>Vous pouvez glisser-déposer les blocs dans la liste, <strong>ou directement sur l'aperçu visuel à droite !</strong></p>
+                        </div>
+                        <div id="dynamic-blocks-list" class="space-y-4"></div>
+                    </div>
+                </div>
+
+                <div id="editor-tab-blocks" class="hidden space-y-3">
+                    <p class="text-xs text-slate-500 font-medium mb-2 bg-blue-50 p-3 rounded-lg border border-blue-100 text-blue-800">
+                        <i class="fa-solid fa-info-circle mr-1"></i> Cliquez sur un bloc pour l'ajouter à votre composition.
+                    </p>
+                    
+                    <div class="space-y-1 mb-2">
+                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest pl-1 mb-2 mt-4">Les 10 Nouveautés</h4>
+                        <div class="grid grid-cols-1 gap-2">
+                            <button onclick="injectBlock('alerte-annulation')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-ban text-rose-600 text-lg w-5"></i> Alerte Annulation / Urgence</div></button>
+                            <button onclick="injectBlock('checklist')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-check-double text-emerald-500 text-lg w-5"></i> Checklist (À prévoir)</div></button>
+                            <button onclick="injectBlock('palmares')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-medal text-amber-400 text-lg w-5"></i> Palmarès / Résultats</div></button>
+                            <button onclick="injectBlock('age-category')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-users text-blue-500 text-lg w-5"></i> Catégorie d'Âge ciblée</div></button>
+                            <button onclick="injectBlock('qr-code-box')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-qrcode text-slate-800 text-lg w-5"></i> Zone QR Code</div></button>
+                            <button onclick="injectBlock('bouton-action')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-regular fa-hand-pointer text-indigo-500 text-lg w-5"></i> Bouton d'Action</div></button>
+                            <button onclick="injectBlock('focus-stat')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-chart-simple text-sky-500 text-lg w-5"></i> Chiffre Clé (Statistique)</div></button>
+                            <button onclick="injectBlock('temoignage')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-star text-amber-400 text-lg w-5"></i> Témoignage / Avis 5 étoiles</div></button>
+                            <button onclick="injectBlock('lieu-details')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-rose-500 text-lg w-5"></i> Lieu & Itinéraire détaillé</div></button>
+                            <button onclick="injectBlock('avantage-rond')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-circle-check text-teal-500 text-lg w-5"></i> Point Fort (Centré)</div></button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest pl-1 mb-2 mt-4">Les Classiques</h4>
+                        <div class="grid grid-cols-1 gap-2">
+                            <button onclick="injectBlock('titre-section')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-heading text-slate-700 text-lg w-5"></i> Titre de Section (Séparateur)</div></button>
+                            <button onclick="injectBlock('event-header-simple')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-bullhorn text-[#C41E3A] text-lg w-5"></i> En-tête (SANS date, centré)</div></button>
+                            <button onclick="injectBlock('horaire-centre')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-clock text-rose-500 text-lg w-5"></i> Horaire Centré</div></button>
+                            <button onclick="injectBlock('contact-info')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-address-book text-slate-900 text-lg w-5"></i> Bloc Contact Rapide</div></button>
+                            <button onclick="injectBlock('event-header')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-bullhorn text-[#C41E3A] text-lg w-5"></i> En-tête (AVEC date)</div></button>
+                            <button onclick="injectBlock('programme')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-list-check text-indigo-500 text-lg w-5"></i> Programme / Liste</div></button>
+                            <button onclick="injectBlock('teacher-profile')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-user-tie text-blue-600 text-lg w-5"></i> Profil Intervenant</div></button>
+                            <button onclick="injectBlock('quote-box')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-quote-left text-slate-700 text-lg w-5"></i> Citation / Code Moral</div></button>
+                            <button onclick="injectBlock('event-card')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-calendar-day text-emerald-600 text-lg w-5"></i> Carte Cours Régulier</div></button>
+                            <button onclick="injectBlock('warning-box')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-500 text-lg w-5"></i> Alerte Logistique</div></button>
+                            <button onclick="injectBlock('info-box')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-circle-info text-sky-500 text-lg w-5"></i> Encart Info Rose</div></button>
+                            <button onclick="injectBlock('tarifs')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-euro-sign text-emerald-600 text-lg w-5"></i> Grille de Tarifs</div></button>
+                            <button onclick="injectBlock('special-stage')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-trophy text-amber-500 text-lg w-5"></i> Stage Inter-Clubs</div></button>
+                            <button onclick="injectBlock('cobranding')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-handshake text-slate-700 text-lg w-5"></i> Partenaire / Mairie</div></button>
+                            <button onclick="injectBlock('custom-text')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-[#C41E3A] flex items-center gap-2"><i class="fa-solid fa-align-left text-slate-400 text-lg w-5"></i> Texte Libre Complet</div></button>
+                            <button onclick="injectBlock('raw-html')" class="bg-white hover:bg-rose-50 border border-slate-200 p-3 rounded-xl text-left transition group shadow-sm"><div class="font-fredoka text-sm text-slate-800 font-bold group-hover:text-purple-600 flex items-center gap-2"><i class="fa-solid fa-code text-purple-600 text-lg w-5"></i> Code HTML Personnalisé</div></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="editor-tab-format" class="hidden space-y-5">
+                    <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl space-y-3 shadow-sm">
+                        <h4 class="font-bold text-indigo-800 font-fredoka text-sm border-b border-indigo-200 pb-2"><i class="fa-solid fa-image text-indigo-600"></i> Vos Images Personnelles</h4>
+                        <div>
+                            <label class="block text-[10px] font-bold text-indigo-800 uppercase mb-1">1. Logo Officiel</label>
+                            <input type="file" accept="image/png, image/jpeg" onchange="handleImageUpload(event, 'logo')" class="w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-white file:text-indigo-800 hover:file:bg-indigo-100 cursor-pointer border border-indigo-200 rounded">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-indigo-800 uppercase mb-1">2. Banderole (Filigrane)</label>
+                            <input type="file" accept="image/png, image/jpeg" onchange="handleImageUpload(event, 'watermark')" class="w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-white file:text-indigo-800 hover:file:bg-indigo-100 cursor-pointer border border-indigo-200 rounded">
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-indigo-200">
+                            <label class="block text-[10px] font-bold text-indigo-800 uppercase mb-1">3. Image QR Code</label>
+                            <input type="file" accept="image/png, image/jpeg" onchange="handleImageUpload(event, 'qrcode')" class="w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-white file:text-indigo-800 hover:file:bg-indigo-100 cursor-pointer border border-indigo-200 rounded">
+                            <p class="text-[9px] text-indigo-600 mt-1">Apparaîtra dans le bloc "Zone QR Code" si ajouté.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 p-4 rounded-xl space-y-4 shadow-sm">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Filigrane Banderole (Fond)</label>
+                            <select id="watermark-select" onchange="renderPoster()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none">
+                                <option value="true">Activer la banderole en fond</option>
+                                <option value="false">Désactiver (Fond blanc)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Ruban des Disciplines</label>
+                            <select id="banner-select" onchange="renderPoster()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none">
+                                <option value="true">Afficher (Sous l'en-tête)</option>
+                                <option value="false">Masquer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Pied de Page</label>
+                            <select id="footer-type-select" onchange="renderPoster()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none">
+                                <option value="print">Complet (avec 'Imprimé par nos soins')</option>
+                                <option value="social">Épuré (Réseaux Sociaux)</option>
+                                <option value="none">Aucun pied de page</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-200 bg-white flex gap-2 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <button onclick="resetEditor()" class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs rounded-lg font-bold transition">Vider</button>
+                <button onclick="addNewPoster()" class="flex-1 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white text-sm font-bold rounded-lg font-fredoka flex justify-center items-center gap-2 shadow-sm transition">
+                    <i class="fa-solid fa-file-circle-plus"></i> Nouveau
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-800">
+            
+            <div class="no-print bg-slate-900 border-b border-slate-700 px-6 py-4 flex items-center justify-between shrink-0 flex-wrap gap-4 shadow-md z-10">
+                <div class="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
+                    <button onclick="setPosterFormat('a4')" id="format-btn-a4" class="px-4 py-2 rounded-lg text-xs font-bold font-fredoka bg-[#C41E3A] text-white transition shadow-sm"><i class="fa-solid fa-file mr-1"></i> A4 Standard</button>
+                    <button onclick="setPosterFormat('facebook')" id="format-btn-facebook" class="px-4 py-2 rounded-lg text-xs font-bold font-fredoka text-slate-400 hover:text-slate-200 transition"><i class="fa-brands fa-facebook mr-1"></i> Vertical (4:5)</button>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <button onclick="window.print()" class="px-6 py-2.5 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-sm font-bold font-fredoka flex items-center gap-2 shadow-lg transition transform hover:scale-105">
+                        <i class="fa-solid fa-print"></i> Générer / Imprimer PDF
+                    </button>
+                </div>
+            </div>
+            
+            <div class="no-print bg-amber-100 text-amber-900 text-[11px] px-6 py-1.5 font-medium flex items-center gap-2 justify-center border-b border-amber-200">
+                <i class="fa-solid fa-circle-exclamation text-amber-600"></i> Impression PDF : Dans la fenêtre d'impression, cochez impérativement "Marges : Aucune" et "Graphiques d'arrière-plan".
+            </div>
+
+            <div class="preview-wrapper" id="preview-wrapper">
+                <div class="preview-scaler" id="preview-scaler">
+                    <div id="poster-render-target" class="poster-viewport format-a4">
+                        <!-- Rendu JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-history" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden no-print">
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="font-fredoka text-lg font-bold text-slate-900"><i class="fa-solid fa-clock-rotate-left text-amber-600 mr-2"></i> Mes Affiches</h3>
+                <button onclick="closeModal('modal-history')" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6 max-h-96 overflow-y-auto space-y-3" id="history-items-container"></div>
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end"><button onclick="closeModal('modal-history')" class="px-5 py-2 border border-slate-300 rounded-lg text-sm font-bold text-slate-700 hover:bg-white">Fermer</button></div>
+        </div>
+    </div>
+
+    <div id="modal-code" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden no-print">
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="font-fredoka text-lg font-bold text-slate-900"><i class="fa-solid fa-code text-[#C41E3A] mr-2"></i> Code Source HTML</h3>
+                <button onclick="closeModal('modal-code')" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6"><textarea id="code-textarea" readonly class="w-full h-80 bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-sm focus:outline-none"></textarea></div>
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                <button onclick="copyCodeToClipboard()" class="px-5 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-sm font-bold transition"><i class="fa-solid fa-copy mr-2"></i> Copier le code</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_LOGO = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png";
+        const DEFAULT_BANDEROLE = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/banderole-dojo-dornois.png";
+
+        window.localImages = { logo: DEFAULT_LOGO, watermark: DEFAULT_BANDEROLE, qrcode: "" };
+
+        function escapeAttr(unsafe) {
+            if (!unsafe) return "";
+            return unsafe.toString().replace(/"/g, '&quot;');
+        }
+
+        let currentPoster = {
+            id: Date.now(),
+            name: "Stage de Rentrée",
+            format: "a4",
+            mainTitle: "", // Vide
+            subtitle: "",
+            watermark: "true",
+            showBanner: "true",
+            footerType: "print",
+            blocks: [
+                { type: "event-header-simple", colSpan: "12", title: "STAGE JUJITSU CONTACT", subtitle: "Dojo Municipal de Dornes" },
+                { type: "horaire-centre", colSpan: "12", timeStr: "De 14h00 à 17h00", title: "Ouvert à toutes et tous" },
+                { type: "qr-code-box", colSpan: "6", text: "Scannez ce QR Code pour vous inscrire en ligne", align: "center" },
+                { type: "checklist", colSpan: "6", item1: "Zooris obligatoires", item2: "Gourde d'eau", item3: "Passeport Sportif", item4: "Judogi propre" }
+            ]
+        };
+
+        window.onload = function() {
+            try { 
+                if(sessionStorage.getItem('dojo_logo')) window.localImages.logo = sessionStorage.getItem('dojo_logo');
+                if(sessionStorage.getItem('dojo_watermark')) window.localImages.watermark = sessionStorage.getItem('dojo_watermark');
+                if(sessionStorage.getItem('dojo_qrcode')) window.localImages.qrcode = sessionStorage.getItem('dojo_qrcode');
+                loadHistoryFromStorage(); 
+            } catch(e) {}
+            renderDynamicEditorList();
+            renderPoster();
+        };
+
+        function handleImageUpload(event, key) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try { 
+                    let storeKey = key === 'logo' ? 'dojo_logo' : (key === 'watermark' ? 'dojo_watermark' : 'dojo_qrcode');
+                    sessionStorage.setItem(storeKey, e.target.result); 
+                } catch(err) {}
+                window.localImages[key] = e.target.result;
+                renderPoster();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function switchEditorTab(tab) {
+            document.querySelectorAll('#editor-tab-content, #editor-tab-blocks, #editor-tab-format').forEach(el => {
+                el.classList.remove('block'); el.classList.add('hidden');
+            });
+            document.querySelectorAll('#tab-btn-content, #tab-btn-blocks, #tab-btn-format').forEach(el => {
+                el.classList.remove('border-b-2', 'border-[#C41E3A]', 'text-[#C41E3A]', 'font-bold');
+                el.classList.add('text-slate-500');
+            });
+            document.getElementById('editor-tab-' + tab).classList.remove('hidden');
+            document.getElementById('editor-tab-' + tab).classList.add('block');
+            document.getElementById('tab-btn-' + tab).classList.add('border-b-2', 'border-[#C41E3A]', 'text-[#C41E3A]', 'font-bold');
+            document.getElementById('tab-btn-' + tab).classList.remove('text-slate-500');
+        }
+
+        function setPosterFormat(fmt) {
+            currentPoster.format = fmt;
+            document.getElementById('poster-render-target').className = 'poster-viewport format-' + fmt;
+            
+            let printCSS = "@page { margin: 0; size: 210mm 297mm; }"; // A4
+            if (fmt === 'facebook') printCSS = "@page { margin: 0; size: 210mm 262.5mm; }";
+            document.getElementById('dynamic-print-size').innerHTML = printCSS;
+            
+            if(fmt === "facebook") {
+                currentPoster.footerType = "social";
+                if(document.getElementById('footer-type-select')) document.getElementById('footer-type-select').value = "social";
+            } else {
+                currentPoster.footerType = "print";
+                if(document.getElementById('footer-type-select')) document.getElementById('footer-type-select').value = "print";
+            }
+
+            document.querySelectorAll('[id^="format-btn-"]').forEach(btn => {
+                btn.classList.remove('bg-[#C41E3A]', 'text-white', 'shadow-sm');
+                btn.classList.add('text-slate-400');
+            });
+            document.getElementById('format-btn-' + fmt).classList.add('bg-[#C41E3A]', 'text-white', 'shadow-sm');
+            document.getElementById('format-btn-' + fmt).classList.remove('text-slate-400');
+            
+            renderPoster();
+            adjustPreviewScale();
+        }
+
+        function adjustPreviewScale() {
+            const containerWidth = document.getElementById('preview-wrapper').clientWidth;
+            const scaler = document.getElementById('preview-scaler');
+            let scale = 0.60;
+            if(containerWidth < 900) scale = 0.50;
+            if(containerWidth < 700) scale = 0.40;
+            scaler.style.transform = `scale(${scale})`;
+            
+            const formatHeight = currentPoster.format === 'a4' ? 1123 : 1000;
+            scaler.style.marginBottom = `-${formatHeight - (formatHeight * scale)}px`;
+        }
+
+        window.addEventListener('resize', adjustPreviewScale);
+
+        // --- GESTION DU DRAG AND DROP (MENU GAUCHE) ---
+        let draggedItemIndex = null;
+        function handleDragStart(e, index) {
+            draggedItemIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', index);
+            setTimeout(() => e.target.classList.add('ghost-dragging'), 0);
+        }
+        function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+        function handleDrop(e, targetIndex) {
+            e.preventDefault();
+            if(draggedItemIndex === null || draggedItemIndex === targetIndex) return;
+            const item = currentPoster.blocks.splice(draggedItemIndex, 1)[0];
+            currentPoster.blocks.splice(targetIndex, 0, item);
+            renderDynamicEditorList(); renderPoster();
+        }
+        function handleDragEnd(e) { e.target.classList.remove('ghost-dragging'); draggedItemIndex = null; }
+
+        // --- GESTION DU DRAG AND DROP INTUITIF (APERÇU VISUEL) ---
+        let visualDraggedItemIndex = null;
+        function handleVisualDragStart(e, index) {
+            visualDraggedItemIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', index);
+            setTimeout(() => e.target.classList.add('preview-dragging'), 0);
+        }
+        function handleVisualDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const rect = e.currentTarget.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            if (y < rect.height / 2) { e.currentTarget.classList.add('drop-target-above'); e.currentTarget.classList.remove('drop-target-below'); } 
+            else { e.currentTarget.classList.add('drop-target-below'); e.currentTarget.classList.remove('drop-target-above'); }
+        }
+        function handleVisualDragLeave(e) { e.currentTarget.classList.remove('drop-target-above', 'drop-target-below'); }
+        function handleVisualDrop(e, targetIndex) {
+            e.preventDefault(); e.stopPropagation();
+            e.currentTarget.classList.remove('drop-target-above', 'drop-target-below');
+            if(visualDraggedItemIndex === null || visualDraggedItemIndex === targetIndex) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            let insertIndex = targetIndex;
+            if (y > rect.height / 2) { insertIndex++; }
+            if (visualDraggedItemIndex < insertIndex) { insertIndex--; }
+            const item = currentPoster.blocks.splice(visualDraggedItemIndex, 1)[0];
+            currentPoster.blocks.splice(insertIndex, 0, item);
+            renderDynamicEditorList(); renderPoster();
+        }
+        function handleVisualDragEnd(e) { e.target.classList.remove('preview-dragging'); visualDraggedItemIndex = null; }
+
+        function renderPoster() {
+            if(document.getElementById('input-main-title')) currentPoster.mainTitle = document.getElementById('input-main-title').value;
+            if(document.getElementById('input-subtitle')) currentPoster.subtitle = document.getElementById('input-subtitle').value;
+            if(document.getElementById('watermark-select')) currentPoster.watermark = document.getElementById('watermark-select').value;
+            if(document.getElementById('banner-select')) currentPoster.showBanner = document.getElementById('banner-select').value;
+            if(document.getElementById('footer-type-select')) currentPoster.footerType = document.getElementById('footer-type-select').value;
+
+            const target = document.getElementById('poster-render-target');
+            let logoSrc = window.localImages.logo;
+            let watermarkSrc = window.localImages.watermark;
+
+            let headerHtml = `
+                <div style="padding:40px 48px; background:#FFFFFF; border-bottom:4px solid #F4F6F9; width:100%; box-sizing:border-box; display:flex; align-items:center;">
+                    <div style="background:#C41E3A; padding:18px; border-radius:24px 12px 28px 16px; transform:rotate(-2.5deg); box-shadow:0 8px 24px rgba(196,30,58,0.25); width:110px; height:110px; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                        <img src="${logoSrc}" style="max-width:85%; max-height:85%; object-fit:contain;" crossorigin="anonymous">
+                    </div>
+                    <div style="margin-left:32px; display:flex; flex-direction:column; justify-content:center; flex-grow:1;">
+                        <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:60px; line-height:1.0; text-transform:uppercase; color:#1A1A1A; margin-bottom:12px; white-space:nowrap; letter-spacing:-1px;">
+                            DOJO <span style="color:#C41E3A;">DORNOIS</span>
+                        </div>
+                        <div style="display:flex; align-items:center; width:100%;">
+                            <div style="height:5px; width:44px; background:#C41E3A; border-radius:3px; margin-right:16px;"></div>
+                            <div style="font-family:'Fredoka', sans-serif; font-size:18px; color:#444444; font-weight:600; text-transform:uppercase; letter-spacing:1px; line-height:1; white-space:nowrap; margin-right:16px;">JUDO & DISCIPLINES ASSOCIÉES</div>
+                            <div style="height:5px; flex-grow:1; background:#C41E3A; border-radius:3px;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            let bannerHtml = currentPoster.showBanner === "true" ? `
+                <div style="text-align:center; padding:16px 36px; background:#C41E3A; color:#FFFFFF; font-family:'Fredoka', sans-serif; font-size:15px; font-weight:600; text-transform:uppercase; box-shadow:0 4px 6px rgba(0,0,0,0.1); width:100%; box-sizing:border-box; display:flex; justify-content:space-around;">
+                    <span>🥋 Judo</span><span>🤝 Jujitsu</span><span>🧘 Taïso</span><span>🛡️ Self-Défense</span><span>📜 Discipline</span><span>🙏 Respect</span>
+                </div>
+            ` : '';
+
+            let watermarkHtml = currentPoster.watermark === "true" ? `
+                <div style="position:absolute; bottom:12%; left:50%; transform:translateX(-50%); width:80%; max-width:650px; opacity:0.07; pointer-events:none; z-index:0;">
+                    <img src="${watermarkSrc}" style="width:100%; display:block;" crossorigin="anonymous">
+                </div>
+            ` : '';
+
+            let blocksHtml = '';
+            currentPoster.blocks.forEach((b, index) => {
+                let colSpan = b.colSpan || "12";
+                let blockWrapperStart = `<div class="preview-block" draggable="true" ondragstart="handleVisualDragStart(event, ${index})" ondragover="handleVisualDragOver(event)" ondragleave="handleVisualDragLeave(event)" ondrop="handleVisualDrop(event, ${index})" ondragend="handleVisualDragEnd(event)" style="grid-column: span ${colSpan}; width:100%; display:flex; flex-direction:column; position:relative; z-index:1;">`;
+                let blockWrapperEnd = `</div>`;
+                let innerHtml = "";
+
+                if (b.type === 'event-card') {
+                    let dayColor = "#D97706"; let dayBg = "#FEF3C7"; let dayBorder = "#FDE68A";
+                    if(b.dayClass === "day-mercredi") { dayColor = "#1D4ED8"; dayBg = "#DBEAFE"; dayBorder = "#BFDBFE"; }
+                    if(b.dayClass === "day-jeudi") { dayColor = "#047857"; dayBg = "#D1FAE5"; dayBorder = "#A7F3D0"; }
+                    if(b.dayClass === "day-samedi") { dayColor = "#6D28D9"; dayBg = "#EDE9FE"; dayBorder = "#DDD6FE"; }
+
+                    innerHtml += `
+                        <div style="background:#FFFFFF; border-radius:14px; border-left:8px solid ${dayColor}; border-top:1px solid #E2E2E2; border-right:1px solid #E2E2E2; border-bottom:1px solid #E2E2E2; padding:22px 28px; display:flex; align-items:center; justify-content:space-between; width:100%; height:100%; box-sizing:border-box; box-shadow:0 4px 10px rgba(0,0,0,0.03);">
+                            <div style="display:flex; align-items:center; gap:24px;">
+                                <div style="background:${dayBg}; color:${dayColor}; border:1px solid ${dayBorder}; padding:12px 20px; border-radius:10px; font-family:'Fredoka', sans-serif; font-weight:700; font-size:18px; min-width:160px; text-align:center;">${b.dateStr}</div>
+                                <div style="display:flex; flex-direction:column; justify-content:center;">
+                                    <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:22px; color:#1A1A1A; margin-bottom:4px; line-height:1.2;">${b.title}</div>
+                                    <div style="font-size:16px; color:#666666; line-height:1.4;">${b.desc}</div>
+                                    <div style="font-size:16px; font-weight:700; color:#333333; margin-top:8px;"><span style="color:#C41E3A; margin-right:6px;">⏰</span> ${b.timeStr}</div>
+                                </div>
+                            </div>
+                            <div style="font-family:'Fredoka', sans-serif; font-weight:700; color:#C41E3A; background:#FAFAFA; border:1px dashed #DDD; padding:12px 20px; border-radius:10px; font-size:18px; text-align:center;">🪙 ${b.priceStr}</div>
+                        </div>
+                    `;
+                } else if (b.type === 'quote-box') {
+                    innerHtml += `
+                        <div style="background:#F8FAFC; border-left:6px solid #C41E3A; padding:24px 32px; border-radius:0 16px 16px 0; width:100%; height:100%; box-sizing:border-box; position:relative; overflow:hidden;">
+                            <div style="font-family:'Fredoka', sans-serif; font-size:40px; color:#C41E3A; opacity:0.1; position:absolute; top:5px; left:15px; line-height:1;">"</div>
+                            <div style="font-size:18px; color:#1A1A1A; font-style:italic; font-weight:500; line-height:1.6; position:relative; z-index:2; padding-left:10px;">${b.text.replace(/\n/g, '<br>')}</div>
+                            <div style="font-family:'Fredoka', sans-serif; font-weight:700; color:#C41E3A; text-align:right; margin-top:10px; font-size:16px;">- ${b.author}</div>
+                        </div>
+                    `;
+                } else if (b.type === 'teacher-profile') {
+                    innerHtml += `
+                        <div style="background:#FFFFFF; border:1px solid #E8E8E8; border-radius:16px; padding:20px; display:flex; align-items:center; gap:20px; width:100%; height:100%; box-sizing:border-box; box-shadow:0 4px 12px rgba(0,0,0,0.04);">
+                            <div style="width:70px; height:70px; background:#F4F6F9; border:2px solid #C41E3A; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:26px; color:#C41E3A; overflow:hidden;">🥋</div>
+                            <div style="display:flex; flex-direction:column; justify-content:center; flex-grow:1;">
+                                <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:20px; color:#1A1A1A; margin-bottom:2px;">${b.name}</div>
+                                <div style="font-size:13px; color:#C41E3A; font-weight:bold; text-transform:uppercase; margin-bottom:4px;">${b.role}</div>
+                                <div style="font-size:14px; color:#6B6B6B; line-height:1.4;">${b.desc.replace(/\n/g, '<br>')}</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'event-header') {
+                    innerHtml += `
+                        <div style="background:#FFFFFF; border:1px solid #E8E8E8; border-radius:16px; padding:28px; box-shadow:0 4px 12px rgba(0,0,0,0.04); width:100%; height:100%; box-sizing:border-box;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #C41E3A; padding-bottom:20px; margin-bottom:20px;">
+                                <div style="display:flex; align-items:center; gap:20px;">
+                                    <div style="background:#C41E3A; border-radius:12px; width:68px; height:68px; display:flex; align-items:center; justify-content:center; color:#FFF; font-size:32px; flex-shrink:0;">🥋</div>
+                                    <div style="display:flex; flex-direction:column; justify-content:center;">
+                                        <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:26px; color:#C41E3A; text-transform:uppercase; line-height:1.2;">${b.title}</div>
+                                        <div style="font-size:16px; color:#6B6B6B; margin-top:4px;">${b.subtitle}</div>
+                                    </div>
+                                </div>
+                                <div style="background:#EBF5FB; color:#3498DB; padding:12px 20px; border-radius:10px; font-family:'Fredoka', sans-serif; font-weight:600; font-size:18px; border:1px solid #BFDBFE;">🗓️ ${b.dateStr}</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'event-header-simple') {
+                    innerHtml += `
+                        <div style="background:#FFFFFF; border:1px solid #E8E8E8; border-radius:16px; padding:28px; box-shadow:0 4px 12px rgba(0,0,0,0.04); width:100%; height:100%; box-sizing:border-box;">
+                            <div style="display:flex; align-items:center; justify-content:center; gap:20px;">
+                                <div style="background:#C41E3A; border-radius:12px; width:68px; height:68px; display:flex; align-items:center; justify-content:center; color:#FFF; font-size:32px; flex-shrink:0;">🥋</div>
+                                <div style="display:flex; flex-direction:column; justify-content:center; text-align:left;">
+                                    <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:26px; color:#C41E3A; text-transform:uppercase; line-height:1.2;">${b.title}</div>
+                                    <div style="font-size:16px; color:#6B6B6B; margin-top:4px;">${b.subtitle}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'titre-section') {
+                    innerHtml += `
+                        <div style="width:100%; height:100%; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px 0;">
+                            <h3 style="font-family:'Fredoka', sans-serif; font-size:28px; font-weight:700; color:#1A1A1A; text-transform:uppercase; margin:0; text-align:center;">${b.title}</h3>
+                            <div style="height:4px; width:60px; background:#C41E3A; border-radius:2px; margin-top:8px;"></div>
+                        </div>
+                    `;
+                } else if (b.type === 'horaire-centre') {
+                    innerHtml += `
+                        <div style="background:#FFFFFF; border:2px dashed #C41E3A; border-radius:12px; padding:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; width:100%; height:100%; box-sizing:border-box;">
+                            <div style="background:#FFEBEF; color:#C41E3A; font-family:'Fredoka', sans-serif; font-weight:700; font-size:24px; padding:8px 24px; border-radius:30px; margin-bottom:12px;">⏰ ${b.timeStr}</div>
+                            <div style="font-size:20px; font-weight:700; color:#1A1A1A;">${b.title}</div>
+                        </div>
+                    `;
+                } else if (b.type === 'contact-info') {
+                    innerHtml += `
+                        <div style="background:#1A1A1A; border-radius:14px; padding:24px; width:100%; height:100%; box-sizing:border-box; color:#FFF; display:flex; align-items:center; justify-content:space-around; box-shadow:0 6px 15px rgba(0,0,0,0.15);">
+                             <div style="text-align:center; flex:1;">
+                                <div style="font-size:24px; margin-bottom:8px; color:#C41E3A;">📍</div>
+                                <div style="font-family:'Fredoka', sans-serif; font-weight:500; font-size:16px; letter-spacing:0.5px;">${b.lieu}</div>
+                             </div>
+                             <div style="width:1px; height:50px; background:#444;"></div>
+                             <div style="text-align:center; flex:1;">
+                                <div style="font-size:24px; margin-bottom:8px; color:#C41E3A;">📞</div>
+                                <div style="font-family:'Fredoka', sans-serif; font-weight:500; font-size:16px; letter-spacing:0.5px;">${b.tel}</div>
+                             </div>
+                        </div>
+                    `;
+                } else if (b.type === 'alerte-annulation') {
+                    innerHtml += `
+                        <div style="background:#C41E3A; border-radius:12px; padding:24px; color:#FFF; display:flex; gap:20px; align-items:center; width:100%; height:100%; box-sizing:border-box; box-shadow:0 4px 15px rgba(196,30,58,0.3);">
+                            <div style="font-size:40px; line-height:1; flex-shrink:0;">🚨</div>
+                            <div>
+                                <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:24px; margin-bottom:4px; text-transform:uppercase;">${b.title}</div>
+                                <div style="font-size:16px; line-height:1.4;">${b.text.replace(/\n/g, '<br>')}</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'checklist') {
+                    innerHtml += `
+                        <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:14px; padding:24px; width:100%; height:100%; box-sizing:border-box;">
+                            <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:20px; color:#1A1A1A; margin-bottom:16px; text-align:center; border-bottom:2px solid #E2E8F0; padding-bottom:10px;">📋 À PRÉVOIR</div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; font-size:16px; color:#333; font-weight:500;">
+                                ${b.item1 ? `<div style="display:flex; align-items:center; gap:8px;"><span style="color:#2ECC71;">✔️</span> ${b.item1}</div>` : ''}
+                                ${b.item2 ? `<div style="display:flex; align-items:center; gap:8px;"><span style="color:#2ECC71;">✔️</span> ${b.item2}</div>` : ''}
+                                ${b.item3 ? `<div style="display:flex; align-items:center; gap:8px;"><span style="color:#2ECC71;">✔️</span> ${b.item3}</div>` : ''}
+                                ${b.item4 ? `<div style="display:flex; align-items:center; gap:8px;"><span style="color:#2ECC71;">✔️</span> ${b.item4}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'palmares') {
+                    innerHtml += `
+                        <div style="background:#FFFFFF; border:2px solid #F1C40F; border-radius:14px; padding:24px; width:100%; height:100%; box-sizing:border-box; box-shadow:0 4px 10px rgba(241,196,15,0.1);">
+                            <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:22px; color:#1A1A1A; margin-bottom:16px; text-align:center;">${b.title}</div>
+                            <div style="display:flex; flex-direction:column; gap:12px; font-size:18px; font-weight:600;">
+                                ${b.gold ? `<div style="display:flex; align-items:center; gap:12px; background:#FFF9E6; padding:10px 16px; border-radius:8px;"><span style="font-size:24px;">🥇</span> ${b.gold}</div>` : ''}
+                                ${b.silver ? `<div style="display:flex; align-items:center; gap:12px; background:#F4F6F9; padding:10px 16px; border-radius:8px;"><span style="font-size:24px;">🥈</span> ${b.silver}</div>` : ''}
+                                ${b.bronze ? `<div style="display:flex; align-items:center; gap:12px; background:#FDF2E9; padding:10px 16px; border-radius:8px;"><span style="font-size:24px;">🥉</span> ${b.bronze}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'age-category') {
+                    innerHtml += `
+                        <div style="display:flex; justify-content:center; width:100%; height:100%; box-sizing:border-box; padding:10px 0;">
+                            <div style="background:#EBF5FB; border:2px solid #3498DB; color:#2980B9; border-radius:30px; padding:12px 32px; font-family:'Fredoka', sans-serif; font-weight:700; font-size:20px; text-transform:uppercase; box-shadow:0 4px 6px rgba(52,152,219,0.2);">
+                                👥 ${b.catName} <span style="color:#7FB3D5; font-size:16px; margin-left:8px;">(${b.years})</span>
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'qr-code-box') {
+                    let qrVisual = window.localImages.qrcode ? 
+                        `<img src="${window.localImages.qrcode}" style="width:100px; height:100px; object-fit:contain; border-radius:8px;" crossorigin="anonymous">` : 
+                        `<div style="width:100px; height:100px; border:3px dashed #1A1A1A; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative;">
+                            <div style="position:absolute; width:20px; height:20px; border-top:3px solid #C41E3A; border-left:3px solid #C41E3A; top:-6px; left:-6px;"></div>
+                            <div style="position:absolute; width:20px; height:20px; border-top:3px solid #C41E3A; border-right:3px solid #C41E3A; top:-6px; right:-6px;"></div>
+                            <div style="position:absolute; width:20px; height:20px; border-bottom:3px solid #C41E3A; border-left:3px solid #C41E3A; bottom:-6px; left:-6px;"></div>
+                            <div style="position:absolute; width:20px; height:20px; border-bottom:3px solid #C41E3A; border-right:3px solid #C41E3A; bottom:-6px; right:-6px;"></div>
+                            <span style="font-size:40px;">📱</span>
+                        </div>`;
+                    
+                    let align = b.align || 'left';
+                    let alignStyle = align === 'center' ? 'center' : (align === 'justify' ? 'justify' : 'left');
+                    let flexDirection = align === 'center' ? 'column' : 'row';
+                    if (parseInt(colSpan) <= 6) flexDirection = 'column';
+
+                    innerHtml += `
+                        <div style="background:#FFFFFF; border:1px solid #E8E8E8; border-radius:14px; padding:20px; display:flex; flex-direction:${flexDirection}; align-items:center; justify-content:center; gap:20px; width:100%; height:100%; box-sizing:border-box;">
+                            ${qrVisual}
+                            <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:22px; color:#1A1A1A; text-align:${alignStyle}; line-height:1.3; flex:1;">
+                                ${b.text.replace(/\n/g, '<br>')}
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'bouton-action') {
+                    innerHtml += `
+                        <div style="display:flex; justify-content:center; width:100%; height:100%; box-sizing:border-box; padding:10px 0;">
+                            <div style="background:#C41E3A; color:#FFF; border-radius:40px; padding:16px 40px; font-family:'Fredoka', sans-serif; font-weight:700; font-size:22px; text-transform:uppercase; box-shadow:0 6px 15px rgba(196,30,58,0.4); text-align:center;">
+                                👉 ${b.text}
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'focus-stat') {
+                    innerHtml += `
+                        <div style="background:#FFFFFF; border:1px solid #E8E8E8; border-radius:14px; padding:24px; text-align:center; width:100%; height:100%; box-sizing:border-box;">
+                            <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:60px; color:#C41E3A; line-height:1;">${b.number}</div>
+                            <div style="font-size:18px; font-weight:600; color:#1A1A1A; text-transform:uppercase; letter-spacing:1px; margin-top:8px;">${b.label}</div>
+                        </div>
+                    `;
+                } else if (b.type === 'temoignage') {
+                    innerHtml += `
+                        <div style="background:#FAFAFA; border:1px solid #EAEAEA; border-radius:14px; padding:24px; width:100%; height:100%; box-sizing:border-box; position:relative; text-align:center;">
+                            <div style="font-size:20px; margin-bottom:12px;">⭐⭐⭐⭐⭐</div>
+                            <div style="font-size:16px; font-style:italic; color:#444; line-height:1.5; margin-bottom:12px;">"${b.quote}"</div>
+                            <div style="font-family:'Fredoka', sans-serif; font-weight:700; color:#1A1A1A; font-size:15px;">- ${b.name}</div>
+                        </div>
+                    `;
+                } else if (b.type === 'lieu-details') {
+                    innerHtml += `
+                        <div style="background:#FFFFFF; border-left:6px solid #1A1A1A; border-top:1px solid #E8E8E8; border-right:1px solid #E8E8E8; border-bottom:1px solid #E8E8E8; border-radius:12px; padding:24px; display:flex; gap:20px; align-items:center; width:100%; height:100%; box-sizing:border-box;">
+                            <div style="background:#F4F6F9; border-radius:50%; width:60px; height:60px; display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0;">🗺️</div>
+                            <div>
+                                <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:20px; color:#1A1A1A; margin-bottom:4px;">${b.address}</div>
+                                <div style="font-size:15px; color:#6B6B6B;">${b.instructions}</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'avantage-rond') {
+                    innerHtml += `
+                        <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:16px; width:100%; height:100%; box-sizing:border-box;">
+                            <div style="background:#FFEBEF; color:#C41E3A; border-radius:50%; width:80px; height:80px; display:flex; align-items:center; justify-content:center; font-size:36px; margin-bottom:16px; box-shadow:0 4px 10px rgba(196,30,58,0.15);">
+                                ${b.icon}
+                            </div>
+                            <div style="font-family:'Fredoka', sans-serif; font-weight:700; font-size:22px; color:#1A1A1A; margin-bottom:8px;">${b.title}</div>
+                            <div style="font-size:15px; color:#6B6B6B; line-height:1.5;">${b.text.replace(/\n/g, '<br>')}</div>
+                        </div>
+                    `;
+                } else if (b.type === 'programme') {
+                    let items = (b.lines||"").split('\n').filter(l => l.trim() !== '').map(l => `<li style="margin-bottom:12px; display:flex; align-items:flex-start; gap:14px;"><span style="color:#C41E3A; font-weight:bold; font-size:20px; line-height:1.4;">•</span><span style="line-height:1.6;">${l}</span></li>`).join('');
+                    innerHtml += `
+                        <div style="background:#FFFFFF; border-radius:14px; border:1px solid #E8E8E8; border-left:8px solid #C41E3A; padding:28px; width:100%; height:100%; box-sizing:border-box;">
+                            <div style="font-family:'Fredoka', sans-serif; font-weight:700; color:#C41E3A; font-size:22px; margin-bottom:18px; display:flex; align-items:center; gap:12px;">⏰ ${b.title}</div>
+                            <ul style="list-style:none; padding:0; margin:0; font-size:16px; color:#333;">${items}</ul>
+                        </div>
+                    `;
+                } else if (b.type === 'warning-box') {
+                    innerHtml += `
+                        <div style="background:#FEF3C7; border:1px solid #FDE68A; border-radius:14px; padding:28px; display:flex; gap:20px; align-items:flex-start; width:100%; height:100%; box-sizing:border-box;">
+                            <div style="color:#D97706; font-size:36px; line-height:1; flex-shrink:0;">⚠️</div>
+                            <div style="display:flex; flex-direction:column; justify-content:center;">
+                                <div style="font-family:'Fredoka', sans-serif; font-weight:700; color:#D97706; font-size:20px; margin-bottom:8px;">${b.title}</div>
+                                <div style="font-size:16px; color:#92400E; line-height:1.6;">${b.text.replace(/\n/g, '<br>')}</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'info-box') {
+                    innerHtml += `
+                        <div style="background:#FFEBEF; border:1px solid #FFC2CE; border-left:6px solid #C41E3A; padding:24px 30px; border-radius:12px; width:100%; height:100%; box-sizing:border-box;">
+                            <strong style="font-family:'Fredoka', sans-serif; color:#C41E3A; display:block; margin-bottom:8px; font-size:20px;">${b.title}</strong>
+                            <span style="font-size:16px; color:#3D3D3D; line-height:1.6; display:block;">${b.text.replace(/\n/g, '<br>')}</span>
+                        </div>
+                    `;
+                } else if (b.type === 'tarifs') {
+                    innerHtml += `
+                        <div style="background:#FFFFFF; border:1px solid #E8E8E8; border-radius:12px; padding:0; box-shadow:0 3px 8px rgba(0,0,0,0.03); overflow:hidden; width:100%; height:100%; box-sizing:border-box; display:flex; flex-direction:column;">
+                            <div style="background:#1A1A1A; color:#FFF; padding:12px 20px; font-family:'Fredoka', sans-serif; font-weight:600; font-size:18px;">${b.title}</div>
+                            <div style="display:flex; width:100%; flex-grow:1;">
+                                <div style="flex:1; padding:20px 24px; border-right:1px solid #E8E8E8;">
+                                    <div style="font-family:'Fredoka', sans-serif; font-weight:700; color:#C41E3A; margin-bottom:6px; font-size:18px;">${b.cat1}</div>
+                                    <div style="font-size:26px; font-weight:700; color:#1A1A1A; margin-bottom:6px;">${b.price1}</div>
+                                    <div style="font-size:15px; color:#666;">${b.desc1}</div>
+                                </div>
+                                <div style="flex:1; padding:20px 24px; background:#FAFAFA;">
+                                    <div style="font-family:'Fredoka', sans-serif; font-weight:700; color:#3498DB; margin-bottom:6px; font-size:18px;">${b.cat2}</div>
+                                    <div style="font-size:26px; font-weight:700; color:#1A1A1A; margin-bottom:6px;">${b.price2}</div>
+                                    <div style="font-size:15px; color:#666;">${b.desc2}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (b.type === 'special-stage') {
+                    innerHtml += `
+                        <div style="background:linear-gradient(135deg, #FFFFFF 0%, #FFEBEF 100%); border:3px solid #C41E3A; border-radius:16px; padding:24px 28px; display:flex; flex-direction:column; gap:14px; box-shadow:0 6px 15px rgba(196,30,58,0.1); width:100%; height:100%; box-sizing:border-box;">
+                            <div style="display:flex; align-items:center; gap:14px; color:#C41E3A; font-family:'Fredoka', sans-serif; font-size:24px; font-weight:700; border-bottom:2px solid #FFC2CE; padding-bottom:10px;"><span>🏆</span> ${b.title}</div>
+                            <div style="display:flex; justify-content:space-between; font-size:16px; color:#1A1A1A; line-height:1.5;">
+                                <div style="flex:1;"><strong>Partenaires :</strong><br>${b.partners}</div>
+                                <div style="flex:1; text-align:right;"><strong>Dates :</strong><br>${b.dates}</div>
+                            </div>
+                            <div style="font-size:15px; color:#666; font-style:italic; margin-top:auto;">${b.notes}</div>
+                        </div>
+                    `;
+                } else if (b.type === 'cobranding') {
+                    innerHtml += `
+                        <div style="border:1px solid #E8E8E8; border-radius:12px; padding:16px 24px; background:#F8FAFC; display:flex; align-items:center; justify-content:space-between; width:100%; height:100%; box-sizing:border-box;">
+                            <div style="display:flex; align-items:center; gap:16px;">
+                                <div style="background:#C41E3A; padding:8px; border-radius:10px; width:52px; height:52px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                    <img src="${logoSrc}" style="width:100%; height:100%; object-fit:contain;" crossorigin="anonymous">
+                                </div>
+                                <span style="font-family:'Fredoka', sans-serif; font-weight:bold; color:#C41E3A; font-size:20px;">DOJO DORNOIS</span>
+                            </div>
+                            <span style="color:#B8B8B8; font-weight:bold; font-size:24px; margin: 0 10px;">x</span>
+                            <div style="background:#ffffff; border:1px solid #E8E8E8; padding:12px 20px; border-radius:10px; font-family:'Fredoka', sans-serif; font-size:18px; font-weight:bold; color:#1A1A1A; box-shadow:0 2px 4px rgba(0,0,0,0.02); text-align:center;">${b.partnerText || 'MAIRIE'}</div>
+                        </div>
+                    `;
+                } else if (b.type === 'custom-text') {
+                    let align = b.align || 'left';
+                    innerHtml += `<div style="font-size:16.5px; color:#3D3D3D; line-height:1.6; width:100%; height:100%; box-sizing:border-box; text-align:${align};">${b.text.replace(/\n/g, '<br>')}</div>`;
+                } else if (b.type === 'raw-html') {
+                    innerHtml += `<div style="width:100%; height:100%; box-sizing:border-box;">${b.htmlContent}</div>`;
+                }
+
+                blocksHtml += blockWrapperStart + innerHtml + blockWrapperEnd;
+            });
+
+            let footerHtml = '';
+            if(currentPoster.footerType === "print") {
+                footerHtml = `
+                    <div style="background-color:#1A1A1A; color:#FFFFFF; padding:24px 32px; font-size:14.5px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; z-index:10; margin-top:auto; flex-shrink:0; width:100%; box-sizing:border-box;">
+                        <div style="display:flex; justify-content:space-around; width:100%; font-weight:500;">
+                            <span>🌐 dojodornois.fr</span><span>📞 06 07 13 91 86</span><span>✉️ dojodornois@gmail.com</span><span>📷 @dojodornois</span>
+                        </div>
+                        <div style="color:#BBBBBB; font-size:13px; display:flex; align-items:center; gap:14px; margin-top:10px;">
+                            <span style="color:#2ECC71;">♻️ Imprimé par nos soins</span><span style="color:#666;">|</span><span>Ne pas jeter sur la voie publique</span>
+                        </div>
+                    </div>
+                `;
+            } else if (currentPoster.footerType === "social") {
+                footerHtml = `
+                    <div style="background-color:#1A1A1A; color:#FFFFFF; padding:24px 32px; font-size:14.5px; display:flex; justify-content:space-around; align-items:center; position:relative; z-index:10; margin-top:auto; flex-shrink:0; width:100%; box-sizing:border-box;">
+                        <span>🌐 dojodornois.fr</span><span>📞 06 07 13 91 86</span><span>✉️ dojodornois@gmail.com</span><span>📷 @dojodornois</span>
+                    </div>
+                `;
+            }
+
+            let titleSectionHtml = '';
+            if ((currentPoster.mainTitle && currentPoster.mainTitle.trim() !== '') || (currentPoster.subtitle && currentPoster.subtitle.trim() !== '')) {
+                titleSectionHtml = `
+                    <div style="text-align: center; margin-bottom: 36px; position:relative; width:100%;">
+                        ${currentPoster.mainTitle && currentPoster.mainTitle.trim() !== '' ? `<h2 style="font-family:'Fredoka', sans-serif; font-size:46px; font-weight:700; color:#1A1A1A; text-transform:uppercase; line-height:1.2; margin:0; letter-spacing:1px; margin-bottom:12px; white-space:nowrap;">${currentPoster.mainTitle}</h2>` : ''}
+                        ${currentPoster.subtitle && currentPoster.subtitle.trim() !== '' ? `<div style="font-family:'Fredoka', sans-serif; font-size:22px; color:#C41E3A; font-weight:600; line-height:1.3;">${currentPoster.subtitle}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            target.innerHTML = `
+                ${headerHtml}
+                ${bannerHtml}
+                <div class="main-content-area" style="padding: 48px 56px; position: relative; width:100%; box-sizing:border-box; flex-grow:1; display:flex; flex-direction:column; align-items:center; overflow:hidden; min-height: 0;">
+                    ${watermarkHtml}
+                    <div class="auto-scale-content" style="width:100%; max-width:700px; z-index:1; display:flex; flex-direction:column; transform-origin: top center;">
+                        
+                        ${titleSectionHtml}
+                        
+                        <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; width: 100%;">
+                            ${blocksHtml}
+                        </div>
+
+                    </div>
+                </div>
+                ${footerHtml}
+            `;
+
+            setTimeout(() => {
+                const mainArea = target.querySelector('.main-content-area');
+                const scaleContent = target.querySelector('.auto-scale-content');
+                if(mainArea && scaleContent) {
+                    scaleContent.style.transform = 'scale(1)';
+                    const availableHeight = mainArea.clientHeight - 20;
+                    const actualHeight = scaleContent.scrollHeight;
+                    if (actualHeight > availableHeight && availableHeight > 0) {
+                        const ratio = availableHeight / actualHeight;
+                        scaleContent.style.transform = `scale(${ratio})`;
+                    }
+                }
+            }, 50);
+        }
+
+        function applyTag(index, prop, tag) {
+            let el = document.getElementById(`input-${index}-${prop}`);
+            if(!el) return;
+            let start = el.selectionStart;
+            let end = el.selectionEnd;
+            let val = el.value;
+            let selected = val.substring(start, end);
+            let before = val.substring(0, start);
+            let after = val.substring(end);
+            
+            let newVal;
+            if (tag === 'br') newVal = before + '<br>' + after;
+            else newVal = before + `<${tag}>` + selected + `</${tag}>` + after;
+            
+            currentPoster.blocks[index][prop] = newVal;
+            renderDynamicEditorList(); renderPoster();
+            setTimeout(() => { let newEl = document.getElementById(`input-${index}-${prop}`); if(newEl) newEl.focus(); }, 10);
+        }
+
+        function getToolbarHtml(index, prop) {
+            return `
+                <div class="flex gap-1 mb-1.5 mt-2">
+                    <button onclick="applyTag(${index}, '${prop}', 'b')" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 rounded text-[11px] font-bold text-slate-800 transition">B</button>
+                    <button onclick="applyTag(${index}, '${prop}', 'i')" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 rounded text-[11px] italic text-slate-800 transition">I</button>
+                    <button onclick="applyTag(${index}, '${prop}', 'u')" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 rounded text-[11px] underline text-slate-800 transition">U</button>
+                    <button onclick="applyTag(${index}, '${prop}', 'br')" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 rounded text-[11px] text-slate-800 transition"><i class="fa-solid fa-arrow-turn-down"></i> Ligne</button>
+                </div>
+            `;
+        }
+
+        function renderDynamicEditorList() {
+            const list = document.getElementById('dynamic-blocks-list');
+            list.innerHTML = '';
+            currentPoster.blocks.forEach((b, index) => {
+                const item = document.createElement('div');
+                item.className = "bg-white border border-slate-200 shadow-sm rounded-xl p-3 space-y-2 text-sm relative group transition-all";
+                item.setAttribute('draggable', 'true');
+                item.setAttribute('ondragstart', `handleDragStart(event, ${index})`);
+                item.setAttribute('ondragover', `handleDragOver(event)`);
+                item.setAttribute('ondrop', `handleDrop(event, ${index})`);
+                item.setAttribute('ondragend', `handleDragEnd(event)`);
+
+                let colSpan = b.colSpan || "12";
+                
+                let controlsHtml = `
+                    <div class="flex justify-between items-center text-slate-800 font-bold font-fredoka pb-2 border-b border-slate-100 cursor-move">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-grip-vertical text-slate-300 mr-1"></i>`;
+                
+                let buttonsHtml = `</span>
+                        <div class="flex items-center gap-1">
+                            <select onchange="updateBlockProp(${index}, 'colSpan', this.value)" class="mr-2 text-[11px] bg-slate-50 border border-slate-200 rounded px-1.5 py-1 text-slate-600 font-sans cursor-pointer focus:outline-none">
+                                <option value="12" ${colSpan==="12"?'selected':''}>100% Largeur</option>
+                                <option value="8" ${colSpan==="8"?'selected':''}>2/3 Largeur</option>
+                                <option value="6" ${colSpan==="6"?'selected':''}>Moitié (1/2)</option>
+                                <option value="4" ${colSpan==="4"?'selected':''}>1/3 Largeur</option>
+                            </select>
+                            <button onclick="removeBlock(${index})" class="p-1.5 text-rose-500 hover:text-white bg-rose-50 hover:bg-rose-500 rounded transition"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>`;
+
+                if (b.type === 'event-card') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-calendar-day text-[#C41E3A]"></i> Carte Cours` + buttonsHtml + `
+                        <select onchange="updateBlockProp(${index}, 'dayClass', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                            <option value="day-mardi" ${b.dayClass==='day-mardi'?'selected':''}>Mardi (Jaune)</option>
+                            <option value="day-mercredi" ${b.dayClass==='day-mercredi'?'selected':''}>Mercredi (Bleu)</option>
+                            <option value="day-jeudi" ${b.dayClass==='day-jeudi'?'selected':''}>Jeudi (Vert)</option>
+                            <option value="day-samedi" ${b.dayClass==='day-samedi'?'selected':''}>Samedi (Violet)</option>
+                        </select>
+                        <input type="text" value="${escapeAttr(b.dateStr)}" oninput="updateBlockProp(${index}, 'dateStr', this.value)" placeholder="Date" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold">
+                        <input type="text" value="${escapeAttr(b.desc)}" oninput="updateBlockProp(${index}, 'desc', this.value)" placeholder="Description" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" value="${escapeAttr(b.timeStr)}" oninput="updateBlockProp(${index}, 'timeStr', this.value)" placeholder="Horaire" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                            <input type="text" value="${escapeAttr(b.priceStr)}" oninput="updateBlockProp(${index}, 'priceStr', this.value)" placeholder="Tarif" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                        </div>
+                    `;
+                } else if (b.type === 'teacher-profile') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-user-tie text-blue-600"></i> Profil Intervenant` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.name)}" oninput="updateBlockProp(${index}, 'name', this.value)" placeholder="Nom" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold">
+                        <input type="text" value="${escapeAttr(b.role)}" oninput="updateBlockProp(${index}, 'role', this.value)" placeholder="Grade / Rôle" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                        <textarea oninput="updateBlockProp(${index}, 'desc', this.value)" placeholder="Description rapide" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-16 resize-none">${escapeAttr(b.desc)}</textarea>
+                    `;
+                } else if (b.type === 'quote-box') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-quote-left text-slate-700"></i> Citation` + buttonsHtml + `
+                        <textarea oninput="updateBlockProp(${index}, 'text', this.value)" placeholder="Texte de la citation" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-16 resize-none italic">${escapeAttr(b.text)}</textarea>
+                        <input type="text" value="${escapeAttr(b.author)}" oninput="updateBlockProp(${index}, 'author', this.value)" placeholder="Auteur (Optionnel)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold text-right">
+                    `;
+                } else if (b.type === 'event-header') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-bullhorn text-[#C41E3A]"></i> En-tête (AVEC date)` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold">
+                        <input type="text" value="${escapeAttr(b.subtitle)}" oninput="updateBlockProp(${index}, 'subtitle', this.value)" placeholder="Sous-titre" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                        <input type="text" value="${escapeAttr(b.dateStr)}" oninput="updateBlockProp(${index}, 'dateStr', this.value)" placeholder="Date (ex: Mercredi 12 Août)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                    `;
+                } else if (b.type === 'event-header-simple') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-bullhorn text-[#C41E3A]"></i> En-tête (SANS date)` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold text-center">
+                        <input type="text" value="${escapeAttr(b.subtitle)}" oninput="updateBlockProp(${index}, 'subtitle', this.value)" placeholder="Sous-titre" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-center">
+                    `;
+                } else if (b.type === 'titre-section') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-heading text-slate-700"></i> Titre de Section` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre (ex: AU PROGRAMME)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold text-center">
+                    `;
+                } else if (b.type === 'horaire-centre') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-clock text-rose-500"></i> Horaire Centré` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.timeStr)}" oninput="updateBlockProp(${index}, 'timeStr', this.value)" placeholder="Horaire" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold text-center">
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Sous-titre" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-center mt-2">
+                    `;
+                } else if (b.type === 'contact-info') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-address-book text-slate-900"></i> Bloc Contact` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.lieu)}" oninput="updateBlockProp(${index}, 'lieu', this.value)" placeholder="Lieu (ex: Dojo Municipal)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-center">
+                        <input type="text" value="${escapeAttr(b.tel)}" oninput="updateBlockProp(${index}, 'tel', this.value)" placeholder="Téléphone / Info" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-center mt-2">
+                    `;
+                } else if (b.type === 'alerte-annulation') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-ban text-rose-600"></i> Alerte Annulation` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre (ex: COURS ANNULÉ)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold">
+                        <textarea oninput="updateBlockProp(${index}, 'text', this.value)" placeholder="Motif de l'alerte" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-16 resize-none">${escapeAttr(b.text)}</textarea>
+                    `;
+                } else if (b.type === 'checklist') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-check-double text-emerald-500"></i> Checklist` + buttonsHtml + `
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" value="${escapeAttr(b.item1)}" oninput="updateBlockProp(${index}, 'item1', this.value)" placeholder="Item 1" class="bg-slate-50 border border-slate-200 rounded px-2 py-1">
+                            <input type="text" value="${escapeAttr(b.item2)}" oninput="updateBlockProp(${index}, 'item2', this.value)" placeholder="Item 2" class="bg-slate-50 border border-slate-200 rounded px-2 py-1">
+                            <input type="text" value="${escapeAttr(b.item3)}" oninput="updateBlockProp(${index}, 'item3', this.value)" placeholder="Item 3" class="bg-slate-50 border border-slate-200 rounded px-2 py-1">
+                            <input type="text" value="${escapeAttr(b.item4)}" oninput="updateBlockProp(${index}, 'item4', this.value)" placeholder="Item 4" class="bg-slate-50 border border-slate-200 rounded px-2 py-1">
+                        </div>
+                    `;
+                } else if (b.type === 'palmares') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-medal text-amber-400"></i> Palmarès` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre (ex: RÉSULTATS TOURNOI)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold mb-2">
+                        <div class="space-y-1">
+                            <input type="text" value="${escapeAttr(b.gold)}" oninput="updateBlockProp(${index}, 'gold', this.value)" placeholder="🥇 1er(s)" class="w-full bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
+                            <input type="text" value="${escapeAttr(b.silver)}" oninput="updateBlockProp(${index}, 'silver', this.value)" placeholder="🥈 2ème(s)" class="w-full bg-slate-100 border border-slate-200 rounded px-2 py-1.5">
+                            <input type="text" value="${escapeAttr(b.bronze)}" oninput="updateBlockProp(${index}, 'bronze', this.value)" placeholder="🥉 3ème(s)" class="w-full bg-orange-50 border border-orange-200 rounded px-2 py-1.5">
+                        </div>
+                    `;
+                } else if (b.type === 'age-category') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-users text-blue-500"></i> Catégorie d'Âge` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.catName)}" oninput="updateBlockProp(${index}, 'catName', this.value)" placeholder="Nom (ex: POUSSINS)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold">
+                        <input type="text" value="${escapeAttr(b.years)}" oninput="updateBlockProp(${index}, 'years', this.value)" placeholder="Années (ex: 2014-2015)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 mt-2">
+                    `;
+                } else if (b.type === 'qr-code-box') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-qrcode text-slate-800"></i> Zone QR Code` + buttonsHtml + `
+                        <select onchange="updateBlockProp(${index}, 'align', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 mb-2 text-xs">
+                            <option value="left" ${b.align==='left'?'selected':''}>Texte à côté (Gauche)</option>
+                            <option value="center" ${b.align==='center'?'selected':''}>Texte en dessous (Centré)</option>
+                            <option value="justify" ${b.align==='justify'?'selected':''}>Texte justifié</option>
+                        </select>
+                        <textarea oninput="updateBlockProp(${index}, 'text', this.value)" placeholder="Texte d'incitation au scan" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-16 resize-none">${escapeAttr(b.text)}</textarea>
+                    `;
+                } else if (b.type === 'bouton-action') {
+                    item.innerHTML = controlsHtml + `<i class="fa-regular fa-hand-pointer text-indigo-500"></i> Bouton d'Action` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.text)}" oninput="updateBlockProp(${index}, 'text', this.value)" placeholder="Texte du bouton" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold text-center">
+                    `;
+                } else if (b.type === 'focus-stat') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-chart-simple text-sky-500"></i> Chiffre Clé` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.number)}" oninput="updateBlockProp(${index}, 'number', this.value)" placeholder="Gros chiffre (ex: 150)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold text-center text-xl text-[#C41E3A]">
+                        <input type="text" value="${escapeAttr(b.label)}" oninput="updateBlockProp(${index}, 'label', this.value)" placeholder="Label (ex: Licenciés)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-center mt-2">
+                    `;
+                } else if (b.type === 'temoignage') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-star text-amber-400"></i> Témoignage` + buttonsHtml + `
+                        <textarea oninput="updateBlockProp(${index}, 'quote', this.value)" placeholder="Le témoignage..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-16 resize-none italic">${escapeAttr(b.quote)}</textarea>
+                        <input type="text" value="${escapeAttr(b.name)}" oninput="updateBlockProp(${index}, 'name', this.value)" placeholder="Nom de la personne" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold text-right mt-2">
+                    `;
+                } else if (b.type === 'lieu-details') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-map-location-dot text-rose-500"></i> Lieu & Itinéraire` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.address)}" oninput="updateBlockProp(${index}, 'address', this.value)" placeholder="Adresse principale" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold">
+                        <textarea oninput="updateBlockProp(${index}, 'instructions', this.value)" placeholder="Consignes (ex: Parking à l'arrière)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-16 resize-none mt-2">${escapeAttr(b.instructions)}</textarea>
+                    `;
+                } else if (b.type === 'avantage-rond') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-circle-check text-teal-500"></i> Point Fort` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.icon)}" oninput="updateBlockProp(${index}, 'icon', this.value)" placeholder="Émoji / Icône" class="w-16 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-center text-xl mb-2 mx-auto block">
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre court" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold text-center">
+                        <textarea oninput="updateBlockProp(${index}, 'text', this.value)" placeholder="Description" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-16 resize-none mt-2">${escapeAttr(b.text)}</textarea>
+                    `;
+                } else if (b.type === 'programme') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-list-check text-indigo-500"></i> Programme` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold">
+                        ${getToolbarHtml(index, 'lines')}
+                        <textarea id="input-${index}-lines" oninput="updateBlockProp(${index}, 'lines', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-24 resize-none">${escapeAttr(b.lines)}</textarea>
+                    `;
+                } else if (b.type === 'warning-box') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Alerte Logistique` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre Alerte" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold">
+                        ${getToolbarHtml(index, 'text')}
+                        <textarea id="input-${index}-text" oninput="updateBlockProp(${index}, 'text', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-20 resize-none">${escapeAttr(b.text)}</textarea>
+                    `;
+                } else if (b.type === 'info-box') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-circle-info text-sky-500"></i> Encart Info` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold">
+                        ${getToolbarHtml(index, 'text')}
+                        <textarea id="input-${index}-text" oninput="updateBlockProp(${index}, 'text', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-20 resize-none">${escapeAttr(b.text)}</textarea>
+                    `;
+                } else if (b.type === 'tarifs') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-euro-sign text-emerald-600"></i> Grille Tarifs` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold">
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <div class="space-y-1"><input type="text" value="${escapeAttr(b.cat1)}" oninput="updateBlockProp(${index}, 'cat1', this.value)" placeholder="Catégorie 1" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1.5"><input type="text" value="${escapeAttr(b.price1)}" oninput="updateBlockProp(${index}, 'price1', this.value)" placeholder="Prix" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1.5"><input type="text" value="${escapeAttr(b.desc1)}" oninput="updateBlockProp(${index}, 'desc1', this.value)" placeholder="Infos" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1.5"></div>
+                            <div class="space-y-1"><input type="text" value="${escapeAttr(b.cat2)}" oninput="updateBlockProp(${index}, 'cat2', this.value)" placeholder="Catégorie 2" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1.5"><input type="text" value="${escapeAttr(b.price2)}" oninput="updateBlockProp(${index}, 'price2', this.value)" placeholder="Prix" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1.5"><input type="text" value="${escapeAttr(b.desc2)}" oninput="updateBlockProp(${index}, 'desc2', this.value)" placeholder="Infos" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1.5"></div>
+                        </div>
+                    `;
+                } else if (b.type === 'special-stage') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-trophy text-amber-500"></i> Stage Inter-Clubs` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.title)}" oninput="updateBlockProp(${index}, 'title', this.value)" placeholder="Titre du Stage" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-bold">
+                        <input type="text" value="${escapeAttr(b.partners)}" oninput="updateBlockProp(${index}, 'partners', this.value)" placeholder="Partenaires" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                        <input type="text" value="${escapeAttr(b.dates)}" oninput="updateBlockProp(${index}, 'dates', this.value)" placeholder="Dates" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                        <input type="text" value="${escapeAttr(b.notes)}" oninput="updateBlockProp(${index}, 'notes', this.value)" placeholder="Lieu / Notes" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                    `;
+                } else if (b.type === 'cobranding') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-handshake text-slate-700"></i> Partenaire` + buttonsHtml + `
+                        <input type="text" value="${escapeAttr(b.partnerText || 'MAIRIE')}" oninput="updateBlockProp(${index}, 'partnerText', this.value)" placeholder="Nom Partenaire" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                    `;
+                } else if (b.type === 'custom-text') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-align-left text-slate-500"></i> Texte Libre` + buttonsHtml + `
+                        <select onchange="updateBlockProp(${index}, 'align', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 mb-2 text-xs">
+                            <option value="left" ${b.align==='left'?'selected':''}>Aligné à gauche</option>
+                            <option value="center" ${b.align==='center'?'selected':''}>Centré</option>
+                            <option value="justify" ${b.align==='justify'?'selected':''}>Justifié</option>
+                            <option value="right" ${b.align==='right'?'selected':''}>Aligné à droite</option>
+                        </select>
+                        ${getToolbarHtml(index, 'text')}
+                        <textarea id="input-${index}-text" oninput="updateBlockProp(${index}, 'text', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-24 resize-none">${escapeAttr(b.text)}</textarea>
+                    `;
+                } else if (b.type === 'raw-html') {
+                    item.innerHTML = controlsHtml + `<i class="fa-solid fa-code text-purple-600"></i> HTML Libre` + buttonsHtml + `
+                        <textarea oninput="updateBlockProp(${index}, 'htmlContent', this.value)" placeholder="Code HTML" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-24 resize-none font-mono text-xs">${escapeAttr(b.htmlContent)}</textarea>
+                    `;
+                }
+                list.appendChild(item);
+            });
+        }
+
+        function updateBlockProp(index, prop, value) { currentPoster.blocks[index][prop] = value; renderPoster(); }
+        function removeBlock(index) { currentPoster.blocks.splice(index, 1); renderDynamicEditorList(); renderPoster(); }
+        
+        function injectBlock(type) {
+            let newBlock = { type: type, colSpan: "12" };
+            
+            if (type === 'event-card') Object.assign(newBlock, { dayClass: "day-mardi", dateStr: "Mardi 10 Oct", title: "Nouvelle Séance", desc: "Description", timeStr: "18h00 - 19h30", priceStr: "5 €" }); 
+            else if (type === 'teacher-profile') Object.assign(newBlock, { name: "Prénom Nom", role: "Ceinture Noire", desc: "Professeur diplômé." }); 
+            else if (type === 'quote-box') Object.assign(newBlock, { text: "L'entraide et la prospérité mutuelle.", author: "Jigoro Kano" }); 
+            else if (type === 'special-stage') Object.assign(newBlock, { title: "Stage Inter-Clubs", partners: "Dojo Nivernais", dates: "Samedi 20 Oct", notes: "Lieu : Dojo Municipal" }); 
+            else if (type === 'tarifs') Object.assign(newBlock, { title: "💳 Tarifs Saison", cat1: "Baby Judo", price1: "115 €", desc1: "Licence incluse", cat2: "Judo Adulte", price2: "135 €", desc2: "Licence incluse" }); 
+            else if (type === 'info-box') Object.assign(newBlock, { title: "ℹ️ Information", text: "Consignes de l'événement." }); 
+            else if (type === 'programme') Object.assign(newBlock, { title: "Programme :", lines: "09h00 : Accueil\n10h00 : Échauffement" }); 
+            else if (type === 'warning-box') Object.assign(newBlock, { title: "Organisation :", text: "Pensez à votre gourde et zooris." }); 
+            else if (type === 'event-header') Object.assign(newBlock, { dateStr: "Mercredi 12 Août", title: "NOUVEL ÉVÉNEMENT", subtitle: "Dojo Dornois" }); 
+            else if (type === 'event-header-simple') Object.assign(newBlock, { title: "NOUVEL ÉVÉNEMENT", subtitle: "Dojo Dornois" }); 
+            else if (type === 'titre-section') Object.assign(newBlock, { title: "AU PROGRAMME" }); 
+            else if (type === 'horaire-centre') Object.assign(newBlock, { timeStr: "14h00", title: "Ouverture des portes" }); 
+            else if (type === 'contact-info') Object.assign(newBlock, { lieu: "Dojo Municipal de Dornes", tel: "06 07 13 91 86" }); 
+            else if (type === 'alerte-annulation') Object.assign(newBlock, { title: "COURS ANNULÉ", text: "En raison d'un problème technique, la séance de ce soir n'aura pas lieu." }); 
+            else if (type === 'checklist') Object.assign(newBlock, { item1: "Zooris obligatoires", item2: "Gourde d'eau", item3: "Passeport Sportif", item4: "Judogi propre" }); 
+            else if (type === 'palmares') Object.assign(newBlock, { title: "🏆 RÉSULTATS TOURNOI", gold: "Équipe 1", silver: "Équipe 2", bronze: "" }); 
+            else if (type === 'age-category') Object.assign(newBlock, { catName: "POUSSINS", years: "2014-2015" }); 
+            else if (type === 'qr-code-box') Object.assign(newBlock, { text: "Scannez ce QR Code pour\nvous inscrire en ligne", align: "left" }); 
+            else if (type === 'bouton-action') Object.assign(newBlock, { text: "INSCRIPTIONS OUVERTES" }); 
+            else if (type === 'focus-stat') Object.assign(newBlock, { number: "100%", label: "De réussite au passage de grade" }); 
+            else if (type === 'temoignage') Object.assign(newBlock, { quote: "Super club, les professeurs sont au top !", name: "Un parent d'élève" }); 
+            else if (type === 'lieu-details') Object.assign(newBlock, { address: "Dojo Municipal de Dornes", instructions: "Entrée par la porte arrière du bâtiment." }); 
+            else if (type === 'avantage-rond') Object.assign(newBlock, { icon: "🥋", title: "Encadrement Diplômé", text: "Tous nos cours sont assurés par des professeurs diplômés d'État." }); 
+            else if (type === 'cobranding') Object.assign(newBlock, { partnerText: "MAIRIE DE DORNES" }); 
+            else if (type === 'custom-text') Object.assign(newBlock, { text: "Paragraphe libre...", align: "left" }); 
+            else if (type === 'raw-html') Object.assign(newBlock, { htmlContent: "<div style='text-align:center;'>Votre HTML personnalisé</div>" }); 
+            
+            currentPoster.blocks.push(newBlock);
+            renderDynamicEditorList(); renderPoster(); switchEditorTab('content');
+            setTimeout(() => { const el = document.getElementById('editor-tab-content'); el.parentElement.scrollTop = el.parentElement.scrollHeight; }, 50);
+        }
+
+        function updatePosterTitle() { currentPoster.name = document.getElementById('poster-name-input').value; }
+
+        function saveCurrentPoster() {
+            try {
+                let history = JSON.parse(localStorage.getItem('dojo_posters_history') || "[]");
+                currentPoster.updatedAt = new Date().toLocaleString('fr-FR');
+                const existingIdx = history.findIndex(p => p.id === currentPoster.id);
+                if (existingIdx >= 0) history[existingIdx] = JSON.parse(JSON.stringify(currentPoster));
+                else history.unshift(JSON.parse(JSON.stringify(currentPoster)));
+                localStorage.setItem('dojo_posters_history', JSON.stringify(history));
+                updateHistoryCounter();
+                alert("Affiche sauvegardée !");
+            } catch(e) {}
+        }
+
+        function loadHistoryFromStorage() { updateHistoryCounter(); }
+        function updateHistoryCounter() { 
+            try { document.getElementById('history-count').textContent = JSON.parse(localStorage.getItem('dojo_posters_history') || "[]").length; 
+            } catch(e) { document.getElementById('history-count').textContent = "0"; }
+        }
+
+        function openHistoryModal() {
+            try {
+                let history = JSON.parse(localStorage.getItem('dojo_posters_history') || "[]");
+                const container = document.getElementById('history-items-container');
+                container.innerHTML = '';
+                if (history.length === 0) {
+                    container.innerHTML = "<p class='text-sm text-slate-500 text-center py-8 font-medium'>Aucune affiche sauvegardée.</p>";
+                } else {
+                    history.forEach((p, idx) => {
+                        const card = document.createElement('div');
+                        card.className = "bg-[#F8FAFC] border border-slate-200 rounded-xl p-4 flex justify-between items-center";
+                        card.innerHTML = `<div><h4 class='font-fredoka text-base font-bold text-slate-800'>${escapeAttr(p.name)}</h4><p class='text-xs text-slate-500 mt-1'>Modifié le ${p.updatedAt || 'N/A'} • Format ${p.format.toUpperCase()}</p></div><div class='flex gap-2'><button onclick='loadPosterFromHistory(${idx})' class='px-4 py-2 bg-[#C41E3A] hover:bg-[#A3182E] transition text-white rounded-lg text-sm font-bold shadow-sm'>Ouvrir</button><button onclick='deletePosterFromHistory(${idx})' class='px-3 py-2 border border-rose-300 text-rose-600 hover:bg-rose-50 transition rounded-lg'><i class='fa-solid fa-trash'></i></button></div>`;
+                        container.appendChild(card);
+                    });
+                }
+                openModal('modal-history');
+            } catch(e) {}
+        }
+
+        function loadPosterFromHistory(idx) {
+            let history = JSON.parse(localStorage.getItem('dojo_posters_history') || "[]");
+            currentPoster = JSON.parse(JSON.stringify(history[idx]));
+            document.getElementById('poster-name-input').value = currentPoster.name || "";
+            document.getElementById('input-main-title').value = currentPoster.mainTitle || "";
+            document.getElementById('input-subtitle').value = currentPoster.subtitle || "";
+            if(document.getElementById('watermark-select')) document.getElementById('watermark-select').value = currentPoster.watermark || "true";
+            if(document.getElementById('banner-select')) document.getElementById('banner-select').value = currentPoster.showBanner || "true";
+            if(document.getElementById('footer-type-select')) document.getElementById('footer-type-select').value = currentPoster.footerType || "social";
+            setPosterFormat(currentPoster.format || "a4");
+            renderDynamicEditorList(); renderPoster(); closeModal('modal-history');
+        }
+
+        function deletePosterFromHistory(idx) {
+            let history = JSON.parse(localStorage.getItem('dojo_posters_history') || "[]");
+            history.splice(idx, 1);
+            localStorage.setItem('dojo_posters_history', JSON.stringify(history));
+            openHistoryModal(); updateHistoryCounter();
+        }
+
+        function addNewPoster() {
+            currentPoster = { id: Date.now(), name: "Nouvelle Affiche", format: "a4", mainTitle: "", subtitle: "", watermark: "true", showBanner: "true", footerType: "social", blocks: [] };
+            document.getElementById('poster-name-input').value = currentPoster.name;
+            document.getElementById('input-main-title').value = currentPoster.mainTitle;
+            document.getElementById('input-subtitle').value = currentPoster.subtitle;
+            setPosterFormat('a4'); renderDynamicEditorList(); renderPoster();
+        }
+
+        function resetEditor() { if(confirm("Vider l'affiche ?")) { addNewPoster(); } }
+        function openCodeModal() { document.getElementById('code-textarea').value = document.getElementById('poster-render-target').innerHTML; openModal('modal-code'); }
+        function copyCodeToClipboard() { const textarea = document.getElementById('code-textarea'); textarea.select(); document.execCommand('copy'); alert("Code source copié !"); }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    </script>
+</body>
+</html>

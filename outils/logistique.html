@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Logistique, Événements & Matériel — Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --rouge-deep: #8B1429;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --bleu: #3498db;
+            --vert: #2ecc71;
+            --orange: #e67e22;
+            --sidebar-width: 280px;
+            --topbar-height: 68px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            margin: 0; padding: 0;
+            color: var(--gris-fonce);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- FIX SIDEBAR DÉBORDEMENT --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        .sidebar * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
+        }
+
+        .topbar {
+            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.04); flex-shrink: 0; z-index: 50;
+        }
+
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); line-height: 1; }
+        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+
+        .app-body {
+            flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
+        }
+
+        /* ===== BOUTONS ET COMPOSANTS ===== */
+        .btn { font-family: 'Roboto', sans-serif; font-weight: 500; padding: 9px 15px; border-radius: 6px; border: none; cursor: pointer; transition: background 0.2s; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-dark:hover { background: #333; }
+        .btn-outline { background: transparent; border: 1px solid var(--gris-moyen); color: var(--gris-fonce); }
+        .btn-outline:hover { background: var(--gris-tres-clair); }
+        .btn-success { background: var(--vert); color: white; }
+        .btn-danger { background: var(--rouge); color: white; }
+        .btn-warning { background: var(--orange); color: white; }
+        .btn-xs { padding: 4px 8px; font-size: 0.78rem; border-radius: 4px; }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 5px; flex-wrap: wrap; }
+        .tab-btn { padding: 10px 18px; border-radius: 6px; border: 1px solid var(--gris-clair); background: white; cursor: pointer; font-family: 'Fredoka', sans-serif; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .tab-btn.active { background: var(--noir-doux); color: white; border-color: var(--noir-doux); }
+
+        .main-card { background: var(--blanc); padding: 22px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid var(--gris-tres-clair); margin-bottom: 20px; }
+        .main-card h2 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin-top: 0; font-size: 1.25rem; border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 10px; }
+
+        .form-grid { display: flex; flex-wrap: wrap; gap: 12px; background: #fafafa; padding: 15px; border-radius: 6px; border: 1px dashed var(--gris-clair); margin-bottom: 20px; align-items: flex-end; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 150px; }
+        .form-group label { font-size: 0.82rem; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 0.88rem; font-family: inherit; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; margin-top: 10px; }
+        th, td { padding: 11px 13px; border-bottom: 1px solid var(--gris-tres-clair); }
+        th { background-color: var(--fond); font-family: 'Fredoka', sans-serif; font-weight: 500; }
+
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: bold; text-align: center; }
+        .badge-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .badge-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+
+        .event-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
+        @media(max-width: 900px) { .event-layout { grid-template-columns: 1fr; } }
+        .event-list { border-right: 1px solid var(--gris-tres-clair); padding-right: 15px; }
+        .event-item { padding: 12px; border: 1px solid var(--gris-clair); border-radius: 6px; margin-bottom: 10px; cursor: pointer; background: white; transition: all 0.2s; }
+        .event-item.active { border-left: 5px solid var(--bleu); background: #f4f9fd; font-weight: 500; }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .card-sub { background: #fafafa; padding: 15px; border-radius: 6px; border: 1px solid var(--gris-tres-clair); }
+        .card-sub h4 { margin-top: 0; font-family: 'Fredoka'; color: var(--gris-fonce); margin-bottom: 10px; }
+
+        .input-edit { width: 90%; padding: 4px; font-size: 0.88rem; border: 1px solid var(--bleu); border-radius: 4px; }
+
+        /* --- TOAST NOTIFICATIONS SYNC CLOUD --- */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        @media print {
+            body { background: white; padding: 0; color: black; display: block !important; }
+            .no-print, .sidebar, .topbar { display: none !important; }
+            .main-content { padding: 0 !important; overflow: visible !important; }
+            .app-body { display: block !important; margin: 0 !important; padding: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== SIDEBAR DYNAMIQUE ===== -->
+    <div class="sidebar"></div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <div class="topbar no-print">
+            <div class="page-title-area">
+                <h2>📦 Logistique, Événements & Matériel</h2>
+                <p>Planification des bénévoles et inventaire global des équipements du dojo</p>
+            </div>
+            <div>
+                <a href="../index.html" class="btn btn-dark">🏠 Central</a>
+            </div>
+        </div>
+
+        <div class="app-body">
+            
+            <div class="tabs no-print">
+                <button class="tab-btn active" id="btn-tab-events" onclick="switchTab('events')">📅 1. Planificateur d'Événements & Bénévoles</button>
+                <button class="tab-btn" id="btn-tab-inventaire" onclick="switchTab('inventaire')">📦 2. Inventaire du Matériel</button>
+                <button class="tab-btn" id="btn-tab-prets" onclick="switchTab('prets')">🤝 3. Prêts de Matériel</button>
+            </div>
+
+            <!-- ================= MODULE 1 : ÉVÉNEMENTS & BÉNÉVOLES ================= -->
+            <div id="pane-events" class="main-card tab-pane">
+                <div class="event-layout">
+                    <div class="event-list">
+                        <h3>Créer un Événement</h3>
+                        <div style="background: #fafafa; padding: 12px; border-radius:6px; border:1px dashed var(--gris-clair); margin-bottom:15px;">
+                            <div class="form-group" style="margin-bottom:10px;"><label>Nom</label><input type="text" id="ev-name" placeholder="Ex: Olympiades 2026"></div>
+                            <div class="form-group" style="margin-bottom:10px;"><label>Date</label><input type="date" id="ev-date"></div>
+                            <button class="btn btn-dark" style="width:100%; justify-content:center;" onclick="addEvent()">➕ Créer</button>
+                        </div>
+                        <h3>Événements</h3>
+                        <div id="active-events-list"></div>
+                    </div>
+
+                    <div>
+                        <div id="event-details-blank" style="text-align:center; color:var(--gris-moyen); padding:40px;">
+                             Sélectionnez ou créez un événement à gauche pour planifier les bénévoles et les horaires.
+                        </div>
+                        
+                        <div id="event-details-zone" style="display:none;">
+                            <h2 id="current-event-title" style="border:none; padding:0; margin-bottom:5px;">-</h2>
+                            <p id="current-event-date" style="color:var(--gris-moyen); margin-top:0; margin-bottom:20px;">-</p>
+
+                            <div class="grid-3 no-print">
+                                <!-- AJOUTER POSTE -->
+                                <div class="card-sub">
+                                    <h4>🛠️ 1. Ajouter un Poste / Tâche</h4>
+                                    <div class="form-group" style="margin-bottom:8px;"><input type="text" id="p-name" placeholder="Ex: Buvette, Installation..."></div>
+                                    <div class="form-group" style="margin-bottom:8px;"><input type="number" id="p-besoin" placeholder="Nb bénévoles requis" min="1"></div>
+                                    <button class="btn btn-dark btn-xs" style="width:100%;" onclick="addPoste()">Ajouter le poste</button>
+                                </div>
+                                <!-- AFFECTER BÉNÉVOLE -->
+                                <div class="card-sub">
+                                    <h4>🙋‍♂️ 2. Assigner un Bénévole</h4>
+                                    <div class="form-group" style="margin-bottom:8px;">
+                                        <label>Poste cible</label>
+                                        <select id="p-select-assign"></select>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:8px;"><input type="text" id="p-ben-name" placeholder="Nom du bénévole"></div>
+                                    <div class="form-group" style="margin-bottom:8px;"><input type="text" id="p-ben-creneau" placeholder="Créneau (Ex: 14h-16h)"></div>
+                                    <button class="btn btn-success btn-xs" style="width:100%;" onclick="assignBenevole()">Assigner</button>
+                                </div>
+                                <!-- PLANNING HORAIRE -->
+                                <div class="card-sub">
+                                    <h4>⏱️ 3. Ligne de Planning Horaire</h4>
+                                    <div class="form-group" style="margin-bottom:8px;"><input type="text" id="h-time" placeholder="Heure (Ex: 08:30)"></div>
+                                    <div class="form-group" style="margin-bottom:8px;"><input type="text" id="h-action" placeholder="Action (Ex: Café / Briefing)"></div>
+                                    <button class="btn btn-dark btn-xs" style="width:100%;" onclick="addHoraireLigne()">Ajouter au fil de la journée</button>
+                                </div>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                                <div>
+                                    <h3>📋 Répartition des Bénévoles</h3>
+                                    <div id="postes-render-zone"></div>
+                                </div>
+                                <div>
+                                    <h3>⏱️ Déroulement Chronologique</h3>
+                                    <table>
+                                        <thead><tr><th>Heure</th><th>Action / Étape</th><th class="no-print">Action</th></tr></thead>
+                                        <tbody id="table-horaires-body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= MODULE 2 : INVENTAIRE DU MATÉRIEL ================= -->
+            <div id="pane-inventaire" class="main-card tab-pane" style="display:none;">
+                <h2>Inventaire Général du Matériel Éducatif & Sportif</h2>
+                <div class="form-grid no-print">
+                    <div class="form-group">
+                        <label>Catégorie</label>
+                        <select id="inv-cat">
+                            <option value="Tatami">🥋 Tatamis</option>
+                            <option value="Pédagogique">🎈 Pédagogique (Cerceaux, Ballons...)</option>
+                            <option value="Agrès / Gym">🤸‍♂️ Agrès & Matelas</option>
+                            <option value="Buvette / Fête">🍻 Buvette & Réception</option>
+                            <option value="Autre">📦 Autre matériel</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Nom de l'équipement</label><input type="text" id="inv-name" placeholder="Ex: Cerceaux plats multicolores"></div>
+                    <div class="form-group"><label>Quantité Totale</label><input type="number" id="inv-qty" min="0" value="1"></div>
+                    <div class="form-group"><label>Lieu de Stockage / État</label><input type="text" id="inv-lieu" placeholder="Ex: Placard Dojo / Bon état"></div>
+                    <button class="btn btn-dark" onclick="addInventaireItem()">💾 Enregistrer</button>
+                </div>
+
+                <div style="margin-bottom: 15px; display:flex; gap:10px;" class="no-print">
+                    <button class="btn btn-outline btn-xs" onclick="filterInventaire('Tous')">Tout afficher</button>
+                    <button class="btn btn-outline btn-xs" onclick="filterInventaire('Tatami')">🥋 Tatamis</button>
+                    <button class="btn btn-outline btn-xs" onclick="filterInventaire('Pédagogique')">🎈 Pédagogique</button>
+                    <button class="btn btn-outline btn-xs" onclick="filterInventaire('Agrès / Gym')">🤸‍♂️ Agrès</button>
+                    <button class="btn btn-outline btn-xs" onclick="filterInventaire('Buvette / Fête')">🍻 Buvette</button>
+                </div>
+
+                <table style="margin-top:20px;">
+                    <thead>
+                        <tr><th>Catégorie</th><th>Nom du Matériel</th><th>Quantité</th><th>Stockage / État</th><th style="text-align:center;" class="no-print">Actions</th></tr>
+                    </thead>
+                    <tbody id="table-inventaire-body"></tbody>
+                </table>
+            </div>
+
+            <!-- ================= MODULE 3 : SUIVI DES PRÊTS ================= -->
+            <div id="pane-prets" class="main-card tab-pane" style="display:none;">
+                <h2>🤝 Registre & Suivi des Prêts de Matériel</h2>
+                
+                <!-- Formulaire d'enregistrement -->
+                <div class="form-grid no-print">
+                    <div class="form-group">
+                        <label>Emprunteur (Asso / Personne)</label>
+                        <input type="text" id="loan-borrower" placeholder="Ex: Comité des Fêtes, Teamgazzz58...">
+                    </div>
+                    <div class="form-group">
+                        <label>Matériel prêté</label>
+                        <input type="text" id="loan-item" placeholder="Ex: 50 Gobelets, 3 Pichets, Panneau...">
+                    </div>
+                    <div class="form-group">
+                        <label>Date du prêt / Événement</label>
+                        <input type="date" id="loan-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Date de Retour Prévue</label>
+                        <input type="date" id="loan-return-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Remarques / Contexte</label>
+                        <input type="text" id="loan-notes" placeholder="Ex: Pour le jambon à la broche">
+                    </div>
+                    <button class="btn btn-dark" onclick="addLoanItem()">💾 Enregistrer le prêt</button>
+                </div>
+
+                <!-- Filtres et Barre de recherche globale -->
+                <div style="background: #fafafa; padding: 15px; border-radius: 6px; border: 1px solid var(--gris-tres-clair); margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;" class="no-print">
+                    <div style="flex: 1; min-width: 250px;" class="form-group">
+                        <label style="margin-bottom: 2px;">🔍 Rechercher par <b>Association / Emprunteur</b> ou par <b>Matériel</b> :</label>
+                        <input type="text" id="loan-search" oninput="renderLoansTable()" placeholder="Tapez un nom d'asso, un mot clé (gobelet, panneau...)...">
+                    </div>
+                    <div class="form-group" style="flex: 0; min-width: 180px;">
+                        <label style="margin-bottom: 2px;">Filtrer par état :</label>
+                        <select id="loan-filter-status" onchange="renderLoansTable()">
+                            <option value="Tous">Tous les prêts (Historique complet)</option>
+                            <option value="En cours">🗓️ Prêts en cours uniquement</option>
+                            <option value="Restitué">✅ Prêts rendus uniquement</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tableau des prêts -->
+                <table style="margin-top:10px;">
+                    <thead>
+                        <tr>
+                            <th>Emprunteur</th>
+                            <th>Matériel mis à disposition</th>
+                            <th>Date Prêt / Événement</th>
+                            <th>Retour prévu</th>
+                            <th>Statut</th>
+                            <th>Remarques</th>
+                            <th style="text-align:center;" class="no-print">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-loans-body"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        let logistiqueDB = {
+            events: [],
+            inventaire: [],
+            prets: [],
+            currentEventId: null
+        };
+
+        let editingItemId = null; 
+        let currentFilterTab = 'Tous';
+
+        // --- CONFIGURATION CLOUD NETWORK ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+        const TARGET_SHEET = "logistique_evenements";
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast success';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3500);
+        }
+
+        function syncToCloud() {
+            localStorage.setItem('dojo_logistique_backup', JSON.stringify(logistiqueDB));
+
+            const packet = {
+                targetSheet: TARGET_SHEET,
+                payload: logistiqueDB
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(packet)
+            })
+            .then(() => {
+                showToast("✓ Événements et matériel synchronisés sur Google Sheets !");
+            })
+            .catch(err => console.error("Erreur de liaison réseau Logistique:", err));
+        }
+
+        function loadCloudLogistiqueData() {
+            fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && (data.events || data.inventaire || data.prets)) {
+                        logistiqueDB = data;
+                        if(!logistiqueDB.prets) logistiqueDB.prets = [];
+                        console.log("✓ Données globales Événements & Matériel récupérées.");
+                    } else {
+                        useFallbackLocalData();
+                    }
+                    finalizeInitialization();
+                })
+                .catch(err => {
+                    console.warn("Erreur réseau, chargement de l'instance locale brute :", err);
+                    useFallbackLocalData();
+                    finalizeInitialization();
+                });
+        }
+
+        function useFallbackLocalData() {
+            const local = localStorage.getItem('dojo_logistique_backup');
+            if (local) {
+                logistiqueDB = JSON.parse(local);
+                if(!logistiqueDB.prets) logistiqueDB.prets = [];
+            } else {
+                logistiqueDB.inventaire = [
+                    { id: 1, cat: "Tatami", name: "Tatamis installés (Zone principale)", qty: 50, lieu: "Sur le praticable - Bon état" },
+                    { id: 2, cat: "Tatami", name: "Tatamis de rechange / stockage", qty: 12, lieu: "Réserve fond de salle" },
+                    { id: 3, cat: "Pédagogique", name: "Cerceaux PVC colorés", qty: 20, lieu: "Placard matériel - Neufs" },
+                    { id: 4, cat: "Pédagogique", name: "Ballons mousse (Taïso/Enfants)", qty: 15, lieu: "Grand bac plastique" },
+                    { id: 5, cat: "Agrès / Gym", name: "Gros matelas de chute", qty: 2, lieu: "Contre le mur droite" }
+                ];
+                logistiqueDB.events = [
+                    { id: 101, name: "Olympiades d'été & Barbecue", date: "2026-06-13", postes: [{id:1, name:"Barbecue / Cuisson", besoin:2, bens:[{name:"Jordan", creneau:"11h30-14h"}]},{id:2, name:"Buvette", besoin:3, bens:[]}], horaires: [{id:1, time:"09:00", action:"Installation des tables & barnums"},{id:2, time:"12:00", action:"Début de l'événement / Apéritif"}] }
+                ];
+                logistiqueDB.prets = [
+                    { id: 1, borrower: "Teamgazzz58", item: "1 Panneau d'affichage", date: "2026-07-04", returnDate: "2026-07-06", status: "En cours", notes: "Pour la fête de la moto" },
+                    { id: 2, borrower: "Comité des fêtes de Toury Lurcy", item: "Gobelets et pichets (nombres à déterminer)", date: "2026-09-05", returnDate: "2026-09-07", status: "En cours", notes: "Pour le jambon à la broche" }
+                ];
+                localStorage.setItem('dojo_logistique_backup', JSON.stringify(logistiqueDB));
+            }
+        }
+
+        function finalizeInitialization() {
+            renderEventsList();
+            renderInventaireTable(currentFilterTab);
+            renderLoansTable();
+        }
+
+        // ================= SCRIPT INVENTAIRE =================
+        function addInventaireItem() {
+            const cat = document.getElementById('inv-cat').value;
+            const name = document.getElementById('inv-name').value.trim();
+            const qty = parseInt(document.getElementById('inv-qty').value) || 0;
+            const lieu = document.getElementById('inv-lieu').value.trim() || "Dojo";
+
+            if(!name || qty < 0) { alert("Saisie invalide"); return; }
+
+            logistiqueDB.inventaire.push({ id: Date.now(), cat, name, qty, lieu });
+            syncToCloud();
+            renderInventaireTable(currentFilterTab);
+            document.getElementById('inv-name').value = '';
+            document.getElementById('inv-qty').value = '1';
+            document.getElementById('inv-lieu').value = '';
+        }
+
+        function updateQty(id, delta) {
+            const item = logistiqueDB.inventaire.find(i => i.id === id);
+            if(item) {
+                item.qty = Math.max(0, item.qty + delta);
+                syncToCloud();
+                renderInventaireTable(currentFilterTab);
+            }
+        }
+
+        function deleteInvItem(id) {
+            if(confirm("Supprimer cet élément de l'inventaire ?")) {
+                logistiqueDB.inventaire = logistiqueDB.inventaire.filter(i => i.id !== id);
+                syncToCloud();
+                renderInventaireTable(currentFilterTab);
+            }
+        }
+
+        function startEditItem(id) {
+            editingItemId = id;
+            renderInventaireTable(currentFilterTab);
+        }
+
+        function saveEditItem(id) {
+            const item = logistiqueDB.inventaire.find(i => i.id === id);
+            if(item) {
+                const newName = document.getElementById(`edit-name-${id}`).value.trim();
+                const newQty = parseInt(document.getElementById(`edit-qty-${id}`).value) || 0;
+                const newLieu = document.getElementById(`edit-lieu-${id}`).value.trim();
+                const newCat = document.getElementById(`edit-cat-${id}`).value;
+
+                if(!newName) { alert("Le nom ne peut pas être vide"); return; }
+
+                item.name = newName;
+                item.qty = newQty;
+                item.lieu = newLieu;
+                item.cat = newCat;
+
+                syncToCloud();
+                editingItemId = null;
+                renderInventaireTable(currentFilterTab);
+            }
+        }
+
+        function cancelEditItem() {
+            editingItemId = null;
+            renderInventaireTable(currentFilterTab);
+        }
+
+        function renderInventaireTable(filter) {
+            currentFilterTab = filter;
+            const tbody = document.getElementById('table-inventaire-body');
+            tbody.innerHTML = '';
+            
+            logistiqueDB.inventaire.forEach(item => {
+                if(filter !== 'Tous' && item.cat !== filter) return;
+
+                const tr = document.createElement('tr');
+                
+                if (editingItemId === item.id) {
+                    tr.style.backgroundColor = "#eef7ff";
+                    tr.innerHTML = `
+                        <td>
+                            <select id="edit-cat-${item.id}" style="padding:4px; font-size:0.85rem;">
+                                <option value="Tatami" ${item.cat === 'Tatami' ? 'selected' : ''}>Tatami</option>
+                                <option value="Pédagogique" ${item.cat === 'Pédagogique' ? 'selected' : ''}>Pédagogique</option>
+                                <option value="Agrès / Gym" ${item.cat === 'Agrès / Gym' ? 'selected' : ''}>Agrès / Gym</option>
+                                <option value="Buvette / Fête" ${item.cat === 'Buvette / Fête' ? 'selected' : ''}>Buvette / Fête</option>
+                                <option value="Autre" ${item.cat === 'Autre' ? 'selected' : ''}>Autre</option>
+                            </select>
+                        </td>
+                        <td><input type="text" id="edit-name-${item.id}" class="input-edit" value="${item.name}"></td>
+                        <td><input type="number" id="edit-qty-${item.id}" class="input-edit" style="width:60px;" value="${item.qty}" min="0"></td>
+                        <td><input type="text" id="edit-lieu-${item.id}" class="input-edit" value="${item.lieu}"></td>
+                        <td style="text-align:center; display:flex; gap:5px; justify-content:center; align-items:center;" class="no-print">
+                            <button class="btn btn-success btn-xs" onclick="saveEditItem(${item.id})">✅</button>
+                            <button class="btn btn-outline btn-xs" onclick="cancelEditItem()">❌</button>
+                        </td>
+                    `;
+                } else {
+                    tr.innerHTML = `
+                        <td><small><b>${item.cat}</b></small></td>
+                        <td><b>${item.name}</b></td>
+                        <td>
+                            <button class="btn btn-outline btn-xs no-print" style="padding: 2px 6px;" onclick="updateQty(${item.id}, -1)">-</button>
+                            <span style="font-weight:bold; margin: 0 8px; font-size:1.05rem;">${item.qty}</span>
+                            <button class="btn btn-outline btn-xs no-print" style="padding: 2px 6px;" onclick="updateQty(${item.id}, 1)">+</button>
+                        </td>
+                        <td><span style="color: gray;">${item.lieu}</span></td>
+                        <td style="text-align:center;" class="no-print">
+                            <button class="btn btn-outline btn-xs" title="Modifier la ligne" onclick="startEditItem(${item.id})">✏️</button>
+                            <button class="btn btn-danger btn-xs" title="Supprimer" onclick="deleteInvItem(${item.id})">❌</button>
+                        </td>
+                    `;
+                }
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterInventaire(cat) { renderInventaireTable(cat); }
+
+        // ================= SCRIPT PLANIFICATEUR =================
+        function addEvent() {
+            const name = document.getElementById('ev-name').value.trim();
+            const date = document.getElementById('ev-date').value || new Date().toISOString().split('T')[0];
+            if(!name) return;
+
+            const newEv = { id: Date.now(), name, date, postes: [], horaires: [] };
+            logistiqueDB.events.push(newEv);
+            syncToCloud();
+            renderEventsList();
+            selectEvent(newEv.id);
+            document.getElementById('ev-name').value = '';
+        }
+
+        function renderEventsList() {
+            const div = document.getElementById('active-events-list');
+            div.innerHTML = '';
+            logistiqueDB.events.forEach(ev => {
+                const item = document.createElement('div');
+                item.className = `event-item ${logistiqueDB.currentEventId === ev.id ? 'active' : ''}`;
+                item.onclick = () => selectEvent(ev.id);
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span><b>${ev.name}</b><br><small style="color:gray;">📅 ${ev.date}</small></span>
+                        <button class="btn btn-danger btn-xs no-print" style="padding:2px 5px;" onclick="event.stopPropagation(); deleteEvent(${ev.id})">❌</button>
+                    </div>
+                `;
+                div.appendChild(item);
+            });
+        }
+
+        function deleteEvent(id) {
+            if(confirm("Supprimer cet événement et tout son planning ?")) {
+                logistiqueDB.events = logistiqueDB.events.filter(e => e.id !== id);
+                if(logistiqueDB.currentEventId === id) logistiqueDB.currentEventId = null;
+                syncToCloud();
+                renderEventsList();
+                showCurrentEventDetails();
+            }
+        }
+
+        function selectEvent(id) {
+            logistiqueDB.currentEventId = id;
+            renderEventsList();
+            showCurrentEventDetails();
+        }
+
+        function showCurrentEventDetails() {
+            const blank = document.getElementById('event-details-blank');
+            const zone = document.getElementById('event-details-zone');
+            
+            if(!logistiqueDB.currentEventId) {
+                blank.style.display = 'block'; zone.style.display = 'none'; return;
+            }
+            
+            blank.style.display = 'none'; zone.style.display = 'block';
+            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
+            
+            document.getElementById('current-event-title').innerText = "🏆 Gestion de : " + ev.name;
+            document.getElementById('current-event-date').innerText = "📆 Date prévue : " + ev.date;
+
+            const select = document.getElementById('p-select-assign');
+            select.innerHTML = '';
+            ev.postes.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
+
+            renderPostesEtBenevoles(ev);
+            renderHorairesList(ev);
+        }
+
+        function addPoste() {
+            const name = document.getElementById('p-name').value.trim();
+            const besoin = parseInt(document.getElementById('p-besoin').value) || 1;
+            if(!name) return;
+
+            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
+            ev.postes.push({ id: Date.now(), name, besoin, bens: [] });
+            syncToCloud();
+            showCurrentEventDetails();
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-besoin').value = '';
+        }
+
+        function assignBenevole() {
+            const posteId = parseInt(document.getElementById('p-select-assign').value);
+            const name = document.getElementById('p-ben-name').value.trim();
+            const creneau = document.getElementById('p-ben-creneau').value.trim() || "Toute la journée";
+            if(!name || !posteId) return;
+
+            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
+            const poste = ev.postes.find(p => p.id === posteId);
+            poste.bens.push({ name, creneau });
+            syncToCloud();
+            showCurrentEventDetails();
+            document.getElementById('p-ben-name').value = '';
+            document.getElementById('p-ben-creneau').value = '';
+        }
+
+        function removeBenevole(posteId, index) {
+            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
+            const poste = ev.postes.find(p => p.id === posteId);
+            poste.bens.splice(index, 1);
+            syncToCloud();
+            showCurrentEventDetails();
+        }
+
+        function removePoste(posteId) {
+            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
+            ev.postes = ev.postes.filter(p => p.id !== posteId);
+            syncToCloud();
+            showCurrentEventDetails();
+        }
+
+        function renderPostesEtBenevoles(ev) {
+            const container = document.getElementById('postes-render-zone');
+            container.innerHTML = '';
+
+            if(ev.postes.length === 0) {
+                container.innerHTML = `<p style="color:gray; font-size:0.85rem;">Aucun poste créé pour le moment.</p>`;
+                return;
+            }
+
+            ev.postes.forEach(p => {
+                const box = document.createElement('div');
+                box.style = "background:#fff; border:1px solid var(--gris-clair); padding:12px; border-radius:6px; margin-bottom:10px;";
+                box.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:8px;">
+                        <strong>🛠️ ${p.name} <span style="color:var(--gris-moyen); font-weight:normal;">(${p.bens.length}/${p.besoin} bénévole(s))</span></strong>
+                        <button class="btn btn-danger btn-xs no-print" style="padding:1px 4px; font-size:0.75rem;" onclick="removePoste(${p.id})">Supprimer poste</button>
+                    </div>
+                    <ul style="margin:0; padding-left:20px; font-size:0.85rem;">
+                        ${p.bens.map((b, idx) => `
+                            <li style="margin-bottom:4px;">
+                                <b>${b.name}</b> <span style="color:gray;">(${b.creneau})</span>
+                                <a href="#" class="no-print" style="color:var(--rouge); margin-left:8px; text-decoration:none;" onclick="removeBenevole(${p.id}, ${idx})">❌</a>
+                            </li>
+                        `).join('')}
+                        ${p.bens.length === 0 ? '<li style="color:gray; list-style:none; margin-left:-20px;">⚠️ Aucun volontaire affecté</li>' : ''}
+                    </ul>
+                `;
+                container.appendChild(box);
+            });
+        }
+
+        function addHoraireLigne() {
+            const time = document.getElementById('h-time').value.trim();
+            const action = document.getElementById('h-action').value.trim();
+            if(!time || !action) return;
+
+            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
+            ev.horaires.push({ id: Date.now(), time, action });
+            ev.horaires.sort((a,b) => a.time.localeCompare(b.time));
+            syncToCloud();
+            showCurrentEventDetails();
+            document.getElementById('h-time').value = '';
+            document.getElementById('h-action').value = '';
+        }
+
+        function removeHoraireLigne(hId) {
+            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
+            ev.horaires = ev.horaires.filter(h => h.id !== hId);
+            syncToCloud();
+            showCurrentEventDetails();
+        }
+
+        function renderHorairesList(ev) {
+            const tbody = document.getElementById('table-horaires-body');
+            tbody.innerHTML = '';
+            if(ev.horaires.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:gray; font-size:0.85rem;">Aucun horaire saisi.</td></tr>`;
+                return;
+            }
+            ev.horaires.forEach(h => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><code><b>${h.time}</b></code></td>
+                    <td>${h.action}</td>
+                    <td class="no-print"><button class="btn btn-danger btn-xs" onclick="removeHoraireLigne(${h.id})">❌</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ================= SCRIPT GESTION DES PRÊTS =================
+        function addLoanItem() {
+            const borrower = document.getElementById('loan-borrower').value.trim();
+            const item = document.getElementById('loan-item').value.trim();
+            const date = document.getElementById('loan-date').value;
+            const returnDate = document.getElementById('loan-return-date').value;
+            const notes = document.getElementById('loan-notes').value.trim();
+
+            if(!borrower || !item) { alert("Veuillez renseigner au minimum l'emprunteur et le matériel prêté."); return; }
+
+            logistiqueDB.prets.push({
+                id: Date.now(),
+                borrower,
+                item,
+                date: date || "-",
+                returnDate: returnDate || "-",
+                status: "En cours",
+                notes: notes || "-"
+            });
+
+            syncToCloud();
+            renderLoansTable();
+
+            document.getElementById('loan-borrower').value = '';
+            document.getElementById('loan-item').value = '';
+            document.getElementById('loan-date').value = '';
+            document.getElementById('loan-return-date').value = '';
+            document.getElementById('loan-notes').value = '';
+        }
+
+        function toggleLoanStatus(id) {
+            const loan = logistiqueDB.prets.find(l => l.id === id);
+            if(loan) {
+                loan.status = loan.status === "En cours" ? "Restitué" : "En cours";
+                syncToCloud();
+                renderLoansTable();
+            }
+        }
+
+        function deleteLoan(id) {
+            if(confirm("Supprimer définitivement cette ligne du registre de prêt ?")) {
+                logistiqueDB.prets = logistiqueDB.prets.filter(l => l.id !== id);
+                syncToCloud();
+                renderLoansTable();
+            }
+        }
+
+        function formatDateFr(dateStr) {
+            if(!dateStr || dateStr === "-") return "-";
+            const parts = dateStr.split('-');
+            if(parts.length !== 3) return dateStr;
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        function renderLoansTable() {
+            const tbody = document.getElementById('table-loans-body');
+            const searchValue = document.getElementById('loan-search').value.toLowerCase().trim();
+            const filterStatus = document.getElementById('loan-filter-status').value;
+            
+            tbody.innerHTML = '';
+
+            if(logistiqueDB.prets.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:gray; padding:20px;">Aucun prêt enregistré dans l'historique.</td></tr>`;
+                return;
+            }
+
+            let countVisible = 0;
+
+            logistiqueDB.prets.forEach(loan => {
+                if(filterStatus !== 'Tous' && loan.status !== filterStatus) return;
+
+                const matchBorrower = loan.borrower.toLowerCase().includes(searchValue);
+                const matchItem = loan.item.toLowerCase().includes(searchValue);
+                if(searchValue !== "" && !matchBorrower && !matchItem) return;
+
+                countVisible++;
+                const tr = document.createElement('tr');
+                
+                const badgeClass = loan.status === 'En cours' ? 'badge-warning' : 'badge-success';
+                const badgeIcon = loan.status === 'En cours' ? '🗓️ En cours' : '✅ Restitué';
+
+                tr.innerHTML = `
+                    <td><b>${loan.borrower}</b></td>
+                    <td><span style="color:#2980b9; font-weight:500;">${loan.item}</span></td>
+                    <td><code>${formatDateFr(loan.date)}</code></td>
+                    <td><code>${formatDateFr(loan.returnDate)}</code></td>
+                    <td><span class="badge ${badgeClass}">${badgeIcon}</span></td>
+                    <td><small style="color:gray;">${loan.notes}</small></td>
+                    <td style="text-align:center; width:130px;" class="no-print">
+                        <button class="btn ${loan.status === 'En cours' ? 'btn-success' : 'btn-warning'} btn-xs" 
+                                title="${loan.status === 'En cours' ? 'Marquer comme Rendu' : 'Remettre En cours'}"
+                                onclick="toggleLoanStatus(${loan.id})">
+                            ${loan.status === 'En cours' ? '✅ Rendu' : '🔄 Relancer'}
+                        </button>
+                        <button class="btn btn-danger btn-xs" title="Supprimer" onclick="deleteLoan(${loan.id})">❌</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if(countVisible === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:gray; padding:20px;">Aucun prêt ne correspond à vos critères de recherche.</td></tr>`;
+            }
+        }
+
+        // NAVIGATION
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
+            
+            document.getElementById(`btn-tab-${tabId}`).classList.add('active');
+            document.getElementById(`pane-${tabId}`).style.display = 'block';
+        }
+
+        window.onload = loadCloudLogistiqueData;
+
+        // Liaison globale des gestionnaires d'événements
+        window.switchTab = switchTab;
+        window.addEvent = addEvent;
+        window.deleteEvent = deleteEvent;
+        window.addPoste = addPoste;
+        window.assignBenevole = assignBenevole;
+        window.removeBenevole = removeBenevole;
+        window.removePoste = removePoste;
+        window.addHoraireLigne = addHoraireLigne;
+        window.removeHoraireLigne = removeHoraireLigne;
+        window.addInventaireItem = addInventaireItem;
+        window.updateQty = updateQty;
+        window.deleteInvItem = deleteInvItem;
+        window.startEditItem = startEditItem;
+        window.saveEditItem = saveEditItem;
+        window.cancelEditItem = cancelEditItem;
+        window.filterInventaire = filterInventaire;
+        window.addLoanItem = addLoanItem;
+        window.toggleLoanStatus = toggleLoanStatus;
+        window.deleteLoan = deleteLoan;
+        window.renderLoansTable = renderLoansTable;
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

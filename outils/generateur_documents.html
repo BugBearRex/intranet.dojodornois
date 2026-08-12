@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Générateur de Documents — Intranet Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --rouge-deep: #8B1429;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --sidebar-width: 280px;
+            --topbar-height: 68px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            margin: 0; padding: 0;
+            color: var(--gris-fonce);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- FIX SIDEBAR DÉBORDEMENT --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        .sidebar * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+
+        /* ===== CONTENU PRINCIPAL ===== */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
+        }
+
+        .topbar {
+            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.04); flex-shrink: 0; z-index: 50;
+        }
+
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); line-height: 1; }
+        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+
+        /* ===== WORKSPACE GRID ===== */
+        .workspace-grid {
+            flex: 1; display: grid; grid-template-columns: 450px 1fr; gap: 24px; padding: 24px 28px; overflow: hidden;
+        }
+
+        /* Colonne de Configuration Formulaire */
+        .config-panel {
+            background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.03); padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto;
+        }
+
+        .config-panel h3 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0 0 5px 0; font-size: 1.1rem; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 8px; }
+
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--gris-fonce); }
+        .form-control { width: 100%; padding: 10px 12px; border: 1.5px solid var(--gris-tres-clair); border-radius: 7px; font-size: 0.875rem; font-family: 'Roboto', sans-serif; }
+        .form-control:focus { outline: none; border-color: var(--rouge); box-shadow: 0 0 0 3px rgba(196,30,58,0.08); }
+        textarea.form-control { min-height: 280px; resize: vertical; font-family: monospace; font-size: 0.85rem; line-height: 1.4; }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn {
+            background: var(--rouge); color: white; border: none; padding: 12px 18px; border-radius: 7px; cursor: pointer; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; transition: background 0.15s;
+        }
+        .btn:hover { background: var(--rouge-hover); }
+        .btn-secondary { background: var(--gris-moyen); }
+        .btn-secondary:hover { background: var(--gris-fonce); }
+
+        /* Colonne d'Aperçu du PDF */
+        .preview-panel {
+            background: #525659; border-radius: 10px; display: flex; justify-content: center; padding: 30px 20px; overflow-y: auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); scrollbar-width: thin;
+        }
+
+        /* Page format A4 standardisé à l'écran */
+        .a4-document {
+            background: var(--blanc); width: 210mm; min-height: 297mm; padding: 20mm; box-shadow: 0 4px 25px rgba(0,0,0,0.25); box-sizing: border-box; position: relative; color: #1a1a1a; display: flex; flex-direction: column;
+        }
+
+        /* Header Club Officiel */
+        .print-header { display: flex; align-items: center; border-bottom: 2px solid var(--rouge); padding-bottom: 14px; margin-bottom: 25px; }
+        .print-logo { height: 65px; width: 65px; object-fit: contain; background: var(--rouge); padding: 4px; border-radius: 6px; margin-right: 18px; }
+        .print-club-info { font-size: 8.5pt; color: var(--gris-fonce); line-height: 1.4; }
+        .print-club-info strong { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 13pt; display: block; margin-bottom: 2px; }
+
+        .doc-meta { text-align: right; font-size: 9.5pt; color: var(--gris-moyen); margin-bottom: 25px; }
+        
+        .doc-title { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 22pt; margin: 0 0 6px 0; text-transform: uppercase; line-height: 1.1; }
+        .doc-subtitle { font-family: 'Roboto', sans-serif; font-weight: 500; color: var(--gris-moyen); font-size: 13pt; margin: 0 0 25px 0; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 12px; }
+        
+        .doc-body { flex: 1; font-size: 11pt; line-height: 1.6; text-align: justify; }
+        .doc-body h3 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); font-size: 14pt; margin-top: 22px; margin-bottom: 8px; border-left: 3px solid var(--rouge); padding-left: 8px; }
+        .doc-body p { margin: 0 0 12px 0; }
+        .doc-body ul, .doc-body ol { margin: 0 0 15px 0; padding-left: 20px; }
+        .doc-body li { margin-bottom: 4px; }
+        
+        .highlight-box { background-color: var(--fond); border-left: 4px solid var(--rouge); padding: 12px 16px; margin: 18px 0; border-radius: 0 6px 6px 0; }
+
+        .print-footer {
+            margin-top: auto; border-top: 1px solid var(--gris-clair); padding-top: 10px; font-size: 8pt; color: var(--gris-moyen); text-align: center; line-height: 1.3;
+        }
+
+        @media print {
+            body { background: white; padding: 0; color: black; display: block !important; }
+            .no-print, .sidebar, .topbar { display: none !important; }
+            .main-content { padding: 0 !important; overflow: visible !important; }
+            .workspace-grid { display: block !important; margin: 0 !important; padding: 0 !important; }
+            .config-panel { display: none !important; }
+            .preview-panel { background: white !important; padding: 0 !important; box-shadow: none !important; }
+            .a4-document { box-shadow: none !important; padding: 0 !important; width: 100% !important; min-height: auto !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CONTENEUR SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
+    <div class="main-content">
+        <div class="topbar no-print">
+            <div class="page-title-area">
+                <h2>Générateur Graphique de Documents</h2>
+                <p>Création de notes, propositions et rapports au format officiel du club</p>
+            </div>
+        </div>
+
+        <div class="workspace-grid">
+            
+            <div class="config-panel no-print">
+                <h3>Configuration du Document</h3>
+                
+                <div class="form-group">
+                    <label for="docTitle">Titre Principal</label>
+                    <input type="text" id="docTitle" class="form-control" value="Présentation du Dojo au TER" oninput="actualiserApercu()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="docSubtitle">Sous-titre ou Contexte</label>
+                    <input type="text" id="docSubtitle" class="form-control" value="Partenariat Territoire Éducatif Rural de Dornes — Année 2026/2027" oninput="actualiserApercu()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dateDoc">Lieu et Date</label>
+                    <input type="text" id="dateDoc" class="form-control" value="Fait à Dornes, le 29 juin 2026" oninput="actualiserApercu()">
+                </div>
+
+                <div class="form-group">
+                    <label for="docContent">Corps du document (HTML supporté)</label>
+                    <textarea id="docContent" class="form-control" oninput="actualiserApercu()"><h3>1. Introduction et Objectifs</h3>
+<p>Le Dojo Dornois souhaite proposer une intégration renforcée des valeurs du judo au sein du projet éducatif global du Territoire Éducatif Rural (TER). Notre objectif est de favoriser l'accès à la pratique sportive pour tous les jeunes du territoire.</p>
+
+<div class="highlight-box">
+    <strong>Point Clé :</strong> Le club se positionne comme un acteur central de la cohésion sociale et de l'animation intergénérationnelle à Dornes.
+</div>
+
+<h3>2. Actions Envisagées</h3>
+<p>Nous proposons plusieurs axes d'intervention pour l'année scolaire à venir :</p>
+<ul>
+    <li>Initiations gratuites sur le temps scolaire et pré-scolaire.</li>
+    <li>Mise à disposition de matériel pédagogique adapté.</li>
+    <li>Organisation de rencontres inter-écoles au dojo.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h3>3. Moyens et Logistique</h3>
+<p>Le club s'appuie sur son équipe technique diplômée d'État ainsi que sur ses infrastructures modernes situées Place de la Mairie pour assurer un accueil de qualité et sécurisé.</p></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn" onclick="imprimerDocument()">🖨️ Imprimer / PDF</button>
+                    <button class="btn btn-secondary" onclick="remettreAZero()">🔄 Effacer</button>
+                </div>
+            </div>
+            
+            <div class="preview-panel">
+                <div class="a4-document" id="a4-zone">
+                    
+                    <div class="print-header">
+                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo" alt="Logo">
+                        <div class="print-club-info">
+                            <strong>DOJO DORNOIS</strong>
+                            1 Pl. de la Mairie, 58390 Dornes &bull; dojodornois@gmail.com<br>
+                            FFJDA n° CE 08.58.067.0 &bull; SIRET 45192841000013 &bull; RNA W583001220
+                        </div>
+                    </div>
+                    
+                    <div class="doc-meta" id="render-date"></div>
+                    <h1 class="doc-title" id="render-title"></h1>
+                    <div class="doc-subtitle" id="render-subtitle"></div>
+                    <div class="doc-body" id="render-body"></div>
+                    
+                    <div class="print-footer">
+                        Dojo Dornois &bull; Judo, Jujitsu &amp; Disciplines Associées &bull; Association Loi 1901 &bull; RNA : W583001220<br>
+                        "Entraide et prospérité mutuelle"
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+    function actualiserApercu() {
+        const title = document.getElementById('docTitle').value;
+        const subtitle = document.getElementById('docSubtitle').value;
+        const dateDoc = document.getElementById('dateDoc').value;
+        const content = document.getElementById('docContent').value;
+
+        document.getElementById('render-title').innerText = title;
+        document.getElementById('render-subtitle').innerText = subtitle;
+        document.getElementById('render-date').innerText = dateDoc;
+        document.getElementById('render-body').innerHTML = content;
+    }
+
+    function remettreAZero() {
+        if(confirm("Voulez-vous réinitialiser le document ?")) {
+            document.getElementById('docTitle').value = "Nouveau Document";
+            document.getElementById('docSubtitle').value = "Contexte ou sous-titre de la note";
+            document.getElementById('docContent').value = "<h3>1. Nouvelle Section</h3>\n<p>Écrivez votre texte ici...</p>";
+            actualiserApercu();
+        }
+    }
+
+    function imprimerDocument() {
+        const contenuPrint = document.getElementById('a4-zone').innerHTML;
+        
+        const fenetreImpression = window.open('', '_blank', 'width=900,height=1000');
+        
+        fenetreImpression.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Impression Document — Dojo Dornois</title>
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=400;600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+                <style>
+                    body {
+                        font-family: 'Roboto', sans-serif;
+                        background: #ffffff;
+                        color: #1a1a1a;
+                        margin: 0; padding: 0;
+                    }
+                    .print-page-wrapper {
+                        width: 210mm;
+                        min-height: 297mm;
+                        padding: 20mm;
+                        box-sizing: border-box;
+                        position: relative;
+                        display: flex;
+                        flex-direction: column;
+                        background: #ffffff;
+                    }
+                    .print-header { display: flex; align-items: center; border-bottom: 2px solid #C41E3A; padding-bottom: 14px; margin-bottom: 25px; }
+                    .print-logo { height: 65px; width: 65px; object-fit: contain; background: #C41E3A; padding: 4px; border-radius: 6px; margin-right: 18px; }
+                    .print-club-info { font-size: 8.5pt; color: #3D3D3D; line-height: 1.4; }
+                    .print-club-info strong { font-family: 'Fredoka', sans-serif; color: #C41E3A; font-size: 13pt; display: block; margin-bottom: 2px; }
+
+                    .doc-meta { text-align: right; font-size: 9.5pt; color: #6B6B6B; margin-bottom: 25px; }
+                    .doc-title { font-family: 'Fredoka', sans-serif; color: #C41E3A; font-size: 22pt; margin: 0 0 6px 0; text-transform: uppercase; line-height: 1.1; }
+                    .doc-subtitle { font-family: 'Roboto', sans-serif; font-weight: 500; color: #6B6B6B; font-size: 13pt; margin: 0 0 25px 0; border-bottom: 1px solid #E8E8E8; padding-bottom: 12px; }
+                    
+                    .doc-body { flex: 1; font-size: 11pt; line-height: 1.6; text-align: justify; }
+                    .doc-body h3 { font-family: 'Fredoka', sans-serif; color: #1A1A1A; font-size: 14pt; margin-top: 22px; margin-bottom: 8px; border-left: 3px solid #C41E3A; padding-left: 8px; page-break-after: avoid; }
+                    .doc-body p { margin: 0 0 12px 0; page-break-inside: avoid; }
+                    .doc-body ul, .doc-body ol { margin: 0 0 15px 0; padding-left: 20px; page-break-inside: avoid; }
+                    .doc-body li { margin-bottom: 4px; }
+                    
+                    .highlight-box { background-color: #F4F6F9; border-left: 4px solid #C41E3A; padding: 12px 16px; margin: 18px 0; border-radius: 0 6px 6px 0; page-break-inside: avoid; }
+                    .print-footer { border-top: 1px solid #B8B8B8; padding-top: 10px; font-size: 8pt; color: #6B6B6B; text-align: center; line-height: 1.3; margin-top: auto; }
+                    
+                    @media print {
+                        html, body { background: #ffffff; }
+                        .page-break { page-break-before: always !important; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="print-page-wrapper">
+                    ${contenuPrint}
+                </div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 300);
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+        fenetreImpression.document.close();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        actualiserApercu();
+    });
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

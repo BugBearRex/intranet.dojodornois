@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Projet Futur Dojo — Intranet Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --vert: #2ECC71;
+            --bleu: #3498DB;
+            --sidebar-width: 270px;
+            --topbar-height: 68px;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: var(--fond); margin: 0; color: var(--gris-fonce); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* --- SIDEBAR --- */
+        .sidebar { width: var(--sidebar-width); background: var(--noir-doux); color: var(--blanc); display: flex; flex-direction: column; height: 100%; position: relative; box-shadow: 4px 0 15px rgba(0,0,0,0.1); flex-shrink: 0; }
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        .topbar { 
+            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; 
+            display: flex; align-items: center; justify-content: space-between; 
+            border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; 
+        }
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); }
+        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+        
+        .btn-back { background: var(--noir-doux); color: white; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; transition: background 0.2s; }
+        .btn-back:hover { background: var(--rouge); }
+        
+        .dashboard-body { flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* KPIS BANNER */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .kpi-card { background: var(--blanc); padding: 18px; border-radius: 10px; border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .kpi-title { font-size: 0.75rem; color: var(--gris-moyen); text-transform: uppercase; font-weight: 700; }
+        .kpi-value { font-family: 'Fredoka', sans-serif; font-size: 1.6rem; color: var(--noir-doux); margin-top: 6px; }
+        .kpi-sub { font-size: 0.75rem; margin-top: 4px; }
+        .kpi-sub.green { color: var(--vert); }
+        .kpi-sub.blue { color: var(--bleu); }
+        
+        /* SECTIONS GRID */
+        .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media(max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
+        
+        .card { background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 14px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 10px; }
+        .card-title { font-family: 'Fredoka', sans-serif; font-size: 1.1rem; color: var(--rouge); margin: 0; display: flex; align-items: center; gap: 8px; }
+        
+        /* TABLE STYLES */
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--gris-tres-clair); vertical-align: middle; }
+        th { background: var(--fond); font-weight: 700; color: var(--gris-fonce); }
+        
+        .btn { background: var(--rouge); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; }
+        .btn:hover { background: var(--rouge-hover); }
+        .btn-small { padding: 4px 8px; font-size: 0.75rem; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-secondary { background: var(--gris-tres-clair); color: var(--gris-fonce); }
+        .btn-secondary:hover { background: var(--gris-moyen); color: white; }
+        
+        .form-control { width: 100%; padding: 8px 10px; border: 1.5px solid var(--gris-tres-clair); border-radius: 6px; font-size: 0.85rem; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-row { display: flex; gap: 10px; }
+        
+        .badge { padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+        .badge-success { background: #E8F8F5; color: #27AE60; }
+        .badge-warning { background: #FEF9E7; color: #F39C12; }
+        
+        .file-link { display: inline-flex; align-items: center; gap: 4px; color: var(--bleu); text-decoration: none; font-weight: 500; font-size: 0.8rem; }
+        .file-link:hover { text-decoration: underline; }
+
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- CONTENEUR SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="page-title-area">
+                <h2>🏛️ Dossier & Programme : Futur Dojo</h2>
+                <p>Gestion dynamique des réserves, devis équipements, résolutions et pièces jointes</p>
+            </div>
+            <a href="../index.html" class="btn-back">🏠 Retour Accueil Intranet</a>
+        </div>
+
+        <div class="dashboard-body">
+            
+            <!-- KPIS BANNER -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-title">Trésorerie Globale</div>
+                    <div class="kpi-value">51 000 €</div>
+                    <div class="kpi-sub blue">Épargne cumulée sur 30 ans</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Réserve Affectée Dojo</div>
+                    <div class="kpi-value">40 000 €</div>
+                    <div class="kpi-sub green">✓ Sanctuarisée pour l'investissement</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Coût Estimé Équipements</div>
+                    <div class="kpi-value" id="kpiTotalDevis">0 €</div>
+                    <div class="kpi-sub blue">Total des devis enregistrés</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Fonds de Roulement Sécurité</div>
+                    <div class="kpi-value">11 000 €</div>
+                    <div class="kpi-sub">Disponible pour aléas & fonctionnement</div>
+                </div>
+            </div>
+
+            <!-- CONTENT GRID -->
+            <div class="content-grid">
+                
+                <!-- SECTION 1 : CHIFFRAGE & DEVIS ÉQUIPEMENTS -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📦 Devis & Chiffrages Équipements</h3>
+                        <button class="btn" onclick="ouvrirModalDevis()">➕ Ajouter Devis</button>
+                    </div>
+                    <p style="font-size:0.8rem; color:var(--gris-moyen); margin:0;">
+                        Tatamis homologués NF EN 12503, protections, matériel. Possibilité d'attacher un fichier (PDF/Image).
+                    </p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Équipement</th>
+                                <th>Fournisseur</th>
+                                <th>Montant</th>
+                                <th>Pièce Jointe</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="devisTableBody">
+                            <!-- Injections dynamiques JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- SECTION 2 : RELATIONS MAIRIE & SUIVI DES ACTES -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📬 Suivi des Actes & Échanges Mairie</h3>
+                        <button class="btn" onclick="ouvrirModalActe()">➕ Ajouter Acte / Courrier</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Document / Action</th>
+                                <th>Statut</th>
+                                <th>Pièce Jointe</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="actesTableBody">
+                            <!-- Injections dynamiques JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- SECTION 3 : RÉSOLUTIONS ET ACTES JURIDIQUES -->
+                <div class="card" style="grid-column: span 2;">
+                    <div class="card-header">
+                        <h3 class="card-title">📜 Générateur de Résolution (Affectation 40 000 €)</h3>
+                    </div>
+                    <p style="font-size:0.8rem; color:var(--gris-moyen); margin:0;">
+                        Génère le texte officiel de résolution à faire voter en CODIR ou en AG du 14/11 pour sanctuariser juridiquement la somme.
+                    </p>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1;">
+                            <label style="font-size:0.8rem; font-weight:bold;">Montant à affecter :</label>
+                            <input type="text" class="form-control" value="40 000 €" id="resMontant" oninput="genererTexteResolution()">
+                        </div>
+                        <div class="form-group" style="flex:2;">
+                            <label style="font-size:0.8rem; font-weight:bold;">Libellé de la ligne comptable :</label>
+                            <input type="text" class="form-control" value="Réserve d'investissement pour aménagement du futur dojo" id="resLibelle" oninput="genererTexteResolution()">
+                        </div>
+                    </div>
+                    <textarea id="outputResolution" class="form-control" style="height:90px; font-family:monospace; font-size:0.8rem;" readonly></textarea>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+    // --- CONFIGURATION DE LA PASSERELLE GOOGLE CLOUD SHEETS ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+    const TARGET_SHEET = "futur_dojo";
+
+    let dojoDB = {
+        devis: [
+            { id: 1, item: "Tatamis Judo (Couche principale 4cm)", fourn: "Progame / BudoNord", prix: 22000, file: null, fileName: "" },
+            { id: 2, item: "Option 2ème couche croisée sécurité", fourn: "Progame / BudoNord", prix: 15000, file: null, fileName: "" },
+            { id: 3, item: "Protections Murales & Racks", fourn: "À déterminer", prix: 4500, file: null, fileName: "" }
+        ],
+        actes: [
+            { id: 1, date: "24/07/2026", action: "Dépôt courrier officiel explicatif Mairie", statut: "Tamponné & Reçu", file: null, fileName: "Reçu Mairie 24-07-2026.pdf" },
+            { id: 2, date: "24/07/2026", action: "Mail transfert secrétariat à tout le Conseil", statut: "Envoyé", file: null, fileName: "" },
+            { id: 3, date: "24/07/2026", action: "Copie transmise à l'opposition (Jean-Michel)", statut: "Transmis", file: null, fileName: "" },
+            { id: 4, date: "14/11/2026", action: "Présentation Bilan Financier Détaillé en AG", statut: "Planifié", file: null, fileName: "" }
+        ]
+    };
+
+    function showToast(message) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast success';
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 3500);
+    }
+
+    // --- SAUVEGARDE SUR GOOGLE SHEETS ---
+    function saveDojoData() {
+        renderDevis();
+        renderActes();
+
+        const packet = {
+            targetSheet: TARGET_SHEET,
+            payload: dojoDB
+        };
+
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(packet)
+        })
+        .then(() => {
+            showToast("✓ Synchronisé sur Google Sheets !");
+        })
+        .catch(err => console.error("Erreur de sauvegarde Cloud Dojo:", err));
+    }
+
+    // --- CHARGEMENT DEPUIS GOOGLE SHEETS ---
+    function loadDojoData() {
+        fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && (data.devis || data.actes)) {
+                    dojoDB = data;
+                    if(!dojoDB.devis) dojoDB.devis = [];
+                    if(!dojoDB.actes) dojoDB.actes = [];
+                    showToast("🔄 Données chargées depuis Google Sheets !");
+                }
+                renderDevis();
+                renderActes();
+            })
+            .catch(err => {
+                console.warn("Utilisation des données de base.");
+                renderDevis();
+                renderActes();
+            });
+    }
+
+    // --- RENDU DES DEVIS ---
+    function renderDevis() {
+        const tbody = document.getElementById('devisTableBody');
+        tbody.innerHTML = '';
+        let total = 0;
+
+        dojoDB.devis.forEach((d) => {
+            total += parseFloat(d.prix) || 0;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${d.item}</strong></td>
+                <td>${d.fourn}</td>
+                <td>${Number(d.prix).toLocaleString('fr-FR')} €</td>
+                <td>
+                    ${d.file ? `<a href="${d.file}" download="${d.fileName}" class="file-link">📎 ${d.fileName}</a>` : 
+                    `<input type="file" style="display:none;" id="file-devis-${d.id}" onchange="attachFileDevis(${d.id}, this)">
+                     <button class="btn btn-secondary btn-small" onclick="document.getElementById('file-devis-${d.id}').click()">📎 Joindre</button>`}
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-small" onclick="deleteDevis(${d.id})">❌</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('kpiTotalDevis').innerText = total.toLocaleString('fr-FR') + ' €';
+    }
+
+    function ouvrirModalDevis() {
+        const item = prompt("Nom de l'équipement (ex: Tatamis, Protections) :");
+        if (!item) return;
+        const fourn = prompt("Fournisseur :");
+        const prix = prompt("Montant estimé ou réel (€) :");
+        
+        dojoDB.devis.push({
+            id: Date.now(),
+            item: item,
+            fourn: fourn || 'Non spécifié',
+            prix: parseFloat(prix) || 0,
+            file: null,
+            fileName: ""
+        });
+        saveDojoData();
+    }
+
+    function deleteDevis(id) {
+        if(confirm("Supprimer ce devis ?")) {
+            dojoDB.devis = dojoDB.devis.filter(d => d.id !== id);
+            saveDojoData();
+        }
+    }
+
+    function attachFileDevis(id, input) {
+        const file = input.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const item = dojoDB.devis.find(d => d.id === id);
+            if(item) {
+                item.file = e.target.result;
+                item.fileName = file.name;
+                saveDojoData();
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // --- RENDU DES ACTES ---
+    function renderActes() {
+        const tbody = document.getElementById('actesTableBody');
+        tbody.innerHTML = '';
+
+        dojoDB.actes.forEach((a) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${a.date}</td>
+                <td><strong>${a.action}</strong></td>
+                <td><span class="badge ${a.statut.includes('Tamponné') || a.statut.includes('Envoyé') ? 'badge-success' : 'badge-warning'}">${a.statut}</span></td>
+                <td>
+                    ${a.file ? `<a href="${a.file}" download="${a.fileName}" class="file-link">📎 ${a.fileName}</a>` : 
+                    `<input type="file" style="display:none;" id="file-acte-${a.id}" onchange="attachFileActe(${a.id}, this)">
+                     <button class="btn btn-secondary btn-small" onclick="document.getElementById('file-acte-${a.id}').click()">📎 Joindre PDF</button>`}
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-small" onclick="deleteActe(${a.id})">❌</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function ouvrirModalActe() {
+        const action = prompt("Description de l'acte ou du courrier :");
+        if (!action) return;
+        const date = prompt("Date (JJ/MM/AAAA) :", new Date().toLocaleDateString('fr-FR'));
+        const statut = prompt("Statut (ex: Tamponné, Envoyé, En attente) :", "Transmis");
+
+        dojoDB.actes.push({
+            id: Date.now(),
+            date: date,
+            action: action,
+            statut: statut,
+            file: null,
+            fileName: ""
+        });
+        saveDojoData();
+    }
+
+    function deleteActe(id) {
+        if(confirm("Supprimer cet acte/courrier de la liste ?")) {
+            dojoDB.actes = dojoDB.actes.filter(a => a.id !== id);
+            saveDojoData();
+        }
+    }
+
+    function attachFileActe(id, input) {
+        const file = input.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const item = dojoDB.actes.find(a => a.id === id);
+            if(item) {
+                item.file = e.target.result;
+                item.fileName = file.name;
+                saveDojoData();
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // --- GÉNÉRATEUR DE RÉSOLUTION ---
+    function genererTexteResolution() {
+        const montant = document.getElementById('resMontant').value;
+        const libelle = document.getElementById('resLibelle').value;
+        
+        document.getElementById('outputResolution').value = `RÉSOLUTION N°____ VOTÉE EN CODIR / AG :
+"L'Assemblée Générale (ou le Comité Directeur) du Dojo Dornois valide à l'unanimité l'affectation de la somme de ${montant} issue des réserves historiques du club sur la ligne comptable dédiée : '${libelle}'.
+Cette somme est sanctuarisée pour l'acquisition des tatamis et équipements du futur dojo et ne pourra être mobilisée pour les dépenses de fonctionnement courant."`;
+    }
+
+    // --- INITIALISATION UNIQUE AU CHARGEMENT ---
+    window.addEventListener('DOMContentLoaded', () => {
+        genererTexteResolution();
+        loadDojoData();
+    });
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

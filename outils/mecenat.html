@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion du Mécénat & Livrets — Intranet Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --rouge-deep: #8B1429;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --vert: #2ecc71;
+            --vert-fonce: #27ae60;
+            --bleu: #3498db;
+            --bleu-fonce: #2980b9;
+            --violet: #8e44ad;
+            --sidebar-width: 280px;
+            --topbar-height: 68px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            margin: 0; padding: 0;
+            color: var(--gris-fonce);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- FIX SIDEBAR DÉBORDEMENT --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        .sidebar * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0; }
+        .topbar { background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; }
+
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); }
+        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+
+        /* TABS SYSTEM */
+        .nav-tabs { display: flex; gap: 6px; background: #eef2f5; padding: 5px; border-radius: 8px; }
+        .tab-btn { border: none; background: transparent; padding: 8px 14px; border-radius: 6px; font-weight: 600; font-size: 0.82rem; cursor: pointer; color: var(--gris-moyen); transition: all 0.2s; }
+        .tab-btn.active { background: var(--blanc); color: var(--rouge); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+
+        .app-body { flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .tab-content { display: none; flex-direction: column; gap: 20px; }
+        .tab-content.active { display: flex; }
+
+        /* KPI CARDS */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .kpi-card { background: var(--blanc); padding: 18px; border-radius: 10px; border-left: 4px solid var(--gris-moyen); border: 1px solid var(--gris-tres-clair); }
+        .kpi-card.promesses { border-left-color: var(--bleu); }
+        .kpi-card.confirmes { border-left-color: var(--vert-fonce); }
+        .kpi-card.reduction { border-left-color: var(--violet); }
+        .kpi-card.ecoles { border-left-color: var(--rouge); }
+        .kpi-card h4 { margin: 0 0 6px 0; font-size: 0.75rem; color: var(--gris-moyen); text-transform: uppercase; }
+        .kpi-card .value { font-family: 'Fredoka', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--noir-doux); margin: 0; }
+
+        /* PANELS & TABLES */
+        .main-card { background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+        .card-header-actions { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 12px; }
+        .card-header-actions h3 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.15rem; color: var(--noir-doux); }
+
+        .btn { background: var(--rouge); color: white; border: none; padding: 9px 15px; border-radius: 7px; cursor: pointer; font-weight: 500; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+        .btn:hover { background: var(--rouge-hover); }
+        .btn-secondary { background: var(--gris-moyen); color: white; }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-blue { background: var(--bleu); color: white; }
+        .btn-green { background: var(--vert-fonce); color: white; }
+        .btn-xs { padding: 4px 8px; font-size: 0.75rem; border-radius: 5px; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; background: #fafafa; padding: 16px; border-radius: 8px; border: 1px dashed var(--gris-clair); align-items: flex-end; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--gris-fonce); }
+        .form-control { width: 100%; padding: 8px 11px; border: 1.5px solid var(--gris-tres-clair); border-radius: 6px; font-size: 0.85rem; font-family:'Roboto',sans-serif; }
+
+        .table-container { overflow-x: auto; border: 1px solid var(--gris-tres-clair); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem; }
+        th { background: var(--noir-doux); color: white; padding: 12px; font-weight: 500; }
+        td { padding: 12px; border-bottom: 1px solid var(--gris-tres-clair); background: white; vertical-align: middle; }
+        tr:hover td { background-color: var(--fond); }
+
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: bold; text-transform: uppercase; display: inline-block; }
+        .badge-a_contacter { background: #EBF5FB; color: #2980B9; }
+        .badge-negociation { background: #FEF3C7; color: #B45309; }
+        .badge-confirme { background: #E8F8F0; color: var(--vert-fonce); }
+        .badge-refuse { background: var(--rouge-clair); color: var(--rouge-deep); }
+
+        /* BADGE CEINTURE SYNOPTIQUE */
+        .val-card-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 12px; border-radius: 6px; font-weight: 700; font-size: 0.8rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left-width: 5px; border-left-style: solid;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* LIVRET GENERATOR STYLES */
+        .page-card { background: #fafafa; border: 1px solid var(--gris-clair); border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .page-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 8px; }
+
+        /* MODALES */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
+        .modal-overlay.active { display: flex; }
+        .modal-card { background: white; border-radius: 12px; width: 850px; max-width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        @media print {
+            body { background: white; padding: 0; color: black; display: block !important; }
+            .no-print, .sidebar, .topbar { display: none !important; }
+            .main-content { padding: 0 !important; overflow: visible !important; }
+            .app-body { display: block !important; margin: 0 !important; padding: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="topbar no-print">
+            <div class="page-title-area">
+                <h2>Gestion du Mécénat & Valorisation Citoyenne</h2>
+                <p>Prospection, conventions, Cerfa fiscal (60%) et livrets de présentation</p>
+            </div>
+            
+            <div class="nav-tabs">
+                <button class="tab-btn active" onclick="switchTab('tab-prospects')">📊 Prospection</button>
+                <button class="tab-btn" onclick="switchTab('tab-confirmes')">🏅 Mécènes Validés</button>
+                <button class="tab-btn" onclick="switchTab('tab-valorisations')">🥋 Packs Ceintures</button>
+                <button class="tab-btn" onclick="switchTab('tab-livret')">📖 Générateur de Livret HTML</button>
+            </div>
+
+            <a href="../index.html" class="btn btn-dark">🏠 Central</a>
+        </div>
+
+        <div class="app-body">
+            
+            <!-- KPI SUMMARY -->
+            <div class="kpi-grid">
+                <div class="kpi-card promesses">
+                    <h4>Promesses / En Négociation</h4>
+                    <div class="value" id="kpi-promesses">0,00 €</div>
+                </div>
+                <div class="kpi-card confirmes">
+                    <h4>Mécénat Confirmé (Encaissé)</h4>
+                    <div class="value" id="kpi-confirmes">0,00 €</div>
+                </div>
+                <div class="kpi-card reduction">
+                    <h4>Économie d'Impôt Entreprises (60%)</h4>
+                    <div class="value" id="kpi-reduction">0,00 €</div>
+                </div>
+                <div class="kpi-card ecoles">
+                    <h4>Impact Écoles du Territoire</h4>
+                    <div class="value">Dornes & Chantenay</div>
+                </div>
+            </div>
+
+            <!-- ONGLET 1 : PROSPECTION ET GESTION MECENES -->
+            <div class="tab-content active" id="tab-prospects">
+                <div class="main-card no-print">
+                    <div class="card-header-actions">
+                        <h3 id="form-title">➕ Saisir un Mécène ou une Entreprise Cible</h3>
+                        <button class="btn btn-secondary btn-xs" id="btn-cancel-edit" style="display:none;" onclick="resetForm()">Annuler la modification</button>
+                    </div>
+
+                    <input type="hidden" id="edit-id" value="-1">
+
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Nom de l'Entreprise / Raison Sociale</label>
+                            <input type="text" id="mecene-societe" class="form-control" placeholder="Ex: Garage Bâtiment Nivernais" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nom du Contact / Dirigeant</label>
+                            <input type="text" id="mecene-contact" class="form-control" placeholder="Ex: M. Jean Dupont">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Téléphone / Mail</label>
+                            <input type="text" id="mecene-coordonnees" class="form-control" placeholder="06 00 00 00 00 / contact@...">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Montant du Don / Promesse (€)</label>
+                            <input type="number" step="10" id="mecene-montant" class="form-control" placeholder="500" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Statut</label>
+                            <select id="mecene-statut" class="form-control">
+                                <option value="A_Contacter">🔵 À contacter / Démarcher</option>
+                                <option value="Negociation">🟡 En négociation / Rendez-vous</option>
+                                <option value="Confirme">🟢 Don Confirmé & Reçu</option>
+                                <option value="Refuse">🔴 Refusé</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pack Valorisation Ceinture</label>
+                            <select id="mecene-valorisation-id" class="form-control"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Document / Justificatif (PDF / Image)</label>
+                            <input type="file" id="mecene-file-input" class="form-control" onchange="traiterFichierMecene(this)">
+                            <input type="hidden" id="mecene-file-data">
+                            <input type="hidden" id="mecene-file-name">
+                        </div>
+
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Notes & Historique des échanges</label>
+                            <input type="text" id="mecene-notes" class="form-control" placeholder="Dossier mécénat déposé le 12/05...">
+                        </div>
+
+                        <div>
+                            <button class="btn" style="width:100%; height:38px;" id="btn-submit" onclick="enregistrerMecene()">💾 Enregistrer le Mécène</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main-card">
+                    <div class="card-header-actions">
+                        <h3>📋 Registre Général des Mécènes & Démarchages</h3>
+                        <button class="btn btn-blue btn-xs no-print" onclick="imprimerRegistreA4()">🖨️ Imprimer le Registre A4 Officiel</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Raison Sociale</th>
+                                    <th>Contact</th>
+                                    <th>Montant Don</th>
+                                    <th>Coût Réel (-60%)</th>
+                                    <th>Statut</th>
+                                    <th>Niveau / Ceinture Valorisation</th>
+                                    <th>Fichier</th>
+                                    <th style="text-align:center;" class="no-print">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mecenes-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ONGLET 2 : MECENES CONFIRMES & FICHES DETAIL -->
+            <div class="tab-content" id="tab-confirmes">
+                <div class="main-card">
+                    <div class="card-header-actions">
+                        <h3>🏆 Mécènes Officiels du Dojo Dornois (Dons Validés)</h3>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--gris-moyen); margin:0;">Cliquer sur une entreprise pour ouvrir sa fiche, générer son Cerfa fiscal, imprimer sa convention ou modifier ses informations.</p>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Entreprise</th>
+                                    <th>Montant Reçu</th>
+                                    <th>Réduction Fiscale</th>
+                                    <th>Niveau Ceinture</th>
+                                    <th style="text-align:center;" class="no-print">Actions & Documents Officiels</th>
+                                </tr>
+                            </thead>
+                            <tbody id="confirmes-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ONGLET 3 : GESTION DES TYPES DE VALORISATIONS PAR CEINTURES DE JUDO -->
+            <div class="tab-content" id="tab-valorisations">
+                <div class="main-card no-print">
+                    <div class="card-header-actions">
+                        <h3 id="val-form-title">🎨 Ajouter / Éditer un Pack de Valorisation Ceinture</h3>
+                        <button class="btn btn-secondary btn-xs" id="btn-cancel-val-edit" style="display:none;" onclick="resetValForm()">Annuler</button>
+                    </div>
+
+                    <input type="hidden" id="edit-val-id" value="-1">
+
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Intitulé du Pack (Nom de la ceinture / Niveau)</label>
+                            <input type="text" id="val-nom" class="form-control" placeholder="Ex: Ceinture Rouge — Pack Grand Maître" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Seuil Don Conseillé / Indicatif (€)</label>
+                            <input type="text" id="val-seuil" class="form-control" placeholder="Ex: 500 € à 1000 €" value="Dès 100 €">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Couleur de Fond (Carte)</label>
+                            <input type="color" id="val-bg-color" class="form-control" value="#FFEBEF" style="height:38px; cursor:pointer;">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Couleur Bordure / Ceinture</label>
+                            <input type="color" id="val-border-color" class="form-control" value="#C41E3A" style="height:38px; cursor:pointer;">
+                        </div>
+
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Description détaillée des contreparties accordées</label>
+                            <input type="text" id="val-desc" class="form-control" placeholder="Banderole d'honneur 3m + Parrainage de l'équipe compétition">
+                        </div>
+
+                        <div>
+                            <button class="btn btn-green" style="width:100%; height:38px;" id="btn-val-submit" onclick="enregistrerValorisation()">💾 Enregistrer la Ceinture</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main-card">
+                    <div class="card-header-actions">
+                        <h3>🥋 Grille des Packs de Valorisation (Usage Interne Intranet)</h3>
+                        <button class="btn btn-secondary btn-xs no-print" onclick="reinitialiserPacksCeintures()">🔄 Réinitialiser la grille des ceintures</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Badge Ceinture</th>
+                                    <th>Nom du Pack</th>
+                                    <th style="color:var(--rouge); font-weight:bold;">Seuil Indicatif (Interne)</th>
+                                    <th>Détail des Contreparties</th>
+                                    <th style="text-align:center;" class="no-print">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="valorisations-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ONGLET 4 : GENERATEUR DE DOSSIER DE MECENAT HTML -->
+            <div class="tab-content" id="tab-livret">
+                <div class="main-card">
+                    <div class="card-header-actions">
+                        <h3>📖 Personnalisation du Livret (Éditeur HTML & Page de Garde)</h3>
+                        <div style="display:flex; gap:8px;" class="no-print">
+                            <button class="btn btn-green btn-xs" onclick="ajouterPageLivret()">➕ Ajouter une page HTML</button>
+                            <button class="btn btn-blue btn-xs" onclick="imprimerLivretMecenetPDF()">🖨️ Imprimer le Livret PDF Officiel</button>
+                        </div>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--gris-moyen); margin:0;">Chaque page dispose de son code HTML. Tu peux modifier le contenu, monter/descendre les pages et réorganiser la Page de Garde.</p>
+
+                    <div id="livret-pages-container"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALE FICHE DETAIL MECENE -->
+    <div class="modal-overlay" id="meceneModal">
+        <div class="modal-card">
+            <div class="card-header-actions">
+                <h3 id="modal-mecene-title">📜 Fiche Officielle du Mécène</h3>
+                <button class="btn btn-secondary btn-xs" onclick="closeModal()">✕</button>
+            </div>
+            
+            <div id="modal-mecene-content" style="background:#fafafa; padding:16px; border-radius:8px; font-size:0.9rem; line-height:1.6;"></div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:10px;">
+                <button class="btn btn-secondary" id="modal-btn-edit-direct" onclick="">✏️ Modifier cette fiche mécène</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-secondary" onclick="closeModal()">Fermer</button>
+                    <button class="btn btn-blue" onclick="imprimerConventionModal()">📄 Convention de Mécénat PDF</button>
+                    <button class="btn btn-green" onclick="imprimerCerfaModal()">🧾 Reçu Fiscal CERFA 11580*05</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+        const TARGET_SHEET = "Mecenat";
+
+        const DEFAULT_CEINTURES = [
+            { id: 1, nom: "⚪ Ceinture Blanche — Pack Découverte", seuil: "< 150 €", bgColor: "#F8FAFC", borderColor: "#94A3B8", desc: "Mention sur le site internet et remerciement officiel newsletter." },
+            { id: 2, nom: "🟡 Ceinture Jaune — Pack Supporteur", seuil: "150 € - 300 €", bgColor: "#FEF9C3", borderColor: "#CA8A04", desc: "Logo sur le site web + Affiche officielle des partenaires dans le dojo." },
+            { id: 3, nom: "🟠 Ceinture Orange — Pack Engagé", seuil: "300 € - 500 €", bgColor: "#FFEDD5", borderColor: "#EA580C", desc: "Banderole 2x1m dans le dojo + visuels réseaux sociaux." },
+            { id: 4, nom: "🟢 Ceinture Verte — Pack Écoles & Citoyenneté", seuil: "500 € - 800 €", bgColor: "#D1FAE5", borderColor: "#059669", desc: "Soutien aux interventions scolaires (TER Dornes, Chantenay-Saint-Imbert, Lucenay-lès-Aix, Cossaye) + Banderole." },
+            { id: 5, nom: "🔵 Ceinture Bleue — Pack Partenaire", seuil: "800 € - 1 200 €", bgColor: "#E0F2FE", borderColor: "#0284C7", desc: "Logo sur les t-shirts du club + Banderole d'honneur + Réseaux sociaux." },
+            { id: 6, nom: "🟤 Ceinture Marron — Pack Majeur", seuil: "1 200 € - 2 000 €", bgColor: "#F5E6D3", borderColor: "#8B4513", desc: "Présence sur tous les supports évènementiels (Truffade, Gala) + Stand offert." },
+            { id: 7, nom: "⚫ Ceinture Noire — Pack Prestige", seuil: "2 000 € - 3 500 €", bgColor: "#E2E8F0", borderColor: "#0F172A", desc: "Parrainage d'une équipe compétition + Banderole centrale + Remise de prix." },
+            { id: 8, nom: "🔴 Ceinture Rouge — Pack Maître / Fondateur", seuil: "Dès 3 500 €", bgColor: "#FFEBEF", borderColor: "#C41E3A", desc: "Mécène d'Honneur exclusif. Logo sur tenues officielles + Banderole d'honneur 3M." }
+        ];
+
+        let DEFAULT_MECENES = [
+            {
+                id: 101, societe: "Entreprise Bâtiment Nivernais", contact: "Jean-Pierre Martin",
+                coordonnees: "06 12 34 56 78 / contact@ebn.fr", montant: 500, statut: "Confirme",
+                valId: 4, notes: "Chèque reçu en juin. Grand merci à eux.", fileName: "", fileData: ""
+            },
+            {
+                id: 102, societe: "Transports Decize-Dornes", contact: "Sophie Bernard",
+                coordonnees: "03 86 00 00 00", montant: 1000, statut: "Negociation",
+                valId: 5, notes: "Dossier transmis. En attente de validation comptable.", fileName: "", fileData: ""
+            }
+        ];
+
+        let valorisationsDB = JSON.parse(JSON.stringify(DEFAULT_CEINTURES));
+        let mecenesDB = JSON.parse(JSON.stringify(DEFAULT_MECENES));
+
+        let livretPages = [
+            {
+                isGarde: true,
+                titre: "Page 1 — Page de Garde Officielle",
+                html: `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; height:100%; padding:0 20px;">
+    <div style="background:#C41E3A; width:150px; height:150px; margin-bottom:30px; border-radius:28px; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 30px rgba(196,30,58,0.35);">
+        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width:120px; height:120px; object-fit:contain;">
+    </div>
+    <h1 style="font-family:'Fredoka',sans-serif; font-size:36pt; color:#C41E3A; margin:0; text-transform:uppercase; letter-spacing:1px;">DOJO DORNOIS</h1>
+    <p style="font-size:15pt; color:#1A1A1A; font-weight:700; margin-top:10px; letter-spacing:0.5px;">DOSSIER OFFICIEL DE MÉCÉNAT & PARTENARIAT CITOYEN</p>
+    <div style="width:100px; height:4px; background:#C41E3A; margin:35px 0;"></div>
+    <p style="font-size:11pt; color:#6B6B6B; max-width:550px; line-height:1.5;">Saison 2026 / 2027 &bull; Pour le développement du judo et la transmission des valeurs éducatives auprès de la jeunesse du territoire</p>
+</div>`
+            },
+            {
+                isGarde: false,
+                titre: "Page 2 — Notre Engagement Scolaire sur le Territoire",
+                html: `<h3 style="color:#C41E3A; font-family:'Fredoka',sans-serif; font-size:16pt;">🥋 Le Judo à l'École : Transmission & Éducation</h3>
+<p>Le Dojo Dornois s'engage activement au cœur des écoles de notre territoire : <strong>Dornes, Chantenay-Saint-Imbert, Lucenay-lès-Aix et Cossaye</strong>.</p>
+<p>Grâce au soutien du <strong>TER de Dornes</strong>, des écoles partenaires et au financement complémentaire pris en charge directement par le <strong>Dojo Dornois</strong>, nous permettons aux enfants du secteur d'apprendre les bases du judo et ses valeurs morales.</p>
+<div style="background:#FFEBEF; padding:15px; border-radius:8px; border-left:4px solid #C41E3A; margin:15px 0;">
+    <strong>Le Code Moral transmis à nos jeunes judokas :</strong><br>
+    Politesse, Courage, Sincérité, Honneur, Modestie, Respect, Contrôle de soi et Amitié.
+</div>
+<p>Votre soutien en mécénat nous aide directement à pérenniser l'encadrement professionnel et le matériel dédié à ces cycles scolaires !</p>`
+            },
+            {
+                isGarde: false,
+                titre: "Page 3 — Avantages Fiscaux du Mécénat (60%)",
+                html: `<h3 style="color:#C41E3A; font-family:'Fredoka',sans-serif; font-size:16pt;">📊 Réduction d'Impôt IS de 60 %</h3>
+<p>En soutenant le Dojo Dornois (association d'intérêt général), votre entreprise bénéficie d'un avantage fiscal avantageux :</p>
+<ul style="line-height:1.8;">
+    <li><strong>60 % du montant du don</strong> est directement déductible de votre Impôt sur les Sociétés (IS).</li>
+    <li>Délivrance immédiate du <strong>Reçu Fiscal officiel CERFA 11580*05</strong>.</li>
+</ul>
+<table style="width:100%; border-collapse:collapse; margin-top:15px;">
+    <tr style="background:#1A1A1A; color:white;"><th style="padding:8px;">Montant du Don</th><th style="padding:8px;">Déduction Fiscale (-60%)</th><th style="padding:8px;">Coût Réel Entreprise</th></tr>
+    <tr><td style="padding:8px; border:1px solid #ddd;">500 €</td><td style="padding:8px; border:1px solid #ddd; color:#27ae60; font-weight:bold;">300 €</td><td style="padding:8px; border:1px solid #ddd; font-weight:bold;">200 €</td></tr>
+    <tr><td style="padding:8px; border:1px solid #ddd;">1 000 €</td><td style="padding:8px; border:1px solid #ddd; color:#27ae60; font-weight:bold;">600 €</td><td style="padding:8px; border:1px solid #ddd; font-weight:bold;">400 €</td></tr>
+</table>`
+            }
+        ];
+
+        let activeMeceneModal = null;
+
+        function showToast(msg) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast success'; toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            if(event && event.target) event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function reinitialiserPacksCeintures() {
+            if(confirm("Réinitialiser les packs avec la grille complète des ceintures et leurs seuils d'origine ?")) {
+                valorisationsDB = JSON.parse(JSON.stringify(DEFAULT_CEINTURES));
+                saveAllData(); renderAll();
+            }
+        }
+
+        function saveAllData() {
+            localStorage.setItem('dojo_mecenes_v8', JSON.stringify(mecenesDB));
+            localStorage.setItem('dojo_val_v8', JSON.stringify(valorisationsDB));
+
+            fetch(SCRIPT_URL, {
+                method: "POST", mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ targetSheet: TARGET_SHEET, payload: { mecenes: mecenesDB, valorisations: valorisationsDB } })
+            }).then(() => showToast("✓ Sauvegardé !"))
+            .catch(err => console.error(err));
+        }
+
+        function loadAllData() {
+            const backupMec = localStorage.getItem('dojo_mecenes_v8');
+            const backupVal = localStorage.getItem('dojo_val_v8');
+
+            if(backupMec) mecenesDB = JSON.parse(backupMec);
+            if(backupVal && JSON.parse(backupVal).length >= 8) { valorisationsDB = JSON.parse(backupVal); }
+
+            renderAll();
+        }
+
+        function renderAll() {
+            populateValSelect();
+            renderProspectsTable();
+            renderConfirmesTable();
+            renderValorisationsTable();
+            renderLivretEditor();
+            updateKPIs();
+        }
+
+        function populateValSelect() {
+            const select = document.getElementById('mecene-valorisation-id');
+            select.innerHTML = '';
+            valorisationsDB.forEach(v => {
+                select.innerHTML += `<option value="${v.id}">${v.nom} (${v.seuil || 'Libre'})</option>`;
+            });
+        }
+
+        function updateKPIs() {
+            let totalPromesses = 0;
+            let totalConfirmes = 0;
+
+            mecenesDB.forEach(m => {
+                if(m.statut === "Confirme") totalConfirmes += parseFloat(m.montant) || 0;
+                if(m.statut === "Negociation" || m.statut === "A_Contacter") totalPromesses += parseFloat(m.montant) || 0;
+            });
+
+            document.getElementById('kpi-promesses').innerText = totalPromesses.toFixed(2) + " €";
+            document.getElementById('kpi-confirmes').innerText = totalConfirmes.toFixed(2) + " €";
+            document.getElementById('kpi-reduction').innerText = (totalConfirmes * 0.6).toFixed(2) + " €";
+        }
+
+        function getValBadgeHtml(valId) {
+            const val = valorisationsDB.find(v => v.id === parseInt(valId)) || { nom: "Niveau Ceinture", bgColor: "#E8E8E8", borderColor: "#6B6B6B" };
+            return `<div class="val-card-badge" style="background:${val.bgColor}; border-left-color:${val.borderColor}; color:#1A1A1A;">
+                <span style="color:${val.borderColor};">🥋</span> ${val.nom}
+            </div>`;
+        }
+
+        function renderValorisationsTable() {
+            const tbody = document.getElementById('valorisations-tbody');
+            tbody.innerHTML = '';
+
+            valorisationsDB.forEach((val, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${getValBadgeHtml(val.id)}</td>
+                    <td><strong>${val.nom}</strong></td>
+                    <td style="color:var(--rouge); font-weight:bold;">${val.seuil || 'N/C'}</td>
+                    <td><span style="font-size:0.82rem; color:var(--gris-moyen);">${val.desc}</span></td>
+                    <td style="text-align:center;" class="no-print">
+                        <button class="btn btn-secondary btn-xs" onclick="editerValorisation(${idx})">✏️ Éditer</button>
+                        <button class="btn btn-secondary btn-xs" style="background:var(--rouge);" onclick="supprimerValorisation(${idx})">✕</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function enregistrerValorisation() {
+            const nom = document.getElementById('val-nom').value.trim();
+            const seuil = document.getElementById('val-seuil').value.trim();
+            const bgColor = document.getElementById('val-bg-color').value;
+            const borderColor = document.getElementById('val-border-color').value;
+            const desc = document.getElementById('val-desc').value.trim();
+            const editId = parseInt(document.getElementById('edit-val-id').value);
+
+            if(!nom) { alert("Merci de remplir au moins le nom du pack."); return; }
+
+            if(editId === -1) {
+                valorisationsDB.push({ id: Date.now(), nom, seuil, bgColor, borderColor, desc });
+            } else {
+                const idx = valorisationsDB.findIndex(x => x.id === editId);
+                if(idx !== -1) {
+                    valorisationsDB[idx] = { ...valorisationsDB[idx], nom, seuil, bgColor, borderColor, desc };
+                }
+            }
+
+            saveAllData(); resetValForm(); renderAll();
+        }
+
+        function editerValorisation(index) {
+            const val = valorisationsDB[index];
+            document.getElementById('edit-val-id').value = val.id;
+            document.getElementById('val-nom').value = val.nom;
+            document.getElementById('val-seuil').value = val.seuil || '';
+            document.getElementById('val-bg-color').value = val.bgColor;
+            document.getElementById('val-border-color').value = val.borderColor;
+            document.getElementById('val-desc').value = val.desc;
+
+            document.getElementById('val-form-title').innerText = `✏️ Modifier le Pack Ceinture`;
+            document.getElementById('btn-cancel-val-edit').style.display = "inline-flex";
+        }
+
+        function supprimerValorisation(index) {
+            if(confirm("Supprimer ce pack de valorisation ?")) {
+                valorisationsDB.splice(index, 1);
+                saveAllData(); renderAll();
+            }
+        }
+
+        function resetValForm() {
+            document.getElementById('edit-val-id').value = "-1";
+            document.getElementById('val-nom').value = "";
+            document.getElementById('val-seuil').value = "";
+            document.getElementById('val-desc').value = "";
+            document.getElementById('val-form-title').innerText = "🎨 Ajouter / Éditer un Pack de Valorisation Ceinture";
+            document.getElementById('btn-cancel-val-edit').style.display = "none";
+        }
+
+        function renderProspectsTable() {
+            const tbody = document.getElementById('mecenes-tbody');
+            tbody.innerHTML = '';
+
+            mecenesDB.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                const coutReel = (item.montant * 0.4).toFixed(2);
+                
+                let fileBtn = '<span style="color:var(--gris-clair);">Aucun</span>';
+                if(item.fileData) {
+                    fileBtn = `<button class="btn btn-secondary btn-xs" style="background:var(--vert-fonce);" onclick="voirFichier(${idx})">📄 Fichier</button>`;
+                }
+
+                const badgeClass = `badge-${item.statut.toLowerCase()}`;
+                const statusLabels = { 'A_Contacter': '🔵 À contacter', 'Negociation': '🟡 En négociation', 'Confirme': '🟢 Don Validé', 'Refuse': '🔴 Refusé' };
+
+                tr.innerHTML = `
+                    <td><strong>${item.societe}</strong></td>
+                    <td>${item.contact || 'N/C'}<br><span style="font-size:0.75rem; color:var(--gris-moyen);">${item.coordonnees || ''}</span></td>
+                    <td><strong>${parseFloat(item.montant).toFixed(2)} €</strong></td>
+                    <td style="color:var(--vert-fonce); font-weight:bold;">${coutReel} €</td>
+                    <td><span class="badge ${badgeClass}">${statusLabels[item.statut]}</span></td>
+                    <td>${getValBadgeHtml(item.valId)}</td>
+                    <td>${fileBtn}</td>
+                    <td style="text-align:center;" class="no-print">
+                        <div style="display:flex; justify-content:center; gap:4px;">
+                            <button class="btn btn-blue btn-xs" onclick="ouvrirModalMecene(${idx})" title="Fiche & Impression">📄 Fiche</button>
+                            <button class="btn btn-secondary btn-xs" onclick="editerMecene(${idx})">✏️ Éditer</button>
+                            <button class="btn btn-secondary btn-xs" style="background:var(--rouge);" onclick="supprimerMecene(${idx})">✕</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderConfirmesTable() {
+            const tbody = document.getElementById('confirmes-tbody');
+            tbody.innerHTML = '';
+
+            mecenesDB.filter(m => m.statut === "Confirme").forEach((item) => {
+                const originalIndex = mecenesDB.findIndex(x => x.id === item.id);
+                const tr = document.createElement('tr');
+                const reduction = (item.montant * 0.6).toFixed(2);
+
+                tr.innerHTML = `
+                    <td><strong>${item.societe}</strong><br><span style="font-size:0.75rem; color:var(--gris-moyen);">${item.contact || ''}</span></td>
+                    <td><strong style="color:var(--vert-fonce); font-size:1.05rem;">${parseFloat(item.montant).toFixed(2)} €</strong></td>
+                    <td style="color:var(--violet); font-weight:bold;">- ${reduction} € (sur impôts)</td>
+                    <td>${getValBadgeHtml(item.valId)}</td>
+                    <td style="text-align:center;" class="no-print">
+                        <div style="display:flex; justify-content:center; gap:6px;">
+                            <button class="btn btn-blue btn-xs" onclick="ouvrirModalMecene(${originalIndex})">🏆 Fiche, CERFA & Convention</button>
+                            <button class="btn btn-secondary btn-xs" onclick="editerMecene(${originalIndex}); switchTab('tab-prospects');">✏️ Modifier</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function enregistrerMecene() {
+            const societe = document.getElementById('mecene-societe').value.trim();
+            const contact = document.getElementById('mecene-contact').value.trim();
+            const coordonnees = document.getElementById('mecene-coordonnees').value.trim();
+            const montant = parseFloat(document.getElementById('mecene-montant').value);
+            const statut = document.getElementById('mecene-statut').value;
+            const valId = parseInt(document.getElementById('mecene-valorisation-id').value);
+            const notes = document.getElementById('mecene-notes').value.trim();
+            const fileData = document.getElementById('mecene-file-data').value;
+            const fileName = document.getElementById('mecene-file-name').value;
+            const editId = parseInt(document.getElementById('edit-id').value);
+
+            if(!societe || isNaN(montant)) { alert("Merci de remplir la société et le montant."); return; }
+
+            if(editId === -1) {
+                mecenesDB.push({ id: Date.now(), societe, contact, coordonnees, montant, statut, valId, notes, fileName, fileData });
+            } else {
+                const idx = mecenesDB.findIndex(x => x.id === editId);
+                if(idx !== -1) {
+                    mecenesDB[idx] = { ...mecenesDB[idx], societe, contact, coordonnees, montant, statut, valId, notes };
+                    if(fileData) { mecenesDB[idx].fileData = fileData; mecenesDB[idx].fileName = fileName; }
+                }
+            }
+
+            saveAllData(); resetForm(); renderAll();
+        }
+
+        function editerMecene(index) {
+            const item = mecenesDB[index];
+            document.getElementById('edit-id').value = item.id;
+            document.getElementById('mecene-societe').value = item.societe;
+            document.getElementById('mecene-contact').value = item.contact || '';
+            document.getElementById('mecene-coordonnees').value = item.coordonnees || '';
+            document.getElementById('mecene-montant').value = item.montant;
+            document.getElementById('mecene-statut').value = item.statut;
+            document.getElementById('mecene-valorisation-id').value = item.valId || valorisationsDB[0].id;
+            document.getElementById('mecene-notes').value = item.notes || '';
+
+            document.getElementById('form-title').innerText = `✏️ Modifier le Mécène (${item.societe})`;
+            document.getElementById('btn-submit').innerText = "💾 Enregistrer les modifications";
+            document.getElementById('btn-cancel-edit').style.display = "inline-flex";
+        }
+
+        function supprimerMecene(index) {
+            if(confirm("Confirmer la suppression de cette fiche mécène ?")) {
+                mecenesDB.splice(index, 1);
+                saveAllData(); renderAll();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('edit-id').value = "-1";
+            document.getElementById('mecene-societe').value = "";
+            document.getElementById('mecene-contact').value = "";
+            document.getElementById('mecene-coordonnees').value = "";
+            document.getElementById('mecene-montant').value = "";
+            document.getElementById('mecene-notes').value = "";
+            document.getElementById('form-title').innerText = "➕ Saisir un Mécène ou une Entreprise Cible";
+            document.getElementById('btn-submit').innerText = "💾 Enregistrer le Mécène";
+            document.getElementById('btn-cancel-edit').style.display = "none";
+        }
+
+        function traiterFichierMecene(input) {
+            const file = input.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('mecene-file-data').value = e.target.result;
+                document.getElementById('mecene-file-name').value = file.name;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function voirFichier(index) {
+            const item = mecenesDB[index]; if(!item.fileData) return;
+            const win = window.open();
+            win.document.write(`<iframe src="${item.fileData}" frameborder="0" style="width:100%; height:100vh;"></iframe>`);
+        }
+
+        /* GESTION MODALE DETAILED MECENE */
+        function ouvrirModalMecene(index) {
+            activeMeceneModal = mecenesDB[index];
+            const m = activeMeceneModal;
+            const valBadge = getValBadgeHtml(m.valId);
+
+            document.getElementById('modal-mecene-title').innerText = `📜 Fiche Mécène — ${m.societe}`;
+            document.getElementById('modal-mecene-content').innerHTML = `
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div><strong>Raison Sociale :</strong> ${m.societe}</div>
+                    <div><strong>Contact Dirigeant :</strong> ${m.contact || 'N/C'}</div>
+                    <div><strong>Coordonnées :</strong> ${m.coordonnees || 'N/C'}</div>
+                    <div><strong>Montant du Don :</strong> ${parseFloat(m.montant).toFixed(2)} €</div>
+                    <div><strong>Déduction Fiscale (60%) :</strong> ${(m.montant * 0.6).toFixed(2)} €</div>
+                    <div><strong>Coût Réel Entreprise :</strong> ${(m.montant * 0.4).toFixed(2)} €</div>
+                    <div><strong>Statut :</strong> ${m.statut}</div>
+                    <div><strong>Pack Valorisation :</strong> ${valBadge}</div>
+                    <div style="grid-column: span 2;"><strong>Notes & Historique :</strong> ${m.notes || 'Aucune note'}</div>
+                </div>
+            `;
+
+            document.getElementById('modal-btn-edit-direct').onclick = () => {
+                closeModal();
+                editerMecene(index);
+                switchTab('tab-prospects');
+            };
+
+            document.getElementById('meceneModal').classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('meceneModal').classList.remove('active'); }
+
+        /* GENERATEUR ET EDITEUR DE LIVRET DE MECENAT HTML */
+        function renderLivretEditor() {
+            const container = document.getElementById('livret-pages-container');
+            container.innerHTML = '';
+
+            livretPages.forEach((page, idx) => {
+                const div = document.createElement('div');
+                div.className = 'page-card';
+                div.innerHTML = `
+                    <div class="page-card-header">
+                        <input type="text" class="form-control" style="font-weight:bold; width:65%;" value="${page.titre}" onchange="livretPages[${idx}].titre = this.value">
+                        <div style="display:flex; gap:4px;" class="no-print">
+                            <button class="btn btn-secondary btn-xs" onclick="deplacerPageLivret(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>▲ Monter</button>
+                            <button class="btn btn-secondary btn-xs" onclick="deplacerPageLivret(${idx}, 1)" ${idx === livretPages.length - 1 ? 'disabled' : ''}>▼ Descendre</button>
+                            <button class="btn btn-secondary btn-xs" style="background:var(--rouge);" onclick="supprimerPageLivret(${idx})">✕</button>
+                        </div>
+                    </div>
+                    <textarea class="form-control" style="height:140px; font-family:monospace; font-size:0.8rem;" onchange="livretPages[${idx}].html = this.value">${page.html}</textarea>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function ajouterPageLivret() {
+            livretPages.push({ isGarde: false, titre: `Page ${livretPages.length + 1} — Nouvelle Section HTML`, html: `<h3 style="color:#C41E3A;">Titre Section</h3>\n<p>Contenu personnalisable en HTML...</p>` });
+            renderLivretEditor();
+        }
+
+        function deplacerPageLivret(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= livretPages.length) return;
+            const temp = livretPages[index];
+            livretPages[index] = livretPages[newIndex];
+            livretPages[newIndex] = temp;
+            renderLivretEditor();
+        }
+
+        function supprimerPageLivret(index) {
+            if(confirm("Supprimer cette page du livret ?")) {
+                livretPages.splice(index, 1); renderLivretEditor();
+            }
+        }
+
+        /* IMPRESSIONS OFFICIELLES CHARTE DOJO DORNOIS */
+        function imprimerConventionModal() {
+            if(!activeMeceneModal) return;
+            const m = activeMeceneModal;
+            const val = valorisationsDB.find(v => v.id === parseInt(m.valId)) || { nom: "Sur-mesure", desc: "Contrepartie personnalisée", borderColor: "#C41E3A", bgColor: "#FFEBEF" };
+
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <!DOCTYPE html><html><head><title>Convention Mécénat — ${m.societe}</title>
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                <style>
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { font-family:'Roboto',sans-serif; color:#1a1a1a; font-size:9.5pt; line-height:1.45; }
+                    .print-header { display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #C41E3A; padding-bottom:10px; margin-bottom:18px; }
+                    .print-logo { height:55px; width:55px; background:#C41E3A; padding:4px; border-radius:6px; object-fit:contain; }
+                    .doc-title { background:#1A1A1A; color:white; padding:8px 14px; font-family:'Fredoka',sans-serif; font-size:12pt; display:inline-block; border-radius:5px; text-transform:uppercase; margin-bottom:15px; }
+                    .box { background:#F4F6F9; padding:12px 16px; border-radius:6px; border-left:4px solid #C41E3A; margin-bottom:14px; }
+                    .val-badge { display:inline-block; padding:4px 10px; border-radius:4px; font-weight:bold; background:${val.bgColor}; border-left:4px solid ${val.borderColor}; margin-top:4px; }
+                </style></head><body>
+                    <div class="print-header">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                            <div><h1 style="font-family:'Fredoka',sans-serif; color:#C41E3A; margin:0; font-size:18pt;">DOJO DORNOIS</h1><p style="margin:0; font-size:8.5pt; color:#666;">Association Sportive & Citoyenne (Loi 1901)</p></div>
+                        </div>
+                        <div style="text-align:right; font-size:8pt; color:#333;">38 rue de Decize, 58390 DORNES<br>dojodornois@gmail.com &bull; RNA W583001220</div>
+                    </div>
+
+                    <div class="doc-title">Convention Officielle de Mécénat Citoyen</div>
+
+                    <p><strong>ENTRE LES SOUSSIGNÉS :</strong></p>
+                    <div class="box">
+                        <strong>Le Bénéficiaire :</strong> Dojo Dornois, représenté par son Président Jordan Loudenot.<br>
+                        <strong>Le Mécène :</strong> ${m.societe}, représenté(e) par ${m.contact || 'son dirigeant'}.
+                    </div>
+
+                    <p><strong>Article 1 : Engagement & Soutien financier</strong><br>Le Mécène effectue un don d'intérêt général d'un montant de <strong>${parseFloat(m.montant).toFixed(2)} €</strong> au profit du Dojo Dornois afin de cofinancer ses cycles éducatifs et ses interventions judo au sein des écoles primaires du territoire (Dornes, Chantenay-Saint-Imbert, Lucenay-lès-Aix, Cossaye).</p>
+
+                    <p><strong>Article 2 : Régime Fiscal (Art. 238 bis du CGI)</strong><br>Ce don ouvre droit à une déduction d'impôt sur les sociétés égale à 60 % de son montant, soit une économie d'impôt direct de <strong>${(m.montant * 0.6).toFixed(2)} €</strong>. Le coût réel net pour l'entreprise s'élève à <strong>${(m.montant * 0.4).toFixed(2)} €</strong>. Un reçu fiscal CERFA n° 11580*05 est émis à cet effet.</p>
+
+                    <p><strong>Article 3 : Pack Valorisation Accordé</strong><br>
+                    En contrepartie du soutien citoyen apporté par l'entreprise, le Dojo Dornois attribue la valorisation suivante :<br>
+                    <span class="val-badge">${val.nom}</span><br>
+                    <span style="font-size:8.5pt; color:#555;">Détails : ${val.desc}</span>
+                    </p>
+
+                    <div style="display:flex; justify-content:space-between; margin-top:40px;">
+                        <div>Fait à Dornes, le ${new Date().toLocaleDateString('fr-FR')}<br><strong>Pour le Dojo Dornois</strong><br><br><br>Le Président</div>
+                        <div>Fait à Dornes, le ${new Date().toLocaleDateString('fr-FR')}<br><strong>Pour l'Entreprise Mécène</strong><br><br><br>Signature & Cachet</div>
+                    </div>
+                    <script>window.onload = function() { setTimeout(() => { window.print(); window.close(); }, 400); };<\/script>
+                </body></html>
+            `);
+            win.document.close();
+        }
+
+        function imprimerCerfaModal() {
+            if(!activeMeceneModal) return;
+            const m = activeMeceneModal;
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <!DOCTYPE html><html><head><title>Reçu Fiscal CERFA — ${m.societe}</title>
+                <style>
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { font-family: Arial, sans-serif; font-size: 9.5pt; color: #000; line-height:1.4; }
+                    .cerfa-box { border: 2px solid #000; padding: 15px; }
+                    .header-table { width: 100%; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; }
+                    .title { font-size: 11pt; font-weight: bold; text-align: center; background: #e0e0e0; padding: 6px; border: 1px solid #000; margin: 10px 0; }
+                    .section { margin-bottom: 12px; }
+                    .section-title { font-weight: bold; text-decoration: underline; margin-bottom: 4px; }
+                </style></head><body>
+                    <div class="cerfa-box">
+                        <table class="header-table">
+                            <tr>
+                                <td><strong>REÇU FISCAL DONATION</strong><br>Articles 200 et 238 bis du CGI</td>
+                                <td style="text-align:right;"><strong>CERFA N° 11580*05</strong></td>
+                            </tr>
+                        </table>
+                        <div class="title">REÇU DE DON À UN ORGANISME D'INTÉRÊT GÉNÉRAL</div>
+                        <div class="section">
+                            <div class="section-title">1. Organisme Bénéficiaire :</div>
+                            <strong>Nom :</strong> DOJO DORNOIS (Association Sportive Loi 1901)<br>
+                            <strong>Adresse :</strong> 38 rue de Decize, 58390 DORNES<br>
+                            <strong>SIRET :</strong> 451 928 410 00013 &bull; <strong>RNA :</strong> W583001220
+                        </div>
+                        <div class="section">
+                            <div class="section-title">2. Donateur (Mécène) :</div>
+                            <strong>Raison Sociale :</strong> ${m.societe}<br>
+                            <strong>Contact :</strong> ${m.contact || 'Direction'}<br>
+                            <strong>Coordonnées :</strong> ${m.coordonnees || 'N/C'}
+                        </div>
+                        <div class="section">
+                            <div class="section-title">3. Montant du Don :</div>
+                            Le bénéficiaire reconnaît avoir reçu la somme de : <strong>${parseFloat(m.montant).toFixed(2)} €</strong><br>
+                            Date du don : ${new Date().toLocaleDateString('fr-FR')}
+                        </div>
+                        <p style="font-size:8.5pt; font-style:italic;">L'organisme certifie sur l'honneur que les dons reçus ouvrent droit à la réduction d'impôt prévue aux articles 200 et 238 bis du CGI.</p>
+                        <br>
+                        <div style="text-align:right;">
+                            Fait à Dornes, le ${new Date().toLocaleDateString('fr-FR')}<br>
+                            <strong>Pour le Dojo Dornois</strong><br><br>Le Président
+                        </div>
+                    </div>
+                    <script>window.onload = function() { setTimeout(() => { window.print(); window.close(); }, 400); };<\/script>
+                </body></html>
+            `);
+            win.document.close();
+        }
+
+        function imprimerLivretMecenetPDF() {
+            let htmlPages = '';
+            livretPages.forEach((p, i) => {
+                let footerContent = p.isGarde 
+                    ? `Dojo Dornois &bull; Association Loi 1901 &bull; RNA W583001220 &bull; SIRET 45192841000013`
+                    : `Livret Mécénat Dojo Dornois &bull; Page ${i+1} / ${livretPages.length}`;
+
+                htmlPages += `
+                    <div class="livret-page">
+                        ${!p.isGarde ? `
+                        <div class="print-header">
+                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                            <div><h1 style="font-family:'Fredoka',sans-serif; color:#C41E3A; margin:0; font-size:16pt;">DOJO DORNOIS</h1><p style="margin:0; font-size:8pt; color:#666;">Dossier de Mécénat & Partenariat Citoyen</p></div>
+                        </div>` : ''}
+                        ${p.html}
+                        <div class="page-footer">${footerContent}</div>
+                    </div>
+                `;
+            });
+
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <!DOCTYPE html><html><head><title>Livret Mécénat Dojo Dornois</title>
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                <style>
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { font-family:'Roboto',sans-serif; color:#1a1a1a; margin:0; padding:0; }
+                    .livret-page { page-break-after: always; height: 91vh; position: relative; box-sizing:border-box; }
+                    .print-header { display:flex; align-items:center; gap:12px; border-bottom:2px solid #C41E3A; padding-bottom:8px; margin-bottom:20px; }
+                    .print-logo { height:45px; width:45px; background:#C41E3A; padding:3px; border-radius:5px; object-fit:contain; }
+                    .page-footer { position:absolute; bottom:0; left:0; right:0; text-align:center; font-size:8pt; color:#888; border-top:1px solid #ddd; padding-top:6px; }
+                </style></head><body>
+                    ${htmlPages}
+                    <script>window.onload = function() { setTimeout(() => { window.print(); window.close(); }, 500); };<\/script>
+                </body></html>
+            `);
+            win.document.close();
+        }
+
+        function imprimerRegistreA4() {
+            let rowsHtml = '';
+            let totalDons = 0;
+
+            mecenesDB.forEach(m => {
+                const coutReel = (m.montant * 0.4).toFixed(2);
+                if(m.statut === "Confirme") totalDons += parseFloat(m.montant);
+
+                const val = valorisationsDB.find(v => v.id === parseInt(m.valId)) || { nom: "N/C", bgColor: "#E8E8E8", borderColor: "#666" };
+                const statusLabels = { 'A_Contacter': '🔵 À contacter', 'Negociation': '🟡 En négociation', 'Confirme': '🟢 Don Validé', 'Refuse': '🔴 Refusé' };
+
+                rowsHtml += `
+                    <tr>
+                        <td><strong>${m.societe}</strong></td>
+                        <td>${m.contact || '-'}<br><span style="font-size:7.5pt; color:#666;">${m.coordonnees || ''}</span></td>
+                        <td style="text-align:right;"><strong>${parseFloat(m.montant).toFixed(2)} €</strong></td>
+                        <td style="text-align:right; color:#27ae60;">${coutReel} €</td>
+                        <td>${statusLabels[m.statut]}</td>
+                        <td>
+                            <span style="display:inline-block; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:7.5pt; background:${val.bgColor}; border-left:3px solid ${val.borderColor};">
+                                ${val.nom}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Registre Général des Mécènes — Dojo Dornois</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                    <style>
+                        @page { size: A4 landscape; margin: 12mm; }
+                        body { font-family: 'Roboto', sans-serif; color: #1a1a1a; padding: 0; margin: 0; font-size: 8.5pt; }
+                        
+                        .print-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #C41E3A; padding-bottom: 10px; margin-bottom: 15px; }
+                        .brand-area { display: flex; align-items: center; gap: 12px; }
+                        .print-logo { height: 50px; width: 50px; object-fit: contain; background: #C41E3A; padding: 3px; border-radius: 6px; }
+                        .brand-titles h1 { font-family: 'Fredoka', sans-serif; color: #C41E3A; margin: 0; font-size: 18pt; line-height: 1; text-transform: uppercase; }
+                        .brand-titles p { margin: 3px 0 0 0; font-size: 8pt; color: #6B6B6B; font-weight: 500; }
+                        .print-club-info { text-align: right; font-size: 7.5pt; color: #3D3D3D; line-height: 1.3; }
+
+                        .doc-badge { background: #1A1A1A; color: white; display: inline-block; padding: 5px 12px; border-radius: 5px; font-family: 'Fredoka', sans-serif; font-size: 10pt; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 12px; }
+
+                        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 8.5pt; }
+                        th, td { border: 1px solid #E8E8E8; padding: 7px 9px; text-align: left; }
+                        th { background: #1A1A1A; color: white; font-family: 'Fredoka', sans-serif; font-weight: normal; }
+
+                        .print-footer { position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid #E8E8E8; padding-top: 6px; text-align: center; font-size: 7.5pt; color: #6B6B6B; }
+                    </style>
+                </head>
+                <body>
+
+                    <div class="print-header">
+                        <div class="brand-area">
+                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                            <div class="brand-titles">
+                                <h1>Dojo Dornois</h1>
+                                <p>Registre Général du Mécénat & Démarchage Entreprises</p>
+                            </div>
+                        </div>
+                        <div class="print-club-info">
+                            <strong>DOJO DORNOIS</strong><br>
+                            38 rue de Decize, 58390 DORNES &bull; dojodornois@gmail.com<br>
+                            RNA W583001220 &bull; SIRET 45192841000013
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="doc-badge">État Général de la Prospection Mécénat</div>
+                        <div style="font-size:9pt;">Total Mécénat Confirmé : <strong style="color:#27ae60; font-size:11pt;">${totalDons.toFixed(2)} €</strong></div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Raison Sociale / Entreprise</th>
+                                <th>Contact & Coordonnées</th>
+                                <th style="text-align:right;">Montant Don</th>
+                                <th style="text-align:right;">Coût Réel (-60%)</th>
+                                <th>Statut</th>
+                                <th>Pack Valorisation Ceinture</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+
+                    <div class="print-footer">
+                        Dojo Dornois &bull; Extrait Officiel du Registre Mécénat &bull; Édité le ${new Date().toLocaleDateString('fr-FR')}
+                    </div>
+                    <script>window.onload = function() { setTimeout(() => { window.print(); window.close(); }, 400); };<\/script>
+                </body>
+                </html>
+            `);
+            win.document.close();
+        }
+
+        window.onload = () => { loadAllData(); };
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

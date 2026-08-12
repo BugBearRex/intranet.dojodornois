@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Messages Kalisport - Dojo Dornois</title>
+
+    <!-- POLICES OFFICIELLES CHARTE DOJO DORNOIS -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- TAILWIND CSS & FONTAWESOME -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            color: var(--gris-fonce);
+            margin: 0;
+            padding: 0;
+            font-size: 13px;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6, .font-fredoka {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        code, pre {
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .logo-box-wrapper {
+            background-color: var(--rouge);
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.25);
+            flex-shrink: 0;
+        }
+
+        .club-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-full flex text-slate-800 antialiased">
+
+    <!-- SIDEBAR UNIFIÉE (Chargée automatiquement via ../js/sidebar.js) -->
+    <div class="sidebar no-print"></div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden main-content h-screen">
+        
+        <!-- TOPBAR OFFICIELLE -->
+        <header class="no-print bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="logo-box-wrapper">
+                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo" class="club-logo-img">
+                </div>
+                <div>
+                    <h1 class="font-fredoka text-lg font-bold text-[#1A1A1A]">Générateur de Messages Kalisport</h1>
+                    <p class="text-xs text-slate-500">Outil intranet pour convocations, annonces de stages &amp; bilans d'événements</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-full font-medium border border-amber-200">
+                    <i class="fa-solid fa-envelope-circle-check mr-1"></i> Astuce Mail : <strong>sansmail@dojo.fr</strong>
+                </span>
+            </div>
+        </header>
+
+        <!-- CONTENU EN 2 COLONNES -->
+        <main class="flex-1 flex overflow-hidden p-4 gap-4">
+            
+            <!-- COLONNE GAUCHE : SÉLECTEUR & FORMULAIRE -->
+            <div class="w-5/12 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+                
+                <!-- SELECTEUR DE TYPE DE MESSAGE -->
+                <div class="p-3 bg-slate-50 border-b border-slate-200 flex gap-2">
+                    <button id="btn-mode-debut" onclick="setMessageType('debut')" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-[#C41E3A] text-white border-[#C41E3A]">
+                        <i class="fa-solid fa-bullhorn"></i> 1. Début / Convocation
+                    </button>
+                    <button id="btn-mode-fin" onclick="setMessageType('fin')" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border-slate-200 hover:bg-slate-100">
+                        <i class="fa-solid fa-flag-checkered"></i> 2. Fin / Résumé &amp; Photos
+                    </button>
+                </div>
+
+                <!-- FORMULAIRE DYNAMIQUE -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    
+                    <!-- SELECTEUR DE COULEUR PERSONNALISÉE -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-palette text-slate-600"></i>
+                            <span class="text-[11px] font-bold text-slate-700">Couleur du thème :</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="color" id="f-color" value="#C41E3A" onchange="updateGenerator()" class="w-8 h-8 rounded border border-slate-300 cursor-pointer bg-transparent">
+                            <span id="lbl-color-code" class="font-mono text-[11px] text-slate-500 font-bold">#C41E3A</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Émoji</label>
+                            <input type="text" id="f-emoji" value="🥋" oninput="updateGenerator()" class="w-full text-center p-2 border border-slate-300 rounded-lg text-base focus:border-[#C41E3A] outline-none">
+                        </div>
+                        <div class="col-span-3">
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Titre de l'Événement</label>
+                            <input type="text" id="f-titre" value="STAGE MULTI-ACTIVITÉS DU DOJO" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold focus:border-[#C41E3A] outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Sous-titre / En-tête</label>
+                            <input type="text" id="f-soustitre" value="Dojo Dornois • Événement Club" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs focus:border-[#C41E3A] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Badge Date / Tag</label>
+                            <input type="text" id="f-date" value="📅 Mercredi 12 Août 2026" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs focus:border-[#C41E3A] outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Texte de Présentation / Intro</label>
+                        <textarea id="f-intro" rows="3" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs focus:border-[#C41E3A] outline-none">Bonjour à tous ! Un stage multi-activités est organisé pour vos enfants le mercredi 12 août. C'est l'occasion idéale pour eux de partager un moment convivial sur les tapis autour du judo et de jeux ludiques. Le stage est gratuit pour les licenciés du Dojo.</textarea>
+                    </div>
+
+                    <div class="border border-slate-200 rounded-lg p-3 bg-slate-50/50 space-y-2">
+                        <label class="block text-[11px] font-bold text-[#C41E3A] uppercase font-fredoka" id="lbl-bloc-titre">⏰ Programme ou Points clés (1 par ligne)</label>
+                        <input type="text" id="f-bloctitre" value="⏰ Programme de la journée :" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold focus:border-[#C41E3A] outline-none mb-1">
+                        
+                        <textarea id="f-liste" rows="4" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs focus:border-[#C41E3A] outline-none">09h45 • 10h00 : Accueil des participants au dojo
+10h00 • 12h00 : Session Judo & activités ludiques sur le tatami
+12h00 • 14h00 : Pause repas (Repas/pique-nique apporté par les enfants • Le Dojo fournit les boissons)
+14h00 • 16h00 : Temps calme, grands jeux & animations l'après-midi</textarea>
+                    </div>
+
+                    <div class="border border-amber-200 rounded-lg p-3 bg-amber-50/50 space-y-2">
+                        <label class="block text-[11px] font-bold text-amber-800 uppercase font-fredoka">⚠️ Message d'alerte / Consigne</label>
+                        <textarea id="f-alerte" rows="4" oninput="updateGenerator()" class="w-full p-2 border border-amber-300 rounded-lg text-xs focus:border-amber-500 outline-none">Organisation & Logistique :
+Merci de bien vouloir valider la présence ou l'absence de votre enfant directement via cette convocation pour nous permettre d'ajuster l'encadrement et les boissons.
+
+Remarque : Si vous ne souhaitez pas renseigner d'adresse email, indiquez simplement sansmail@dojo.fr dans le champ requis.</textarea>
+                    </div>
+
+                    <!-- NOUVEAU BLOC : CONDITIONS DE MAINTIEN -->
+                    <div id="bloc-conditions-ui" class="border border-sky-200 rounded-lg p-3 bg-sky-50/50 space-y-2 mt-4">
+                        <label class="block text-[11px] font-bold text-sky-800 uppercase font-fredoka">ℹ️ Conditions de maintien</label>
+                        <textarea id="f-conditions" rows="3" oninput="updateGenerator()" class="w-full p-2 border border-sky-300 rounded-lg text-xs focus:border-sky-500 outline-none">Pour que le stage puisse se dérouler dans les meilleures conditions, il faut un minimum de 6 participants (idéalement 8). 
+L'événement est sous réserve de conditions météorologiques favorables et propices (annulation possible si forte canicule ou gros orages).</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Pied de Page</label>
+                        <input type="text" id="f-footer" value="Dojo Dornois • Amitié • Entraide • Esprit de Famille" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs focus:border-[#C41E3A] outline-none">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- COLONNE DROITE : APERÇU EN DIRECT & CODE BRUT -->
+            <div class="w-7/12 flex flex-col gap-4 overflow-hidden">
+                
+                <div class="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+                    <div class="p-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                        <span class="font-fredoka text-xs font-bold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-eye text-[#C41E3A]"></i> Aperçu en Direct (Rendu Kalisport)
+                        </span>
+                        <span class="text-[10px] text-slate-400">Largeur optimale responsive</span>
+                    </div>
+                    <div class="flex-1 p-4 overflow-y-auto bg-slate-100 flex justify-center items-start">
+                        <div id="render-preview" class="w-full max-w-[680px]"></div>
+                    </div>
+                </div>
+
+                <div class="h-2/5 bg-slate-900 rounded-xl shadow-sm border border-slate-800 flex flex-col overflow-hidden">
+                    <div class="p-2.5 bg-slate-950 border-b border-slate-800 flex justify-between items-center px-4">
+                        <span class="font-mono text-xs font-bold text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-code text-amber-400"></i> Code HTML Brut (prêt à coller)
+                        </span>
+                        <button onclick="copyCode()" id="btn-copy" class="px-3 py-1 bg-[#C41E3A] hover:bg-[#A3182E] text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition-all shadow-sm">
+                            <i class="fa-solid fa-copy"></i> Copier le Code
+                        </button>
+                    </div>
+                    <div class="flex-1 p-3 overflow-y-auto">
+                        <textarea id="raw-code" readonly class="w-full h-full bg-transparent text-slate-200 font-mono text-[11px] border-none outline-none resize-none leading-relaxed"></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE INTRA -->
+    <script src="../js/sidebar.js"></script>
+
+    <script>
+        let currentMode = 'debut';
+
+        function setMessageType(mode) {
+            currentMode = mode;
+            const btnDebut = document.getElementById('btn-mode-debut');
+            const btnFin = document.getElementById('btn-mode-fin');
+            const blocConditionsUI = document.getElementById('bloc-conditions-ui');
+
+            if (mode === 'debut') {
+                btnDebut.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-[#C41E3A] text-white border-[#C41E3A]";
+                btnFin.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border-slate-200 hover:bg-slate-100";
+                
+                document.getElementById('f-color').value = '#C41E3A';
+                document.getElementById('f-emoji').value = '🥋';
+                document.getElementById('f-titre').value = 'STAGE MULTI-ACTIVITÉS DU DOJO';
+                document.getElementById('f-soustitre').value = 'Dojo Dornois • Événement Club';
+                document.getElementById('f-date').value = '📅 Mercredi 12 Août 2026';
+                document.getElementById('f-intro').value = "Bonjour à tous ! Un stage multi-activités est organisé pour vos enfants le mercredi 12 août. C'est l'occasion idéale pour eux de partager un moment convivial sur les tapis autour du judo et de jeux ludiques. Le stage est gratuit pour les licenciés du Dojo.";
+                document.getElementById('f-bloctitre').value = '⏰ Programme de la journée :';
+                document.getElementById('f-liste').value = "09h45 • 10h00 : Accueil des participants au dojo\n10h00 • 12h00 : Session Judo & activités ludiques sur le tatami\n12h00 • 14h00 : Pause repas (Repas/pique-nique apporté par les enfants • Le Dojo fournit les boissons)\n14h00 • 16h00 : Temps calme, grands jeux & animations l'après-midi";
+                document.getElementById('f-alerte').value = "Organisation & Logistique :\nMerci de bien vouloir valider la présence ou l'absence de votre enfant directement via cette convocation pour nous permettre d'ajuster l'encadrement et les boissons.\n\nRemarque : Si vous ne souhaitez pas renseigner d'adresse email, indiquez simplement sansmail@dojo.fr dans le champ requis.";
+                
+                blocConditionsUI.style.display = 'block';
+                document.getElementById('f-conditions').value = "Pour que le stage puisse se dérouler dans les meilleures conditions, il faut un minimum de 6 participants (idéalement 8). \nL'événement est sous réserve de conditions météorologiques favorables et propices (annulation possible si forte canicule ou gros orages).";
+            } else {
+                btnFin.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-[#1E40AF] text-white border-[#1E40AF]";
+                btnDebut.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border-slate-200 hover:bg-slate-100";
+
+                document.getElementById('f-color').value = '#1E40AF';
+                document.getElementById('f-emoji').value = '👏';
+                document.getElementById('f-titre').value = 'RETOUR SUR LE STAGE DU DOJO !';
+                document.getElementById('f-soustitre').value = 'Dojo Dornois • Bilan & Souvenirs';
+                document.getElementById('f-date').value = '📸 Album disponible';
+                document.getElementById('f-intro').value = "Un grand bravo à tous les enfants ayant participé à notre stage ! La journée s'est déroulée dans une excellente ambiance, rythmée par du judo, des jeux, du partage et de très belles valeurs du code moral.";
+                document.getElementById('f-bloctitre').value = '🌟 Résumé & Remerciements :';
+                document.getElementById('f-liste').value = "Une superbe énergie : Les enfants ont donné le meilleur d'eux-mêmes sur le tatami du matin au soir !\nEsprit d'équipe : Mention spéciale pour l'entraide entre les grands et les plus petits lors des grands jeux.\nMerci aux encadrants : Un grand merci aux professeurs et bénévoles mobilisés pour le bon déroulement du stage.";
+                document.getElementById('f-alerte').value = "Photos de la journée :\nRetrouvez quelques clichés du stage ci-dessous ainsi que dans la galerie photos du site !";
+                
+                blocConditionsUI.style.display = 'none';
+                document.getElementById('f-conditions').value = "";
+            }
+
+            updateGenerator();
+        }
+
+        function hexToRgba(hex, alpha) {
+            let c = hex.replace('#', '');
+            if (c.length === 3) c = c.split('').map(x => x + x).join('');
+            const num = parseInt(c, 16);
+            return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
+        }
+
+        function updateGenerator() {
+            const primaryColor = document.getElementById('f-color').value || '#C41E3A';
+            document.getElementById('lbl-color-code').textContent = primaryColor.toUpperCase();
+
+            const emoji = document.getElementById('f-emoji').value || '🥋';
+            const titre = document.getElementById('f-titre').value || '';
+            const soustitre = document.getElementById('f-soustitre').value || '';
+            const dateStr = document.getElementById('f-date').value || '';
+            const intro = document.getElementById('f-intro').value || '';
+            const bloctitre = document.getElementById('f-bloctitre').value || '';
+            const listeRaw = document.getElementById('f-liste').value || '';
+            const alerteRaw = document.getElementById('f-alerte').value || '';
+            const conditionsRaw = document.getElementById('f-conditions').value || '';
+            const footer = document.getElementById('f-footer').value || '';
+
+            const lines = listeRaw.split('\n').filter(l => l.trim() !== '');
+            let listHtml = '';
+            lines.forEach(line => {
+                if (line.includes(':')) {
+                    const parts = line.split(':');
+                    const head = parts.shift();
+                    const rest = parts.join(':');
+                    listHtml += `\n      <li style="margin-bottom: 6px;"><strong>${head.trim()} :</strong>${rest}</li>`;
+                } else {
+                    listHtml += `\n      <li style="margin-bottom: 6px;">${line.trim()}</li>`;
+                }
+            });
+
+            const badgeBg = hexToRgba(primaryColor, 0.12);
+            const badgeTxt = primaryColor;
+            const badgeBorder = hexToRgba(primaryColor, 0.3);
+            
+            const alertBg = (currentMode === 'debut') ? '#FEF3C7' : hexToRgba(primaryColor, 0.08);
+            const alertBorder = (currentMode === 'debut') ? '#FDE68A' : hexToRgba(primaryColor, 0.25);
+            const alertTxt = (currentMode === 'debut') ? '#B45309' : primaryColor;
+            const alertIcon = (currentMode === 'debut') ? '⚠️' : '📷';
+
+            const alertParagraphs = alerteRaw.split('\n\n');
+            let alertHtml = '';
+            
+            alertParagraphs.forEach((para, idx) => {
+                const subLines = para.split('\n').filter(l => l.trim() !== '');
+                if (subLines.length > 0) {
+                    if (idx > 0) alertHtml += `<div style="margin-top: 10px;"></div>`;
+                    alertHtml += `<strong>${subLines[0]}</strong>`;
+                    for (let i = 1; i < subLines.length; i++) {
+                        alertHtml += `<br />\n      <span style="display: inline-block; margin-top: 4px;"><em>${subLines[i]}</em></span>`;
+                    }
+                }
+            });
+
+            let conditionsHtml = '';
+            if (conditionsRaw.trim() !== '') {
+                const condLines = conditionsRaw.split('\n').filter(l => l.trim() !== '');
+                let condContent = '';
+                condLines.forEach((line, i) => {
+                    if (i > 0) condContent += `<br />`;
+                    condContent += `<em>${line}</em>`;
+                });
+
+                conditionsHtml = `
+  <!-- BLOC CONDITIONS DE MAINTIEN -->
+  <div style="background-color: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 8px; padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
+    <span style="font-size: 20px; line-height: 1;">ℹ️</span>
+    <div style="font-size: 12.5px; color: #0369A1; line-height: 1.6;">
+      <strong>Conditions de maintien :</strong><br />
+      <span style="display: inline-block; margin-top: 4px;">${condContent}</span>
+    </div>
+  </div>`;
+            }
+
+            const fullHtml = `<div style="font-family: 'Roboto', 'Segoe UI', Arial, sans-serif; background-color: #F4F6F9; border: 1px solid #E2E8F0; border-radius: 12px; padding: 22px; max-width: 680px; margin: 10px 0; color: #3D3D3D;">
+  <!-- EN-TÊTE DU MESSAGE -->
+  <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid ${primaryColor}; padding-bottom: 12px; margin-bottom: 18px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="background-color: ${primaryColor}; color: #FFFFFF; font-family: 'Fredoka', Arial, sans-serif; font-weight: bold; font-size: 20px; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">${emoji}</div>
+      <div>
+        <h3 style="font-family: 'Fredoka', Arial, sans-serif; font-size: 18px; font-weight: bold; margin: 0; color: ${primaryColor};">${titre}</h3>
+        <span style="font-size: 11px; color: #6B6B6B; font-weight: bold; text-transform: uppercase;">${soustitre}</span>
+      </div>
+    </div>
+    <div style="background-color: ${badgeBg}; color: ${badgeTxt}; padding: 6px 12px; border-radius: 8px; font-family: 'Fredoka', Arial, sans-serif; font-weight: bold; font-size: 12px; border: 1px solid ${badgeBorder};">${dateStr}</div>
+  </div>
+
+  <!-- MESSAGE INTRO -->
+  <p style="font-size: 13px; line-height: 1.6; color: #1A1A1A; margin-bottom: 18px;">${intro}</p>
+
+  <!-- PROGRAMME OU POINTS CLES -->
+  <div style="background-color: #FFFFFF; border-left: 4px solid ${primaryColor}; border-radius: 8px; padding: 16px; margin-bottom: 18px; border-top: 1px solid #E8E8E8; border-right: 1px solid #E8E8E8; border-bottom: 1px solid #E8E8E8;">
+    <h4 style="font-family: 'Fredoka', Arial, sans-serif; font-size: 14px; color: ${primaryColor}; margin: 0 0 12px 0; text-transform: uppercase;">${bloctitre}</h4>
+    <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.8; color: #3D3D3D;">${listHtml}
+    </ul>
+  </div>
+
+  <!-- BLOC INFORMATION / CONSIGNES -->
+  <div style="background-color: ${alertBg}; border: 1px solid ${alertBorder}; border-radius: 8px; padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
+    <span style="font-size: 20px; line-height: 1;">${alertIcon}</span>
+    <div style="font-size: 12.5px; color: ${alertTxt}; line-height: 1.6;">
+      ${alertHtml}
+    </div>
+  </div>
+${conditionsHtml}
+  <!-- PIED DE PAGE -->
+  <div style="text-align: center; font-size: 11px; color: #6B6B6B; border-top: 1px solid #E8E8E8; padding-top: 12px; margin-top: 12px;">${footer}</div>
+</div>`;
+
+            document.getElementById('render-preview').innerHTML = fullHtml;
+            document.getElementById('raw-code').value = fullHtml;
+        }
+
+        function copyCode() {
+            const rawCode = document.getElementById('raw-code');
+            rawCode.select();
+            document.execCommand('copy');
+            
+            const btn = document.getElementById('btn-copy');
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Copié !';
+            btn.classList.remove('bg-[#C41E3A]', 'hover:bg-[#A3182E]');
+            btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copier le Code';
+                btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                btn.classList.add('bg-[#C41E3A]', 'hover:bg-[#A3182E]');
+            }, 2000);
+        }
+
+        window.onload = function() {
+            updateGenerator();
+        };
+    </script>
+</body>
+</html>

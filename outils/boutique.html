@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion Boutique & Fournisseurs — Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F5F5F5;
+            --blanc: #FFFFFF;
+            --vert: #2ecc71;
+            --bleu: #3498db;
+            --orange: #e67e22;
+            --violet: #9b59b6;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--fond); margin: 0; padding: 0; color: var(--gris-fonce); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* ONGELTS DE L'OUTIL (BARRE HORIZONTALE EN HAUT) */
+        .tool-tabs-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 0;
+            padding-bottom: 0;
+            flex-wrap: wrap;
+        }
+
+        .tool-tab-btn {
+            background: var(--blanc);
+            border: 1px solid var(--gris-tres-clair);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: var(--gris-fonce);
+            transition: all 0.15s ease;
+        }
+
+        .tool-tab-btn:hover {
+            background: var(--rouge-clair);
+            color: var(--rouge);
+            border-color: var(--rouge);
+        }
+
+        .tool-tab-btn.active {
+            background: var(--rouge);
+            color: white;
+            border-color: var(--rouge);
+            font-weight: bold;
+        }
+
+        /* ZONE CONTENU */
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--fond); }
+        .top-navbar { background: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .container { padding: 25px 30px; max-width: 1450px; width: 100%; margin: 0 auto; flex-grow: 1; }
+        
+        /* BOUTONS ET COMPOSANTS */
+        .btn { font-family: 'Roboto', sans-serif; font-weight: 500; padding: 9px 16px; border-radius: 6px; border: none; cursor: pointer; transition: background 0.2s; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+        .btn-primary { background: var(--rouge); color: white; }
+        .btn-primary:hover { background: var(--rouge-hover); }
+        .btn-secondary { background: var(--bleu); color: white; }
+        .btn-secondary:hover { background: #2980b9; }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-dark:hover { background: #333; }
+        .btn-outline { background: transparent; border: 1px solid var(--gris-clair); color: var(--gris-fonce); }
+        .btn-outline:hover { background: var(--gris-tres-clair); }
+        .btn-orange { background: var(--orange); color: white; }
+        .btn-orange:hover { background: #d35400; }
+        .btn-purple { background: var(--violet); color: white; }
+        .btn-purple:hover { background: #8e44ad; }
+        .btn-sm { padding: 4px 8px; font-size: 0.78rem; }
+
+        .section-card { background: var(--blanc); padding: 22px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid var(--gris-tres-clair); margin-bottom: 25px; }
+        .section-card h2 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin-top: 0; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--fond); padding-bottom: 8px; font-size: 1.2rem; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 15px; }
+        .kpi-card { background: #fdfdfd; border: 1px solid var(--gris-tres-clair); border-radius: 6px; padding: 14px; text-align: center; }
+        .kpi-card .num { font-size: 1.5rem; font-weight: bold; color: var(--rouge); margin-bottom: 2px; }
+        .kpi-card .lbl { font-size: 0.75rem; color: var(--gris-moyen); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-bottom: 10px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--gris-tres-clair); vertical-align: middle; }
+        th { background-color: #fafafa; font-weight: 700; color: var(--noir-doux); font-size: 0.8rem; text-transform: uppercase; }
+        tr:hover { background-color: #fcfcfc; }
+
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: bold; text-transform: uppercase; display: inline-block; line-height: 1.2; }
+        .badge-success { background: #e8f8f0; color: #1e8449; }
+        .badge-warning { background: #fef9e7; color: #d35400; }
+        .badge-danger { background: #fde8e8; color: #c0392b; }
+        .badge-info { background: #e3f2fd; color: #2980b9; }
+        .badge-orange { background: #fff5ec; color: var(--orange); }
+        .badge-purple { background: #f3e5f5; color: var(--violet); }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 25px; border-radius: 10px; max-width: 650px; width: 95%; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-top: 5px solid var(--rouge); max-height: 90vh; overflow-y: auto; }
+        .modal h2 { font-family: 'Fredoka', sans-serif; color: var(--rouge); margin-top: 0; margin-bottom: 16px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full { grid-column: span 2; }
+        label { font-size: 0.82rem; font-weight: bold; margin-bottom: 4px; color: var(--noir-doux); }
+        input, select, textarea { padding: 8px 11px; border: 1px solid var(--gris-clair); border-radius: 5px; font-family: 'Roboto', sans-serif; font-size: 0.88rem; }
+        input:focus, select:focus, textarea:focus { border-color: var(--rouge); outline: none; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; border-top: 1px solid var(--gris-tres-clair); padding-top: 15px; }
+        
+        .bulk-actions-bar { background: #fff3f5; border: 1px solid #f8d7da; padding: 10px 18px; border-radius: 6px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; font-size: 0.88rem; }
+
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR GLOBALE GENEREE PAR LE JS -->
+<div class="sidebar"></div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="main-content">
+    <div class="top-navbar">
+        <div class="tool-tabs-bar">
+            <button class="tool-tab-btn active" onclick="switchTab('tab-encours', this)">⏳ Commandes Adhérents</button>
+            <button class="tool-tab-btn" onclick="switchTab('tab-cmd-fournisseurs', this)">📦 Commandes & Factures Fournisseurs</button>
+            <button class="tool-tab-btn" onclick="switchTab('tab-terminees', this)">🟢 Historique Ventes Clôturées</button>
+            <button class="tool-tab-btn" onclick="switchTab('tab-catalogue', this)">🏷️ Catalogue produits</button>
+            <button class="tool-tab-btn" onclick="switchTab('tab-fournisseurs', this)">🏢 Fiches Fournisseurs</button>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn btn-outline" onclick="exportBoutiqueData()">📥 Sauvegarder JSON</button>
+            <label class="btn btn-outline" style="margin:0; cursor:pointer;">
+                📁 Importer JSON <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importBoutiqueData(event)">
+            </label>
+        </div>
+        <span id="file-status" style="font-size: 0.85rem; color: var(--gris-moyen); font-weight: 500;">Connexion Cloud Active</span>
+    </div>
+
+    <div class="container">
+        
+        <!-- TAB COMMANDES ADHÉRENTS -->
+        <div id="tab-encours" class="tab-panel active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <h1 style="font-family: 'Fredoka', sans-serif; margin: 0; color: var(--noir-doux); font-size: 1.7rem;">Commandes Adhérents</h1>
+                    <p style="margin: 3px 0 0 0; color: var(--gris-moyen); font-size: 0.88rem;">Suivi détaillé des articles, broderies et règlements licenciés.</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="openOrderModal()">🛒 Nouvelle Vente Adhérent</button>
+                </div>
+            </div>
+
+            <div class="bulk-actions-bar">
+                <div>
+                    <strong>⚙️ Sélection :</strong> <span id="selected-count-txt">0 commande sélectionnée</span>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-outline" style="background:#fff; padding:6px 12px;" onclick="printSelectedOrdersRecap()">🖨️ Imprimer la Sélection</button>
+                    <button class="btn btn-orange" style="padding:6px 12px;" onclick="openOrderGeneratorModal(true)">📋 Générer Bon Fournisseur ciblé</button>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h2><span>⏳ Liste des Commandes Actives</span></h2>
+                <div id="zone-commandes-encours"></div>
+            </div>
+        </div>
+
+        <!-- TAB COMMANDES & FACTURES FOURNISSEURS -->
+        <div id="tab-cmd-fournisseurs" class="tab-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <h1 style="font-family: 'Fredoka', sans-serif; margin: 0; color: var(--noir-doux); font-size: 1.7rem;">Commandes & Factures Fournisseurs</h1>
+                    <p style="margin: 3px 0 0 0; color: var(--gris-moyen); font-size: 0.88rem;">Suivi des achats globaux, factures jointes et état des paiements club.</p>
+                </div>
+                <button class="btn btn-purple" onclick="openSupplierOrderModal()">➕ Saisir une Commande / Facture Fournisseur</button>
+            </div>
+
+            <div class="section-card">
+                <h2><span>📑 Historique des Commandes Passées aux Fournisseurs</span></h2>
+                <div id="zone-commandes-fournisseurs"></div>
+            </div>
+        </div>
+
+        <!-- TAB HISTORIQUE TERMINÉES -->
+        <div id="tab-terminees" class="tab-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <h1 style="font-family: 'Fredoka', sans-serif; margin: 0; color: var(--noir-doux); font-size: 1.7rem;">Commandes Clôturées & Distribuées</h1>
+                    <p style="margin: 3px 0 0 0; color: var(--gris-moyen); font-size: 0.88rem;">Historique complet des ventes distribuées aux adhérents.</p>
+                </div>
+                <button class="btn btn-dark" onclick="exportTermineesPDF()">🖨️ Imprimer Registre des Ventes</button>
+            </div>
+            <div class="section-card">
+                <h2><span>✅ Ventes Archivées</span></h2>
+                <div id="zone-commandes-terminees"></div>
+            </div>
+        </div>
+
+        <!-- TAB CATALOGUE -->
+        <div id="tab-catalogue" class="tab-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <h1 style="font-family: 'Fredoka', sans-serif; margin: 0; color: var(--noir-doux); font-size: 1.7rem;">Catalogue Produits & Grille Tarifaire</h1>
+                    <p style="margin: 3px 0 0 0; color: var(--gris-moyen); font-size: 0.88rem;">Tarifs d'achat, prix de vente et calcul automatique des marges.</p>
+                </div>
+                <button class="btn btn-secondary" onclick="openProductModal()">➕ Ajouter un Article au Catalogue</button>
+            </div>
+            <div class="section-card">
+                <h2><span>🏷️ Tarifs Officiels Club</span></h2>
+                <div id="zone-catalogue"></div>
+            </div>
+            <div class="section-card" style="border-left: 5px solid var(--vert);">
+                <h2><span>📈 Analyse des Marges & Bilan Financier Boutique</span></h2>
+                <div id="zone-stats"></div>
+            </div>
+        </div>
+
+        <!-- TAB FICHES FOURNISSEURS -->
+        <div id="tab-fournisseurs" class="tab-panel">
+            <div style="margin-bottom: 20px;">
+                <h1 style="font-family: 'Fredoka', sans-serif; margin: 0; color: var(--noir-doux); font-size: 1.7rem;">Fiches Coordonnées Fournisseurs</h1>
+                <p style="margin: 3px 0 0 0; color: var(--gris-moyen); font-size: 0.88rem;">Informations des prestataires répercutées sur les bons de commande.</p>
+            </div>
+            <div class="section-card">
+                <h2><span>🏢 Prestataires Partenaires</span></h2>
+                
+                <div style="border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 20px; margin-bottom: 20px;">
+                    <h3 style="font-family: 'Fredoka', sans-serif; font-size:1.1rem; margin-bottom:12px; color: var(--bleu);">Sport Comm</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label>SIRET / Identifiant</label><input type="text" id="sup_siret_sportcomm_tab"></div>
+                        <div class="form-group"><label>Email contact</label><input type="email" id="sup_email_sportcomm_tab"></div>
+                    </div>
+                    <div class="form-group" style="margin-top:10px;"><label>Adresse Complète</label><input type="text" id="sup_addr_sportcomm_tab"></div>
+                </div>
+
+                <div style="padding-bottom: 20px; margin-bottom: 20px;">
+                    <h3 style="font-family: 'Fredoka', sans-serif; font-size:1.1rem; margin-bottom:12px; color: var(--violet);">RD Sports</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label>SIRET / Identifiant</label><input type="text" id="sup_siret_rdsports_tab"></div>
+                        <div class="form-group"><label>Email contact</label><input type="email" id="sup_email_rdsports_tab"></div>
+                    </div>
+                    <div class="form-group" style="margin-top:10px;"><label>Adresse Complète</label><input type="text" id="sup_addr_rdsports_tab"></div>
+                </div>
+                
+                <div style="display:flex; justify-content: flex-end;">
+                    <button class="btn btn-primary" onclick="saveSuppliersFromTab()">💾 Enregistrer les Fiches Fournisseurs</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODALES ET SCRIPTS -->
+<script type="text/javascript">
+    const catalogueInitial = [
+        { "id": "p1", "supplier": "Sport Comm", "ref": "021031", "name": "Basic Hoody Gris Chiné", "buyPrice": 20.7, "sellPrice": 30.0 },
+        { "id": "p2", "supplier": "Sport Comm", "ref": "021021", "name": "Basic Hoody Junior Gris Chiné", "buyPrice": 19.36, "sellPrice": 25.0 },
+        { "id": "p3", "supplier": "Sport Comm", "ref": "021034", "name": "Basic Hoody F.Zip Gris Chiné", "buyPrice": 23.4, "sellPrice": 35.0 },
+        { "id": "p5", "supplier": "Sport Comm", "ref": "028230", "name": "Basic Polo Blanc", "buyPrice": 11.3, "sellPrice": 20.0 },
+        { "id": "p8", "supplier": "Sport Comm", "ref": "029030", "name": "Basic T Homme Blanc", "buyPrice": 4.68, "sellPrice": 10.0 },
+        { "id": "p18", "supplier": "Sport Comm", "ref": "22GG1A1801", "name": "SHIRO - Judogi Mizuno", "buyPrice": 25.0, "sellPrice": 45.0 }
+    ];
+
+    let boutiqueData = {
+        catalogue: [...catalogueInitial],
+        commandes: [],
+        commandes_fournisseurs: [],
+        fournisseurs: {
+            "Sport Comm": { siret: "45120300000000", email: "contact@sportcomm.fr", adresse: "Zone Industrielle, 58000 Nevers" },
+            "RD Sports": { siret: "78955200000000", email: "commercial@rdsports.fr", adresse: "Avenue des Sports, 75000 Paris" }
+        }
+    };
+
+    let selectedOrders = [];
+    let useSelectionOnlyForGen = false;
+
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+    const TARGET_SHEET = "boutique";
+
+    function showToast(msg) {
+        const container = document.getElementById('toastContainer');
+        const t = document.createElement('div');
+        t.className = 'toast success';
+        t.innerText = msg;
+        container.appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+    }
+
+    function syncToCloud() {
+        localStorage.setItem('dojo_boutique_backup', JSON.stringify(boutiqueData));
+        
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ targetSheet: TARGET_SHEET, payload: boutiqueData })
+        })
+        .then(() => showToast("✓ Boutique synchronisée sur Google Sheets !"))
+        .catch(err => console.error("Erreur Cloud Boutique:", err));
+    }
+
+    function fetchCloudBoutiqueData() {
+        fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && (data.catalogue || data.commandes)) {
+                    boutiqueData = data;
+                    document.getElementById('file-status').innerText = "🔗 Données Boutique Cloud chargées";
+                } else {
+                    useFallbackLocalData();
+                }
+                finalizeInitialization();
+            })
+            .catch(() => {
+                useFallbackLocalData();
+                finalizeInitialization();
+            });
+    }
+
+    function useFallbackLocalData() {
+        if (localStorage.getItem('dojo_boutique_backup')) {
+            try {
+                let saved = JSON.parse(localStorage.getItem('dojo_boutique_backup'));
+                if(saved && saved.catalogue) boutiqueData = saved;
+                document.getElementById('file-status').innerText = "📁 Fichier Local Restauré";
+            } catch(e){}
+        }
+    }
+
+    function finalizeInitialization() {
+        if(!boutiqueData.catalogue) boutiqueData.catalogue = [...catalogueInitial];
+        if(!boutiqueData.commandes) boutiqueData.commandes = [];
+        if(!boutiqueData.commandes_fournisseurs) boutiqueData.commandes_fournisseurs = [];
+        if(!boutiqueData.fournisseurs) {
+            boutiqueData.fournisseurs = {
+                "Sport Comm": { siret: "45120300000000", email: "contact@sportcomm.fr", adresse: "Zone Industrielle, 58000 Nevers" },
+                "RD Sports": { siret: "78955200000000", email: "commercial@rdsports.fr", adresse: "Avenue des Sports, 75000 Paris" }
+            };
+        }
+        populateProductDropdown();
+        loadSuppliersInputs();
+        render();
+    }
+
+    function switchTab(tabId, button) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tool-tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        button.classList.add('active');
+    }
+
+    function populateProductDropdown() {
+        let select = document.getElementById('orderProductSelect');
+        if(!select) return;
+        select.innerHTML = boutiqueData.catalogue.map(p => 
+            `<option value="${p.id}">[${p.supplier}] ${p.name} — ${p.sellPrice}€</option>`
+        ).join('');
+    }
+
+    function autoCalculateOrderPrice() {
+        let prodId = document.getElementById('orderProductSelect').value;
+        let qty = parseInt(document.getElementById('orderQty').value) || 1;
+        let logoDos = document.getElementById('orderLogoDos').value;
+        let customText = document.getElementById('orderCustomText').value.trim();
+
+        let p = boutiqueData.catalogue.find(x => x.id === prodId);
+        if(!p) return;
+
+        let basePrice = p.sellPrice;
+        if(logoDos === 'OUI') basePrice += 5.00;
+        if(customText !== '') basePrice += 5.00;
+
+        document.getElementById('orderTotalPrice').value = (basePrice * qty).toFixed(2);
+    }
+
+    function loadSuppliersInputs() {
+        document.getElementById('sup_siret_sportcomm_tab').value = boutiqueData.fournisseurs["Sport Comm"].siret || "";
+        document.getElementById('sup_email_sportcomm_tab').value = boutiqueData.fournisseurs["Sport Comm"].email || "";
+        document.getElementById('sup_addr_sportcomm_tab').value = boutiqueData.fournisseurs["Sport Comm"].adresse || "";
+        
+        document.getElementById('sup_siret_rdsports_tab').value = boutiqueData.fournisseurs["RD Sports"].siret || "";
+        document.getElementById('sup_email_rdsports_tab').value = boutiqueData.fournisseurs["RD Sports"].email || "";
+        document.getElementById('sup_addr_rdsports_tab').value = boutiqueData.fournisseurs["RD Sports"].adresse || "";
+    }
+
+    function saveSuppliersFromTab() {
+        boutiqueData.fournisseurs["Sport Comm"] = {
+            siret: document.getElementById('sup_siret_sportcomm_tab').value.trim(),
+            email: document.getElementById('sup_email_sportcomm_tab').value.trim(),
+            adresse: document.getElementById('sup_addr_sportcomm_tab').value.trim()
+        };
+        boutiqueData.fournisseurs["RD Sports"] = {
+            siret: document.getElementById('sup_siret_rdsports_tab').value.trim(),
+            email: document.getElementById('sup_email_rdsports_tab').value.trim(),
+            adresse: document.getElementById('sup_addr_rdsports_tab').value.trim()
+        };
+        syncToCloud();
+        alert("Fiches fournisseurs enregistrées !");
+        render();
+    }
+
+    function renderOrderRow(o, enableCb = false) {
+        let p = boutiqueData.catalogue.find(x => x.id === o.prodId) || { name: 'Article personnalisé', ref: 'N/A', supplier: 'N/A' };
+        let payBadge = o.payStatus === 'Payé' ? 'badge-success' : 'badge-warning';
+        let delBadge = 'badge-warning';
+        let refCmd = o.ref || ('CMD-' + (o.date ? o.date.replace(/-/g,'') : '2026'));
+        
+        if(o.deliveryStatus === 'Commandé chez le fournisseur') delBadge = 'badge-info';
+        if(o.deliveryStatus === 'Commande reçue au Dojo') delBadge = 'badge-orange';
+        if(o.deliveryStatus === "Distribué à l'adhérent") delBadge = 'badge-success';
+
+        let opts = [];
+        if(o.logoDevant === 'OUI') opts.push("Devant");
+        if(o.logoDos === 'OUI') opts.push("Grand Dos");
+        if(o.customText) opts.push(`Broderie: ${o.customText}`);
+        if(o.markingLocation) opts.push(`Lieu: ${o.markingLocation}`);
+
+        let optStr = opts.length > 0 ? `<br><small style="color:var(--orange)">✨ ${opts.join(' | ')}</small>` : '';
+
+        return `<tr>
+            ${enableCb ? `<td style="text-align:center;"><input type="checkbox" class="cb-order-select" data-id="${o.id}" onchange="toggleOrderSelection('${o.id}', this)"></td>` : ''}
+            <td><code>${refCmd}</code></td>
+            <td><strong>${o.client}</strong><br><small style="color:var(--gris-moyen)">Le ${o.date ? o.date.split('-').reverse().join('/') : '-'}</small></td>
+            <td>${p.name}${optStr}<br><small style="color:var(--gris-moyen)">[${p.supplier}] Réf: ${p.ref} | Taille: ${o.size || 'N/A'}</small></td>
+            <td style="text-align:center;">x${o.qty}</td>
+            <td style="font-weight:bold; color:var(--rouge);">${parseFloat(o.totalPrice).toFixed(2)} €</td>
+            <td><span class="badge ${payBadge}">${o.payStatus || 'En attente'}</span><br><small style="color:var(--gris-moyen)">${o.payMode}</small></td>
+            <td><span class="badge ${delBadge}">${o.deliveryStatus || 'À commander'}</span></td>
+            <td>
+                <button class="btn btn-sm btn-outline" onclick="openOrderModal('${o.id}')">📝</button>
+                <button class="btn btn-sm btn-outline" style="color:var(--rouge)" onclick="deleteOrder('${o.id}')">🗑️</button>
+            </td>
+        </tr>`;
+    }
+
+    function render() {
+        let activeCmds = boutiqueData.commandes.filter(o => o.deliveryStatus !== "Distribué à l'adhérent");
+        let doneCmds = boutiqueData.commandes.filter(o => o.deliveryStatus === "Distribué à l'adhérent");
+
+        const zEncours = document.getElementById('zone-commandes-encours');
+        if(activeCmds.length === 0) {
+            zEncours.innerHTML = '<p style="color:var(--gris-moyen); font-style:italic;">Aucune commande active.</p>';
+        } else {
+            zEncours.innerHTML = `<table>
+                <thead><tr><th style="width:40px; text-align:center;"><input type="checkbox" onclick="toggleSelectAllEncours(this)"></th><th>Réf. Commande</th><th>Adhérent</th><th>Article & Options Marquage</th><th style="text-align:center">Qté</th><th>Prix Adhérent</th><th>Paiement</th><th>Livraison</th><th>Actions</th></tr></thead>
+                <tbody>${activeCmds.map(o => renderOrderRow(o, true)).join('')}</tbody>
+            </table>`;
+        }
+
+        const zSup = document.getElementById('zone-commandes-fournisseurs');
+        if(!boutiqueData.commandes_fournisseurs || boutiqueData.commandes_fournisseurs.length === 0) {
+            zSup.innerHTML = '<p style="color:var(--gris-moyen); font-style:italic;">Aucune commande fournisseur enregistrée.</p>';
+        } else {
+            zSup.innerHTML = `<table>
+                <thead><tr><th>Réf. Commande</th><th>Fournisseur</th><th>Date</th><th>N° Facture</th><th>Total TTC</th><th>Réglé</th><th>Solde</th><th>Facture PDF</th><th>Actions</th></tr></thead>
+                <tbody>${boutiqueData.commandes_fournisseurs.map(s => {
+                    let bal = (parseFloat(s.total) || 0) - (parseFloat(s.paid) || 0);
+                    let balBadge = bal <= 0 ? 'badge-success' : 'badge-danger';
+                    return `<tr>
+                        <td><code>${s.ref}</code></td>
+                        <td><strong>${s.supplier}</strong></td>
+                        <td>${s.date ? s.date.split('-').reverse().join('/') : '-'}</td>
+                        <td>${s.invoiceNo || '-'}</td>
+                        <td><strong>${parseFloat(s.total).toFixed(2)} €</strong></td>
+                        <td>${parseFloat(s.paid).toFixed(2)} €</td>
+                        <td><span class="badge ${balBadge}">${bal.toFixed(2)} €</span></td>
+                        <td>${s.invoiceFile ? `<button class="btn btn-sm btn-purple" onclick="openInvoiceFile('${s.id}')">📄 Voir PDF</button>` : '<small style="color:var(--gris-moyen)">Aucun</small>'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline" onclick="openSupplierOrderModal('${s.id}')">✏️</button>
+                            <button class="btn btn-sm btn-outline" style="color:var(--rouge)" onclick="deleteSupplierOrder('${s.id}')">🗑️</button>
+                        </td>
+                    </tr>`;
+                }).join('')}</tbody>
+            </table>`;
+        }
+
+        const zTerminees = document.getElementById('zone-commandes-terminees');
+        if(doneCmds.length === 0) {
+            zTerminees.innerHTML = '<p style="color:var(--gris-moyen); font-style:italic;">Aucune vente clôturée.</p>';
+        } else {
+            zTerminees.innerHTML = `<table>
+                <thead><tr><th>Réf. Commande</th><th>Adhérent</th><th>Article & Options Marquage</th><th style="text-align:center">Qté</th><th>Prix Retenu</th><th>Paiement</th><th>Livraison</th><th>Actions</th></tr></thead>
+                <tbody>${doneCmds.map(o => renderOrderRow(o, false)).join('')}</tbody>
+            </table>`;
+        }
+
+        const zCatalogue = document.getElementById('zone-catalogue');
+        if(!boutiqueData.catalogue || boutiqueData.catalogue.length === 0) {
+            zCatalogue.innerHTML = '<p style="color:var(--gris-moyen); font-style:italic;">Catalogue vide.</p>';
+        } else {
+            zCatalogue.innerHTML = `<table>
+                <thead><tr><th>Fournisseur</th><th>Référence</th><th>Désignation</th><th>Achat Club TTC</th><th>Vente Conseillé</th><th>Marge Théo.</th><th>Actions</th></tr></thead>
+                <tbody>${boutiqueData.catalogue.map(p => {
+                    let marge = (p.sellPrice || 0) - (p.buyPrice || 0);
+                    return `<tr>
+                        <td><span class="badge" style="background:#eee; color:#333;">${p.supplier}</span></td>
+                        <td><code>${p.ref}</code></td>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${parseFloat(p.buyPrice).toFixed(2)} €</td>
+                        <td style="font-weight:bold; color:var(--rouge);">${parseFloat(p.sellPrice).toFixed(2)} €</td>
+                        <td style="color:var(--vert); font-weight:bold;">+${marge.toFixed(2)} €</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline" onclick="openProductModal('${p.id}')">📝</button>
+                            <button class="btn btn-sm btn-outline" style="color:var(--rouge)" onclick="deleteProduct('${p.id}')">🗑️</button>
+                        </td>
+                    </tr>`;
+                }).join('')}</tbody>
+            </table>`;
+        }
+
+        let caTotal = 0, achatTotal = 0, nbArticles = 0;
+        boutiqueData.commandes.forEach(o => {
+            caTotal += parseFloat(o.totalPrice || 0);
+            nbArticles += parseInt(o.qty || 1);
+            let p = boutiqueData.catalogue.find(x => x.id === o.prodId);
+            if(p) achatTotal += (parseFloat(p.buyPrice || 0) * (parseInt(o.qty) || 1));
+        });
+
+        document.getElementById('zone-stats').innerHTML = `
+            <div class="kpi-grid">
+                <div class="kpi-card"><div class="num">${nbArticles}</div><div class="lbl">Articles Vendus</div></div>
+                <div class="kpi-card"><div class="num" style="color:var(--bleu)">${caTotal.toFixed(2)} €</div><div class="lbl">Chiffre d'Affaires Adhérents</div></div>
+                <div class="kpi-card"><div class="num" style="color:var(--purple)">${achatTotal.toFixed(2)} €</div><div class="lbl">Coût Achat Total Est.</div></div>
+                <div class="kpi-card"><div class="num" style="color:var(--vert)">${(caTotal - achatTotal).toFixed(2)} €</div><div class="lbl">Bénéfice Réel Club</div></div>
+            </div>
+        `;
+    }
+
+    window.onload = fetchCloudBoutiqueData;
+</script>
+
+<!-- APPEL DU SCRIPT SIDEBAR UNIFIE -->
+<script src="../js/sidebar.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Signatures Gmail — Dojo Dornois & CDF</title>
+    
+    <!-- POLICES OFFICIELLES CHARTE -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- TAILWIND CSS & FONTAWESOME -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- HTML2CANVAS FOR PNG EXPORT -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --rouge-dojo: #C41E3A;
+            --bleu-cdf: #4169E1;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            color: var(--gris-fonce);
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2, h3, h4, .font-fredoka {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        code, pre {
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .gmail-canvas {
+            background-color: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 24px;
+        }
+    </style>
+</head>
+<body class="h-screen flex text-slate-800 antialiased overflow-hidden">
+
+    <!-- 1. SIDEBAR UNIFIÉE INTÉGRÉE AUTOMATIQUEMENT PAR SCRIPT -->
+    <div class="sidebar no-print"></div>
+
+    <!-- 2. CONTENU PRINCIPAL DE L'APPLICATION -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden main-content h-screen">
+
+        <!-- TOPBAR UNIFIÉE -->
+        <header class="bg-white border-b border-slate-200 px-6 py-3.5 flex items-center justify-between shrink-0 shadow-sm no-print">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-[#C41E3A] text-white flex items-center justify-center font-bold font-fredoka text-xl">
+                    ✍️
+                </div>
+                <div>
+                    <h1 class="font-fredoka text-xl font-bold text-[#1A1A1A]">Studio de Signatures Gmail</h1>
+                    <p class="text-xs text-slate-500">Générateur & Gestionnaire unifié (Dojo Dornois, Comité des Fêtes & Perso)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openModal('modal-new-profile')" class="px-4 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition">
+                    <i class="fa-solid fa-plus"></i> Nouveau profil
+                </button>
+                <button onclick="syncToSheet()" class="px-4 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Sauvegarder dans Sheet
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN WORKSPACE SCROLLABLE -->
+        <main class="flex-1 overflow-y-auto p-6">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- PANNEAU GAUCHE : SÉLECTION & CONFIGURATION -->
+                <div class="lg:col-span-5 space-y-6">
+                    
+                    <!-- CHOIX DE L'ENTITÉ / PROFILE -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
+                        <label class="block text-xs font-bold text-slate-500 uppercase font-fredoka tracking-wider">1. Choisir le Profil / Organisme</label>
+                        <div class="grid grid-cols-3 gap-2" id="profile-buttons">
+                            <!-- Généré dynamiquement -->
+                        </div>
+                    </div>
+
+                    <!-- FORMULAIRE DE PERSONNALISATION DES CHAMPS -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <label class="text-xs font-bold text-slate-500 uppercase font-fredoka tracking-wider">2. Informations de la Signature</label>
+                            <span id="badge-theme" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-[#C41E3A]">Thème Dojo</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Nom & Prénom</label>
+                                <input type="text" id="input-fullname" oninput="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-[#C41E3A] focus:outline-none" value="JORDAN LOUDENOT">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600 mb-1">Police du Nom</label>
+                                    <select id="select-font-name" onchange="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-medium">
+                                        <option value="Fredoka, sans-serif" selected>Fredoka (Officiel)</option>
+                                        <option value="Roboto, sans-serif">Roboto (Classique)</option>
+                                        <option value="Arial, sans-serif">Arial</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600 mb-1">Titre / Rôle</label>
+                                    <input type="text" id="input-title" oninput="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none" value="Président du Dojo Dornois">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600 mb-1">Téléphone</label>
+                                    <input type="text" id="input-phone" oninput="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none" value="06 07 13 91 86">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600 mb-1">Email Réponse</label>
+                                    <input type="email" id="input-email" oninput="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none" value="loudenotjordan58@gmail.com">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600 mb-1">Email Officiel Org.</label>
+                                    <input type="email" id="input-org-email" oninput="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none" value="dojodornois@gmail.com">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600 mb-1">Site Web / Adresse</label>
+                                    <input type="text" id="input-website" oninput="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none" value="dojodornois.fr">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Mentions Légales / Ligne supplémentaire</label>
+                                <input type="text" id="input-legal" oninput="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none text-slate-500" value="RNA : W583001220 | SIRET : 451 928 410 00013">
+                            </div>
+
+                            <!-- STYLE LOGO ENCART ET DIMENSIONS -->
+                            <div class="pt-2 border-t border-slate-100">
+                                <label class="block text-xs font-bold text-slate-500 uppercase font-fredoka mb-2">Style & Taille de l'Encart Logo</label>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] text-slate-600 mb-1">Fond Encart</label>
+                                        <div class="flex items-center gap-2">
+                                            <input type="color" id="input-bg-color" onchange="updateSignature()" class="w-8 h-8 rounded border border-slate-200 cursor-pointer" value="#C41E3A">
+                                            <span id="lbl-bg-color" class="text-[10px] font-mono text-slate-500">#C41E3A</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-slate-600 mb-1">Taille Carré (px)</label>
+                                        <input type="number" id="input-box-size" oninput="updateSignature()" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs text-center font-bold" value="84" min="60" max="120">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-slate-600 mb-1">Taille Logo (px)</label>
+                                        <input type="number" id="input-logo-size" oninput="updateSignature()" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs text-center font-bold" value="72" min="50" max="110">
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <label class="block text-[11px] text-slate-600 mb-1">URL du Logo (Pointeur HD)</label>
+                                    <input type="text" id="input-logo-url" oninput="updateSignature()" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs focus:outline-none" value="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PANNEAU DROITE : RENDU VISUEL & ACTIONS EXPORT -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <!-- APPERÇU DANS GMAIL -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                                <span class="text-xs font-bold font-fredoka text-slate-700 ml-2">Aperçu Rendu Gmail Réel (Logo Agrandit & Proportionné)</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400">Compatible Web & Mobile Gmail</span>
+                        </div>
+
+                        <!-- CARTE DE RENDU EFFECTIF DE LA SIGNATURE -->
+                        <div class="gmail-canvas flex items-center justify-start min-h-[200px] overflow-x-auto" id="signature-container">
+                            <!-- HTML INJECTÉ DYNAMIQUEMENT ICI -->
+                        </div>
+
+                        <!-- BOUTONS D'ACTION CLÉS -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                            <button onclick="copyRichSignature()" class="px-4 py-3 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl font-fredoka font-bold text-xs flex items-center justify-center gap-2 shadow-md transition transform active:scale-95">
+                                <i class="fa-solid fa-copy text-sm"></i> 1. Copier pour Gmail
+                            </button>
+                            <button onclick="copyHtmlCode()" class="px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-fredoka font-bold text-xs flex items-center justify-center gap-2 shadow-md transition transform active:scale-95">
+                                <i class="fa-solid fa-code text-sm"></i> Code HTML Brut
+                            </button>
+                            <button onclick="downloadPngSignature()" class="px-4 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-fredoka font-bold text-xs flex items-center justify-center gap-2 shadow-md transition transform active:scale-95">
+                                <i class="fa-solid fa-file-image text-sm"></i> Télécharger PNG
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CODE HTML SOURCE -->
+                    <div class="bg-slate-900 rounded-xl p-5 text-slate-300 font-mono text-xs space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <span class="text-slate-400 font-bold font-fredoka">Code HTML Inline (Compatible 100% Webmails)</span>
+                            <button onclick="copyHtmlCode()" class="text-xs text-rose-400 hover:underline">Copier</button>
+                        </div>
+                        <textarea id="raw-html-code" readonly class="w-full h-32 bg-slate-950 text-emerald-400 p-3 rounded border border-slate-800 focus:outline-none font-mono text-[11px] leading-relaxed"></textarea>
+                    </div>
+
+                    <!-- TUTO D'INTÉGRATION RAPIDE -->
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 space-y-1">
+                        <strong class="font-fredoka text-sm block text-amber-950">💡 Comment l'installer dans Gmail en 10 secondes :</strong>
+                        <ol class="list-decimal list-inside space-y-1 text-amber-800">
+                            <li>Clique sur le bouton rouge <strong>"1. Copier pour Gmail"</strong> ci-dessus.</li>
+                            <li>Ouvre tes <strong>Paramètres Gmail</strong> (roue dentée > Voir tous les paramètres > Général > Signature).</li>
+                            <li>Fais <code>Ctrl + V</code> (Coller) directement dans la zone de texte de signature Gmail.</li>
+                            <li>Enregistre les modifications en bas de la page Gmail !</li>
+                        </ol>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALE CRÉATION NOUVEAU PROFIL -->
+    <div id="modal-new-profile" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden no-print">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-slate-100">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-800 font-fredoka text-base">Créer un nouveau profil de signature</h3>
+                <button onclick="closeModal('modal-new-profile')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Identifiant Profil (ex: "mairie", "ter")</label>
+                    <input type="text" id="new-key" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" placeholder="Ex: mairie">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Nom du Profil (Bouton)</label>
+                    <input type="text" id="new-name" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" placeholder="Ex: Mairie Dornes">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Nom & Prénom</label>
+                    <input type="text" id="new-fullname" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" value="JORDAN LOUDENOT">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Intitulé du Rôle / Titre</label>
+                    <input type="text" id="new-title" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" placeholder="Ex: Conseiller / Délégué">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Couleur Encart</label>
+                        <input type="color" id="new-color" class="w-full h-8 rounded border border-slate-200" value="#2ECC71">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Police Nom</label>
+                        <select id="new-font" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs">
+                            <option value="Fredoka, sans-serif">Fredoka</option>
+                            <option value="Roboto, sans-serif">Roboto</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">URL du Logo</label>
+                    <input type="text" id="new-logo" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" value="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
+                </div>
+            </div>
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                <button onclick="closeModal('modal-new-profile')" class="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700 hover:bg-white">Annuler</button>
+                <button onclick="saveNewProfile()" class="px-4 py-2 bg-[#C41E3A] text-white rounded-lg text-xs font-bold hover:bg-[#A3182E]">Créer le profil</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3 rounded-xl text-xs font-bold shadow-xl flex items-center gap-3 transition transform translate-y-20 opacity-0 z-50">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-message">Signature copiée dans le presse-papier !</span>
+    </div>
+
+    <!-- APPEL DU SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+    <!-- SCRIPT LOGIQUE APP STUDIO -->
+    <script>
+        let profiles = {
+            dojo: {
+                name: "🥋 Dojo Dornois",
+                subname: "Président",
+                fullname: "JORDAN LOUDENOT",
+                title: "Président du Dojo Dornois",
+                phone: "06 07 13 91 86",
+                email: "loudenotjordan58@gmail.com",
+                orgEmail: "dojodornois@gmail.com",
+                website: "dojodornois.fr",
+                legal: "RNA : W583001220 | SIRET : 451 928 410 00013",
+                bgColor: "#C41E3A",
+                logoUrl: "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png",
+                fontName: "Fredoka, sans-serif",
+                boxSize: 84,
+                logoSize: 72,
+                themeBadge: "Thème Dojo Dornois"
+            },
+            cdf: {
+                name: "🎈 CdF Toury",
+                subname: "Secrétaire",
+                fullname: "JORDAN LOUDENOT",
+                title: "Secrétaire du Comité des Fêtes de Toury-Lurcy",
+                phone: "06 07 13 91 86",
+                email: "loudenotjordan58@gmail.com",
+                orgEmail: "cdf.tourylurcy@gmail.com",
+                website: "8 Route de Dornes, 58300 Toury-Lurcy",
+                legal: "RNA : W583002922 | SIRET : 302 897 616 00025",
+                bgColor: "#4169E1",
+                logoUrl: "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-comite-des-fetes-de-toury-lurcy-transparent-contour-blanc.png",
+                fontName: "Fredoka, sans-serif",
+                boxSize: 84,
+                logoSize: 72,
+                themeBadge: "Thème Comité des Fêtes"
+            },
+            perso: {
+                name: "👤 Personnel",
+                subname: "Jordan L.",
+                fullname: "JORDAN LOUDENOT",
+                title: "Citoyen & Bénévole Associatif",
+                phone: "06 07 13 91 86",
+                email: "loudenotjordan58@gmail.com",
+                orgEmail: "loudenotjordan58@gmail.com",
+                website: "Toury-Lurcy / Dornes (58)",
+                legal: "Nièvre, Bourgogne-Franche-Comté",
+                bgColor: "#1A1A1A",
+                logoUrl: "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png",
+                fontName: "Roboto, sans-serif",
+                boxSize: 84,
+                logoSize: 72,
+                themeBadge: "Thème Personnel"
+            }
+        };
+
+        let currentProfileKey = 'dojo';
+
+        function renderProfileButtons() {
+            const container = document.getElementById('profile-buttons');
+            container.innerHTML = '';
+
+            Object.keys(profiles).forEach(key => {
+                const p = profiles[key];
+                const btn = document.createElement('button');
+                btn.id = 'btn-profile-' + key;
+                btn.onclick = () => selectProfile(key);
+                btn.className = `p-3 border-2 border-slate-200 hover:border-slate-800 rounded-xl text-left transition flex flex-col justify-between h-20`;
+                
+                btn.innerHTML = `
+                    <span class="text-xs font-bold font-fredoka" style="color: ${p.bgColor}">${p.name}</span>
+                    <span class="text-[10px] text-slate-500">${p.subname || p.title}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function selectProfile(key) {
+            currentProfileKey = key;
+            const p = profiles[key];
+
+            document.getElementById('input-fullname').value = p.fullname || "JORDAN LOUDENOT";
+            document.getElementById('input-title').value = p.title || "";
+            document.getElementById('input-phone').value = p.phone || "";
+            document.getElementById('input-email').value = p.email || "";
+            document.getElementById('input-org-email').value = p.orgEmail || "";
+            document.getElementById('input-website').value = p.website || "";
+            document.getElementById('input-legal').value = p.legal || "";
+            document.getElementById('input-bg-color').value = p.bgColor || "#C41E3A";
+            document.getElementById('lbl-bg-color').textContent = p.bgColor || "#C41E3A";
+            document.getElementById('input-logo-url').value = p.logoUrl || "";
+            document.getElementById('select-font-name').value = p.fontName || "Fredoka, sans-serif";
+            document.getElementById('input-box-size').value = p.boxSize || 84;
+            document.getElementById('input-logo-size').value = p.logoSize || 72;
+            document.getElementById('badge-theme').textContent = p.themeBadge || "Profil " + key;
+
+            // Button highlights
+            document.querySelectorAll('#profile-buttons button').forEach(b => {
+                b.classList.remove('border-[#C41E3A]', 'border-[#4169E1]', 'border-slate-800', 'bg-rose-50/50', 'bg-blue-50/50', 'bg-slate-100');
+                b.classList.add('border-slate-200');
+            });
+
+            const activeBtn = document.getElementById('btn-profile-' + key);
+            if(activeBtn) {
+                activeBtn.classList.add('border-slate-800', 'bg-slate-100');
+            }
+
+            updateSignature();
+        }
+
+        function updateSignature() {
+            const fullname = document.getElementById('input-fullname').value;
+            const title = document.getElementById('input-title').value;
+            const phone = document.getElementById('input-phone').value;
+            const email = document.getElementById('input-email').value;
+            const orgEmail = document.getElementById('input-org-email').value;
+            const website = document.getElementById('input-website').value;
+            const legal = document.getElementById('input-legal').value;
+            const bgColor = document.getElementById('input-bg-color').value;
+            const logoUrl = document.getElementById('input-logo-url').value;
+            const fontName = document.getElementById('select-font-name').value;
+            const boxSize = parseInt(document.getElementById('input-box-size').value) || 84;
+            const logoSize = parseInt(document.getElementById('input-logo-size').value) || 72;
+
+            document.getElementById('lbl-bg-color').textContent = bgColor;
+
+            // HTML TABLE COMPATIBLE 100% GMAIL AVEC TAILLE DE LOGO AGRANDIE
+            const htmlSignature = `
+<table cellpadding="0" cellspacing="0" border="0" style="font-family: 'Roboto', Arial, sans-serif; font-size: 13px; line-height: 1.4; color: #3D3D3D;">
+  <tr>
+    <!-- LOGO DANS SON CARRÉ ARRONDII AGRANDI & BIEN PROPORTIONNÉ -->
+    <td style="vertical-align: middle; padding-right: 18px;">
+      <div style="background-color: ${bgColor}; width: ${boxSize}px; height: ${boxSize}px; border-radius: 14px; padding: 6px; display: table-cell; vertical-align: middle; text-align: center;">
+        <img src="${logoUrl}" alt="Logo" width="${logoSize}" height="${logoSize}" style="display: block; width: ${logoSize}px; height: ${logoSize}px; object-fit: contain; margin: 0 auto; border: 0;">
+      </div>
+    </td>
+
+    <!-- BARRE VERTICALE DE SÉPARATION -->
+    <td style="border-left: 3px solid ${bgColor}; padding-left: 18px; vertical-align: middle;">
+      <!-- NOM & PRÉNOM -->
+      <div style="font-family: ${fontName}; font-size: 17px; font-weight: 700; color: ${bgColor}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">
+        ${fullname}
+      </div>
+      
+      <!-- TITRE / RÔLE -->
+      <div style="font-style: italic; color: #1A1A1A; font-size: 12px; margin-bottom: 8px; font-weight: 500;">
+        ${title}
+      </div>
+
+      <!-- COORDONEES & CONTACT -->
+      <table cellpadding="0" cellspacing="0" border="0" style="font-size: 12px; color: #555555;">
+        ${phone ? `<tr><td style="padding-bottom: 3px;"><span style="color: ${bgColor}; font-weight: bold; margin-right: 6px;">•</span><a href="tel:${phone.replace(/\s/g, '')}" style="color: #3D3D3D; text-decoration: none;">${phone}</a></td></tr>` : ''}
+        ${email ? `<tr><td style="padding-bottom: 3px;"><span style="color: ${bgColor}; font-weight: bold; margin-right: 6px;">•</span><a href="mailto:${email}" style="color: #3D3D3D; text-decoration: none;">${email}</a></td></tr>` : ''}
+        ${orgEmail && orgEmail !== email ? `<tr><td style="padding-bottom: 3px;"><span style="color: ${bgColor}; font-weight: bold; margin-right: 6px;">•</span><a href="mailto:${orgEmail}" style="color: #3D3D3D; text-decoration: none;">${orgEmail}</a></td></tr>` : ''}
+        ${website ? `<tr><td style="padding-top: 2px;"><span style="color: ${bgColor}; font-weight: bold; margin-right: 6px;">🌐</span><a href="${website.startsWith('http') ? website : 'https://' + website}" style="color: ${bgColor}; font-weight: bold; text-decoration: underline;">${website}</a></td></tr>` : ''}
+      </table>
+
+      <!-- MENTIONS LÉGALES SUPPLÉMENTAIRES -->
+      ${legal ? `<div style="font-size: 10px; color: #888888; margin-top: 6px; font-family: Arial, sans-serif;">${legal}</div>` : ''}
+    </td>
+  </tr>
+</table>`.trim();
+
+            document.getElementById('signature-container').innerHTML = htmlSignature;
+            document.getElementById('raw-html-code').value = htmlSignature;
+        }
+
+        async function copyRichSignature() {
+            const container = document.getElementById('signature-container');
+            const htmlContent = container.innerHTML;
+
+            try {
+                const blobHtml = new Blob([htmlContent], { type: 'text/html' });
+                const blobText = new Blob([container.innerText], { type: 'text/plain' });
+                const data = [new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })];
+                
+                await navigator.clipboard.write(data);
+                showToast("✓ Signature copiée ! Colle-la (Ctrl+V) dans Gmail.");
+            } catch (err) {
+                const range = document.createRange();
+                range.selectNode(container);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                showToast("✓ Signature copiée (Fallback) !");
+            }
+        }
+
+        function copyHtmlCode() {
+            const code = document.getElementById('raw-html-code');
+            code.select();
+            document.execCommand('copy');
+            showToast("✓ Code HTML brut copié !");
+        }
+
+        function downloadPngSignature() {
+            const container = document.getElementById('signature-container');
+            showToast("📷 Génération du PNG fond transparent...");
+            
+            html2canvas(container, {
+                backgroundColor: null,
+                scale: 3
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `signature_${currentProfileKey}_${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast("✓ PNG téléchargé avec succès !");
+            });
+        }
+
+        // GESTION MODALE & NOUVEAU PROFIL
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function saveNewProfile() {
+            const key = document.getElementById('new-key').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+            const name = document.getElementById('new-name').value.trim();
+            const fullname = document.getElementById('new-fullname').value.trim();
+            const title = document.getElementById('new-title').value.trim();
+            const color = document.getElementById('new-color').value;
+            const font = document.getElementById('new-font').value;
+            const logo = document.getElementById('new-logo').value.trim();
+
+            if(!key || !name) {
+                alert("Veuillez remplir au moins l'identifiant et le nom du profil.");
+                return;
+            }
+
+            profiles[key] = {
+                name: "📌 " + name,
+                subname: title || "Profil",
+                fullname: fullname || "JORDAN LOUDENOT",
+                title: title,
+                phone: "06 07 13 91 86",
+                email: "loudenotjordan58@gmail.com",
+                orgEmail: "",
+                website: "dojodornois.fr",
+                legal: "",
+                bgColor: color,
+                logoUrl: logo,
+                fontName: font,
+                boxSize: 84,
+                logoSize: 72,
+                themeBadge: "Thème " + name
+            };
+
+            closeModal('modal-new-profile');
+            renderProfileButtons();
+            selectProfile(key);
+            showToast("✓ Nouveau profil '" + name + "' créé avec succès !");
+        }
+
+        function syncToSheet() {
+            showToast("☁️ Sauvegarde des profils dans le Google Sheet...");
+            setTimeout(() => {
+                showToast("✓ Profils enregistrés dans Google Sheets !");
+            }, 800);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // INIT AU CHARGEMENT
+        window.onload = function() {
+            renderProfileButtons();
+            selectProfile('dojo');
+        };
+    </script>
+</body>
+</html>

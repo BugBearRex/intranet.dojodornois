@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Livret d'Accueil — Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --rouge-deep: #8B1429;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --or: #D4AF37;
+            --sidebar-width: 280px;
+            --topbar-height: 65px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            color: var(--noir-doux);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- FIX SIDEBAR DÉBORDEMENT --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        .sidebar * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+
+        /* CONTENU PRINCIPAL INTERACTION */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        /* TOPBAR ACTIONS */
+        .topbar {
+            background: var(--blanc);
+            height: var(--topbar-height);
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--rouge);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            flex-shrink: 0;
+            z-index: 50;
+        }
+
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo-box {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            background: var(--rouge);
+            padding: 4px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .logo-title h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.25rem;
+            color: var(--noir-doux);
+        }
+
+        .badge-dojo {
+            background: linear-gradient(135deg, var(--rouge) 0%, var(--rouge-deep) 100%);
+            color: white;
+            font-weight: 700;
+            font-family: 'Fredoka', sans-serif;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(196, 30, 58, 0.3);
+        }
+
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        button {
+            background: var(--rouge);
+            color: white;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        button:hover { background: var(--rouge-hover); transform: translateY(-1px); }
+        button.btn-sec { background: #E2E8F0; color: #334155; box-shadow: none; }
+        button.btn-sec:hover { background: #CBD5E1; color: #0F172A; transform: none; }
+        button.btn-danger { background: #EF4444; }
+        button.btn-danger:hover { background: #DC2626; }
+
+        /* LAYOUT SPÉCIFIQUE LIVRET */
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+
+        /* SIDEBAR PANELS COMPOSITION */
+        aside {
+            width: 340px;
+            background: white;
+            border-right: 1px solid #E2E8F0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        aside h4 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--rouge-deep);
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-item-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-left: 4px solid var(--rouge);
+            padding: 12px 14px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .page-item-card:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            background: white;
+        }
+
+        .page-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .page-item-actions {
+            display: flex;
+            gap: 4px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        /* WORKSPACE */
+        main#workspace {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        /* FEUILLE A4 PAYSAGE */
+        .a4-landscape {
+            width: 297mm;
+            min-height: 210mm;
+            height: 210mm;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            box-sizing: border-box;
+            padding: 16mm 20mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transform: scale(0.82);
+            transform-origin: top center;
+            margin-bottom: -35mm;
+            border: 1px solid #E2E8F0;
+        }
+
+        /* STYLES INTERNE PAGES STANDARDS */
+        .header-page {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--rouge);
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-header-box {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            background: var(--rouge);
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(196, 30, 58, 0.25);
+            flex-shrink: 0;
+        }
+
+        .header-page h2 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--rouge-deep);
+            font-size: 20pt;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        .header-page p {
+            color: var(--gris-moyen);
+            font-size: 10pt;
+            font-weight: 400;
+        }
+
+        .body-page {
+            flex: 1;
+            font-size: 10pt;
+            line-height: 1.6;
+            color: var(--noir-doux);
+        }
+
+        .footer-page {
+            border-top: 1px solid #E2E8F0;
+            padding-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 8.5pt;
+            color: var(--gris-moyen);
+            font-weight: 500;
+        }
+
+        /* STYLES COUVERTURE AVEC CARRE ARRONDI ROUGE */
+        .cover-style {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A080C 50%, #8B1429 100%);
+            color: white;
+            margin: -16mm -20mm;
+            padding: 22mm 25mm;
+            width: 297mm;
+            height: 210mm;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-style::after {
+            content: "";
+            position: absolute;
+            bottom: -50px;
+            right: -50px;
+            width: 300px;
+            height: 300px;
+            background: rgba(196, 30, 58, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cover-left {
+            width: 38%;
+            border-right: 3px solid var(--rouge);
+            padding-right: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 2;
+        }
+
+        .cover-logo-box {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            background: var(--rouge);
+            padding: 10px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4), 0 0 15px rgba(196, 30, 58, 0.5);
+            margin-bottom: 12px;
+        }
+
+        .cover-right {
+            width: 62%;
+            padding-left: 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .box {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-left: 4px solid var(--rouge);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .box h3 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--rouge);
+            margin-bottom: 8px;
+            font-size: 12pt;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 10px;
+            font-size: 9.5pt;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #E2E8F0;
+        }
+
+        th {
+            background: var(--rouge);
+            color: white;
+            padding: 8px 12px;
+            text-align: left;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+        }
+
+        td {
+            border-bottom: 1px solid #E2E8F0;
+            padding: 8px 12px;
+            background: white;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) td { background: #F8FAFC; }
+
+        /* MODALE ÉDITEUR HTML */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-card {
+            background: white;
+            width: 850px;
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow-y: auto;
+        }
+
+        .modal-card h3 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--rouge-deep);
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--gris-fonce);
+        }
+
+        .form-control {
+            padding: 8px 12px;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        textarea.form-control-code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            min-height: 180px;
+            background: #1E293B;
+            color: #F8FAFC;
+            padding: 12px;
+            line-height: 1.5;
+            border-radius: 6px;
+        }
+
+        /* FIX IMPRESSION TOUTES LES PAGES A4 PAYSAGE */
+        @media print {
+            @page { size: A4 landscape; margin: 0; }
+            html, body {
+                background: white !important;
+                height: auto !important;
+                overflow: visible !important;
+                display: block !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .no-print, .sidebar, .topbar, aside, .modal-overlay { display: none !important; }
+            .main-content, .main-layout {
+                display: block !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            main#workspace {
+                padding: 0 !important;
+                margin: 0 !important;
+                display: block !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            .a4-landscape {
+                transform: none !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                width: 297mm !important;
+                height: 210mm !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CONTENEUR SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
+    <div class="main-content">
+        <div class="topbar no-print">
+            <div class="logo-title">
+                <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="brand-logo-box" alt="Logo Dojo Dornois">
+                <h3>Générateur de Livret d'Accueil Pro</h3>
+            </div>
+            <div class="btn-group">
+                <button onclick="addPage()">➕ Page</button>
+                <button class="btn-sec" onclick="exportJSON()">💾 Enregistrer (JSON)</button>
+                <button class="btn-sec" onclick="document.getElementById('import-file').click()">📂 Ouvrir (JSON)</button>
+                <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importJSON(event)">
+                <button class="btn-sec" onclick="resetDefaults()">🔄 Réinitialiser</button>
+                <button onclick="window.print()">🖨️ Imprimer / Export PDF</button>
+            </div>
+        </div>
+
+        <div class="main-layout">
+            <aside class="no-print">
+                <h4>📖 Structure du Livret</h4>
+                <div id="sidebar-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+            </aside>
+
+            <main id="workspace">
+                <!-- Pages A4 dynamiques -->
+            </main>
+        </div>
+    </div>
+
+    <!-- MODALE ÉDITEUR HTML PAGE PAR PAGE -->
+    <div class="modal-overlay" id="editor-modal">
+        <div class="modal-card">
+            <h3 id="modal-title">Édition HTML de la page</h3>
+            
+            <div class="form-group">
+                <label>Titre de la Page</label>
+                <input type="text" id="edit-title" class="form-control">
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div class="form-group">
+                    <label>Sous-titre / En-tête</label>
+                    <input type="text" id="edit-subtitle" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Type de Mise en Page</label>
+                    <select id="edit-type" class="form-control" onchange="toggleCoverFields()">
+                        <option value="standard">Standard (En-tête & Pied de page)</option>
+                        <option value="cover">Couverture Pleine Page</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- CHAMP SPÉCIFIQUE COLONNE GAUCHE DE LA COUVERTURE -->
+            <div class="form-group" id="cover-left-group" style="display:none;">
+                <label style="color:var(--rouge-deep);">HTML de la Colonne de Gauche (Couverture uniquement : infos, RNA...)</label>
+                <textarea id="edit-left-code" class="form-control-code" style="min-height:100px;"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label id="label-content-code">Code HTML du Contenu</label>
+                <textarea id="edit-content-code" class="form-control-code"></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                <button class="btn-sec" onclick="closeModal()">Annuler</button>
+                <button onclick="saveModal()">Appliquer les modifications</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const logoUrl = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png";
+
+        const initialPages = [
+            {
+                title: "LIVRET D'ACCUEIL",
+                subtitle: "Saison Officielle 2026 - 2027",
+                type: "cover",
+                leftContent: `Club affilié France Judo<br>RNA : W583001220`,
+                content: `<p style="font-size:11pt; line-height:1.7;">Vous venez de vous inscrire ou vous souhaitez nous rejoindre ? Ce livret est conçu pour vous guider à travers notre club, ses valeurs, son organisation et son équipe de bénévoles et professeurs.</p>
+<div style="margin-top:25px; padding:15px; background:rgba(255,255,255,0.08); border-radius:8px; border-left:3px solid var(--rouge);">
+    <p style="font-size:10pt;">📍 <b>Dojo Henri Pierrehumbert</b> — Rue du Moulin, Dornes</p>
+    <p style="font-size:10pt;">📧 dojodornois@gmail.com | 📞 06.07.13.91.86</p>
+    <p style="font-size:10pt; color:#FFB3C1; margin-top:4px;">🌐 dojodornois.fr</p>
+</div>`
+            },
+            {
+                title: "MOT DU PRÉSIDENT & CODE MORAL",
+                subtitle: "Bienvenue au Dojo Dornois",
+                type: "standard",
+                content: `<div class="grid-2">
+    <div class="box">
+        <h3>🥋 Mot du Président</h3>
+        <p>Toute l'équipe du Dojo Dornois est ravie de vous accueillir pour cette nouvelle saison sportive. Notre dojo met un point d'honneur à offrir un cadre sécurisé, bienveillant et structuré où chaque pratiquant, du plus petit au plus grand, peut s'épanouir à son rythme.</p>
+        <p style="margin-top:12px; font-weight:bold; color:var(--rouge); font-family:'Fredoka', sans-serif;">Jordan — Président du Dojo Dornois</p>
+    </div>
+    <div class="box" style="border-left-color: var(--noir-doux); background: #FAF9F6;">
+        <h3>⛩️ Code Moral du Judo</h3>
+        <p style="line-height:1.8;">
+            • <b>La Politesse</b> : C'est le respect d'autrui<br>
+            • <b>Le Courage</b> : C'est faire ce qui est juste<br>
+            • <b>Sincérité & Honneur</b> : Être vrai et fidèle à sa parole<br>
+            • <b>Modestie & Contrôle de soi</b> : Savoir taire son orgueil<br>
+            • <b>Amitié</b> : Le plus pur des sentiments humains
+        </p>
+    </div>
+</div>`
+            },
+            {
+                title: "HORAIRES & DISCIPLINES",
+                subtitle: "Planning complet de la semaine",
+                type: "standard",
+                content: `<table>
+    <thead>
+        <tr><th>Discipline / Section</th><th>Âges / Public</th><th>Créneaux Horaires</th><th>Enseignant</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><b>Baby Judo</b></td><td>3 – 5 ans</td><td>Samedi : 10h00 – 11h00</td><td>Romain (BPJEPS)</td></tr>
+        <tr><td><b>Poussins / Benjamins</b></td><td>6 – 11 ans</td><td>Mardi : 17h30 – 19h00 | Samedi : 14h00 – 15h30</td><td>Romain (BPJEPS)</td></tr>
+        <tr><td><b>Ados / Adultes</b></td><td>12 ans et +</td><td>Mardi : 17h30 – 19h00 | Samedi : 16h30 – 18h30</td><td>Romain (BPJEPS)</td></tr>
+        <tr><td><b>Ju-Jitsu & Self-Défense</b></td><td>Dès 12 ans</td><td>Mardi : 19h00 – 20h00 | Samedi : 11h00 – 11h45</td><td>Romain (BPJEPS)</td></tr>
+        <tr><td><b>Taïso (Renforcement)</b></td><td>Dès 12 ans</td><td>Mardi : 20h00 – 21h00 | Samedi : 11h45 – 12h30</td><td>Romain (BPJEPS)</td></tr>
+        <tr><td><b>Taïso Seniors</b></td><td>50 ans et +</td><td>Mardi : 14h00 – 15h00</td><td>Romain (BPJEPS)</td></tr>
+    </tbody>
+</table>`
+            }
+        ];
+
+        let pagesData = [];
+        let editingPageIndex = null;
+
+        function init() {
+            const saved = localStorage.getItem('dojo_livret_data_v5');
+            if (saved) {
+                try {
+                    pagesData = JSON.parse(saved);
+                } catch(e) {
+                    pagesData = JSON.parse(JSON.stringify(initialPages));
+                }
+            } else {
+                pagesData = JSON.parse(JSON.stringify(initialPages));
+            }
+            render();
+        }
+
+        function saveLocal() {
+            localStorage.setItem('dojo_livret_data_v5', JSON.stringify(pagesData));
+        }
+
+        function render() {
+            const sidebar = document.getElementById('sidebar-list');
+            const workspace = document.getElementById('workspace');
+
+            sidebar.innerHTML = '';
+            workspace.innerHTML = '';
+
+            pagesData.forEach((p, idx) => {
+                const card = document.createElement('div');
+                card.className = 'page-item-card';
+                card.innerHTML = `
+                    <div class="page-item-header">
+                        <span><b>Page ${idx + 1}</b></span>
+                        <span style="font-size:11px; color:var(--gris-moyen);">${p.type}</span>
+                    </div>
+                    <div style="font-size:12px; font-weight:bold; color:var(--noir-doux);">${escapeHtml(p.title)}</div>
+                    <div class="page-item-actions">
+                        <button style="padding:3px 8px; font-size:11px;" onclick="openModal(${idx})">📝 Éditer HTML</button>
+                        <button class="btn-sec" style="padding:3px 8px; font-size:11px;" onclick="move(${idx}, -1)">⬆️</button>
+                        <button class="btn-sec" style="padding:3px 8px; font-size:11px;" onclick="move(${idx}, 1)">⬇️</button>
+                        <button class="btn-danger" style="padding:3px 8px; font-size:11px;" onclick="removePage(${idx})">🗑️</button>
+                    </div>
+                `;
+                sidebar.appendChild(card);
+
+                const pageWrapper = document.createElement('div');
+                pageWrapper.className = 'a4-landscape';
+
+                if (p.type === 'cover') {
+                    const leftHtml = p.leftContent || `Club affilié France Judo<br>RNA : W583001220`;
+                    pageWrapper.innerHTML = `
+                        <div class="cover-style">
+                            <div class="cover-left">
+                                <div>
+                                    <img src="${logoUrl}" class="cover-logo-box" alt="Logo Dojo Dornois">
+                                    <h1 style="font-family:'Fredoka',sans-serif; color:white; font-size:24pt; letter-spacing:1px; margin-top:8px;">DOJO DORNOIS</h1>
+                                    <p style="color:#FFB3C1; font-size:11pt; margin-top:2px; font-weight:500;">Judo • Ju-Jitsu • Taïso</p>
+                                </div>
+                                <div style="font-size:8.5pt; opacity:0.75; line-height:1.4;">
+                                    ${leftHtml}
+                                </div>
+                            </div>
+                            <div class="cover-right">
+                                <h1 style="font-family:'Fredoka',sans-serif; font-size:36pt; line-height:1.1; margin-bottom:8px; color:white;">${p.title}</h1>
+                                <h3 style="color:#FFB3C1; font-size:16pt; font-weight:400; margin-bottom:24px;">${p.subtitle}</h3>
+                                <div>${p.content}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    pageWrapper.innerHTML = `
+                        <div class="header-page">
+                            <div class="header-left">
+                                <img src="${logoUrl}" class="logo-header-box" alt="Logo">
+                                <div>
+                                    <h2>${p.title}</h2>
+                                    <p>${p.subtitle}</p>
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                <span class="badge-dojo">DOJO DORNOIS</span>
+                            </div>
+                        </div>
+                        <div class="body-page">
+                            ${p.content}
+                        </div>
+                        <div class="footer-page">
+                            <span>Dojo Dornois — Club de Judo, Ju-Jitsu & Disciplines Associées</span>
+                            <span>Page ${idx + 1} / ${pagesData.length}</span>
+                        </div>
+                    `;
+                }
+
+                workspace.appendChild(pageWrapper);
+            });
+
+            saveLocal();
+        }
+
+        function toggleCoverFields() {
+            const type = document.getElementById('edit-type').value;
+            const leftGroup = document.getElementById('cover-left-group');
+            const labelContent = document.getElementById('label-content-code');
+            if (type === 'cover') {
+                leftGroup.style.display = 'flex';
+                labelContent.innerText = "Code HTML de la Colonne de Droite (Contenu principal)";
+            } else {
+                leftGroup.style.display = 'none';
+                labelContent.innerText = "Code HTML du Contenu";
+            }
+        }
+
+        function openModal(idx) {
+            editingPageIndex = idx;
+            const p = pagesData[idx];
+            document.getElementById('modal-title').innerText = `Édition de la Page ${idx + 1}`;
+            document.getElementById('edit-title').value = p.title || '';
+            document.getElementById('edit-subtitle').value = p.subtitle || '';
+            document.getElementById('edit-type').value = p.type || 'standard';
+            document.getElementById('edit-left-code').value = p.leftContent || `Club affilié France Judo<br>RNA : W583001220`;
+            document.getElementById('edit-content-code').value = p.content || '';
+            
+            toggleCoverFields();
+            document.getElementById('editor-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('editor-modal').style.display = 'none';
+            editingPageIndex = null;
+        }
+
+        function saveModal() {
+            if (editingPageIndex === null) return;
+            pagesData[editingPageIndex].title = document.getElementById('edit-title').value;
+            pagesData[editingPageIndex].subtitle = document.getElementById('edit-subtitle').value;
+            pagesData[editingPageIndex].type = document.getElementById('edit-type').value;
+            pagesData[editingPageIndex].leftContent = document.getElementById('edit-left-code').value;
+            pagesData[editingPageIndex].content = document.getElementById('edit-content-code').value;
+            closeModal();
+            render();
+        }
+
+        function addPage() {
+            pagesData.push({
+                title: "NOUVELLE PAGE",
+                subtitle: "Section d'information",
+                type: "standard",
+                content: `<div class="box"><h3>Titre du bloc</h3><p>Saisissez ou collez votre HTML ici...</p></div>`
+            });
+            render();
+            openModal(pagesData.length - 1);
+        }
+
+        function removePage(idx) {
+            if (pagesData.length <= 1) return alert("Le livret doit contenir au moins une page.");
+            if (confirm("Supprimer cette page ?")) {
+                pagesData.splice(idx, 1);
+                render();
+            }
+        }
+
+        function move(idx, dir) {
+            const target = idx + dir;
+            if (target < 0 || target >= pagesData.length) return;
+            const temp = pagesData[idx];
+            pagesData[idx] = pagesData[target];
+            pagesData[target] = temp;
+            render();
+        }
+
+        function resetDefaults() {
+            if (confirm("Réinitialiser toutes les pages avec les modèles par défaut ?")) {
+                pagesData = JSON.parse(JSON.stringify(initialPages));
+                render();
+            }
+        }
+
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pagesData, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "livret_accueil_dojo_dornois.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        pagesData = imported;
+                        render();
+                        alert("Livret d'accueil chargé avec succès !");
+                    } else {
+                        alert("Le fichier sélectionné ne contient pas une structure valide.");
+                    }
+                } catch(err) {
+                    alert("Erreur lors de la lecture du fichier JSON.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function escapeHtml(str) {
+            return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        window.onload = init;
+    </script>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>

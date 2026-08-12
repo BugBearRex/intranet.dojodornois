@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Factures & Reçus — Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --rouge-deep: #8B1429;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --gris-fond-input: #F8FAFC;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --sidebar-width: 280px;
+            --topbar-height: 68px;
+            --vert-succes: #2ECC71;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            margin: 0; padding: 0;
+            color: var(--gris-fonce);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR UNIFIÉE - SANS DÉBORDEMENT */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        .sidebar * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* MAIN CONTENT STRUCTURE */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
+        }
+
+        .topbar {
+            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; z-index: 50;
+        }
+
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); }
+        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+
+        .app-body {
+            flex: 1; padding: 20px 24px; overflow-y: auto;
+        }
+
+        .workspace-grid {
+            display: grid; grid-template-columns: 480px 1fr; gap: 20px; width: 100%; height: 100%;
+        }
+
+        .panel {
+            background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.03); padding: 20px; display: flex; flex-direction: column; gap: 12px;
+        }
+
+        .panel h3 { font-family: 'Fredoka', sans-serif; color: var(--rouge); margin: 0 0 5px 0; font-size: 1.1rem; border-bottom: 2px solid var(--fond); padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--gris-fonce); }
+        .form-control { width: 100%; padding: 8px 12px; border: 1.5px solid var(--gris-tres-clair); background: var(--gris-fond-input); border-radius: 6px; font-size: 0.875rem; font-family: 'Roboto', sans-serif; }
+        .form-control:focus { outline: none; border-color: var(--rouge); background: white; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        .btn {
+            background: var(--rouge); color: white; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.875rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; text-decoration: none;
+        }
+        .btn:hover { background: var(--rouge-hover); }
+        .btn-secondary { background: var(--gris-tres-clair); color: var(--gris-fonce); }
+        .btn-secondary:hover { background: #d8d8d8; }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-dark:hover { background: #333; }
+        .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+
+        /* ARTICLES EDITOR */
+        .item-row { display: grid; grid-template-columns: 1fr 65px 85px 30px; gap: 6px; align-items: center; margin-bottom: 6px; }
+
+        /* PREVIEW A4 CONTAINER */
+        #preview-container {
+            background: #525659; padding: 24px; border-radius: 8px; display: flex; justify-content: center; overflow-y: auto; max-height: calc(100vh - 120px);
+        }
+
+        .a4-page {
+            background: white; width: 210mm; min-height: 297mm; padding: 16mm 15mm; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; font-size: 9.5pt; color: #1a1a1a; position: relative;
+        }
+
+        /* HEADER DOCUMENT PRINT AVEC LOGO EN CARRÉ ROUGE ARRONDI */
+        .doc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+        .header-left-brand { display: flex; gap: 14px; align-items: center; }
+        
+        /* LOGO DANS CARRÉ ROUGE ARRONDI SIGNATURE */
+        .logo-box-wrapper {
+            background-color: var(--rouge);
+            width: 82px;
+            height: 82px;
+            border-radius: 14px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.25);
+            flex-shrink: 0;
+        }
+
+        .club-logo { width: 100%; height: 100%; object-fit: contain; }
+        
+        .club-info { font-size: 8.5pt; line-height: 1.35; }
+        .club-name { font-family: 'Fredoka', sans-serif; font-size: 15pt; color: var(--rouge); font-weight: bold; margin-bottom: 3px; }
+        
+        .client-box {
+            width: 240px; border: 1px solid var(--gris-clair); border-radius: 6px; padding: 10px 12px; background: #fafafa; font-size: 9pt;
+        }
+        .client-box-title { font-weight: bold; color: var(--rouge); font-size: 8pt; text-transform: uppercase; margin-bottom: 4px; }
+
+        .doc-type-bar {
+            text-align: center; border-top: 2px solid var(--rouge); border-bottom: 2px solid var(--rouge); padding: 6px 0; margin: 10px 0 16px 0;
+        }
+        .doc-type-title { font-family: 'Fredoka', sans-serif; font-size: 15pt; color: var(--rouge); text-transform: uppercase; letter-spacing: 1px; }
+
+        .doc-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--fond); padding: 9px 12px; border-radius: 6px; margin-bottom: 16px; font-size: 8.5pt; }
+
+        /* TABLE PRINT */
+        .print-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        .print-table th { background: var(--noir-doux); color: white; font-family: 'Fredoka', sans-serif; padding: 8px 10px; font-size: 8.5pt; text-transform: uppercase; text-align: left; }
+        .print-table td { padding: 8px 10px; border-bottom: 1px solid var(--gris-tres-clair); font-size: 9pt; }
+        .print-table .text-right { text-align: right; }
+        .print-table .text-center { text-align: center; }
+
+        .total-box { display: flex; justify-content: flex-end; margin-top: 8px; margin-bottom: 16px; }
+        .total-table { width: 250px; border-collapse: collapse; }
+        .total-table td { padding: 6px 10px; font-size: 9.5pt; }
+        .total-table .row-final { font-family: 'Fredoka', sans-serif; font-size: 12.5pt; color: var(--rouge); font-weight: bold; background: var(--rouge-clair); border-top: 2px solid var(--rouge); }
+
+        .legal-notice { font-size: 8pt; color: var(--gris-moyen); font-style: italic; margin-top: 8px; }
+
+        .politeness-text { font-size: 8.5pt; margin: 20px 0 15px 0; line-height: 1.4; }
+
+        /* BLOC RAPPROCHÉ TAMPON ET SIGNATURE */
+        .signature-area { display: flex; justify-content: flex-end; margin-top: 20px; }
+        .sig-block-wrapper { display: flex; align-items: flex-end; gap: 15px; position: relative; }
+        .print-tampon { max-height: 80px; object-fit: contain; mix-blend-mode: multiply; opacity: 0.9; }
+        
+        .sig-block { text-align: center; width: 200px; }
+        .sig-title { font-weight: bold; font-size: 9pt; color: var(--gris-fonce); }
+        .sig-name { font-family: 'Fredoka', sans-serif; font-size: 10.5pt; color: var(--rouge); margin-top: 2px; }
+        .sig-img { max-height: 55px; margin-top: 4px; object-fit: contain; mix-blend-mode: multiply; }
+
+        /* TOAST NOTIFICATION */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* CORRECTION STRICTE IMPRESSION A4 */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            html, body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                height: 100% !important;
+                overflow: visible !important;
+            }
+            .no-print, .sidebar, .topbar { 
+                display: none !important; 
+            }
+            .main-content, .app-body { 
+                padding: 0 !important; 
+                margin: 0 !important;
+                overflow: visible !important; 
+                height: auto !important; 
+                display: block !important;
+            }
+            .workspace-grid { 
+                display: block !important; 
+            }
+            #preview-container { 
+                background: white !important; 
+                padding: 0 !important; 
+                margin: 0 !important;
+                max-height: none !important;
+                overflow: visible !important;
+                display: block !important;
+            }
+            .a4-page { 
+                box-shadow: none !important; 
+                width: 210mm !important; 
+                height: 297mm !important; 
+                padding: 15mm !important; 
+                margin: 0 auto !important; 
+                page-break-after: avoid !important;
+                page-break-before: avoid !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="topbar no-print">
+            <div class="page-title-area">
+                <h2>Générateur de Factures & Reçus</h2>
+                <p>Édition de factures officielles, reçus de cotisation et attestations pour tierces personnes</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn" onclick="window.print()">🖨️ Imprimer / PDF</button>
+                <a href="../index.html" class="btn btn-dark">🏠 Central</a>
+            </div>
+        </div>
+
+        <div class="app-body">
+            <div class="workspace-grid">
+                
+                <!-- PANNEAU FORMULAIRE -->
+                <div class="panel no-print">
+                    <h3>
+                        <span>⚙️ Informations Document</span>
+                        <button class="btn btn-secondary btn-sm" onclick="nouvelleFacture()">➕ Nouveau</button>
+                    </h3>
+
+                    <div class="form-group">
+                        <label>Type de document :</label>
+                        <select id="doc_type" class="form-control" onchange="actualiserApercu()">
+                            <option value="FACTURE">FACTURE</option>
+                            <option value="REÇU">REÇU</option>
+                            <option value="ATTESTATION DE PAIEMENT">ATTESTATION DE PAIEMENT</option>
+                        </select>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>N° de Facture / Reçu :</label>
+                            <input type="text" id="doc_num" class="form-control" oninput="actualiserApercu()">
+                        </div>
+                        <div class="form-group">
+                            <label>Date :</label>
+                            <input type="date" id="doc_date" class="form-control" onchange="actualiserApercu()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Référence / Objet :</label>
+                        <input type="text" id="doc_ref" class="form-control" placeholder="Ex: Inscription Judo Saison 2025-2026" oninput="actualiserApercu()">
+                    </div>
+
+                    <h4 style="font-family:'Fredoka', sans-serif; color:var(--rouge); margin: 6px 0 0 0; font-size: 0.95rem;">👤 Client / Destinataire</h4>
+                    
+                    <div class="form-group">
+                        <label>Nom & Prénom / Structure :</label>
+                        <input type="text" id="cli_nom" class="form-control" placeholder="Ex: M. Dupont Jean / Comité des Fêtes" oninput="actualiserApercu()">
+                    </div>
+                    <div class="form-group">
+                        <label>Adresse :</label>
+                        <input type="text" id="cli_adresse" class="form-control" placeholder="Ex: 12 Rue des Fleurs" oninput="actualiserApercu()">
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Code Postal & Ville :</label>
+                            <input type="text" id="cli_ville" class="form-control" placeholder="Ex: 58390 Dornes" oninput="actualiserApercu()">
+                        </div>
+                        <div class="form-group">
+                            <label>Échéance / Règlement :</label>
+                            <input type="text" id="doc_echeance" class="form-control" value="Acquitté / Comptant" oninput="actualiserApercu()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email & Téléphone (Optionnel) :</label>
+                        <input type="text" id="cli_contact" class="form-control" placeholder="Ex: jean.dupont@email.com - 06 12 34 56 78" oninput="actualiserApercu()">
+                    </div>
+
+                    <h4 style="font-family:'Fredoka', sans-serif; color:var(--rouge); margin: 6px 0 0 0; font-size: 0.95rem; display:flex; justify-content:space-between; align-items:center;">
+                        <span>📋 Prestations & Articles</span>
+                        <button class="btn btn-secondary btn-sm" onclick="ajouterLigneArticle()">+ Ligne</button>
+                    </h4>
+
+                    <div id="articles-inputs-list">
+                        <!-- Génération dynamique des articles -->
+                    </div>
+
+                    <div class="form-group">
+                        <label>Message de politesse / Note bas de page :</label>
+                        <textarea id="doc_note" class="form-control" rows="2" oninput="actualiserApercu()">Tout en restant à votre disposition pour des renseignements complémentaires dont vous pourriez avoir besoin, je vous prie d’agréer, Madame, Monsieur, l’expression de mes sentiments les meilleurs.</textarea>
+                    </div>
+
+                    <div style="display:flex; gap:8px; margin-top:6px;">
+                        <button class="btn" style="flex:1;" onclick="enregistrerFactureCloud()">💾 Enregistrer la Facture</button>
+                    </div>
+
+                    <h4 style="font-family:'Fredoka', sans-serif; color:var(--rouge); margin: 10px 0 0 0; font-size: 0.95rem;">📚 Historique des Factures Générées</h4>
+                    <div style="max-height: 130px; overflow-y: auto; border: 1px solid var(--gris-tres-clair); border-radius: 6px;" id="history-list">
+                        <!-- Liste des factures sauvegardées -->
+                    </div>
+
+                </div>
+
+                <!-- PREVIEW A4 INTERACTIF -->
+                <div id="preview-container">
+                    <div class="a4-page" id="facture-print-target">
+                        <div>
+                            <!-- EN-TÊTE AVEC LOGO EN CARRÉ ROUGE ET INFOS LÉGALES -->
+                            <div class="doc-header">
+                                <div class="header-left-brand">
+                                    <div class="logo-box-wrapper">
+                                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo Dojo Dornois" class="club-logo">
+                                    </div>
+                                    <div class="club-info">
+                                        <div class="club-name">DOJO DORNOIS</div>
+                                        1 Place de la Mairie - 58390 DORNES<br>
+                                        Club enregistré à la FFJDA sous le n° CE 08.58.067.0<br>
+                                        Agrément Jeunesse et Sport n° 58.S.471<br>
+                                        SIRET n° 45192841000013 • RNA W583001220<br>
+                                        dojodornois@gmail.com • 06.07.13.91.86
+                                    </div>
+                                </div>
+                                <div class="client-box">
+                                    <div class="client-box-title">DESTINATAIRE</div>
+                                    <strong id="pv_cli_nom" style="font-size:10pt;">NOM Prénom / Organisme</strong><br>
+                                    <span id="pv_cli_adresse">Adresse du destinataire</span><br>
+                                    <span id="pv_cli_ville">Code Postal, Ville</span><br>
+                                    <small id="pv_cli_contact" style="display:none; color:var(--gris-moyen); margin-top:3px;"></small>
+                                </div>
+                            </div>
+
+                            <!-- BANDEAU TITRE -->
+                            <div class="doc-type-bar">
+                                <div class="doc-type-title" id="pv_doc_type">FACTURE</div>
+                            </div>
+
+                            <!-- MÉTADONNÉES -->
+                            <div class="doc-meta-grid">
+                                <div><strong>N° Document :</strong> <span id="pv_doc_num">DD2026-0001</span></div>
+                                <div><strong>Date d'émission :</strong> <span id="pv_doc_date">29/07/2026</span></div>
+                                <div><strong>Référence :</strong> <span id="pv_doc_ref">Cotisation / Intervention</span></div>
+                                <div><strong>Conditions de règlement :</strong> <span id="pv_doc_echeance">Acquitté</span></div>
+                            </div>
+
+                            <!-- TABLEAU ARTICLES -->
+                            <table class="print-table">
+                                <thead>
+                                    <tr>
+                                        <th>Désignation</th>
+                                        <th style="width: 70px;" class="text-center">Quantité</th>
+                                        <th style="width: 100px;" class="text-right">Prix Unitaire</th>
+                                        <th style="width: 100px;" class="text-right">Total HT</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pv_articles_tbody">
+                                    <!-- Lignes générées -->
+                                </tbody>
+                            </table>
+
+                            <!-- TOTAL & MENTIONS LEGALES -->
+                            <div class="total-box">
+                                <table class="total-table">
+                                    <tr class="row-final">
+                                        <td>MONTANT TOTAL</td>
+                                        <td class="text-right" id="pv_total_ttc">0,00 €</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="legal-notice">
+                                Micro-entreprise / Association exonérée : <em>"Non assujetti à la TVA art. 293-B du CGI"</em>
+                            </div>
+
+                            <div class="politeness-text" id="pv_doc_note">
+                                Tout en restant à votre disposition pour des renseignements complémentaires dont vous pourriez avoir besoin, je vous prie d’agréer, Madame, Monsieur, l’expression de mes sentiments les meilleurs.
+                            </div>
+                        </div>
+
+                        <!-- BLOC RAPPROCHÉ TAMPON CLUB & SIGNATURE PRÉSIDENT -->
+                        <div class="signature-area">
+                            <div class="sig-block-wrapper">
+                                <img id="pv_tampon_img" src="" class="print-tampon" style="display:none;">
+                                <div class="sig-block">
+                                    <div class="sig-title">Le Président</div>
+                                    <div class="sig-name">Jordan LOUDENOT</div>
+                                    <img id="pv_sig_img" src="" class="sig-img" style="display:none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+        const TARGET_SHEET = "factures";
+
+        let facturesDB = {
+            lastNumberIndex: 0,
+            liste: []
+        };
+
+        let currentArticles = [
+            { des: "Licence Fédération Française de Judo et Disciplines Associées", qte: 1, px: 46 }
+        ];
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast success';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3500);
+        }
+
+        function initVisuelsEtDates() {
+            document.getElementById('doc_date').valueAsDate = new Date();
+            
+            // Chargement de la signature
+            let savedSig = localStorage.getItem('club_signature');
+            if(savedSig) {
+                const imgSig = document.getElementById('pv_sig_img');
+                imgSig.src = savedSig;
+                imgSig.style.display = 'block';
+            }
+
+            // Chargement du tampon
+            let savedTampon = localStorage.getItem('club_tampon');
+            if(savedTampon) {
+                const imgTampon = document.getElementById('pv_tampon_img');
+                imgTampon.src = savedTampon;
+                imgTampon.style.display = 'block';
+            }
+        }
+
+        function generateNextInvoiceNumber() {
+            const currentYear = new Date().getFullYear();
+            let nextIdx = (facturesDB.lastNumberIndex || 0) + 1;
+            let formattedIdx = String(nextIdx).padStart(4, '0');
+            document.getElementById('doc_num').value = `DD${currentYear}-${formattedIdx}`;
+        }
+
+        function renderArticlesInputs() {
+            const container = document.getElementById('articles-inputs-list');
+            container.innerHTML = '';
+            currentArticles.forEach((art, idx) => {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.innerHTML = `
+                    <input type="text" class="form-control" value="${art.des.replace(/"/g, '&quot;')}" placeholder="Désignation" oninput="updateArticle(${idx}, 'des', this.value)">
+                    <input type="number" class="form-control" value="${art.qte}" min="1" placeholder="Qté" oninput="updateArticle(${idx}, 'qte', this.value)">
+                    <input type="number" step="0.01" class="form-control" value="${art.px}" placeholder="Prix €" oninput="updateArticle(${idx}, 'px', this.value)">
+                    <button class="btn btn-secondary btn-sm" onclick="supprimerLigneArticle(${idx})">✕</button>
+                `;
+                container.appendChild(row);
+            });
+            actualiserApercu();
+        }
+
+        function updateArticle(index, field, value) {
+            if(field === 'qte' || field === 'px') currentArticles[index][field] = parseFloat(value) || 0;
+            else currentArticles[index][field] = value;
+            actualiserApercu();
+        }
+
+        function ajouterLigneArticle() {
+            currentArticles.push({ des: "", qte: 1, px: 0 });
+            renderArticlesInputs();
+        }
+
+        function supprimerLigneArticle(index) {
+            if(currentArticles.length > 1) {
+                currentArticles.splice(index, 1);
+                renderArticlesInputs();
+            } else {
+                alert("La facture doit contenir au moins un article.");
+            }
+        }
+
+        function actualiserApercu() {
+            document.getElementById('pv_doc_type').innerText = document.getElementById('doc_type').value;
+            document.getElementById('pv_doc_num').innerText = document.getElementById('doc_num').value || 'DD2026-0001';
+            
+            const rawDate = document.getElementById('doc_date').value;
+            document.getElementById('pv_doc_date').innerText = rawDate ? rawDate.split('-').reverse().join('/') : '-';
+            
+            document.getElementById('pv_doc_ref').innerText = document.getElementById('doc_ref').value || '-';
+            document.getElementById('pv_doc_echeance').innerText = document.getElementById('doc_echeance').value || '-';
+            
+            document.getElementById('pv_cli_nom').innerText = document.getElementById('cli_nom').value || 'NOM Prénom / Organisme';
+            document.getElementById('pv_cli_adresse').innerText = document.getElementById('cli_adresse').value || 'Adresse du destinataire';
+            document.getElementById('pv_cli_ville').innerText = document.getElementById('cli_ville').value || 'Code Postal, Ville';
+            
+            const contactVal = document.getElementById('cli_contact').value.trim();
+            const pvContact = document.getElementById('pv_cli_contact');
+            if(contactVal) {
+                pvContact.innerText = contactVal;
+                pvContact.style.display = 'block';
+            } else {
+                pvContact.innerText = '';
+                pvContact.style.display = 'none';
+            }
+
+            document.getElementById('pv_doc_note').innerText = document.getElementById('doc_note').value;
+
+            const tbody = document.getElementById('pv_articles_tbody');
+            tbody.innerHTML = '';
+            let totalGeneral = 0;
+
+            currentArticles.forEach(art => {
+                const totalLigne = (art.qte || 0) * (art.px || 0);
+                totalGeneral += totalLigne;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${art.des || '<em>Article sans désignation</em>'}</td>
+                    <td class="text-center">${art.qte}</td>
+                    <td class="text-right">${art.px.toFixed(2)} €</td>
+                    <td class="text-right"><strong>${totalLigne.toFixed(2)} €</strong></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('pv_total_ttc').innerText = totalGeneral.toFixed(2) + " €";
+        }
+
+        function nouvelleFacture() {
+            document.getElementById('cli_nom').value = "";
+            document.getElementById('cli_adresse').value = "";
+            document.getElementById('cli_ville').value = "";
+            document.getElementById('cli_contact').value = "";
+            document.getElementById('doc_ref').value = "";
+            currentArticles = [{ des: "Licence Fédération Française de Judo et Disciplines Associées", qte: 1, px: 46 }];
+            generateNextInvoiceNumber();
+            renderArticlesInputs();
+        }
+
+        function enregistrerFactureCloud() {
+            const num = document.getElementById('doc_num').value;
+            const nom = document.getElementById('cli_nom').value.trim();
+
+            if(!num || !nom) {
+                alert("Veuillez remplir au moins le numéro et le destinataire.");
+                return;
+            }
+
+            let totalGeneral = currentArticles.reduce((acc, a) => acc + (a.qte * a.px), 0);
+
+            const factObj = {
+                num: num,
+                type: document.getElementById('doc_type').value,
+                date: document.getElementById('doc_date').value,
+                destinataire: nom,
+                adresse: document.getElementById('cli_adresse').value,
+                ville: document.getElementById('cli_ville').value,
+                contact: document.getElementById('cli_contact').value,
+                ref: document.getElementById('doc_ref').value,
+                total: totalGeneral,
+                articles: currentArticles
+            };
+
+            const existingIdx = facturesDB.liste.findIndex(f => f.num === num);
+            if(existingIdx !== -1) {
+                facturesDB.liste[existingIdx] = factObj;
+            } else {
+                facturesDB.liste.unshift(factObj);
+                facturesDB.lastNumberIndex = (facturesDB.lastNumberIndex || 0) + 1;
+            }
+
+            localStorage.setItem('dojo_factures_backup', JSON.stringify(facturesDB));
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ targetSheet: TARGET_SHEET, payload: facturesDB })
+            })
+            .then(() => {
+                showToast("✓ Facture enregistrée et synchronisée sur Google Sheets !");
+                renderHistory();
+            })
+            .catch(err => console.error("Erreur Cloud Factures:", err));
+        }
+
+        function loadFacturesData() {
+            fetch(`${SCRIPT_URL}?sheet=${TARGET_SHEET}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data && data.liste) {
+                        facturesDB = data;
+                    } else {
+                        fallbackLocal();
+                    }
+                    finalizeInit();
+                })
+                .catch(() => {
+                    fallbackLocal();
+                    finalizeInit();
+                });
+        }
+
+        function fallbackLocal() {
+            const backup = localStorage.getItem('dojo_factures_backup');
+            if(backup) facturesDB = JSON.parse(backup);
+        }
+
+        function finalizeInit() {
+            if(!facturesDB.liste) facturesDB.liste = [];
+            if(!facturesDB.lastNumberIndex) facturesDB.lastNumberIndex = 0;
+            generateNextInvoiceNumber();
+            renderArticlesInputs();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            container.innerHTML = '';
+            if(facturesDB.liste.length === 0) {
+                container.innerHTML = `<p style="font-size:0.8rem; color:var(--gris-moyen); text-align:center; padding:10px; margin:0;">Aucune facture enregistrée.</p>`;
+                return;
+            }
+            facturesDB.liste.forEach(f => {
+                const item = document.createElement('div');
+                item.style.cssText = "padding: 6px 10px; border-bottom: 1px solid var(--gris-tres-clair); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer;";
+                item.onclick = () => chargerFactureDepuisHistorique(f.num);
+                item.innerHTML = `
+                    <div>
+                        <strong>${f.num}</strong> — ${f.destinataire}<br>
+                        <small style="color:var(--gris-moyen);">${f.date ? f.date.split('-').reverse().join('/') : ''}</small>
+                    </div>
+                    <strong>${f.total.toFixed(2)} €</strong>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function chargerFactureDepuisHistorique(num) {
+            const f = facturesDB.liste.find(x => x.num === num);
+            if(!f) return;
+            document.getElementById('doc_type').value = f.type || 'FACTURE';
+            document.getElementById('doc_num').value = f.num;
+            document.getElementById('doc_date').value = f.date;
+            document.getElementById('cli_nom').value = f.destinataire;
+            document.getElementById('cli_adresse').value = f.adresse || '';
+            document.getElementById('cli_ville').value = f.ville || '';
+            document.getElementById('cli_contact').value = f.contact || '';
+            document.getElementById('doc_ref').value = f.ref || '';
+            currentArticles = f.articles || [];
+            renderArticlesInputs();
+        }
+
+        window.onload = () => {
+            initVisuelsEtDates();
+            loadFacturesData();
+        };
+    </script>
+
+    <!-- SCRIPT SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+</body>
+</html>

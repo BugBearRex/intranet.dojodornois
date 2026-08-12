@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Achats Publicitaires & Objets — Intranet Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=400;600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --status-a-commander: #FFADAD;
+            --status-commande: #FDFFB6;
+            --status-recu: #CAFFBF;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--fond); margin: 0; padding: 0; color: var(--gris-fonce); display: flex; height: 100vh; overflow: hidden; }
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; width: 100vw; }
+        .topbar { background: var(--blanc); height: 68px; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.04); flex-shrink: 0; }
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); line-height: 1; }
+        .page-title-area p { margin: 4px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+        .btn-back { background: var(--noir-doux); color: white; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; transition: background 0.15s; }
+        .btn-back:hover { background: var(--rouge); }
+        .dashboard-body { flex: 1; padding: 24px 28px; overflow-y: auto; display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+        .card { background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); height: max-content; }
+        .card-title { font-family: 'Fredoka', sans-serif; font-size: 1.1rem; color: var(--rouge); margin: 0 0 16px 0; border-bottom: 1px dashed var(--gris-tres-clair); padding-bottom: 8px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; }
+        .form-control { width: 100%; padding: 8px 12px; border: 1.5px solid var(--gris-tres-clair); border-radius: 7px; font-size: 0.875rem; font-family: 'Roboto', sans-serif; }
+        .form-control:focus { outline: none; border-color: var(--rouge); }
+        .btn-add { background: var(--rouge); color: white; border: none; width: 100%; padding: 10px; border-radius: 7px; cursor: pointer; font-weight: 500; font-size: 0.9rem; margin-top: 10px; }
+        .btn-add:hover { background: var(--rouge-hover); }
+        .table-container { background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.03); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        th { background: var(--fond); font-family: 'Fredoka', sans-serif; color: var(--noir-doux); padding: 12px; font-weight: 600; border-bottom: 2px solid var(--gris-tres-clair); }
+        td { padding: 12px; border-bottom: 1px solid var(--gris-tres-clair); vertical-align: middle; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
+        .badge-a-commander { background: var(--status-a-commander); color: #600; }
+        .badge-commande { background: var(--status-commande); color: #550; }
+        .badge-recu { background: var(--status-recu); color: #050; }
+        .btn-action { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 2px; margin-right: 4px; }
+        .total-bar { margin-top: 20px; background: var(--fond); padding: 14px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-family: 'Fredoka', sans-serif; font-size: 1.1rem; font-weight: 600; }
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+        .toast { background: #1a472a; border-left: 4px solid #2ecc71; color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="toast-container" id="toastContainer"></div>
+    <div class="main-content">
+        <div class="topbar">
+            <div class="page-title-area">
+                <h2>🛍️ Achats Publicitaires & Objets de Comm</h2>
+                <p>Planification, suivi et budget des supports de communication pour la prochaine saison</p>
+            </div>
+            <a href="../index.html" class="btn-back">🏠 Retour Accueil Intranet</a>
+        </div>
+        <div class="dashboard-body">
+            <div class="card">
+                <h3 class="card-title">📝 Ajouter un besoin</h3>
+                <div class="form-group">
+                    <label>Nom de l'objet / Support</label>
+                    <input type="text" id="item-name" class="form-control" placeholder="Ex: Flyers A5 Saison Prochaine">
+                </div>
+                <div class="form-group">
+                    <label>Fournisseur potentiel</label>
+                    <input type="text" id="item-supplier" class="form-control" placeholder="Ex: VistaPrint, Imprimerie locale...">
+                </div>
+                <div class="form-group">
+                    <label>Quantité voulue</label>
+                    <input type="number" id="item-qty" class="form-control" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Prix unitaire estimé (€)</label>
+                    <input type="number" id="item-price" class="form-control" value="0.00" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Statut de l'achat</label>
+                    <select id="item-status" class="form-control">
+                        <option value="a-commander">🔴 À commander</option>
+                        <option value="commande">🟡 Commandé</option>
+                        <option value="recu">🟢 Reçu</option>
+                    </select>
+                </div>
+                <button class="btn-add" onclick="addItem()">🛒 Ajouter à la liste</button>
+            </div>
+            <div class="table-container">
+                <div style="overflow-y: auto; flex: 1;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Désignation</th>
+                                <th>Fournisseur</th>
+                                <th>Quantité</th>
+                                <th>P.U. Est.</th>
+                                <th>Total Est.</th>
+                                <th>Statut</th>
+                                <th style="text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="items-tbody"></tbody>
+                    </table>
+                </div>
+                <div class="total-bar">
+                    <span style="color: var(--gris-fonce);">Estimation Budget global :</span>
+                    <span id="global-total" style="color: var(--rouge);">0.00 €</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const itemsDefaut = [
+            { id: 1, name: "Flyers A5 Rentrée de Judo", supplier: "Imprimerie", qty: 1000, price: 0.08, status: "a-commander" },
+            { id: 2, name: "Banderole extérieure club (3x1m)", supplier: "BâcheÉco", qty: 2, price: 45.00, status: "commande" },
+            { id: 3, name: "Stickers Logo Adhésif Club", supplier: "StickerMule", qty: 500, price: 0.30, status: "recu" }
+        ];
+
+        let items = JSON.parse(localStorage.getItem('dd_achats_publicitaires')) || itemsDefaut;
+
+        function renderItems() {
+            const tbody = document.getElementById('items-tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            let budgetGlobal = 0;
+
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--gris-moyen); padding:30px;">Aucun objet publicitaire recensé pour le moment.</td></tr>`;
+                document.getElementById('global-total').innerText = "0.00 €";
+                return;
+            }
+
+            items.forEach(item => {
+                const totalItem = item.qty * item.price;
+                budgetGlobal += totalItem;
+
+                let statusBadge = '';
+                if(item.status === 'a-commander') statusBadge = `<span class="badge badge-a-commander">🔴 À commander</span>`;
+                if(item.status === 'commande') statusBadge = `<span class="badge badge-commande">🟡 Commandé</span>`;
+                if(item.status === 'recu') statusBadge = `<span class="badge badge-recu">🟢 Reçu</span>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 500;">${item.name}</td>
+                    <td style="color: var(--gris-moyen);">${item.supplier || '-'}</td>
+                    <td><strong>${item.qty}</strong></td>
+                    <td>${item.price.toFixed(2)} €</td>
+                    <td><strong>${totalItem.toFixed(2)} €</strong></td>
+                    <td>${statusBadge}</td>
+                    <td style="text-align: center;">
+                        <button class="btn-action" onclick="cycleStatus(${item.id})" title="Changer le statut">🔄</button>
+                        <button class="btn-action" onclick="deleteItem(${item.id})" title="Supprimer">❌</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('global-total').innerText = budgetGlobal.toFixed(2) + " €";
+        }
+
+        function addItem() {
+            const name = document.getElementById('item-name').value.trim();
+            const supplier = document.getElementById('item-supplier').value.trim();
+            const qty = parseInt(document.getElementById('item-qty').value) || 1;
+            const price = parseFloat(document.getElementById('item-price').value) || 0;
+            const status = document.getElementById('item-status').value;
+
+            if (!name) {
+                alert("Donne un nom à l'objet ou au support publicitaire !");
+                return;
+            }
+
+            items.push({ id: Date.now(), name, supplier, qty, price, status });
+            save();
+            renderItems();
+
+            document.getElementById('item-name').value = '';
+            document.getElementById('item-supplier').value = '';
+            document.getElementById('item-qty').value = '1';
+            document.getElementById('item-price').value = '0.00';
+            showToast("Support ajouté à la liste ! 📦");
+        }
+
+        function cycleStatus(id) {
+            items = items.map(item => {
+                if (item.id === id) {
+                    let nextStatus = 'a-commander';
+                    if (item.status === 'a-commander') nextStatus = 'commande';
+                    else if (item.status === 'commande') nextStatus = 'recu';
+                    return { ...item, status: nextStatus };
+                }
+                return item;
+            });
+            save();
+            renderItems();
+        }
+
+        function deleteItem(id) {
+            if (confirm("Supprimer cet article de la liste de vos achats ?")) {
+                items = items.filter(item => item.id !== id);
+                save();
+                renderItems();
+                showToast("Article supprimé.");
+            }
+        }
+
+        function save() {
+            localStorage.setItem('dd_achats_publicitaires', JSON.stringify(items));
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toastContainer');
+            if(!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3000);
+        }
+
+        window.addEventListener('DOMContentLoaded', renderItems);
+    </script>
+    <script src="../js/sidebar.js"></script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Générateur de Comptes-Rendus - Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F5F5F5;
+            --blanc: #FFFFFF;
+            --sidebar-width: 280px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--fond); 
+            margin: 0; 
+            padding: 0; 
+            color: var(--gris-fonce); 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        /* --- FIX SIDEBAR DÉBORDEMENT --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .sidebar * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
+        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+
+        /* MAIN CONTENT CONTAINER SCROLLABLE */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .panel { background: var(--blanc); padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 4px solid var(--rouge); height: fit-content; }
+        
+        h2, h3 { font-family: 'Fredoka', sans-serif; color: var(--rouge); margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        
+        .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .full-width { grid-column: span 2; }
+        
+        label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 0.9rem; color: var(--gris-fonce); }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid var(--gris-clair); border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        
+        .btn-container { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; transition: background 0.2s; }
+        .btn-primary { background-color: var(--rouge); color: white; }
+        .btn-primary:hover { background-color: #A3182E; }
+        .btn-secondary { background-color: var(--gris-moyen); color: white; }
+        
+        /* Zone d'aperçu & Mise en page Impression A4 */
+        #preview-zone { background: var(--blanc); padding: 40px; border: 1px solid var(--gris-clair); border-radius: 4px; box-shadow: 0 0 15px rgba(0,0,0,0.05); min-height: 297mm; box-sizing: border-box; }
+        
+        /* Structure de table pour le multipage propre */
+        .print-table { width: 100%; border-collapse: collapse; }
+        .print-table td { padding: 0; border: none; }
+        
+        /* En-tête officiel */
+        .print-header-content { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 15px; margin-bottom: 20px; }
+        .header-left { display: flex; align-items: center; gap: 15px; text-align: left; }
+        .print-logo { width: 85px; height: 85px; object-fit: contain; background-color: var(--rouge); padding: 6px; border-radius: 6px; }
+        .print-club-info { font-size: 9.5pt; color: var(--noir-doux); line-height: 1.4; }
+        .print-club-info strong { font-family: 'Fredoka', sans-serif; font-size: 18pt; color: var(--rouge); display: block; margin-bottom: 2px; }
+        .doc-meta-top { font-size: 11pt; text-align: right; font-weight: bold; color: var(--gris-fonce); }
+        
+        /* Titre du CR */
+        .cr-title-box { margin: 25px 0; background-color: #FAFAFA; border: 1px solid var(--gris-tres-clair); border-left: 5px solid var(--rouge); padding: 15px; text-align: center; }
+        .cr-title-box h1 { font-family: 'Fredoka', sans-serif; color: var(--rouge); margin: 0 0 5px 0; font-size: 20pt; letter-spacing: 1px; }
+        .cr-title-box p { margin: 0; font-size: 12pt; font-weight: bold; color: var(--gris-fonce); }
+        
+        /* Corps du compte-rendu */
+        .cr-body { font-size: 11pt; line-height: 1.6; text-align: justify; color: var(--noir-doux); }
+        
+        /* Formatage automatique des titres saisis */
+        .cr-body h2 { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 13pt; margin-top: 25px; margin-bottom: 10px; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 5px; page-break-after: avoid; }
+        .cr-body h3 { font-family: 'Roboto', sans-serif; font-weight: bold; color: var(--gris-fonce); font-size: 11.5pt; margin-top: 15px; margin-bottom: 5px; page-break-after: avoid; }
+        .cr-body p { margin-top: 0; margin-bottom: 12px; text-align: justify; }
+        .cr-body ul, .cr-body ol { margin-top: 0; margin-bottom: 15px; padding-left: 20px; }
+        .cr-body li { margin-bottom: 6px; }
+        
+        /* Formatage des Tableaux si copier-coller */
+        .cr-body table { width: 100%; border-collapse: collapse; margin: 15px 0; page-break-inside: avoid; }
+        .cr-body th, .cr-body td { border: 1px solid var(--gris-clair); padding: 8px 12px; font-size: 10pt; text-align: left; }
+        .cr-body th { background-color: #FAFAFA; color: var(--rouge); font-weight: bold; }
+
+        /* Signatures */
+        .sig-block { width: 100%; display: flex; justify-content: flex-end; margin-top: 30px; page-break-inside: avoid; }
+        .sig-box { width: 320px; border: 2px dashed var(--rouge); padding: 15px; background: #FAFAFA; border-radius: 6px; text-align: left; }
+        .sig-title { color: var(--rouge); font-weight: bold; font-family: 'Fredoka', sans-serif; font-size: 11pt; display: block; margin-bottom: 5px; }
+        .inserted-signature { max-height: 70px; display: block; margin-top: 10px; object-fit: contain; mix-blend-mode: multiply; }
+        
+        /* Pied de page visible sur l'écran */
+        .print-footer-content { width: 100%; text-align: center; padding-top: 10px; border-top: 1px solid var(--gris-tres-clair); font-size: 9pt; color: var(--gris-moyen); line-height: 1.4; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Configuration pure de la feuille pour impression */
+        @media print {
+            @page { 
+                size: A4 portrait; 
+                margin: 20mm 15mm 25mm 15mm;
+                
+                @bottom-left {
+                    content: "Dojo Dornois Bureau Directeur (RNA : W583001220)";
+                    font-family: 'Roboto', sans-serif;
+                    font-size: 9pt;
+                    color: #6B6B6B;
+                    border-top: 1px solid #E8E8E8;
+                    padding-top: 10px;
+                    vertical-align: top;
+                }
+                
+                @bottom-right {
+                    content: "Page " counter(page) " / " counter(pages);
+                    font-family: 'Fredoka', sans-serif;
+                    font-weight: 600;
+                    font-size: 10pt;
+                    color: #C41E3A;
+                    border-top: 1px solid #E8E8E8;
+                    padding-top: 10px;
+                    vertical-align: top;
+                }
+            }
+            
+            body { background: white; padding: 0; color: black; display: block !important; }
+            .no-print, .sidebar { display: none !important; }
+            .main-content { padding: 0 !important; overflow: visible !important; }
+            .container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .dashboard-grid { display: block !important; margin: 0 !important; }
+            #preview-zone { border: none !important; box-shadow: none !important; padding: 0 !important; min-height: auto !important; }
+            
+            thead { display: table-header-group; }
+            tfoot { display: none !important; } 
+        }
+    </style>
+</head>
+<body>
+
+<!-- CONTENEUR SIDEBAR DYNAMIQUE -->
+<div class="sidebar"></div>
+
+<div class="main-content">
+    <div class="container">
+        <div class="no-print" style="background: white; padding: 15px 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center;">
+            <a href="../index.html" style="text-decoration: none; font-weight: bold; color: var(--gris-fonce); display: flex; align-items: center; gap: 8px;">🏠 Retour Intranet</a>
+            <h2 style="margin: 0; font-size: 1.4rem;">📝 Outil Comptes-Rendus Officiels</h2>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="panel no-print">
+                <h3>⚙️ Paramètres du Compte-Rendu</h3>
+                <div class="form-group">
+                    <div>
+                        <label>Date de la Réunion :</label>
+                        <input type="text" id="dateDoc" value="Samedi 6 Juin 2026">
+                    </div>
+                    <div>
+                        <label>Objet / Type de Réunion :</label>
+                        <input type="text" id="objet" value="Réunion du Comité Directeur">
+                    </div>
+                    
+                    <div class="full-width">
+                        <label>Contenu (Texte brut ou HTML de Gemini) :</label>
+                        <textarea id="message" rows="18" style="font-family: monospace; font-size: 11px;" placeholder="Colle le texte structuré ici...">Le Comité Directeur du Dojo Dornois s'est réuni ce jour afin de faire un point d'étape sur les dossiers administratifs en cours, de statuer sur le modèle économique de la saison à venir et de finaliser la logistique des prochains événements.
+
+<h2>1. SITUATION ADMINISTRATIVE & PROJETS SCOLAIRES</h2>
+Un point de situation a été fait concernant les démarches de subventions actuellement engagées. Les dossiers d'aide financière restent ouverts et en attente des arbitrages des différents organismes institutionnels de tutelle (FDVA, ANS pour le volet Écoles, Mairie de Dornes et Comité Départemental de la Nièvre).
+
+<h3>Développement des partenariats scolaires :</h3>
+<ul>
+    <li><strong>Dispositif Projet TER :</strong> Les bases de travail conjointes concernant les écoles de Dornes, Lucenay-lès-Aix et Cossaye avancent conformément au calendrier établi.</li>
+    <li><strong>École de Chantenay-Saint-Imbert :</strong> Présentation du cadre d'intervention renforcé au sein de l'établissement pour la rentrée prochaine.</li>
+</ul>
+
+<h2>2. PLAN FINANCIER INTERVENANT & MODALITÉS DE RÈGLEMENT</h2>
+Romain a présenté son plan financier global pour la saison 2026-2027. Il propose un forfait tout compris incluant ses prestations régulières d'heures de cours, ainsi que sa participation active aux différents stages et compétitions programmés.
+<br><br>
+<strong>Décision budgétaire :</strong> La proposition financière est officiellement validée pour un montant total de 17 000 € à l'année. Les modalités de versement sont fixées à 1 700 € par mois sur une période stricte de 10 mois, s'étalant de septembre 2026 à juin 2027.
+
+<h3>Évolution de la politique de règlement des cotisations :</h3>
+Le comité a longuement débattu de la mise en place des paiements mensuels et annuels. Après analyse rigoureuse des risques opérationnels et de trésorerie encourus par la structure, la décision a été prise de maintenir le principe du paiement annuel réglementaire.
+<ul>
+    <li>Possibilité d'échelonner le règlement en 1, 2 ou 3 fois.</li>
+    <li>En cas de difficultés spécifiques rencontrées par certaines familles, le bureau étudiera les situations exceptionnelles au cas par cas afin d'ajuster l'accompagnement.</li>
+</ul></textarea>
+                    </div>
+
+                    <div>
+                        <label>Nom du Signataire :</label>
+                        <input type="text" id="nomSignataire" value="Jordan Loudenot">
+                    </div>
+                    <div>
+                        <label>Fonction / Qualité :</label>
+                        <input type="text" id="fonctionSignataire" value="Le Président & Secrétaire">
+                    </div>
+                    <div>
+                        <label>Afficher Signature ?</label>
+                        <select id="switch-sig" onchange="genererApercu()">
+                            <option value="oui">Oui</option>
+                            <option value="non">Non</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Convertir retours à la ligne automatiques ?</label>
+                        <select id="switch-nl2br" onchange="genererApercu()">
+                            <option value="oui">Oui (Texte Brut)</option>
+                            <option value="non" selected>Non (Si HTML déjà balisé)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn btn-primary" onclick="genererApercu()">👁️ Mettre à jour l'aperçu</button>
+                    <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimer / PDF</button>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="no-print">📄 Aperçu du Compte-Rendu</h3>
+                <div id="preview-zone">
+                    <table class="print-table">
+                        <thead>
+                            <tr>
+                                <td>
+                                    <div class="print-header-content">
+                                        <div class="header-left">
+                                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                                            <div class="print-club-info">
+                                                <strong>DOJO DORNOIS</strong>
+                                                1 Pl. de la Mairie, 58390 Dornes &bull; dojodornois@gmail.com<br>
+                                                FFJDA n° CE 08.58.067.0 &bull; SIRET 45192841000013 &bull; RNA W583001220
+                                            </div>
+                                        </div>
+                                        <div class="doc-meta-top" id="header-date">Le 06/06/2026</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </thead>
+                        
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="cr-title-box">
+                                        <h1 id="title-objet">COMPTE-RENDU DE RÉUNION</h1>
+                                        <p id="title-date">Samedi 6 Juin 2026</p>
+                                    </div>
+                                    <div class="cr-body" id="render-body">
+                                    </div>
+                                    <div class="sig-block" id="render-sig">
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tfoot class="no-print">
+                            <tr>
+                                <td>
+                                    <div style="height: 15px;"></div>
+                                    <div class="print-footer-content">
+                                        <div>Dojo Dornois Bureau Directeur (RNA : W583001220)</div>
+                                        <div style="font-family:'Fredoka'; color:var(--rouge); font-weight:bold;">Page X / Y</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let imgSignature = localStorage.getItem('club_signature') || '';
+
+function genererApercu() {
+    const dateDoc = document.getElementById('dateDoc').value;
+    const objet = document.getElementById('objet').value;
+    let message = document.getElementById('message').value;
+    const nomSignataire = document.getElementById('nomSignataire').value;
+    const fonctionSignataire = document.getElementById('fonctionSignataire').value;
+    const convertNl2br = document.getElementById('switch-nl2br').value;
+    
+    document.getElementById('header-date').innerText = "Le " + dateDoc.split(' ').slice(-3).join(' ');
+    document.getElementById('title-objet').innerText = objet.toUpperCase();
+    document.getElementById('title-date').innerText = dateDoc;
+
+    if (convertNl2br === 'oui') {
+        message = message.replace(/\n/g, '<br>');
+    }
+
+    document.getElementById('render-body').innerHTML = message;
+
+    let sigHtml = '';
+    if (document.getElementById('switch-sig').value === 'oui') {
+        let signatureImgTag = imgSignature ? `<img src="${imgSignature}" class="inserted-signature">` : '<div style="height:50px;"></div>';
+        sigHtml = `
+            <div class="sig-box">
+                <span class="sig-title">${fonctionSignataire}</span>
+                <span style="font-size:11pt; font-style:italic; color:#333;">${nomSignataire}</span>
+                ${signatureImgTag}
+            </div>
+        `;
+    }
+    document.getElementById('render-sig').innerHTML = sigHtml;
+}
+
+window.onload = function() {
+    genererApercu();
+};
+</script>
+
+<!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+<script src="../js/sidebar.js"></script>
+
+</body>
+</html>

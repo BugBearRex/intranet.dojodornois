@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Heures Romain — Dojo Dornois</title>
+
+    <!-- POLICES OFFICIELLES CHARTE DOJO DORNOIS -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- TAILWIND CSS & FONTAWESOME -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --vert-succes: #2ECC71;
+            --vert-fond: #E8F8F0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            color: var(--gris-fonce);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, .font-fredoka {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .tab-btn.active {
+            color: var(--rouge);
+            border-bottom: 3px solid var(--rouge);
+            font-weight: 700;
+        }
+
+        /* CARTE COURS SOBRE EN ATTENTE */
+        .course-card-item {
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+            user-select: none;
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-left: 5px solid #CBD5E1;
+            color: #475569;
+        }
+        .course-card-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        /* ÉTAT VALIDÉ : BARRE VERTE */
+        .course-card-item.status-done {
+            background-color: #FFFFFF;
+            border-color: #A7F3D0;
+            border-left-color: #2ECC71;
+            color: #065F46;
+        }
+
+        /* ÉTAT ANNULÉ : BARRE ROUGE */
+        .course-card-item.status-cancelled {
+            background-color: #FFFFFF;
+            border-color: #FECDD3;
+            border-left-color: #C41E3A;
+            color: #881337;
+        }
+
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 8px; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+
+        /* ZONE D'IMPRESSION A4 PORTRAIT MASQUÉE SUR ÉCRAN */
+        #printable-releve-a4 {
+            display: none;
+        }
+
+        /* ==========================================================================
+           GESTION CSS PRINT OFFICIELLE
+           ========================================================================== */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm;
+                @bottom-left {
+                    content: "Dojo Dornois (RNA : W583001220 - SIRET : 451 928 410 00013) — Relevé de Prestations";
+                    font-family: 'Roboto', sans-serif;
+                    font-size: 7.5pt;
+                    color: #64748b;
+                    border-top: 1px solid #e2e8f0;
+                    padding-top: 4px;
+                }
+                @bottom-right {
+                    content: "Page " counter(page) " / " counter(pages);
+                    font-family: 'Fredoka', sans-serif;
+                    font-weight: bold;
+                    font-size: 8.5pt;
+                    color: #C41E3A;
+                    border-top: 1px solid #e2e8f0;
+                    padding-top: 4px;
+                }
+            }
+
+            /* Masquer l'application Web */
+            .no-print, .sidebar, .main-content > header, .main-content > main {
+                display: none !important;
+            }
+
+            body, .main-content {
+                background: white !important;
+                height: auto !important;
+                overflow: visible !important;
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* Afficher la fiche A4 */
+            #printable-releve-a4 {
+                display: block !important;
+                width: 100% !important;
+                background: white !important;
+                color: #1e293b !important;
+                font-size: 9pt !important;
+            }
+
+            #printable-releve-a4 * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            tr {
+                page-break-inside: avoid !important;
+            }
+        }
+    </style>
+</head>
+<body class="h-full flex text-slate-800 antialiased">
+
+    <!-- 1. SIDEBAR UNIFIÉE INTÉGRÉE AUTOMATIQUEMENT -->
+    <div class="sidebar no-print"></div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 2. CONTENU PRINCIPAL DE L'APPLICATION -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden main-content h-screen">
+        
+        <!-- Topbar -->
+        <header class="bg-white border-b border-slate-200 px-6 py-3.5 flex items-center justify-between shrink-0 no-print">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-[#C41E3A] text-white flex items-center justify-center font-bold font-fredoka text-xl shadow-md">
+                    🥋
+                </div>
+                <div>
+                    <h1 class="font-fredoka text-xl font-bold text-[#1A1A1A]">Suivi & Pointage des Heures — Romain</h1>
+                    <p class="text-xs text-slate-500">Gestionnaire d'activité, pointage hebdomadaire visuel & relevés mensuels</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="saveToSheet()" class="px-4 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Enregistrer vers Sheet
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+            <!-- NAVIGATION PAR ONGLETS -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
+                <div class="border-b border-slate-200 bg-slate-50 px-4 flex gap-4">
+                    <button onclick="switchTab('pointage')" id="tab-btn-pointage" class="tab-btn active py-3.5 font-fredoka font-semibold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check"></i> 1. Pointage Visuel Hebdo
+                    </button>
+                    <button onclick="switchTab('ajustements')" id="tab-btn-ajustements" class="tab-btn py-3.5 font-fredoka font-semibold text-sm text-slate-500 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders"></i> 2. Heures Sup. & Déductions
+                    </button>
+                </div>
+
+                <!-- ONGLET 1 : POINTAGE HEBDO -->
+                <div id="pane-pointage" class="p-6 space-y-6">
+                    
+                    <!-- BARRE SÉLECTEUR DE MOIS & ACTIONS -->
+                    <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="flex items-center gap-3">
+                            <label class="text-xs font-bold font-fredoka text-slate-600 uppercase">Sélecteur de Mois :</label>
+                            <select id="select-month" onchange="renderPointage()" class="px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-bold font-fredoka focus:ring-2 focus:ring-[#C41E3A] focus:outline-none">
+                                <option value="2026-09" selected>Septembre 2026</option>
+                                <option value="2026-10">Octobre 2026</option>
+                                <option value="2026-11">Novembre 2026</option>
+                                <option value="2026-12">Décembre 2026</option>
+                                <option value="2027-01">Janvier 2027</option>
+                                <option value="2027-02">Février 2027</option>
+                                <option value="2027-03">Mars 2027</option>
+                                <option value="2027-04">Avril 2027</option>
+                                <option value="2027-05">Mai 2027</option>
+                                <option value="2027-06">Juin 2027</option>
+                                <option value="2027-07">Juillet 2027</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <button onclick="imprimerReleveMensuel()" class="px-3.5 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-print"></i> Imprimer Relevé Mensuel (A4)
+                            </button>
+                            <button onclick="validateAllMonth('done')" class="px-3 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-xs font-bold transition">
+                                <i class="fa-solid fa-check-double"></i> Tout cocher (Fait)
+                            </button>
+                            <button onclick="validateAllMonth('pending')" class="px-3 py-2 bg-slate-200 text-slate-700 hover:bg-slate-300 rounded-lg text-xs font-bold transition">
+                                <i class="fa-solid fa-rotate-left"></i> Réinitialiser
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CADRE BLOC RECAPITULATIF DU MOIS SÉLECTIONNÉ -->
+                    <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-5 rounded-2xl border border-slate-700 shadow-md">
+                        <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-4">
+                            <h3 class="font-fredoka text-base font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-chart-simple text-[#C41E3A]"></i> Synthèse du Mois — <span id="block-month-title">Septembre 2026</span>
+                            </h3>
+                            <span class="text-[11px] text-slate-400">Calcul en temps réel</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                            <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase font-fredoka block">1. Volume Prévu</span>
+                                <span class="text-xl font-bold font-fredoka text-slate-200" id="block-planned">0.00 h</span>
+                            </div>
+                            <div class="bg-emerald-950/40 p-3 rounded-xl border border-emerald-800/60">
+                                <span class="text-[10px] font-bold text-emerald-400 uppercase font-fredoka block">2. Réel Fait (Coché Vert)</span>
+                                <span class="text-xl font-bold font-fredoka text-emerald-400" id="block-done">0.00 h</span>
+                            </div>
+                            <div class="bg-rose-950/40 p-3 rounded-xl border border-rose-800/60">
+                                <span class="text-[10px] font-bold text-rose-400 uppercase font-fredoka block">3. Annulé / Non Fait (Rouge)</span>
+                                <span class="text-xl font-bold font-fredoka text-rose-400" id="block-cancelled">0.00 h</span>
+                            </div>
+                            <div class="bg-indigo-950/40 p-3 rounded-xl border border-indigo-800/60">
+                                <span class="text-[10px] font-bold text-indigo-300 uppercase font-fredoka block">4. Total à Payer (Avec +/-)</span>
+                                <span class="text-xl font-bold font-fredoka text-indigo-300" id="block-total">0.00 h</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GRILLE VISUELLE EN CARTES DE SEMAINE -->
+                    <div id="weeks-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Généré dynamiquement -->
+                    </div>
+                </div>
+
+                <!-- ONGLET 2 : AJUSTEMENTS -->
+                <div id="pane-ajustements" class="p-6 hidden space-y-6">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                        <h3 class="font-fredoka text-base font-bold text-slate-800">Saisir un ajustement ponctuel d'heures</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Mois Concerné</label>
+                                <select id="adj-month" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold">
+                                    <option value="2026-09">Septembre 2026</option>
+                                    <option value="2026-10">Octobre 2026</option>
+                                    <option value="2026-11">Novembre 2026</option>
+                                    <option value="2026-12">Décembre 2026</option>
+                                    <option value="2027-01">Janvier 2027</option>
+                                    <option value="2027-02">Février 2027</option>
+                                    <option value="2027-03">Mars 2027</option>
+                                    <option value="2027-04">Avril 2027</option>
+                                    <option value="2027-05">Mai 2027</option>
+                                    <option value="2027-06">Juin 2027</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Type d'Ajustement</label>
+                                <select id="adj-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold">
+                                    <option value="plus">➕ Heures Supplémentaires (+)</option>
+                                    <option value="minus">➖ Déduction / Heures en moins (-)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Durée (Heures)</label>
+                                <input type="number" step="0.25" id="adj-hours" placeholder="Ex: 1.5" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Motif / Contexte</label>
+                                <input type="text" id="adj-reason" placeholder="Ex: Stage compétition ou Absence cours" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs">
+                            </div>
+                        </div>
+                        <button onclick="addAdjustment()" class="px-4 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition">
+                            <i class="fa-solid fa-plus"></i> Ajouter l'Ajustement
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-800 text-white font-fredoka uppercase">
+                                <tr>
+                                    <th class="p-3">Mois</th>
+                                    <th class="p-3">Type</th>
+                                    <th class="p-3">Durée</th>
+                                    <th class="p-3">Motif / Contexte</th>
+                                    <th class="p-3 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adjustments-table-body" class="divide-y divide-slate-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 3. ZONE A4 PORTRAIT IMPRIMABLE NATIVEMENT -->
+    <div id="printable-releve-a4">
+        <!-- TABLEAU GLOBAL PERMETTANT DE RÉPÉTER L'EN-TÊTE SUR CHAQUE PAGE EN IMPRESSION -->
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <td style="padding-bottom:12px; border-bottom:2px solid #C41E3A;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div style="display:flex; gap:12px; align-items:center;">
+                                <div style="background:#C41E3A; width:52px; height:50px; border-radius:8px; padding:3px; display:flex; align-items:center; justify-content:center;">
+                                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width:100%; height:100%; object-fit:contain;">
+                                </div>
+                                <div>
+                                    <h1 style="margin:0; font-size:13pt; color:#C41E3A; font-family:'Fredoka', sans-serif; font-weight:bold;">DOJO DORNOIS</h1>
+                                    <div style="font-size:7pt; color:#64748b; line-height:1.2;">
+                                        1 Place de la Mairie - 58390 DORNES<br>
+                                        FFJDA n° CE 08.58.067.0 • Agrément J&S n° 58.S.471<br>
+                                        SIRET n° 451 928 410 00013 • RNA W583001220
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                <strong style="font-size:9pt; text-transform:uppercase; font-family:'Fredoka', sans-serif; display:block;">Relevé de Prestations</strong>
+                                <div style="color:#C41E3A; font-size:12pt; font-family:'Fredoka', sans-serif; font-weight:bold;" id="print-month-title">Septembre 2026</div>
+                                <div style="font-size:7.5pt; color:#64748b;">Intervenant : Romain Flammang</div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding-top:12px;">
+                        
+                        <!-- BLOC SYNTHÈSE A4 -->
+                        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; background:#f8fafc; padding:10px; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:15px; text-align:center;">
+                            <div><span style="display:block; font-size:6.5pt; color:#64748b; text-transform:uppercase; font-weight:bold;">Volume Prévu</span><strong id="p-stat-planned" style="font-size:10.5pt;">0.00 h</strong></div>
+                            <div><span style="display:block; font-size:6.5pt; color:#64748b; text-transform:uppercase; font-weight:bold;">Réel Fait</span><strong id="p-stat-done" style="font-size:10.5pt; color:#047857;">0.00 h</strong></div>
+                            <div><span style="display:block; font-size:6.5pt; color:#64748b; text-transform:uppercase; font-weight:bold;">Ajustements (+/-)</span><strong id="p-stat-adjust" style="font-size:10.5pt; color:#0284c7;">0.00 h</strong></div>
+                            <div><span style="display:block; font-size:6.5pt; color:#64748b; text-transform:uppercase; font-weight:bold;">Total Dû</span><strong id="p-stat-total" style="font-size:10.5pt; color:#4338ca;">0.00 h</strong></div>
+                        </div>
+
+                        <h3 style="font-size:8.5pt; text-transform:uppercase; margin-bottom:6px; font-family:'Fredoka', sans-serif; color:#1e293b;">Détail chronologique des séances du mois :</h3>
+                        
+                        <table style="width:100%; border-collapse:collapse; font-size:8.5pt; margin-bottom:15px;">
+                            <thead>
+                                <tr style="background:#1e293b; color:white; font-family:'Fredoka', sans-serif;">
+                                    <th style="padding:6px; text-align:left; font-size:7pt; text-transform:uppercase;">Date & Jour</th>
+                                    <th style="padding:6px; text-align:left; font-size:7pt; text-transform:uppercase;">Séance / Cours</th>
+                                    <th style="padding:6px; text-align:left; font-size:7pt; text-transform:uppercase;">Horaire</th>
+                                    <th style="padding:6px; text-align:center; font-size:7pt; text-transform:uppercase;">Durée</th>
+                                    <th style="padding:6px; text-align:right; font-size:7pt; text-transform:uppercase;">Statut Effectué</th>
+                                </tr>
+                            </thead>
+                            <tbody id="print-rows-tbody" style="border-bottom:1px solid #e2e8f0;">
+                                <!-- Rempli en JS -->
+                            </tbody>
+                        </table>
+
+                        <div id="print-adjustments-block" style="background:#f0f9ff; border:1px solid #bae6fd; padding:8px; border-radius:6px; margin-bottom:15px; font-size:8pt;" class="hidden">
+                            <strong style="color:#0369a1; display:block; margin-bottom:3px; font-family:'Fredoka', sans-serif; text-transform:uppercase; font-size:7.5pt;">Ajustements / Heures complémentaires :</strong>
+                            <div id="print-adjustments-list" style="color:#0c4a6e;"></div>
+                        </div>
+
+                        <div style="display:flex; justify-space-between; align-items:flex-end; margin-top:25px; border-top:1px solid #e2e8f0; padding-top:8px;">
+                            <div style="font-size:6.8pt; color:#64748b; font-style:italic;">
+                                Document extrait de l'intranet officiel du Dojo Dornois le <span id="print-export-date">--/--/----</span>.<br>
+                                Certifié conforme pour le suivi de facturation du professeur.
+                            </div>
+                            <div style="text-align:center; width:170px; border:1px solid #cbd5e1; padding:5px; border-radius:4px; background:#f8fafc;">
+                                <span style="display:block; font-size:6.5pt; font-weight:bold; text-transform:uppercase; color:#334155;">Le Président du Club</span>
+                                <span style="display:block; font-size:8pt; font-family:'Fredoka', sans-serif; color:#C41E3A; font-weight:bold; margin-top:1px;">Jordan LOUDENOT</span>
+                            </div>
+                        </div>
+
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SCRIPT SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
+        const TARGET_SHEET = "suivi_romain";
+
+        // MATRICE DU PLANNING HEBDOMADAIRE SANS LES ÉCOLES
+        const scheduleWeekly = [
+            { id: "mar_taiso_seniors", day: 2, name: "Taïso Adapté", category: "Taïso", duration: 1.0, time: "15h00-16h00" },
+            { id: "mar_enfants", day: 2, name: "Pré-Poussins & Benj. 1", category: "Judo Enfants", duration: 1.25, time: "17h30-18h45" },
+            { id: "mar_taiso_1", day: 2, name: "Taïso Soir", category: "Taïso", duration: 0.75, time: "18h45-19h30" },
+            { id: "mar_jujitsu", day: 2, name: "Jujitsu", category: "Jujitsu", duration: 1.5, time: "19h30-21h00" },
+            
+            { id: "jeu_taiso_seniors", day: 4, name: "Taïso Adapté", category: "Taïso", duration: 1.0, time: "15h00-16h00" },
+            { id: "jeu_jeunes", day: 4, name: "Benjamins 2 & Cadets 1", category: "Judo Jeunes", duration: 1.5, time: "17h30-19h00" },
+            { id: "jeu_taiso_2", day: 4, name: "Taïso Soir", category: "Taïso", duration: 1.0, time: "19h30-20h30" },
+            
+            { id: "sam_baby", day: 6, name: "Baby Motricité", category: "Baby", duration: 0.75, time: "08h30-09h15" },
+            { id: "sam_eveil", day: 6, name: "Éveil Judo", category: "Éveil", duration: 1.0, time: "09h15-10h15" },
+            { id: "sam_enfants", day: 6, name: "Pré-Poussins, Poussins & Benj.", category: "Judo Enfants", duration: 1.25, time: "10h15-11h30" },
+            { id: "sam_taiso", day: 6, name: "Taïso Matin", category: "Taïso", duration: 0.75, time: "11h30-12h15" },
+            { id: "sam_adultes", day: 6, name: "Cadets & Adultes", category: "Judo Adultes", duration: 1.75, time: "13h30-15h15" }
+        ];
+
+        const vacationRanges = [
+            { start: "2026-10-17", end: "2026-11-02" }, 
+            { start: "2026-12-19", end: "2027-01-04" }, 
+            { start: "2027-02-06", end: "2027-02-22" }, 
+            { start: "2027-04-10", end: "2027-04-26" }, 
+            { start: "2027-07-03", end: "2027-09-01" }  
+        ];
+
+        let romainData = {
+            checkState: {}, 
+            adjustments: []
+        };
+
+        function isVacationDate(dateStr) {
+            return vacationRanges.some(r => dateStr >= r.start && dateStr <= r.end);
+        }
+
+        function getLocalDateStr(y, m, d) {
+            return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        }
+
+        function autoSaveLocal() {
+            localStorage.setItem('romain_hours_data_v5', JSON.stringify(romainData));
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('#pane-pointage, #pane-ajustements').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'text-[#C41E3A]'));
+            
+            document.getElementById('pane-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-btn-' + tabId).classList.add('active');
+        }
+
+        function renderPointage() {
+            const selectedMonth = document.getElementById('select-month').value;
+            const [year, month] = selectedMonth.split('-').map(Number);
+            
+            const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+            document.getElementById('block-month-title').textContent = `${monthNames[month - 1]} ${year}`;
+
+            const container = document.getElementById('weeks-container');
+            container.innerHTML = '';
+
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const weeksMap = {};
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateObj = new Date(year, month - 1, d);
+                const dateStr = getLocalDateStr(year, month, d);
+                const dayOfWeek = dateObj.getDay();
+
+                const matchingCourses = scheduleWeekly.filter(c => c.day === dayOfWeek);
+
+                if (matchingCourses.length > 0) {
+                    const weekNum = getWeekNumber(dateObj);
+                    if (!weeksMap[weekNum]) weeksMap[weekNum] = {};
+                    if (!weeksMap[weekNum][dateStr]) weeksMap[weekNum][dateStr] = { dateObj, courses: [] };
+                    
+                    matchingCourses.forEach(course => {
+                        weeksMap[weekNum][dateStr].courses.push(course);
+                    });
+                }
+            }
+
+            Object.keys(weeksMap).forEach((weekNum) => {
+                const datesInWeek = weeksMap[weekNum];
+                const weekBlock = document.createElement('div');
+                weekBlock.className = "bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4";
+
+                let weekDoneHours = 0;
+                let daysBadgesHtml = '';
+
+                Object.keys(datesInWeek).forEach(dateStr => {
+                    const { dateObj, courses } = datesInWeek[dateStr];
+                    const isVac = isVacationDate(dateStr);
+                    const formattedDay = dateObj.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+
+                    let courseBadges = '';
+
+                    courses.forEach(course => {
+                        const checkKey = `${dateStr}_${course.id}`;
+                        
+                        if (romainData.checkState[checkKey] === undefined) {
+                            romainData.checkState[checkKey] = 'pending';
+                        }
+
+                        let status = romainData.checkState[checkKey];
+                        const isDone = (status === 'done');
+                        const isCancelled = (status === 'cancelled');
+
+                        if (isDone && !isVac) weekDoneHours += course.duration;
+
+                        courseBadges += `
+                            <div onclick="${isVac ? '' : `toggleCheckCycle('${checkKey}')`}" 
+                                 class="course-card-item p-2.5 rounded-xl font-medium text-xs flex items-center justify-between gap-2 ${isVac ? 'bg-amber-50/70 border-amber-200 text-amber-700 opacity-60 cursor-not-allowed border-l-4 border-l-amber-400' : (isDone ? 'status-done' : (isCancelled ? 'status-cancelled' : ''))}">
+                                <div class="truncate">
+                                    <strong class="font-fredoka block text-[11px] leading-tight">${course.name}</strong>
+                                    <span class="text-[10px] opacity-75 block">${course.time}</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <span class="font-fredoka font-bold text-[11px]">${course.duration}h</span>
+                                    ${isVac 
+                                        ? '<i class="fa-solid fa-umbrella-beach text-[10px]"></i>' 
+                                        : (isDone 
+                                            ? '<i class="fa-solid fa-circle-check text-emerald-500 text-sm"></i>' 
+                                            : (isCancelled 
+                                                ? '<i class="fa-solid fa-circle-xmark text-rose-600 text-sm"></i>' 
+                                                : '<i class="fa-regular fa-circle text-slate-300 text-sm"></i>'))
+                                    }
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    daysBadgesHtml += `
+                        <div class="space-y-1.5 bg-slate-50/80 p-3 rounded-xl border border-slate-200/70">
+                            <div class="text-[11px] font-bold font-fredoka text-slate-500 uppercase border-b border-slate-200 pb-1 mb-2 flex justify-between">
+                                <span>${formattedDay}</span>
+                                ${isVac ? '<span class="text-amber-600 font-bold">Vacances</span>' : ''}
+                            </div>
+                            <div class="space-y-1.5">
+                                ${courseBadges}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                weekBlock.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-[#C41E3A] inline-block"></span>
+                            <h3 class="font-fredoka text-sm font-bold text-slate-800">Semaine N° ${weekNum}</h3>
+                        </div>
+                        <span class="text-xs font-bold font-fredoka text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                            Volume Réel Fait : ${weekDoneHours.toFixed(2)} h
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        ${daysBadgesHtml}
+                    </div>
+                `;
+
+                container.appendChild(weekBlock);
+            });
+
+            updateKPIs();
+        }
+
+        function toggleCheckCycle(key) {
+            let current = romainData.checkState[key];
+            if (current === 'pending' || !current) {
+                romainData.checkState[key] = 'done';
+            } else if (current === 'done') {
+                romainData.checkState[key] = 'cancelled';
+            } else {
+                romainData.checkState[key] = 'pending';
+            }
+            autoSaveLocal(); 
+            renderPointage();
+        }
+
+        function validateAllMonth(targetStatus) {
+            const selectedMonth = document.getElementById('select-month').value;
+            const [year, month] = selectedMonth.split('-').map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = getLocalDateStr(year, month, d);
+                if (isVacationDate(dateStr)) continue;
+                const dayOfWeek = new Date(year, month - 1, d).getDay();
+                
+                const matchingCourses = scheduleWeekly.filter(c => c.day === dayOfWeek);
+                matchingCourses.forEach(c => {
+                    romainData.checkState[`${dateStr}_${c.id}`] = targetStatus;
+                });
+            }
+            autoSaveLocal();
+            renderPointage();
+        }
+
+        function updateKPIs() {
+            const selectedMonth = document.getElementById('select-month').value;
+            const [year, month] = selectedMonth.split('-').map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            let plannedHours = 0;
+            let doneHours = 0;
+            let cancelledHours = 0;
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = getLocalDateStr(year, month, d);
+                if (isVacationDate(dateStr)) continue;
+
+                const dayOfWeek = new Date(year, month - 1, d).getDay();
+                const matchingCourses = scheduleWeekly.filter(c => c.day === dayOfWeek);
+
+                matchingCourses.forEach(course => {
+                    plannedHours += course.duration;
+                    const checkKey = `${dateStr}_${course.id}`;
+                    const status = romainData.checkState[checkKey];
+
+                    if (status === 'done' || status === true) {
+                        doneHours += course.duration;
+                    } else if (status === 'cancelled') {
+                        cancelledHours += course.duration;
+                    }
+                });
+            }
+
+            let adjustHours = 0;
+            romainData.adjustments.filter(a => a.month === selectedMonth).forEach(a => {
+                adjustHours += (a.type === 'plus' ? a.hours : -a.hours);
+            });
+
+            const totalPayable = doneHours + adjustHours;
+
+            // Mise à jour du Bloc Synthèse sous le sélecteur
+            document.getElementById('block-planned').textContent = `${plannedHours.toFixed(2)} h`;
+            document.getElementById('block-done').textContent = `${doneHours.toFixed(2)} h`;
+            document.getElementById('block-cancelled').textContent = `${cancelledHours.toFixed(2)} h`;
+            document.getElementById('block-total').textContent = `${totalPayable.toFixed(2)} h`;
+        }
+
+        function addAdjustment() {
+            const month = document.getElementById('adj-month').value;
+            const type = document.getElementById('adj-type').value;
+            const hours = parseFloat(document.getElementById('adj-hours').value);
+            const reason = document.getElementById('adj-reason').value.trim();
+
+            if (isNaN(hours) || hours <= 0 || !reason) {
+                alert("Veuillez remplir correctement la durée et le motif de l'ajustement.");
+                return;
+            }
+
+            romainData.adjustments.push({ id: Date.now(), month, type, hours, reason });
+            document.getElementById('adj-hours').value = '';
+            document.getElementById('adj-reason').value = '';
+
+            autoSaveLocal(); 
+            renderAdjustmentsTable();
+            updateKPIs();
+            showToast("Ajustement ajouté !");
+        }
+
+        function renderAdjustmentsTable() {
+            const tbody = document.getElementById('adjustments-table-body');
+            tbody.innerHTML = '';
+            if (romainData.adjustments.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Aucun ajustement enregistré.</td></tr>`;
+                return;
+            }
+            romainData.adjustments.forEach(adj => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-3 font-bold font-fredoka">${adj.month}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded font-bold text-[10px] ${adj.type === 'plus' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                ${adj.type === 'plus' ? '+ Heures Sup' : '- Déduction'}
+                            </span>
+                        </td>
+                        <td class="p-3 font-bold font-fredoka ${adj.type === 'plus' ? 'text-emerald-600' : 'text-rose-600'}">
+                            ${adj.type === 'plus' ? '+' : '-'}${adj.hours.toFixed(2)} h
+                        </td>
+                        <td class="p-3 text-slate-600">${adj.reason}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteAdjustment(${adj.id})" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteAdjustment(id) {
+            romainData.adjustments = romainData.adjustments.filter(a => a.id !== id);
+            autoSaveLocal(); 
+            renderAdjustmentsTable();
+            updateKPIs();
+        }
+
+        // IMPRESSION DIRECTE NATIVE
+        function imprimerReleveMensuel() {
+            const selectedMonth = document.getElementById('select-month').value;
+            const [year, month] = selectedMonth.split('-').map(Number);
+            const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+            
+            document.getElementById('print-month-title').textContent = `${monthNames[month - 1]} ${year}`;
+            document.getElementById('print-export-date').textContent = new Date().toLocaleDateString('fr-FR');
+
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const tbody = document.getElementById('print-rows-tbody');
+            tbody.innerHTML = '';
+
+            let pPlanned = 0, pDone = 0, pCancelled = 0;
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateObj = new Date(year, month - 1, d);
+                const dateStr = getLocalDateStr(year, month, d);
+                if (isVacationDate(dateStr)) continue;
+
+                const dayOfWeek = dateObj.getDay();
+                const matchingCourses = scheduleWeekly.filter(c => c.day === dayOfWeek);
+
+                matchingCourses.forEach(course => {
+                    pPlanned += course.duration;
+                    const checkKey = `${dateStr}_${course.id}`;
+                    const status = romainData.checkState[checkKey] || 'pending';
+
+                    let statusLabel = '<span style="color:#94a3b8; font-weight:bold;">Non pointé</span>';
+                    if (status === 'done' || status === true) {
+                        pDone += course.duration;
+                        statusLabel = '<span style="color:#047857; font-weight:bold;">✓ Effectué</span>';
+                    } else if (status === 'cancelled') {
+                        pCancelled += course.duration;
+                        statusLabel = '<span style="color:#b91c1c; font-weight:bold;">✕ Non dispensé</span>';
+                    }
+
+                    const formattedDate = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+                    tbody.innerHTML += `
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 6px; font-weight: bold; text-transform: capitalize;">${formattedDate}</td>
+                            <td style="padding: 6px; font-weight: bold;">${course.name}</td>
+                            <td style="padding: 6px;">${course.time}</td>
+                            <td style="padding: 6px; text-align: center; font-weight: bold;">${course.duration} h</td>
+                            <td style="padding: 6px; text-align: right;">${statusLabel}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            let adjustHours = 0;
+            const monthAdjusts = romainData.adjustments.filter(a => a.month === selectedMonth);
+            const adjBlock = document.getElementById('print-adjustments-block');
+            const adjList = document.getElementById('print-adjustments-list');
+            adjList.innerHTML = '';
+
+            if (monthAdjusts.length > 0) {
+                adjBlock.classList.remove('hidden');
+                monthAdjusts.forEach(a => {
+                    const hVal = a.type === 'plus' ? a.hours : -a.hours;
+                    adjustHours += hVal;
+                    adjList.innerHTML += `<div>• <strong>${a.type === 'plus' ? '+' : '-'}${a.hours} h</strong> : ${a.reason}</div>`;
+                });
+            } else {
+                adjBlock.classList.add('hidden');
+            }
+
+            document.getElementById('p-stat-planned').textContent = `${pPlanned.toFixed(2)} h`;
+            document.getElementById('p-stat-done').textContent = `${pDone.toFixed(2)} h`;
+            document.getElementById('p-stat-adjust').textContent = `${adjustHours > 0 ? '+' : ''}${adjustHours.toFixed(2)} h`;
+            document.getElementById('p-stat-total').textContent = `${(pDone + adjustHours).toFixed(2)} h`;
+
+            // DÉCLENCHEMENT NATION IMPRESSION FENÊTRE
+            window.print();
+        }
+
+        function getWeekNumber(d) {
+            const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+            const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+            return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+        }
+
+        // SAUVEGARDE GOOGLE SHEETS & LOCAL STORAGE
+        function saveToSheet() {
+            autoSaveLocal(); 
+
+            showToast("☁️ Synchronisation vers Google Sheets...");
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ targetSheet: TARGET_SHEET, payload: romainData })
+            })
+            .then(() => showToast("✓ Données d'heures enregistrées vers Google Sheets !"))
+            .catch((err) => {
+                console.error(err);
+                showToast("✓ Données sauvegardées en local !");
+            });
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('romain_hours_data_v5') || localStorage.getItem('romain_hours_data_v4') || localStorage.getItem('romain_hours_data_v3');
+            if (saved) {
+                try {
+                    romainData = JSON.parse(saved);
+                } catch (e) {}
+            }
+            renderPointage();
+            renderAdjustmentsTable();
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast success';
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>

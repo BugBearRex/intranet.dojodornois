@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Studio Créateur de Vignettes — Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-clair: #B8B8B8;
+            --fond: #2D2D2D;
+            --blanc: #FFFFFF;
+            --sidebar-width: 280px;
+            --topbar-height: 68px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            margin: 0; padding: 0;
+            color: var(--blanc);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar { 
+            width: var(--sidebar-width); min-width: var(--sidebar-width); max-width: var(--sidebar-width);
+            background: var(--noir-doux); color: var(--blanc); display: flex; flex-direction: column; 
+            height: 100%; position: relative; box-shadow: 4px 0 15px rgba(0,0,0,0.1); flex-shrink: 0; z-index: 100;
+        }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0; }
+        .topbar { background: #3D3D3D; height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #555; flex-shrink: 0; }
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--blanc); }
+        .page-title-area h2 span { color: var(--rouge); }
+        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-clair); }
+
+        .app-body { flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .btn { font-family: 'Roboto', sans-serif; font-weight: 500; padding: 9px 15px; border-radius: 6px; border: none; cursor: pointer; transition: background 0.2s; font-size: 0.85rem; text-decoration: none; }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-dark:hover { background: #111; }
+
+        .studio-container { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; align-items: flex-start; max-width: 1300px; width: 100%; }
+
+        .config-panel {
+            background-color: #3D3D3D; padding: 22px; border-radius: 20px; border: 2px solid var(--rouge);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 14px; width: 440px;
+        }
+
+        .config-group { display: flex; flex-direction: column; gap: 6px; }
+        .config-group label { font-family: 'Fredoka', sans-serif; font-size: 10.5pt; color: #E8E8E8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .config-group input, .config-group select { font-family: 'Roboto', sans-serif; font-size: 10.5pt; padding: 8px; border-radius: 8px; border: 1px solid #555; background-color: #2D2D2D; color: #FFF; }
+        .row-flex { display: flex; gap: 10px; align-items: center; }
+
+        .color-presets-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin-top: 4px; background-color: #2D2D2D; padding: 8px; border-radius: 10px; }
+        .color-btn { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #FFF; cursor: pointer; transition: transform 0.1s; }
+        .color-btn:hover { transform: scale(1.25); }
+
+        .emoji-bar { display: flex; gap: 6px; flex-wrap: wrap; background-color: #2D2D2D; padding: 8px; border-radius: 8px; }
+        .emoji-btn { font-size: 13pt; background: none; border: none; cursor: pointer; transition: transform 0.1s; }
+        .emoji-btn:hover { transform: scale(1.3); }
+
+        .preview-area { display: flex; flex-direction: column; align-items: center; gap: 20px; position: sticky; top: 20px; }
+
+        .preview-wrapper {
+            background-image: repeating-conic-gradient(#808080 0 25%, #ffffff 0 50%);
+            background-size: 16px 16px; border-radius: 12px; padding: 0; display: inline-block; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        /* --- BASE VIGNETTE (CÔTÉS BLANCS - FOCUS HAUT) --- */
+        .vignette-card {
+            width: 400px;
+            height: 250px;
+            background-color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            padding: 0 20px 45px 20px; /* Dégagement bas pour Kalisport */
+        }
+
+        /* --- MODÈLES ORIENTÉS ZONES HAUTES --- */
+        
+        /* 1. Bandeau Supérieur Plein (Dossier Principal) */
+        .vignette-card.style-top-banner .header-area {
+            width: 100%;
+            background-color: var(--theme-color, #C41E3A);
+            padding: 8px 0;
+            text-align: center;
+        }
+        .vignette-card.style-top-banner .brand-text { color: #FFFFFF; }
+        .vignette-card.style-top-banner .brand-text span { color: #FFFFFF; }
+
+        /* 2. Bordure Haute Épaisse (Sous-dossier) */
+        .vignette-card.style-top-thick-border {
+            border-top: 10px solid var(--theme-color, #C41E3A);
+            padding-top: 12px;
+        }
+
+        /* 3. Onglet Centré / Pilule Haute (Projet / Rubrique) */
+        .vignette-card.style-top-pill {
+            padding-top: 10px;
+        }
+        .vignette-card.style-top-pill .header-area {
+            background-color: var(--theme-color, #C41E3A);
+            padding: 4px 20px;
+            border-radius: 0 0 14px 14px;
+        }
+        .vignette-card.style-top-pill .brand-text { color: #FFFFFF; }
+        .vignette-card.style-top-pill .brand-text span { color: #FFFFFF; }
+
+        /* 4. Vague / Aronde Haute (Médiathèque / Thématique) */
+        .vignette-card.style-top-wave .header-area {
+            width: 100%;
+            background-color: var(--theme-color, #C41E3A);
+            padding: 10px 0 14px 0;
+            border-radius: 0 0 50% 50% / 0 0 15px 15px;
+            text-align: center;
+        }
+        .vignette-card.style-top-wave .brand-text { color: #FFFFFF; }
+        .vignette-card.style-top-wave .brand-text span { color: #FFFFFF; }
+
+        /* 5. Ligne Fine Minimaliste (Archive / Document) */
+        .vignette-card.style-top-thin-line {
+            border-top: 4px solid var(--theme-color, #C41E3A);
+            padding-top: 12px;
+        }
+
+        /* 6. En-tête Bicolore / Ligne Double (Saison / Année) */
+        .vignette-card.style-top-double-line {
+            border-top: 6px solid var(--theme-color, #C41E3A);
+            padding-top: 10px;
+            position: relative;
+        }
+        .vignette-card.style-top-double-line::before {
+            content: '';
+            position: absolute;
+            top: 3px; left: 0; right: 0;
+            height: 2px;
+            background-color: var(--theme-color, #C41E3A);
+            opacity: 0.4;
+        }
+
+        /* --- STYLES COMMUNS DE MARQUE --- */
+        .brand-text {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 13pt;
+            font-weight: 700;
+            color: #3D3D3D;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .brand-text span { color: var(--rouge); }
+
+        /* --- CONTENU DE LA VIGNETTE --- */
+        .card-inner-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-grow: 1;
+            width: 100%;
+            gap: 4px;
+        }
+
+        .icon-image-container { display: flex; justify-content: center; align-items: center; height: 48px; }
+        .icon-image-container img { max-height: 100%; max-width: 80px; object-fit: contain; }
+        .icon-image-container .emoji-display { font-size: 32pt; line-height: 1; }
+
+        .title-main { font-family: 'Fredoka', sans-serif; font-size: 18pt; font-weight: 700; color: #1A1A1A; text-transform: uppercase; line-height: 1.05; word-break: break-word; }
+        .title-sub { font-family: 'Fredoka', sans-serif; font-size: 11pt; color: var(--theme-color, #C41E3A); font-weight: 600; }
+
+        .download-btn {
+            border: none; font-family: 'Fredoka', sans-serif; font-size: 13pt; padding: 12px 28px; border-radius: 40px; cursor: pointer;
+            box-shadow: 0 6px 15px rgba(196, 30, 58, 0.4); transition: transform 0.1s, background-color 0.2s; color: #FFF; background-color: var(--rouge);
+        }
+        .download-btn:hover { background-color: var(--rouge-hover); transform: scale(1.05); }
+        .btn-reset { background-color: #555; color: #FFF; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 8pt; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar"></div>
+
+    <div class="main-content">
+        <div class="topbar no-print">
+            <div class="page-title-area">
+                <h2>Studio Créateur de Vignettes — <span>Dojo Dornois</span></h2>
+                <p>Modèles optimisés pour les zones hautes (Anti-découpe Kalisport)</p>
+            </div>
+            <a href="../index.html" class="btn btn-dark">🏠 Central</a>
+        </div>
+
+        <div class="app-body">
+            <div class="studio-container">
+                
+                <div class="config-panel no-print">
+
+                    <div class="config-group">
+                        <label>Dimensions PNG :</label>
+                        <select id="selectDimensions" onchange="updateDimensions()">
+                            <option value="400x250" selected>400 x 250 px (Standard Kalisport)</option>
+                            <option value="450x280">450 x 280 px (Grand Angle)</option>
+                            <option value="350x220">350 x 220 px (Compact)</option>
+                        </select>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Structure / Modèle Haut :</label>
+                        <select id="selectStyle" onchange="updatePreview()">
+                            <option value="style-top-banner" selected>1. Bandeau Supérieur Plein (Dossier)</option>
+                            <option value="style-top-thick-border">2. Bordure Épaisse Haute (Sous-dossier)</option>
+                            <option value="style-top-pill">3. Onglet Centré (Projet / Rubrique)</option>
+                            <option value="style-top-wave">4. Aronde Incurvée (Médiathèque)</option>
+                            <option value="style-top-thin-line">5. Ligne Fine Minimaliste (Archive)</option>
+                            <option value="style-top-double-line">6. Ligne Double Accentuée (Saison)</option>
+                        </select>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Couleur Thème (40 Couleurs) :</label>
+                        <input type="color" id="inputBadgeColor" value="#C41E3A" onchange="updatePreview()">
+                        
+                        <div class="color-presets-grid">
+                            <div class="color-btn" style="background:#C41E3A;" onclick="setPresetColor('#C41E3A')"></div>
+                            <div class="color-btn" style="background:#E11D48;" onclick="setPresetColor('#E11D48')"></div>
+                            <div class="color-btn" style="background:#F43F5E;" onclick="setPresetColor('#F43F5E')"></div>
+                            <div class="color-btn" style="background:#DB2777;" onclick="setPresetColor('#DB2777')"></div>
+                            <div class="color-btn" style="background:#EC4899;" onclick="setPresetColor('#EC4899')"></div>
+                            <div class="color-btn" style="background:#A855F7;" onclick="setPresetColor('#A855F7')"></div>
+                            <div class="color-btn" style="background:#9333EA;" onclick="setPresetColor('#9333EA')"></div>
+                            <div class="color-btn" style="background:#6B21A8;" onclick="setPresetColor('#6B21A8')"></div>
+
+                            <div class="color-btn" style="background:#3B82F6;" onclick="setPresetColor('#3B82F6')"></div>
+                            <div class="color-btn" style="background:#2563EB;" onclick="setPresetColor('#2563EB')"></div>
+                            <div class="color-btn" style="background:#1D4ED8;" onclick="setPresetColor('#1D4ED8')"></div>
+                            <div class="color-btn" style="background:#0284C7;" onclick="setPresetColor('#0284C7')"></div>
+                            <div class="color-btn" style="background:#06B6D4;" onclick="setPresetColor('#06B6D4')"></div>
+                            <div class="color-btn" style="background:#0891B2;" onclick="setPresetColor('#0891B2')"></div>
+                            <div class="color-btn" style="background:#0D9488;" onclick="setPresetColor('#0D9488')"></div>
+                            <div class="color-btn" style="background:#14B8A6;" onclick="setPresetColor('#14B8A6')"></div>
+
+                            <div class="color-btn" style="background:#10B981;" onclick="setPresetColor('#10B981')"></div>
+                            <div class="color-btn" style="background:#059669;" onclick="setPresetColor('#059669')"></div>
+                            <div class="color-btn" style="background:#16A34A;" onclick="setPresetColor('#16A34A')"></div>
+                            <div class="color-btn" style="background:#22C55E;" onclick="setPresetColor('#22C55E')"></div>
+                            <div class="color-btn" style="background:#65A30D;" onclick="setPresetColor('#65A30D')"></div>
+                            <div class="color-btn" style="background:#84CC16;" onclick="setPresetColor('#84CC16')"></div>
+                            <div class="color-btn" style="background:#A3E635;" onclick="setPresetColor('#A3E635')"></div>
+                            <div class="color-btn" style="background:#4D7C0F;" onclick="setPresetColor('#4D7C0F')"></div>
+
+                            <div class="color-btn" style="background:#FACC15;" onclick="setPresetColor('#FACC15')"></div>
+                            <div class="color-btn" style="background:#EAB308;" onclick="setPresetColor('#EAB308')"></div>
+                            <div class="color-btn" style="background:#CA8A04;" onclick="setPresetColor('#CA8A04')"></div>
+                            <div class="color-btn" style="background:#F97316;" onclick="setPresetColor('#F97316')"></div>
+                            <div class="color-btn" style="background:#D97706;" onclick="setPresetColor('#D97706')"></div>
+                            <div class="color-btn" style="background:#EA580C;" onclick="setPresetColor('#EA580C')"></div>
+                            <div class="color-btn" style="background:#C2410C;" onclick="setPresetColor('#C2410C')"></div>
+                            <div class="color-btn" style="background:#78350F;" onclick="setPresetColor('#78350F')"></div>
+
+                            <div class="color-btn" style="background:#A16207;" onclick="setPresetColor('#A16207')"></div>
+                            <div class="color-btn" style="background:#78716C;" onclick="setPresetColor('#78716C')"></div>
+                            <div class="color-btn" style="background:#57534E;" onclick="setPresetColor('#57534E')"></div>
+                            <div class="color-btn" style="background:#6B7280;" onclick="setPresetColor('#6B7280')"></div>
+                            <div class="color-btn" style="background:#4B5563;" onclick="setPresetColor('#4B5563')"></div>
+                            <div class="color-btn" style="background:#1F2937;" onclick="setPresetColor('#1F2937')"></div>
+                            <div class="color-btn" style="background:#0F172A;" onclick="setPresetColor('#0F172A')"></div>
+                            <div class="color-btn" style="background:#18181B;" onclick="setPresetColor('#18181B')"></div>
+                        </div>
+                    </div>
+
+                    <div class="config-group">
+                        <div class="row-flex" style="justify-content: space-between;">
+                            <label>1. Visuel (Image / Emoji) :</label>
+                            <button class="btn-reset" onclick="clearImage()">Masquer</button>
+                        </div>
+                        <input type="file" id="inputImage" accept="image/*" onchange="handleImageUpload(event)">
+                        <div class="emoji-bar">
+                            <button class="emoji-btn" onclick="setEmoji('📊')">📊</button>
+                            <button class="emoji-btn" onclick="setEmoji('📁')">📁</button>
+                            <button class="emoji-btn" onclick="setEmoji('📂')">📂</button>
+                            <button class="emoji-btn" onclick="setEmoji('🪙')">🪙</button>
+                            <button class="emoji-btn" onclick="setEmoji('🥋')">🥋</button>
+                            <button class="emoji-btn" onclick="setEmoji('📜')">📜</button>
+                            <button class="emoji-btn" onclick="setEmoji('🏆')">🏆</button>
+                            <button class="emoji-btn" onclick="setEmoji('📷')">📷</button>
+                            <button class="emoji-btn" onclick="setEmoji('✉️')">✉️</button>
+                            <button class="emoji-btn" onclick="setEmoji('📅')">📅</button>
+                            <button class="emoji-btn" onclick="setEmoji('🌐')">🌐</button>
+                            <button class="emoji-btn" onclick="setEmoji('📝')">📝</button>
+                        </div>
+                    </div>
+
+                    <div class="config-group">
+                        <label>2. Titre Principal :</label>
+                        <input type="text" id="inputMainTitle" value="EXERCICE COMPTABLE" oninput="updatePreview()">
+                    </div>
+
+                    <div class="config-group">
+                        <div class="row-flex">
+                            <label>Taille du Titre :</label>
+                            <input type="range" id="inputFontSize" min="14" max="30" value="18" oninput="updatePreview()" style="flex:1;">
+                        </div>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Couleur du Titre :</label>
+                        <input type="color" id="inputMainColor" value="#1A1A1A" onchange="updatePreview()">
+                    </div>
+
+                    <div class="config-group">
+                        <label>3. Sous-titre :</label>
+                        <input type="text" id="inputSubTitle" value="Saison 2026 - 2027" oninput="updatePreview()">
+                    </div>
+
+                    <div class="config-group">
+                        <label>Couleur du Sous-titre :</label>
+                        <input type="color" id="inputSubColor" value="#C41E3A" onchange="updatePreview()">
+                    </div>
+                </div>
+
+                <div class="preview-area">
+                    <div class="preview-wrapper">
+                        <div class="vignette-card style-top-banner" id="previewCard">
+                            
+                            <div class="header-area">
+                                <div class="brand-text">Dojo <span>Dornois</span></div>
+                            </div>
+                            
+                            <div class="card-inner-content">
+                                <div class="icon-image-container" id="cardImageContainer">
+                                    <span class="emoji-display">📊</span>
+                                </div>
+                                <div class="title-main" id="cardMainTitle">EXERCICE COMPTABLE</div>
+                                <div class="title-sub" id="cardSubTitle">Saison 2026 - 2027</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <button class="download-btn no-print" onclick="downloadPNG()">📥 Télécharger la Vignette PNG</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentImageSrc = null;
+        let currentEmoji = '📊';
+
+        function updateDimensions() {
+            const dim = document.getElementById('selectDimensions').value.split('x');
+            const card = document.getElementById('previewCard');
+            card.style.width = dim[0] + 'px';
+            card.style.height = dim[1] + 'px';
+            updatePreview();
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageSrc = e.target.result;
+                    currentEmoji = null;
+                    updatePreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function setEmoji(emoji) {
+            currentEmoji = emoji; currentImageSrc = null;
+            document.getElementById('inputImage').value = '';
+            updatePreview();
+        }
+
+        function clearImage() {
+            currentImageSrc = null; currentEmoji = null;
+            document.getElementById('inputImage').value = '';
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const styleChoice = document.getElementById('selectStyle').value;
+            const themeColor = document.getElementById('inputBadgeColor').value;
+            const mainText = document.getElementById('inputMainTitle').value;
+            const fontSize = document.getElementById('inputFontSize').value;
+            const mainColor = document.getElementById('inputMainColor').value;
+            const subText = document.getElementById('inputSubTitle').value;
+            const subColor = document.getElementById('inputSubColor').value;
+
+            const card = document.getElementById('previewCard');
+            card.className = 'vignette-card ' + styleChoice;
+            card.style.setProperty('--theme-color', themeColor);
+
+            // Structure HTML dynamique
+            card.innerHTML = `
+                <div class="header-area">
+                    <div class="brand-text">Dojo <span>Dornois</span></div>
+                </div>
+                <div class="card-inner-content">
+                    <div class="icon-image-container" id="cardImageContainer"></div>
+                    <div class="title-main" id="cardMainTitle"></div>
+                    <div class="title-sub" id="cardSubTitle"></div>
+                </div>
+            `;
+
+            // Image / Emoji
+            const imgContainer = card.querySelector('#cardImageContainer');
+            if (imgContainer) {
+                if (currentImageSrc) {
+                    imgContainer.style.display = 'flex';
+                    imgContainer.innerHTML = `<img src="${currentImageSrc}" alt="icone">`;
+                } else if (currentEmoji) {
+                    imgContainer.style.display = 'flex';
+                    imgContainer.innerHTML = `<span class="emoji-display">${currentEmoji}</span>`;
+                } else {
+                    imgContainer.style.display = 'none';
+                }
+            }
+
+            // Titres
+            const mainElem = card.querySelector('#cardMainTitle');
+            if (mainElem) {
+                mainElem.innerText = mainText;
+                mainElem.style.fontSize = fontSize + 'pt';
+                mainElem.style.color = mainColor;
+            }
+
+            const subElem = card.querySelector('#cardSubTitle');
+            if (subElem) {
+                subElem.innerText = subText;
+                subElem.style.color = subColor;
+                subElem.style.display = subText.trim() ? 'block' : 'none';
+            }
+        }
+
+        function setPresetColor(colorHex) {
+            document.getElementById('inputBadgeColor').value = colorHex;
+            document.getElementById('inputSubColor').value = colorHex;
+            updatePreview();
+        }
+
+        function downloadPNG() {
+            const cardElement = document.getElementById('previewCard');
+            const name = (document.getElementById('inputMainTitle').value || 'vignette-web').replace(/[^a-zA-Z0-9-_]/g, '_');
+            
+            html2canvas(cardElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: null
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = name + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        updateDimensions();
+    </script>
+
+    <script src="../js/sidebar.js"></script>
+
+</body>
+</html>
