@@ -18,7 +18,6 @@
                 background: var(--noir-doux);
                 backdrop-filter: blur(15px);
                 -webkit-backdrop-filter: blur(15px);
-                /* PAVAGE HEXAGONAL RENFORCÉ (Opacité 0.08, trait 1.8) */
                 background-image: url("data:image/svg+xml,%3Csvg width='56' height='100' viewBox='0 0 56 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 68L28 84L56 68L56 84L28 100Z' fill='none' stroke='%23ffffff' stroke-opacity='0.08' stroke-width='1.8'/%3E%3C/svg%3E");
                 color: var(--text-light);
                 display: flex;
@@ -263,7 +262,7 @@
     function renderSidebar() {
         let structure = [];
         try {
-            const saved = localStorage.getItem('dd_catalog_structure_v5');
+            const saved = localStorage.getItem('dd_catalog_structure_v6');
             if (saved) structure = JSON.parse(saved);
         } catch(e) {}
 
