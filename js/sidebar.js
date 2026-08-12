@@ -1,3 +1,22 @@
+(async function checkAuth() {
+    if (window.location.pathname.endsWith('login.html')) return;
+    
+    // Inclusion automatique du SDK Supabase si non présent
+    if (typeof supabase === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+        document.head.appendChild(script);
+        await new Promise(resolve => script.onload = resolve);
+    }
+    
+    const sbClient = supabase.createClient('https://tumrbyxfnkqobyfzucax.supabase.co', 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8');
+    const { data: { session } } = await sbClient.auth.getSession();
+    
+    if (!session) {
+        const isAtRoot = !window.location.pathname.includes('/outils/');
+        window.location.href = isAtRoot ? 'login.html' : '../login.html';
+    }
+})();
 (function() {
     const styleId = 'dojo-sidebar-auto-styles';
     if (!document.getElementById(styleId)) {
