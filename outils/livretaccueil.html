@@ -571,60 +571,185 @@
     <script>
         const logoUrl = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png";
 
-        const initialPages = [
-            {
-                title: "LIVRET D'ACCUEIL",
-                subtitle: "Saison Officielle 2026 - 2027",
-                type: "cover",
-                leftContent: `Club affilié France Judo<br>RNA : W583001220`,
-                content: `<p style="font-size:11pt; line-height:1.7;">Vous venez de vous inscrire ou vous souhaitez nous rejoindre ? Ce livret est conçu pour vous guider à travers notre club, ses valeurs, son organisation et son équipe de bénévoles et professeurs.</p>
+       const initialPages = [
+    {
+        title: "LIVRET D'ACCUEIL",
+        subtitle: "Saison Officielle 2026 - 2027",
+        type: "cover",
+        leftContent: `Club affilié France Judo<br>RNA : W583001220`,
+        content: `<p style="font-size:11pt; line-height:1.7;">Vous venez de vous inscrire ou vous souhaitez nous rejoindre ? Ce livret est conçu pour vous guider à travers notre club, son histoire, ses bénévoles, ses professeurs et ses valeurs.</p>
 <div style="margin-top:25px; padding:15px; background:rgba(255,255,255,0.08); border-radius:8px; border-left:3px solid var(--rouge);">
     <p style="font-size:10pt;">📍 <b>Dojo Henri Pierrehumbert</b> — Rue du Moulin, Dornes</p>
     <p style="font-size:10pt;">📧 dojodornois@gmail.com | 📞 06.07.13.91.86</p>
     <p style="font-size:10pt; color:#FFB3C1; margin-top:4px;">🌐 dojodornois.fr</p>
 </div>`
-            },
-            {
-                title: "MOT DU PRÉSIDENT & CODE MORAL",
-                subtitle: "Bienvenue au Dojo Dornois",
-                type: "standard",
-                content: `<div class="grid-2">
+    },
+    {
+        title: "BIENVENUE DANS VOTRE CLUB",
+        subtitle: "Mot du Président & Organisation",
+        type: "standard",
+        content: `<div class="grid-2">
     <div class="box">
         <h3>🥋 Mot du Président</h3>
-        <p>Toute l'équipe du Dojo Dornois est ravie de vous accueillir pour cette nouvelle saison sportive. Notre dojo met un point d'honneur à offrir un cadre sécurisé, bienveillant et structuré où chaque pratiquant, du plus petit au plus grand, peut s'épanouir à son rythme.</p>
-        <p style="margin-top:12px; font-weight:bold; color:var(--rouge); font-family:'Fredoka', sans-serif;">Jordan — Président du Dojo Dornois</p>
+        <p style="font-size:9.5pt; line-height:1.5;">Une nouvelle saison commence pour notre dojo, et toute l'équipe est mobilisée pour vous offrir des conditions optimales de pratique. Le judo incarne l'harmonie entre la force et la souplesse. Au-delà des projections, il enseigne des valeurs de respect, de discipline et de dépassement de soi. C'est une vraie école de vie.</p>
+        <p style="margin-top:10px; font-weight:bold; color:var(--rouge); font-family:'Fredoka', sans-serif;">Jordan LOUDENOT — Président du Dojo Dornois</p>
     </div>
-    <div class="box" style="border-left-color: var(--noir-doux); background: #FAF9F6;">
-        <h3>⛩️ Code Moral du Judo</h3>
-        <p style="line-height:1.8;">
-            • <b>La Politesse</b> : C'est le respect d'autrui<br>
-            • <b>Le Courage</b> : C'est faire ce qui est juste<br>
-            • <b>Sincérité & Honneur</b> : Être vrai et fidèle à sa parole<br>
-            • <b>Modestie & Contrôle de soi</b> : Savoir taire son orgueil<br>
-            • <b>Amitié</b> : Le plus pur des sentiments humains
-        </p>
+    <div class="box" style="border-left-color: var(--noir-doux);">
+        <h3>🏛️ Une Association Affiliée</h3>
+        <p style="font-size:9.5pt; line-height:1.5;"><b>Association Loi 1901 :</b> Le Comité Directeur est composé de bénévoles assurant la gestion du club. Votre avis compte lors de l'Assemblée Générale annuelle !</p>
+        <p style="font-size:9.5pt; line-height:1.5; margin-top:8px;"><b>Affilié France Judo :</b> Votre licence vous offre une assurance complète ainsi que l'accès aux animations et compétitions fédérales.</p>
     </div>
 </div>`
-            },
-            {
-                title: "HORAIRES & DISCIPLINES",
-                subtitle: "Planning complet de la semaine",
-                type: "standard",
-                content: `<table>
+    },
+    {
+        title: "L'ÉQUIPE DU CLUB",
+        subtitle: "Comité Directeur & Enseignants",
+        type: "standard",
+        content: `<div class="grid-2">
+    <div class="box">
+        <h3>👥 Comité Directeur</h3>
+        <ul style="list-style:none; padding:0; font-size:9.5pt; line-height:1.8;">
+            <li><b>Président :</b> Jordan LOUDENOT (06 07 13 91 86)</li>
+            <li><b>Secrétaire :</b> Lucile CHAMPAGNE (06 63 66 82 47)</li>
+            <li><b>Trésorière :</b> Aurore BELLOUARD</li>
+            <li><b>Trésorière Adjointe :</b> Laetitia BERNARD</li>
+            <li><b>Membres :</b> Régis D'ARGENT, Johnny GARNIER</li>
+        </ul>
+    </div>
+    <div class="box" style="border-left-color: var(--noir-doux);">
+        <h3>🥋 Enseignants Diplômés</h3>
+        <ul style="list-style:none; padding:0; font-size:9.5pt; line-height:1.8;">
+            <li><b>Romain FLAMMANG :</b> Professeur principal (BPJEPS) — 07 68 88 78 70</li>
+            <li><b>Philippe FLAMMANG :</b> Enseignant & Séances de Sophrologie</li>
+        </ul>
+        <p style="font-size:8.5pt; color:var(--gris-moyen); margin-top:10px;">L'enseignement est assuré par des professeurs diplômés garantissant la qualité pédagogique et la sécurité sur le tatami.</p>
+    </div>
+</div>`
+    },
+    {
+        title: "HISTOIRE DU DOJO",
+        subtitle: "Plus de 50 ans de passion à Dornes",
+        type: "standard",
+        content: `<div class="box">
+    <ul style="list-style:none; padding:0; font-size:9.5pt; line-height:1.7;">
+        <li><b>1973 :</b> Création du club "Dojo Dornois", cofondé notamment par Marcel Brasquies.</li>
+        <li><b>1991 :</b> Inauguration du dojo au nom d'Henri Pierrehumbert, ancien président et professeur.</li>
+        <li><b>2000 :</b> Maurice Serreau prend la tête du club pendant 18 ans avec sa maman Chantal.</li>
+        <li><b>2021 :</b> Romain Flammang reprend les rênes de l'association.</li>
+        <li><b>2023 :</b> Célébration du 50ème anniversaire du Dojo Dornois !</li>
+        <li><b>2024 :</b> Romain valide son BPJEPS et prend la suite de Philippe pour la partie enseignement.</li>
+        <li><b>2026-2027 :</b> Une dynamique renforcée pour accueillir plus de 100 licenciés sur nos tatamis.</li>
+    </ul>
+</div>`
+    },
+    {
+        title: "NOS DISCIPLINES",
+        subtitle: "Une offre pour tous les âges et tous les profils",
+        type: "standard",
+        content: `<div class="grid-2">
+    <div class="box">
+        <h3>🥋 Judo & Jujitsu</h3>
+        <p style="font-size:9pt;"><b>Judo :</b> Méthode d'éducation et art martial japonais, apprentissage du contrôle et du combat en toute sécurité.</p>
+        <p style="font-size:9pt; margin-top:6px;"><b>Jujitsu / Self-Défense :</b> Art martial traditionnel axé sur la défense personnelle et la maîtrise de soi.</p>
+    </div>
+    <div class="box">
+        <h3>🤸 Taïso & Santé</h3>
+        <p style="font-size:9pt;"><b>Taïso :</b> Renforcement musculaire, entretien cardio et étirements sans chutes ni coups.</p>
+        <p style="font-size:9pt; margin-top:6px;"><b>Taïso Adapté :</b> Dédié aux seniors (50+) et au public PSH (handicap physique) pour une pratique douce.</p>
+    </div>
+</div>
+<div class="box" style="margin-top:12px; border-left-color:var(--noir-doux);">
+    <h3>🌿 Sophrologie</h3>
+    <p style="font-size:9pt;">Techniques de relaxation psychocorporelle et évocation positive, proposées lors de séances programmées le vendredi soir avec Philippe Flammang.</p>
+</div>`
+    },
+    {
+        title: "PLANNING DES COURS",
+        subtitle: "Saison 2026 - 2027",
+        type: "standard",
+        content: `<table>
     <thead>
-        <tr><th>Discipline / Section</th><th>Âges / Public</th><th>Créneaux Horaires</th><th>Enseignant</th></tr>
+        <tr><th>Jour</th><th>Créneau</th><th>Discipline / Section</th><th>Public / Âges</th></tr>
     </thead>
     <tbody>
-        <tr><td><b>Baby Judo</b></td><td>3 – 5 ans</td><td>Samedi : 10h00 – 11h00</td><td>Romain (BPJEPS)</td></tr>
-        <tr><td><b>Poussins / Benjamins</b></td><td>6 – 11 ans</td><td>Mardi : 17h30 – 19h00 | Samedi : 14h00 – 15h30</td><td>Romain (BPJEPS)</td></tr>
-        <tr><td><b>Ados / Adultes</b></td><td>12 ans et +</td><td>Mardi : 17h30 – 19h00 | Samedi : 16h30 – 18h30</td><td>Romain (BPJEPS)</td></tr>
-        <tr><td><b>Ju-Jitsu & Self-Défense</b></td><td>Dès 12 ans</td><td>Mardi : 19h00 – 20h00 | Samedi : 11h00 – 11h45</td><td>Romain (BPJEPS)</td></tr>
-        <tr><td><b>Taïso (Renforcement)</b></td><td>Dès 12 ans</td><td>Mardi : 20h00 – 21h00 | Samedi : 11h45 – 12h30</td><td>Romain (BPJEPS)</td></tr>
-        <tr><td><b>Taïso Seniors</b></td><td>50 ans et +</td><td>Mardi : 14h00 – 15h00</td><td>Romain (BPJEPS)</td></tr>
+        <tr><td rowspan="4"><b>Mardi</b></td><td>15h00 – 16h00</td><td>Taïso Adapté</td><td>Seniors / PSH</td></tr>
+        <tr><td>17h30 – 18h45</td><td>Pré-Poussins, Poussins & Benjamins 1</td><td>6 – 10 ans</td></tr>
+        <tr><td>18h45 – 19h30</td><td>Taïso</td><td>Dès 12 ans</td></tr>
+        <tr><td>19h30 – 21h00</td><td>Jujitsu</td><td>Dès 12 ans</td></tr>
+        <tr><td rowspan="2"><b>Jeudi</b></td><td>15h00 – 16h00</td><td>Taïso Adapté</td><td>Seniors / PSH</td></tr>
+        <tr><td>17h30 – 19h00</td><td>Benjamins 2 & Cadets 1<br><span style="font-size:8pt; color:var(--gris-moyen);">+ Taïso (19h30–20h30)</span></td><td>10 – 14 ans<br>Dès 12 ans</td></tr>
+        <tr><td rowspan="5"><b>Samedi</b></td><td>08h30 – 09h15</td><td>Baby Motricité</td><td>12 – 36 mois</td></tr>
+        <tr><td>09h15 – 10h15</td><td>Éveil Judo</td><td>3 – 5 ans</td></tr>
+        <tr><td>10h15 – 11h30</td><td>Pré-Poussins, Poussins & Benjamins 1</td><td>6 – 10 ans</td></tr>
+        <tr><td>11h30 – 12h15</td><td>Taïso</td><td>Dès 12 ans</td></tr>
+        <tr><td>13h30 – 15h15</td><td>Cadets & Adultes</td><td>Dès 14 ans</td></tr>
     </tbody>
-</table>`
-            }
-        ];
+</table>
+<div style="margin-top:10px; font-size:8.5pt; background:#FFFBEB; padding:8px; border-radius:6px; border:1px solid #FCD34D;">
+    🚌 <b>Ramassage scolaire :</b> Prise en charge des enfants à l'école primaire de Dornes le mardi à 16h15 (sur autorisation parentale).<br>
+    🎁 <b>3 séances d'essai gratuites</b> et sans engagement toute l'année !
+</div>`
+    },
+    {
+        title: "TENUE, HYGIÈNE ET REGLES",
+        subtitle: "Bien se préparer pour le tatami",
+        type: "standard",
+        content: `<div class="grid-2">
+    <div class="box">
+        <h3>🥋 Le Judogi & La Tenue</h3>
+        <p style="font-size:9pt;">• Veste, pantalon et ceinture adaptés.<br>
+        • Pour les féminines : t-shirt blanc sous le judogi.<br>
+        • <b>Zooris / Tongs :</b> Indispensables pour circuler entre le vestiaire et le tatami.<br>
+        • Gourde d'eau individuelle obligatoire.</p>
+    </div>
+    <div class="box">
+        <h3>🧼 Hygiène & Sécurité</h3>
+        <p style="font-size:9pt;">• Corps et judogi propres, ongles coupés court.<br>
+        • Cheveux longs obligatoirement attachés sans partie dure.<br>
+        • Pas d'arrivée directe en kimono : passage par les vestiaires obligatoire.<br>
+        • Retirer bijoux, montres et barrettes avant de monter sur le tapis.</p>
+    </div>
+</div>`
+    },
+    {
+        title: "CHARTE & PROTECTION",
+        subtitle: "Un cadre sécurisé pour tous nos pratiquants",
+        type: "standard",
+        content: `<div class="box">
+    <h3>👨‍👩‍👧 Rôle des Parents & Vie du Club</h3>
+    <p style="font-size:8.5pt;">• Respecter le travail de l'enseignant et encourager tous les enfants de manière positive.<br>
+    • Accompagner les enfants lors des compétitions et participer aux événements collectifs du dojo.<br>
+    • Accès aux vestiaires réservé à l'habillage des plus petits.</p>
+</div>
+<div class="box" style="margin-top:10px; border-left-color: #DC2626; background: #FEF2F2;">
+    <h3 style="color:#DC2626;">🛡️ Protection de l'Enfant — Colosse aux pieds d'argile</h3>
+    <p style="font-size:8.5pt; color:#991B1B;">Tout acte de violence, harcèlement ou bizutage est strictement interdit. Si tu te sens en danger ou besoin de parler :</p>
+    <p style="font-size:8.5pt; margin-top:4px; color:#991B1B;">
+        • Parles-en à <b>Jordan</b> (Président) ou <b>Romain</b> (Professeur).<br>
+        • Appelle le <b>119</b> (Enfance en danger) ou l'association Colosse au <b>07 88 86 46 27</b>.
+    </p>
+</div>`
+    },
+    {
+        title: "CODE MORAL DU JUDO",
+        subtitle: "Les 8 valeurs fondamentales",
+        type: "standard",
+        content: `<div class="box" style="background:#FAF9F6;">
+    <p style="font-size:9.5pt; line-height:1.8;">
+        • <b>La Politesse</b> : C'est le respect d'autrui.<br>
+        • <b>Le Courage</b> : C'est faire ce qui est juste.<br>
+        • <b>Sincérité & Honneur</b> : Être vrai et fidèle à sa parole.<br>
+        • <b>Modestie & Contrôle de soi</b> : Savoir taire son orgueil et sa colère.<br>
+        • <b>Le Respect</b> : Sans respect, aucune confiance ne peut naître.<br>
+        • <b>L'Amitié</b> : Le plus pur des sentiments humains.
+    </p>
+</div>
+<div style="margin-top:15px; text-align:center; font-size:9pt; color:var(--gris-moyen);">
+    Merci de faire vivre les valeurs du Dojo Dornois au quotidien !<br>
+    Retrouvez toute notre actualité sur <b>dojodornois.fr</b>
+</div>`
+    }
+];
 
         let pagesData = [];
         let editingPageIndex = null;
