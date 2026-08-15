@@ -35,6 +35,10 @@
             overflow: hidden;
         }
 
+        .sidebar {
+            flex-shrink: 0;
+        }
+
         .main-content {
             flex: 1;
             display: flex;
@@ -144,6 +148,9 @@
 </head>
 <body>
 
+    <!-- SIDEBAR DYNAMIQUE -->
+    <div class="sidebar"></div>
+
     <div class="modal-overlay" id="toolModal">
         <div class="modal-box">
             <h2 style="font-family:'Fredoka',sans-serif; margin-top:0;">➕ Ajouter un Outil</h2>
@@ -213,7 +220,7 @@
                         <h3 style="font-family:'Fredoka',sans-serif; margin-top:0; color:var(--rouge);">📌 Mode d'emploi</h3>
                         <p style="font-size:0.85rem; color:var(--gris-moyen); line-height: 1.6;">
                             • Clique sur <strong>Mode Édition</strong> pour renommer une catégorie, glisser un outil sur un autre pour réordonner ou changer de catégorie.<br>
-                            • Si une partie des 41 outils n'apparaît pas immédiatement, clique sur <strong>Réinitialiser les 41 Outils</strong> en haut à droite pour vider le cache de ton navigateur.
+                            • Si une partie des outils n'apparaît pas, clique sur <strong>Réinitialiser les 41 Outils</strong> en haut à droite.
                         </p>
                     </div>
                 </div>
@@ -299,7 +306,7 @@
                 { name: "📓 Workspace Notes", url: "outils/notion_board.html" },
                 { name: "🚀 Futur Dojo / Projets", url: "outils/futur_dojo.html" },
                 { name: "📅 Réunions & ODJ", url: "outils/reunions.html" },
-                { name: "📊 Logistique & Planning", url: "outils/logistique.html" }
+                { name: "📊 Logistique & Planning", url: "outils/logistique.html" },
                 { name: "📝 Générateur Kalisport", url: "outils/generateur_kalisport.html" }
             ]
         }
@@ -310,21 +317,26 @@
     let draggedInfo = null;
 
     function chargerInitialisation() {
-        const saved = localStorage.getItem('dd_catalog_structure_v6');
-        if (saved) {
-            structureCategories = JSON.parse(saved);
-        } else {
+        try {
+            const saved = localStorage.getItem('dd_catalog_structure_v6');
+            if (saved) {
+                structureCategories = JSON.parse(saved);
+            } else {
+                structureCategories = tousLesOutilsDojoDefaut;
+                saveState();
+            }
+        } catch (e) {
+            console.error("Erreur lecture storage :", e);
             structureCategories = tousLesOutilsDojoDefaut;
-            saveState();
         }
         renderCatalog();
     }
 
     function resetToDefault() {
-        if (confirm("Réinitialiser le Dashboard pour afficher les 41 outils par défaut ?")) {
+        if (confirm("Réinitialiser le Dashboard pour afficher tous les outils par défaut ?")) {
             localStorage.removeItem('dd_catalog_structure_v6');
             localStorage.removeItem('dd_catalog_structure_v5');
-            structureCategories = tousLesOutilsDojoDefaut;
+            structureCategories = JSON.parse(JSON.stringify(tousLesOutilsDojoDefaut));
             saveState();
             renderCatalog();
         }
@@ -340,6 +352,7 @@
 
     function renderCatalog() {
         const container = document.getElementById('catalogCard');
+        if (!container) return;
         container.innerHTML = '';
 
         structureCategories.forEach((cat, catIdx) => {
@@ -356,7 +369,7 @@
 
             const listEl = section.querySelector('.catalog-list');
 
-            cat.outils.forEach((tool, toolIdx) => {
+            (cat.outils || []).forEach((tool, toolIdx) => {
                 const item = document.createElement('div');
                 item.className = 'app-tool-link';
                 item.draggable = isEditMode;
