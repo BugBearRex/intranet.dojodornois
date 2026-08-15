@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion & Préparation des Réunions — Dojo Dornois</title>
+    <title>Gestion & Préparation des Réunions - Dojo Dornois</title>
 
     <!-- POLICES OFFICIELLES CHARTE DOJO DORNOIS -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -122,8 +122,8 @@
                 <button onclick="copierPourGemini()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
                     <i class="fa-solid fa-copy"></i> Copier pour Compte-Rendu Gemini
                 </button>
-                <button onclick="saveReunionsToSheet()" class="px-4 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Enregistrer vers Sheet
+                <button onclick="saveReunionsToSupabase()" class="px-4 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-database"></i> Enregistrer vers Supabase
                 </button>
             </div>
         </header>
@@ -179,11 +179,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Participants / Présents</label>
-                                <input type="text" id="reu-participants" placeholder="Ex: Jordan Loudenot, Romain Flammang, Serge, Laetitia..." oninput="autoSaveCurrent()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs">
+                                <input type="text" id="reu-participants" placeholder="Ex: Jordan Loudenot, Romain Flammang, Serge..." oninput="autoSaveCurrent()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Excusés / Membres Absents</label>
-                                <input type="text" id="reu-excuses" placeholder="Ex: Ophélie (excusée), Régis..." oninput="autoSaveCurrent()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs">
+                                <input type="text" id="reu-excuses" placeholder="Ex: Marc Direito, Yoann David..." oninput="autoSaveCurrent()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs">
                             </div>
                         </div>
                     </div>
@@ -281,32 +281,32 @@
 
     <script>
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-const SUPABASE_TABLE = 'reunions';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "reunions";
-const defaultReunionRentrée = {
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'reunions';
+
+        // Modèle exact repris du Dossier de Préparation CoDir
+        const defaultReunionRentrée = {
             id: 'reu_rentree_2026_v5',
             title: "Réunion de Rentrée du Comité Directeur",
-            date: "Vendredi 28 Août 2026 — 20h00",
-            lieu: "Dojo Municipal de Dornes",
-            participants: "Jordan Loudenot, Romain Flammang, Serge, Laetitia, Ophélie, Régis",
-            excuses: "",
+            date: "Vendredi 28 Août 2026 - 18h30",
+            lieu: "Dojo Dornois",
+            participants: "Jordan Loudenot, Romain Flammang, Laetitia Bernard, Thevenin Fanny, Hélène Chaussin, Régis D'Argent",
+            excuses: "Marc Direito, Yoann David",
             points: [
                 {
                     id: 101,
                     title: "🏫 1. Suivi du projet Écoles, TER & Point Mairie",
-                    contexte: "Suivi du projet avec les écoles (Dornes, Lucenay-lès-Aix, Cossaye) et le TER + le point Mairie.",
+                    contexte: "Suivi du projet avec les écoles (Dornes, Lucenay-lès-Aix, Cossaye) et le TER + le point Mairie sur les subventions.",
                     prep: "",
                     notes: "",
-                    files: "Conventions_Ecoles_2026.pdf",
+                    files: "R2026-08-26 - PJ01 - Convention & Planning des Interventions Scolaires - Dojo Dornois _ École de Dornes",
                     collapsed: false
                 },
                 {
                     id: 102,
-                    title: "🎟️ 2. Événements Fin 2026 & Dates Saison 2027",
-                    contexte: "Le point sur les événements de fin d'année 2026 et surtout l'anticipation des dates de TOUS nos événements 2027.",
+                    title: "🥋 2. Activité du Mercredi à St Ennemond & Disponibilité Romain",
+                    contexte: "Revoir avec Ophélie du périscolaire pour l'activité du mercredi à St Ennemond, Romain dispo le mercredi matin. Elle m'en avait parlé vers mai-juin pour voir pour une activité à St-Ennemond avec les enfants le mercredi. Mais je dois revoir les détails avec elle et en fonction des disponibilités de Romain (qui peut le mercredi matin)",
                     prep: "",
                     notes: "",
                     files: "",
@@ -314,8 +314,8 @@ const defaultReunionRentrée = {
                 },
                 {
                     id: 103,
-                    title: "🎰 3. Étude Loto / Rifles (Début 2027 ou Novembre)",
-                    contexte: "Étude pour caler notre Loto / Rifles sur début 2027 (entre janvier et juin, à voir avec Caroline du foot ou par nous-mêmes) ou en novembre comme le suggérait Régis (pour voir comment remonter au mieux la trésorerie).",
+                    title: "🎟️ 3. Événements Fin 2026 & Dates Saison 2027",
+                    contexte: "Le point sur les événements de fin d'année 2026 et surtout l'anticipation des dates de TOUS nos événements 2027. AG le 14/11 - Marché de Noël AACD à discuter - Noël du Dojo le 19/12 (à déterminer les cadeaux que l'on fera aux enfants). Voir si on refait les calendriers par Inititatives - Prévoir toutes les dates approximatives de 2027 (Janvier à Décembre) car réunion de réservation de la salle des fêtes à la mi-octobre certainement.",
                     prep: "",
                     notes: "",
                     files: "",
@@ -323,17 +323,17 @@ const defaultReunionRentrée = {
                 },
                 {
                     id: 104,
-                    title: "🖥️ 4. Démo du nouvel Intranet Club",
-                    contexte: "Démo du nouvel Intranet que j'ai structuré pour le club (documents et chartes unifiés).",
+                    title: "🎰 4. Étude Loto / Rifles (Début 2027 ou Novembre)",
+                    contexte: "Étude pour caler notre Loto / Rifles sur début 2027 (entre janvier et juin, à voir avec Caroline du foot ou par nous-mêmes) ou en novembre comme le suggérait Régis (pour voir comment remonter au mieux la trésorerie).",
                     prep: "",
                     notes: "",
-                    files: "Charte_Intranet.pdf",
+                    files: "",
                     collapsed: false
                 },
                 {
                     id: 105,
-                    title: "🥋 5. Activité du Mercredi à St Ennemond & Disponibilité Romain",
-                    contexte: "Revoir avec Ophélie pour l'activité du mercredi à St Ennemond, Romain dispo le mercredi matin.",
+                    title: "🎁 5. Organisation des Tombolas & Partenariat Initiatives",
+                    contexte: "Organisation détaillée des tombolas (outil créé) + dates + calage du calendrier via Initiatives (voir si on reconduit le système de challenge qui avait bien fonctionné cette année).",
                     prep: "",
                     notes: "",
                     files: "",
@@ -341,8 +341,8 @@ const defaultReunionRentrée = {
                 },
                 {
                     id: 106,
-                    title: "💳 6. Politiques Tarifaires, Gratuité Licenciés & Inscriptions Stages",
-                    contexte: "Réunion rentrée : Désormais pour les activités proposées hors cours (self défense, stage...), on ne fera pas payer les licenciés, on ne fera payer que les extérieurs une somme correcte pour participer au club (les licenciés paient déjà leur cotisation). Ajouter la mention 'Inscriptions obligatoires' pour les participations aux stages.",
+                    title: "🖥️ 6. Démo du nouvel Intranet Club",
+                    contexte: "Démo du nouvel Intranet que j'ai structuré pour le club (documents et chartes unifiés). Rapide présentation, pour vous montrer un peu l'évolution de la charte graphique présenté dernièrement.",
                     prep: "",
                     notes: "",
                     files: "",
@@ -350,20 +350,65 @@ const defaultReunionRentrée = {
                 },
                 {
                     id: 107,
-                    title: "🎁 7. Organisation des Tombolas & Partenariat Initiatives",
-                    contexte: "Organisation détaillée des tombolas (outil créé) + dates + calage du calendrier via Initiatives (voir si on reconduit le système de challenge qui avait bien fonctionné cette année).",
+                    title: "💳 7. Politiques Tarifaires, Gratuité Licenciés & Inscriptions Stages",
+                    contexte: "Désormais pour les activités proposées hors cours (self défense, stage...), on ne fera pas payer les licenciés, on ne fera payer que les extérieurs une somme correcte pour participer au club (les licenciés paient déjà leur cotisation). Ajouter la mention 'Inscriptions obligatoires' pour les participations aux stages. Gestion des stages et évènement comme self défense. géré par kalisport. Donc stages genre vacances tout géré par le module organisation et équipes (adhérents). Et self défense géré par le module Stages (adhérents + extérieur) .Après rien n'empêche à un extérieur de venir essayer sur un stage pendant les vacances à voir.",
                     prep: "",
                     notes: "",
-                    files: "Catalogue_Initiatives_2026.pdf",
+                    files: "",
                     collapsed: false
                 },
                 {
                     id: 108,
                     title: "📱 8. Messagerie Officielle : Intégration & Transition Kalisport",
-                    contexte: "Configurer Kalisport en tant que messagerie principale, en parler avec le codir. WhatsApp est pratique mais tout le monde n'est pas dessus et tout le monde ne lit pas. De plus, à chaque saison il va falloir changer de catégories tout un tas de parents donc risque d'erreur. Voir si Kalisport gère bien les réponses aussi, le but étant de communiquer dans les deux sens.",
-                    prep: "Préparer une démonstration de l'outil de messagerie de Kalisport et la documentation sur le suivi des messages.",
+                    contexte: "Configurer Kalisport en tant que messagerie principale. WhatsApp est pratique mais tout le monde n'est pas dessus et tout le monde ne lit pas. De plus, à chaque saison il va falloir changer de catégories tout un tas de parents donc risque d'erreur. Voir si Kalisport gère bien les réponses aussi, le but étant de communiquer dans les deux sens. Le logiciel est payé à l'année et permet de tout gérer ou presque depuis son interface.",
+                    prep: "",
                     notes: "",
-                    files: "Guide_Messagerie_Kalisport.pdf",
+                    files: "R2026-08-26 - PJ08 - Transition Messagerie vers Kalisport",
+                    collapsed: false
+                },
+                {
+                    id: 109,
+                    title: "🛡️ 9. Colosse aux pieds d'argile",
+                    contexte: "Présentation d'une proposition d'adhésion du Dojo Dornois à l'association « Colosse aux pieds d'argile », reconnue pour son action dans la prévention et la lutte contre les dérives, violences sexuelles, le harcèlement et le bizutage en milieu sportif. Cette démarche s'inscrit dans notre volonté de renforcer la protection des pratiquants (notamment les enfants) et de positionner notre club de manière claire et engagée sur la sécurité et le bien-être au sein du dojo. Romain et Jordan ont déjà suivi la formation dédiée dispensée par l'association.\nCoût de l'adhésion : 50 € / an",
+                    prep: "",
+                    notes: "",
+                    files: "",
+                    collapsed: false
+                },
+                {
+                    id: 110,
+                    title: "♿ 10. Inscription à Handiguide, MAJ FALC sur le site",
+                    contexte: "Inscription de la structure sur la plateforme Handiguide afin de référencer officiellement le Dojo Dornois comme club accueillant et adapté. En parallèle, mise à jour et optimisation du site internet du club pour intégrer une option FALC (Facile À Lire et à Comprendre).",
+                    prep: "",
+                    notes: "",
+                    files: "",
+                    collapsed: false
+                },
+                {
+                    id: 111,
+                    title: "🗼 11. Antenne à Chantenay St Imbert",
+                    contexte: "Mme Billard, maman du petit Amaury a un contact à la mairie pour étudier le projet. Voir si Romain intéressé et comment on pourrait organiser tout ça alors soit pour cette saison soit la saison prochaine (si Romain salarié, on pourrait lui donner des heures grâce à cette antenne)",
+                    prep: "",
+                    notes: "",
+                    files: "",
+                    collapsed: false
+                },
+                {
+                    id: 112,
+                    title: "👛 12. Budget 2026-2027, Salaire Romain",
+                    contexte: "Présentation du budget prévisionnel (et premier jet) pour la saison 2026-2027. À étudier le fait de passer Romain en salarié, les coûts, tout ce que cela implique et voir avec Romain. Une demande d'informations a été faite au Conseiller Technique Fédéral Philippe THOMAS.",
+                    prep: "",
+                    notes: "",
+                    files: "R2026-08-28 - PJ12 - Budget Prévisionnel - 2026-2027",
+                    collapsed: false
+                },
+                {
+                    id: 113,
+                    title: "❓ 13. Questions Diverses",
+                    contexte: "",
+                    prep: "",
+                    notes: "",
+                    files: "",
                     collapsed: false
                 }
             ]
@@ -394,7 +439,6 @@ const defaultReunionRentrée = {
                 card.innerHTML = `
                     <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-2">
                         <div class="flex items-center gap-2 flex-1 min-w-[250px]">
-                            <!-- BOUTONS DE DÉPLACEMENT -->
                             <div class="flex flex-col gap-0.5">
                                 <button onclick="movePoint(${idx}, -1)" ${idx === 0 ? 'disabled class="opacity-30 cursor-not-allowed text-xs text-slate-400"' : 'class="text-xs text-slate-600 hover:text-[#C41E3A]"'} title="Monter">
                                     <i class="fa-solid fa-chevron-up"></i>
@@ -416,25 +460,21 @@ const defaultReunionRentrée = {
                     </div>
 
                     <div class="${isCollapsed ? 'hidden' : 'space-y-4'}">
-                        <!-- BLOC FICHIERS JOINTS -->
                         <div class="bg-indigo-50/60 p-3 rounded-xl border border-indigo-200 flex items-center gap-3">
                             <label class="text-[11px] font-bold text-indigo-900 uppercase font-fredoka shrink-0 flex items-center gap-1.5">
                                 📎 Fichiers joints / Pièces transmises :
                             </label>
-                            <input type="text" value="${(p.files || '').replace(/"/g, '&quot;')}" oninput="updatePointFiles(${idx}, this.value)" class="w-full px-2.5 py-1 bg-white border border-indigo-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-1 focus:ring-indigo-400" placeholder="Ex: Convention_Ecoles.pdf, Guide_Kalisport.pdf...">
+                            <input type="text" value="${(p.files || '').replace(/"/g, '&quot;')}" oninput="updatePointFiles(${idx}, this.value)" class="w-full px-2.5 py-1 bg-white border border-indigo-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-1 focus:ring-indigo-400" placeholder="Ex: R2026-08-26 - PJ01...">
                         </div>
 
-                        <!-- 3 BLOCS EMPILÉS EN RANGEES -->
                         <div class="space-y-4">
-                            <!-- BLOC CONTEXTE (POUR LE CODIR) -->
                             <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
                                 <label class="block text-[11px] font-bold text-slate-700 uppercase font-fredoka flex items-center gap-1">
                                     📌 Contexte / Détail (Partagé au CoDir)
                                 </label>
-                                <textarea oninput="updatePointContexte(${idx}, this.value)" rows="3" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-1 focus:ring-slate-400 preserve-format" placeholder="Éléments d'information et contexte transmis aux membres pour préparation chez eux...">${p.contexte || ''}</textarea>
+                                <textarea oninput="updatePointContexte(${idx}, this.value)" rows="3" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-1 focus:ring-slate-400 preserve-format" placeholder="Éléments d'information et contexte transmis aux membres...">${p.contexte || ''}</textarea>
                             </div>
 
-                            <!-- PREPARATION PERSO -->
                             <div class="bg-amber-50/70 p-3.5 rounded-xl border border-amber-200 space-y-1">
                                 <label class="block text-[11px] font-bold text-amber-800 uppercase font-fredoka flex items-center gap-1">
                                     💡 Ma Préparation / Avis Personnel (Privé)
@@ -442,7 +482,6 @@ const defaultReunionRentrée = {
                                 <textarea oninput="updatePointPrep(${idx}, this.value)" rows="3" class="w-full p-2.5 bg-white border border-amber-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-1 focus:ring-amber-400 preserve-format" placeholder="Notes personnelles, chiffres à rappeler, questions à poser...">${p.prep || ''}</textarea>
                             </div>
 
-                            <!-- CE QUI SE DIT / RETRANSCRIPTION -->
                             <div class="bg-sky-50/70 p-3.5 rounded-xl border border-sky-200 space-y-1">
                                 <label class="block text-[11px] font-bold text-sky-800 uppercase font-fredoka flex items-center gap-1">
                                     🗣️ Échanges Réunion & Décisions Prises (Notes de Séance)
@@ -526,7 +565,7 @@ const defaultReunionRentrée = {
                 id: 'reu_' + Date.now(),
                 title: "Nouvelle Réunion",
                 date: new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
-                lieu: "Dojo Municipal de Dornes",
+                lieu: "Dojo Dornois",
                 participants: "",
                 excuses: "",
                 points: [{ id: Date.now(), title: "1. Ordre du jour", contexte: "", prep: "", notes: "", files: "", collapsed: false }]
@@ -701,7 +740,7 @@ const defaultReunionRentrée = {
             if (mode === 'codir') {
                 document.getElementById('p-label-type').textContent = "Dossier de Préparation CoDir";
             } else {
-                document.getElementById('p-label-type').textContent = "Dossier Integral de Réunion";
+                document.getElementById('p-label-type').textContent = "Dossier Intégral de Réunion";
             }
 
             const body = document.getElementById('p-points-body');
@@ -778,26 +817,30 @@ const defaultReunionRentrée = {
             }
         }
 
-        function deleteReunionArchive(idx) {
+        async function deleteReunionArchive(idx) {
             if (confirm("Supprimer cette réunion de l'historique ?")) {
                 reunionsDB.splice(idx, 1);
                 localStorage.setItem('dojo_reunions_db_v5', JSON.stringify(reunionsDB));
                 renderHistorique();
+                await saveReunionsToSupabase(true);
             }
         }
 
-        async function saveReunionsToSheet() {
+        async function saveReunionsToSupabase(silent = false) {
             autoSaveCurrent();
             
             try {
-                await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: reunionsDB });
-                showToast("✓ Enregistrement transmis vers Google Sheets !", "success");
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: reunionsDB });
+                if (error) throw error;
+                if (!silent) showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
             } catch (e) {
-                showToast("✓ Données sauvegardées en local !", "success");
+                console.error("Erreur Supabase:", e);
+                if (!silent) showToast("✓ Données sauvegardées en local (erreur synchronisation Supabase)", "error");
             }
         }
 
-        function loadData() {
+        async function loadData() {
+            // 1. Chargement du cache local en premier
             const savedDb = localStorage.getItem('dojo_reunions_db_v5');
             if (savedDb) {
                 try { 
@@ -809,6 +852,19 @@ const defaultReunionRentrée = {
             const savedCurrent = localStorage.getItem('dojo_current_reunion_v5');
             if (savedCurrent) {
                 try { currentReunion = JSON.parse(savedCurrent); } catch (e) {}
+            }
+
+            // 2. Synchronisation en direct depuis Supabase
+            try {
+                const { data, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (data && Array.isArray(data.data) && data.data.length > 0) {
+                    reunionsDB = data.data;
+                    currentReunion = reunionsDB[0];
+                    localStorage.setItem('dojo_reunions_db_v5', JSON.stringify(reunionsDB));
+                    localStorage.setItem('dojo_current_reunion_v5', JSON.stringify(currentReunion));
+                }
+            } catch (err) {
+                console.log("Chargement hors ligne ou premier chargement :", err);
             }
 
             loadCurrentToForm();
