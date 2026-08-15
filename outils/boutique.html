@@ -292,48 +292,58 @@
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
 const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'boutique';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "boutique";
-function showToast(msg) {
+    function showToast(msg, type="success") {
         const container = document.getElementById('toastContainer');
         const t = document.createElement('div');
-        t.className = 'toast success';
+        t.className = 'toast ' + type;
+        if(type === 'error') {
+            t.style.background = '#c0392b';
+            t.style.borderLeft = '4px solid #e74c3c';
+        }
         t.innerText = msg;
         container.appendChild(t);
         setTimeout(() => t.remove(), 3500);
     }
 
-    function syncToCloud() {
-        localStorage.setItem('dojo_boutique_backup', JSON.stringify(boutiqueData));
-        
-        sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: boutiqueData })
-        .then(() => showToast("✓ Boutique synchronisée sur Google Sheets !"))
-        .catch(err => console.error("Erreur Cloud Boutique:", err));
+    async function syncToSupabase(silent = false) {
+        if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+        try {
+            const payload = boutiqueData;
+            localStorage.setItem('dojo_boutique_backup', JSON.stringify(payload));
+            const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+            if (error) throw error;
+            if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+        } catch (err) {
+            console.error("Erreur Supabase:", err);
+            if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+        }
     }
 
-    function fetchCloudBoutiqueData() {
-        sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
-                if (data && (data.catalogue || data.commandes)) {
-                    boutiqueData = data;
-                    document.getElementById('file-status').innerText = "🔗 Données Boutique Cloud chargées";
-                } else {
-                    useFallbackLocalData();
-                }
-                finalizeInitialization();
-            })
-            .catch(() => {
-                useFallbackLocalData();
-                finalizeInitialization();
-            });
-    }
-
-    function useFallbackLocalData() {
-        if (localStorage.getItem('dojo_boutique_backup')) {
+    async function loadData() {
+        const saved = localStorage.getItem('dojo_boutique_backup');
+        if (saved) {
             try {
-                let saved = JSON.parse(localStorage.getItem('dojo_boutique_backup'));
-                if(saved && saved.catalogue) boutiqueData = saved;
-                document.getElementById('file-status').innerText = "📁 Fichier Local Restauré";
-            } catch(e){}
+                let parsed = JSON.parse(saved);
+                if (parsed && parsed.catalogue) {
+                    boutiqueData = parsed;
+                    document.getElementById('file-status').innerText = "📁 Fichier Local Restauré";
+                    finalizeInitialization();
+                }
+            } catch(e) {}
+        }
+        
+        try {
+            const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+            if (error) throw error;
+            if (result && result.data && (result.data.catalogue || result.data.commandes)) {
+                boutiqueData = result.data;
+                localStorage.setItem('dojo_boutique_backup', JSON.stringify(boutiqueData));
+                document.getElementById('file-status').innerText = "🔗 Données Boutique Cloud chargées";
+                finalizeInitialization();
+            }
+        } catch(e) {
+            console.error("Erreur chargement Supabase:", e);
+            finalizeInitialization();
         }
     }
 
@@ -404,7 +414,7 @@ function showToast(msg) {
             email: document.getElementById('sup_email_rdsports_tab').value.trim(),
             adresse: document.getElementById('sup_addr_rdsports_tab').value.trim()
         };
-        syncToCloud();
+        syncToSupabase();
         alert("Fiches fournisseurs enregistrées !");
         render();
     }
@@ -536,7 +546,7 @@ function showToast(msg) {
         `;
     }
 
-    window.onload = fetchCloudBoutiqueData;
+    window.onload = loadData;
 </script>
 
 <!-- APPEL DU SCRIPT SIDEBAR UNIFIE -->

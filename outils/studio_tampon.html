@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- BIBLIOTHÈQUE CONVERSION CANVAS -> PNG TRANSPARENT HD -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -557,6 +558,56 @@
     </div>
 
     <script type="text/javascript">
+        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'studio_tampon';
+
+        async function syncToSupabase(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = {
+                    club_logo_upload: localStorage.getItem('club_logo_upload'),
+                    club_signature: localStorage.getItem('club_signature')
+                }; 
+
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+            }
+        }
+
+        async function loadData() {
+            // 1. Sync load from localStorage for instant UI
+            const savedLogo = localStorage.getItem('club_logo_upload');
+            if (savedLogo) applyLogoDataUrl(savedLogo);
+
+            const savedSig = localStorage.getItem('club_signature');
+            if (savedSig) applySigDataUrl(savedSig);
+            
+            // 2. Async fetch from Supabase
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error && error.code !== 'PGRST116') throw error;
+                if (result && result.data) {
+                    if (result.data.club_logo_upload) {
+                        localStorage.setItem('club_logo_upload', result.data.club_logo_upload);
+                        applyLogoDataUrl(result.data.club_logo_upload);
+                    }
+                    if (result.data.club_signature) {
+                        localStorage.setItem('club_signature', result.data.club_signature);
+                        applySigDataUrl(result.data.club_signature);
+                    }
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+            }
+        }
+
         function showToast(message) {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -576,6 +627,7 @@
                     applyLogoDataUrl(dataUrl);
                     localStorage.setItem('club_logo_upload', dataUrl);
                     showToast("✓ Logo chargé avec succès !");
+                    syncToSupabase(true);
                 };
                 reader.readAsDataURL(file);
             }
@@ -600,6 +652,7 @@
                     applySigDataUrl(dataUrl);
                     localStorage.setItem('club_signature', dataUrl);
                     showToast("✓ Signature chargée avec succès !");
+                    syncToSupabase(true);
                 };
                 reader.readAsDataURL(file);
             }
@@ -664,12 +717,7 @@
             const today = new Date().toLocaleDateString('fr-FR');
             document.getElementById('ctrl-date').value = today;
 
-            // Chargement automatique des visuels sauvegardés s'ils existent déjà
-            const savedLogo = localStorage.getItem('club_logo_upload');
-            if(savedLogo) applyLogoDataUrl(savedLogo);
-
-            const savedSig = localStorage.getItem('club_signature');
-            if(savedSig) applySigDataUrl(savedSig);
+            loadData();
 
             applyGlobalStyles();
             updateCustomTexts();

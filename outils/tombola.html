@@ -113,8 +113,8 @@
             </div>
             
             <div class="flex items-center gap-2">
-                <button onclick="saveTombolaToSheet()" class="px-4 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Enregistrer vers Sheet
+                <button onclick="syncToSupabase()" class="px-4 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> ☁️ Enregistrer vers Supabase
                 </button>
             </div>
         </header>
@@ -331,12 +331,11 @@
 
     <script>
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-const SUPABASE_TABLE = 'tombola';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "tombolas";
-let currentLots = [
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'tombola';
+
+        let currentLots = [
             "Panier garni",
             "3 places CGR",
             "Licence Dojo (46€)",
@@ -693,13 +692,23 @@ let currentLots = [
             }
         }
 
-        function saveTombolaToSheet() {
-            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: tombolasDB })
-            .then(() => showToast("✓ Tombolas sauvegardées vers Google Sheets !"))
-            .catch(() => showToast("✓ Sauvegarde locale effectuée !"));
+        async function syncToSupabase(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = tombolasDB; 
+                localStorage.setItem('dojo_tombolas_data', JSON.stringify(payload)); 
+
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+            }
         }
 
-        function loadTombolasData() {
+        async function loadTombolasData() {
             const saved = localStorage.getItem('dojo_tombolas_data');
             if (saved) {
                 try {
@@ -708,12 +717,25 @@ let currentLots = [
             }
             renderLotsInputs();
             updatePreview();
+
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
+                if (result && result.data) {
+                    tombolasDB = result.data;
+                    localStorage.setItem('dojo_tombolas_data', JSON.stringify(tombolasDB));
+                    renderLotsInputs();
+                    updatePreview();
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+            }
         }
 
-        function showToast(msg) {
+        function showToast(msg, type = "success") {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            toast.className = 'toast success';
+            toast.className = `toast ${type}`;
             toast.innerText = msg;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3500);

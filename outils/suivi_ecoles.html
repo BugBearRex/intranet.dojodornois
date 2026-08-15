@@ -539,48 +539,67 @@
         };
 
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-const SUPABASE_TABLE = 'suivi_ecoles';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "scolaire";
-function showToast(message) {
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'suivi_ecoles';
+
+        function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
+            if (!container) return;
             const toast = document.createElement('div');
-            toast.className = 'toast success';
+            toast.className = 'toast ' + type;
+            if (type === 'error') {
+                toast.style.backgroundColor = '#8B1429';
+                toast.style.borderLeftColor = '#C41E3A';
+            }
             toast.innerText = message;
             container.appendChild(toast);
             setTimeout(() => { toast.remove(); }, 3500);
         }
 
-        function saveScolaireData() {
-            localStorage.setItem('dojo_scolaire_backup', JSON.stringify(scolaireDB));
+        async function saveScolaireData(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = scolaireDB; 
+                localStorage.setItem('dojo_scolaire_backup', JSON.stringify(payload)); 
 
-            const packet = {
-                targetSheet: TARGET_SHEET,
-                payload: scolaireDB
-            };
-
-            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
-            .then(() => {
-                showToast("✓ Données scolaires synchronisées sur Google Sheets !");
-            })
-            .catch(err => console.error("Erreur Cloud Scolaire:", err));
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+            }
         }
 
-        function loadScolaireData() {
-            sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
-                    if (data) {
-                        scolaireDB = data;
-                    } else {
-                        useFallbackLocalData();
-                    }
+        async function loadScolaireData() {
+            const saved = localStorage.getItem('dojo_scolaire_backup');
+            if (saved) {
+                try {
+                    scolaireDB = JSON.parse(saved);
                     finalizeInitialization();
-                })
-                .catch(err => {
+                } catch(e) {}
+            }
+            
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
+                if (result && result.data) {
+                    scolaireDB = result.data;
+                    localStorage.setItem('dojo_scolaire_backup', JSON.stringify(scolaireDB));
+                    finalizeInitialization();
+                } else if (!saved) {
                     useFallbackLocalData();
                     finalizeInitialization();
-                });
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+                if (!saved) {
+                    useFallbackLocalData();
+                    finalizeInitialization();
+                }
+            }
         }
 
         function useFallbackLocalData() {

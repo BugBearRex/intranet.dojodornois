@@ -219,75 +219,68 @@
         let currentFolderKey = null;
         let syncTimeout = null;
 
-        // --- INTERCONNEXION GOOGLE SHEETS CLOUD ---
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-const SUPABASE_TABLE = 'notion_board';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "base_connaissances";
-function showToast(message) {
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'notion_board';
+
+        function showToast(message, type = "success") {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            toast.className = 'toast success';
+            toast.className = `toast ${type}`;
             toast.innerText = message;
+            if (type === "error") {
+                toast.style.background = "#8B1429";
+                toast.style.borderLeft = "4px solid #C41E3A";
+            }
             container.appendChild(toast);
             setTimeout(() => { toast.remove(); }, 3500);
         }
 
-        function syncToCloud(immediate = false) {
-            localStorage.setItem('dojo_notion_v2', JSON.stringify(notionData));
-            
-            clearTimeout(syncTimeout);
-            const executeSync = () => {
-                const packet = {
-                    targetSheet: TARGET_SHEET,
-                    payload: notionData
-                };
+        async function syncToSupabase(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = notionData;
+                localStorage.setItem('dojo_notion_v2', JSON.stringify(payload)); 
 
-                sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
-                .then(() => {
-                    showToast("✓ Base de connaissances synchronisée sur Google Sheets !");
-                })
-                .catch(err => console.error("Erreur de sauvegarde Cloud Notes:", err));
-            };
-
-            if (immediate) {
-                executeSync();
-            } else {
-                // Anti-surcharge réseau lors de la saisie texte en continu (1.5 secondes de debounce)
-                syncTimeout = setTimeout(executeSync, 1500);
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
             }
         }
 
-        function loadCloudNotionData() {
-            sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
-                    if (data && Object.keys(data).length > 0) {
-                        notionData = data;
-                        console.log("✓ Notes chargées depuis le Cloud Google.");
-                    } else {
-                        useFallbackLocalData();
-                    }
+        async function loadData() {
+            const saved = localStorage.getItem('dojo_notion_v2');
+            if (saved) {
+                try {
+                    notionData = JSON.parse(saved);
                     finalizeInitialization();
-                })
-                .catch(err => {
-                    console.warn("Erreur Cloud Notes, bascule locale :", err);
-                    useFallbackLocalData();
-                    finalizeInitialization();
-                });
-        }
-
-        function useFallbackLocalData() {
-            const backup = localStorage.getItem('dojo_notion_v2');
-            if (backup) {
-                notionData = JSON.parse(backup);
+                } catch(e) {}
             } else {
                 notionData = defaultFolders;
+                finalizeInitialization();
+            }
+            
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
+                if (result && result.data) {
+                    notionData = result.data;
+                    localStorage.setItem('dojo_notion_v2', JSON.stringify(notionData));
+                    finalizeInitialization();
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
             }
         }
 
         function finalizeInitialization() {
             renderSidebar();
+            if (currentFolderKey) renderBlocks();
         }
 
         function renderSidebar() {
@@ -328,7 +321,7 @@ function showToast(message) {
             const newKey = 'custom_' + Date.now();
 
             notionData[newKey] = { title: title.trim(), icon: icon.trim(), isFixed: false, blocks: [] };
-            syncToCloud(true);
+            syncToSupabase(false);
             renderSidebar();
             selectFolder(newKey);
         }
@@ -343,7 +336,7 @@ function showToast(message) {
                     document.getElementById('blocks-container').innerHTML = `<p style="text-align: center; color: var(--gris-moyen); margin-top: 50px;">Sélectionnez une catégorie.</p>`;
                 }
                 delete notionData[key];
-                syncToCloud(true);
+                syncToSupabase(false);
                 renderSidebar();
             }
         }
@@ -398,7 +391,7 @@ function showToast(message) {
             event.stopPropagation();
             const block = notionData[currentFolderKey].blocks[index];
             block.isCollapsed = !block.isCollapsed;
-            syncToCloud(true);
+            syncToSupabase(false);
             renderBlocks();
         }
 
@@ -411,29 +404,30 @@ function showToast(message) {
                 content: "",
                 isCollapsed: false
             });
-            syncToCloud(true);
+            syncToSupabase(false);
             renderBlocks();
         }
 
         function updateBlockTitle(index, newValue) {
             notionData[currentFolderKey].blocks[index].title = newValue;
-            syncToCloud(true);
+            syncToSupabase(false);
         }
 
         function updateBlockContent(index, newValue) {
             notionData[currentFolderKey].blocks[index].content = newValue;
-            syncToCloud(false); // Mode écriture continu (debounce actif)
+            clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(() => syncToSupabase(true), 1500);
         }
 
         function deleteBlock(index) {
             if (confirm("Voulez-vous supprimer ce bloc ?")) {
                 notionData[currentFolderKey].blocks.splice(index, 1);
-                syncToCloud(true);
+                syncToSupabase(false);
                 renderBlocks();
             }
         }
 
-        window.onload = loadCloudNotionData;
+        window.onload = loadData;
 
         // Liaison globale pour les liaisons HTML du DOM
         window.createNewFolder = createNewFolder;

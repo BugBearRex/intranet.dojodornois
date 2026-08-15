@@ -325,7 +325,7 @@
                     </div>
 
                     <div style="display:flex; gap:8px; margin-top:6px;">
-                        <button class="btn" style="flex:1;" onclick="enregistrerFactureCloud()">💾 Enregistrer la Facture</button>
+                        <button class="btn" style="flex:1;" onclick="enregistrerFactureCloud()">☁️ Enregistrer vers Supabase</button>
                     </div>
 
                     <h4 style="font-family:'Fredoka', sans-serif; color:var(--rouge); margin: 10px 0 0 0; font-size: 0.95rem;">📚 Historique des Factures Générées</h4>
@@ -430,12 +430,11 @@
 
     <script type="text/javascript">
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-const SUPABASE_TABLE = 'facturation';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "factures";
-let facturesDB = {
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'facturation';
+        
+        let facturesDB = {
             lastNumberIndex: 0,
             liste: []
         };
@@ -575,7 +574,7 @@ let facturesDB = {
             renderArticlesInputs();
         }
 
-        function enregistrerFactureCloud() {
+        async function enregistrerFactureCloud(silent = false) {
             const num = document.getElementById('doc_num').value;
             const nom = document.getElementById('cli_nom').value.trim();
 
@@ -607,34 +606,46 @@ let facturesDB = {
                 facturesDB.lastNumberIndex = (facturesDB.lastNumberIndex || 0) + 1;
             }
 
-            localStorage.setItem('dojo_factures_backup', JSON.stringify(facturesDB));
-
-            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: facturesDB })
-            .then(() => {
-                showToast("✓ Facture enregistrée et synchronisée sur Google Sheets !");
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                localStorage.setItem('dojo_factures_backup', JSON.stringify(facturesDB));
+                
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: facturesDB });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
                 renderHistory();
-            })
-            .catch(err => console.error("Erreur Cloud Factures:", err));
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+                renderHistory();
+            }
         }
 
-        function loadFacturesData() {
-            sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
-                    if(data && data.liste) {
-                        facturesDB = data;
-                    } else {
-                        fallbackLocal();
-                    }
+        async function loadFacturesData() {
+            // 1. Sync load from localStorage for instant UI
+            const saved = localStorage.getItem('dojo_factures_backup');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data && data.liste) facturesDB = data;
                     finalizeInit();
-                })
-                .catch(() => {
-                    fallbackLocal();
+                } catch(e) {}
+            }
+            
+            // 2. Async fetch from Supabase
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
+                if (result && result.data && result.data.liste) {
+                    facturesDB = result.data;
+                    localStorage.setItem('dojo_factures_backup', JSON.stringify(facturesDB));
                     finalizeInit();
-                });
-        }
-
-        function fallbackLocal() {
-            const backup = localStorage.getItem('dojo_factures_backup');
-            if(backup) facturesDB = JSON.parse(backup);
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+                finalizeInit();
+            }
         }
 
         function finalizeInit() {

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Générateur de Livret d'Accueil — Dojo Dornois</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --rouge: #C41E3A;
@@ -506,7 +507,8 @@
             </div>
             <div class="btn-group">
                 <button onclick="addPage()">➕ Page</button>
-                <button class="btn-sec" onclick="exportJSON()">💾 Enregistrer (JSON)</button>
+                <button class="btn-sec" onclick="exportJSON()">💾 Exporter (JSON)</button>
+                <button class="btn-sec" onclick="syncToSupabase(false)">☁️ Synchro Supabase</button>
                 <button class="btn-sec" onclick="document.getElementById('import-file').click()">📂 Ouvrir (JSON)</button>
                 <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importJSON(event)">
                 <button class="btn-sec" onclick="resetDefaults()">🔄 Réinitialiser</button>
@@ -569,6 +571,11 @@
     </div>
 
     <script>
+        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'livretaccueil';
+
         const logoUrl = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png";
 
        const initialPages = [
@@ -754,7 +761,8 @@
         let pagesData = [];
         let editingPageIndex = null;
 
-        function init() {
+        async function loadData() {
+            // 1. Sync load from localStorage for instant UI
             const saved = localStorage.getItem('dojo_livret_data_v5');
             if (saved) {
                 try {
@@ -765,14 +773,37 @@
             } else {
                 pagesData = JSON.parse(JSON.stringify(initialPages));
             }
-            render();
+            render(false);
+
+            // 2. Async fetch from Supabase
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error && error.code !== 'PGRST116') throw error;
+                if (result && result.data) {
+                    pagesData = result.data;
+                    localStorage.setItem('dojo_livret_data_v5', JSON.stringify(pagesData));
+                    render(false);
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+            }
         }
 
-        function saveLocal() {
-            localStorage.setItem('dojo_livret_data_v5', JSON.stringify(pagesData));
+        async function syncToSupabase(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = pagesData;
+                localStorage.setItem('dojo_livret_data_v5', JSON.stringify(payload)); 
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+            }
         }
 
-        function render() {
+        function render(shouldSync = true) {
             const sidebar = document.getElementById('sidebar-list');
             const workspace = document.getElementById('workspace');
 
@@ -848,7 +879,9 @@
                 workspace.appendChild(pageWrapper);
             });
 
-            saveLocal();
+            if (shouldSync) {
+                syncToSupabase(true);
+            }
         }
 
         function toggleCoverFields() {
@@ -964,7 +997,7 @@
             return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        window.onload = init;
+        window.onload = loadData;
     </script>
 
     <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->

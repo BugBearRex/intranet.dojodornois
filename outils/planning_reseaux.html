@@ -471,31 +471,25 @@
         });
 
         async function loadInitialData() {
-            // 1. Lecture du cache local
-            const localData = localStorage.getItem('dojo_pub_planning');
-            if (localData) {
+            // 1. Sync load from localStorage for instant UI
+            const saved = localStorage.getItem('dojo_pub_planning');
+            if (saved) {
                 try {
-                    const parsed = JSON.parse(localData);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        publications = parsed;
+                    const data = JSON.parse(saved);
+                    if (Array.isArray(data) && data.length > 0) {
+                        publications = data;
                         renderTable();
                     }
-                } catch (e) {}
+                } catch(e) {}
             }
-
-            // 2. Synchronisation prioritaire depuis Supabase
+            
+            // 2. Async fetch from Supabase
             try {
-                const { data, error } = await sbClient
-                    .from(SUPABASE_TABLE)
-                    .select('data')
-                    .eq('id', 1)
-                    .single();
-
-                if (error && error.code !== 'PGRST116') {
-                    console.error('Erreur Supabase au chargement:', error);
-                } else if (data && Array.isArray(data.data) && data.data.length > 0) {
-                    publications = data.data;
-                    saveLocal();
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error && error.code !== 'PGRST116') throw error;
+                if (result && result.data && Array.isArray(result.data) && result.data.length > 0) {
+                    publications = result.data;
+                    localStorage.setItem('dojo_pub_planning', JSON.stringify(publications));
                     renderTable();
                 } else if (publications.length === 0) {
                     // Données par défaut si base vide
@@ -520,8 +514,8 @@
                     renderTable();
                     await syncToSupabase(true);
                 }
-            } catch (err) {
-                console.warn('Mode hors-ligne ou erreur de connexion Supabase:', err);
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
                 if (publications.length === 0) renderTable();
             }
         }
@@ -686,18 +680,20 @@
         }
 
         async function syncToSupabase(silent = false) {
-            if (!silent) showToast('Synchronisation Supabase en cours...');
-
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
             try {
+                const payload = publications;
+                localStorage.setItem('dojo_pub_planning', JSON.stringify(payload)); 
+                
                 const { error } = await sbClient
                     .from(SUPABASE_TABLE)
-                    .upsert({ id: 1, data: publications });
+                    .upsert({ id: 1, data: payload });
 
                 if (error) throw error;
-                if (!silent) showToast('✅ Synchronisation Supabase réussie !');
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
             } catch (err) {
-                console.error('Erreur Supabase:', err);
-                if (!silent) alert('⚠️ Erreur lors de la synchronisation Supabase : ' + (err.message || err));
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
             }
         }
 

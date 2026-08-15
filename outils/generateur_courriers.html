@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Générateur de Courriers Officiels - Dojo Dornois</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -349,8 +350,62 @@
 </div>
 
 <script>
-let imgSignature = localStorage.getItem('club_signature') || '';
-let imgTampon = localStorage.getItem('club_tampon') || '';
+const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_TABLE = 'generateur_courriers';
+
+let imgSignature = '';
+let imgTampon = '';
+
+async function syncToSupabase(silent = false) {
+    if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+    try {
+        const payload = {
+            club_signature: imgSignature,
+            club_tampon: imgTampon
+        }; 
+
+        localStorage.setItem('club_signature', imgSignature);
+        localStorage.setItem('club_tampon', imgTampon);
+
+        const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+        if (error) throw error;
+        
+        if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+    } catch (err) {
+        console.error("Erreur Supabase:", err);
+        if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+    }
+}
+
+async function loadData() {
+    const savedSig = localStorage.getItem('club_signature');
+    const savedTampon = localStorage.getItem('club_tampon');
+    if (savedSig) imgSignature = savedSig;
+    if (savedTampon) imgTampon = savedTampon;
+    majMinis();
+    genererApercu();
+    
+    try {
+        const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+        if (error) throw error;
+        if (result && result.data) {
+            if (result.data.club_signature) {
+                imgSignature = result.data.club_signature;
+                localStorage.setItem('club_signature', imgSignature);
+            }
+            if (result.data.club_tampon) {
+                imgTampon = result.data.club_tampon;
+                localStorage.setItem('club_tampon', imgTampon);
+            }
+            majMinis();
+            genererApercu();
+        }
+    } catch(e) {
+        console.error("Erreur chargement Supabase:", e);
+    }
+}
 
 function execCmd(command, value = null) {
     document.execCommand(command, false, value);
@@ -362,8 +417,9 @@ function sauvegarderVisuel(type) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
-        if (type === 'sig') { imgSignature = e.target.result; localStorage.setItem('club_signature', imgSignature); }
-        else { imgTampon = e.target.result; localStorage.setItem('club_tampon', imgTampon); }
+        if (type === 'sig') { imgSignature = e.target.result; }
+        else { imgTampon = e.target.result; }
+        syncToSupabase(true);
         majMinis(); genererApercu();
     };
     reader.readAsDataURL(file);
@@ -537,7 +593,7 @@ function createPageElement(ref, lieu, dateDoc, pageNum, totalPages) {
     return page;
 }
 
-window.onload = function() { majMinis(); genererApercu(); };
+window.onload = function() { loadData(); };
 </script>
 
 <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->

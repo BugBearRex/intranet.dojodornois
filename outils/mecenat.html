@@ -258,7 +258,7 @@
                         </div>
 
                         <div>
-                            <button class="btn" style="width:100%; height:38px;" id="btn-submit" onclick="enregistrerMecene()">💾 Enregistrer le Mécène</button>
+                            <button class="btn" style="width:100%; height:38px;" id="btn-submit" onclick="enregistrerMecene()">☁️ Enregistrer vers Supabase</button>
                         </div>
                     </div>
                 </div>
@@ -351,7 +351,7 @@
                         </div>
 
                         <div>
-                            <button class="btn btn-green" style="width:100%; height:38px;" id="btn-val-submit" onclick="enregistrerValorisation()">💾 Enregistrer la Ceinture</button>
+                            <button class="btn btn-green" style="width:100%; height:38px;" id="btn-val-submit" onclick="enregistrerValorisation()">☁️ Enregistrer vers Supabase</button>
                         </div>
                     </div>
                 </div>
@@ -421,12 +421,10 @@
 
     <script type="text/javascript">
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-const SUPABASE_TABLE = 'mecenat';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "Mecenat";
-const DEFAULT_CEINTURES = [
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'mecenat';
+        const DEFAULT_CEINTURES = [
             { id: 1, nom: "⚪ Ceinture Blanche — Pack Découverte", seuil: "< 150 €", bgColor: "#F8FAFC", borderColor: "#94A3B8", desc: "Mention sur le site internet et remerciement officiel newsletter." },
             { id: 2, nom: "🟡 Ceinture Jaune — Pack Supporteur", seuil: "150 € - 300 €", bgColor: "#FEF9C3", borderColor: "#CA8A04", desc: "Logo sur le site web + Affiche officielle des partenaires dans le dojo." },
             { id: 3, nom: "🟠 Ceinture Orange — Pack Engagé", seuil: "300 € - 500 €", bgColor: "#FFEDD5", borderColor: "#EA580C", desc: "Banderole 2x1m dans le dojo + visuels réseaux sociaux." },
@@ -517,26 +515,54 @@ const DEFAULT_CEINTURES = [
         function reinitialiserPacksCeintures() {
             if(confirm("Réinitialiser les packs avec la grille complète des ceintures et leurs seuils d'origine ?")) {
                 valorisationsDB = JSON.parse(JSON.stringify(DEFAULT_CEINTURES));
-                saveAllData(); renderAll();
+                syncToSupabase(); renderAll();
             }
         }
 
-        function saveAllData() {
-            localStorage.setItem('dojo_mecenes_v8', JSON.stringify(mecenesDB));
-            localStorage.setItem('dojo_val_v8', JSON.stringify(valorisationsDB));
+        async function syncToSupabase(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = { mecenes: mecenesDB, valorisations: valorisationsDB, livretPages: livretPages };
+                localStorage.setItem('dojo_mecenes_v8', JSON.stringify(mecenesDB));
+                localStorage.setItem('dojo_val_v8', JSON.stringify(valorisationsDB));
+                localStorage.setItem('dojo_livret_v8', JSON.stringify(livretPages));
 
-            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: { mecenes: mecenesDB, valorisations: valorisationsDB } }).then(() => showToast("✓ Sauvegardé !"))
-            .catch(err => console.error(err));
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+            }
         }
 
-        function loadAllData() {
+        async function loadAllData() {
             const backupMec = localStorage.getItem('dojo_mecenes_v8');
             const backupVal = localStorage.getItem('dojo_val_v8');
+            const backupLivret = localStorage.getItem('dojo_livret_v8');
 
             if(backupMec) mecenesDB = JSON.parse(backupMec);
-            if(backupVal && JSON.parse(backupVal).length >= 8) { valorisationsDB = JSON.parse(backupVal); }
+            if(backupVal && JSON.parse(backupVal).length >= 8) valorisationsDB = JSON.parse(backupVal);
+            if(backupLivret) livretPages = JSON.parse(backupLivret);
 
             renderAll();
+
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error && error.code !== 'PGRST116') throw error;
+                if (result && result.data) {
+                    if (result.data.mecenes) mecenesDB = result.data.mecenes;
+                    if (result.data.valorisations) valorisationsDB = result.data.valorisations;
+                    if (result.data.livretPages) livretPages = result.data.livretPages;
+
+                    localStorage.setItem('dojo_mecenes_v8', JSON.stringify(mecenesDB));
+                    localStorage.setItem('dojo_val_v8', JSON.stringify(valorisationsDB));
+                    localStorage.setItem('dojo_livret_v8', JSON.stringify(livretPages));
+                    renderAll();
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+            }
         }
 
         function renderAll() {
@@ -616,7 +642,7 @@ const DEFAULT_CEINTURES = [
                 }
             }
 
-            saveAllData(); resetValForm(); renderAll();
+            syncToSupabase(); resetValForm(); renderAll();
         }
 
         function editerValorisation(index) {
@@ -635,7 +661,7 @@ const DEFAULT_CEINTURES = [
         function supprimerValorisation(index) {
             if(confirm("Supprimer ce pack de valorisation ?")) {
                 valorisationsDB.splice(index, 1);
-                saveAllData(); renderAll();
+                syncToSupabase(); renderAll();
             }
         }
 
@@ -733,7 +759,7 @@ const DEFAULT_CEINTURES = [
                 }
             }
 
-            saveAllData(); resetForm(); renderAll();
+            syncToSupabase(); resetForm(); renderAll();
         }
 
         function editerMecene(index) {
@@ -748,14 +774,14 @@ const DEFAULT_CEINTURES = [
             document.getElementById('mecene-notes').value = item.notes || '';
 
             document.getElementById('form-title').innerText = `✏️ Modifier le Mécène (${item.societe})`;
-            document.getElementById('btn-submit').innerText = "💾 Enregistrer les modifications";
+            document.getElementById('btn-submit').innerText = "☁️ Enregistrer vers Supabase";
             document.getElementById('btn-cancel-edit').style.display = "inline-flex";
         }
 
         function supprimerMecene(index) {
             if(confirm("Confirmer la suppression de cette fiche mécène ?")) {
                 mecenesDB.splice(index, 1);
-                saveAllData(); renderAll();
+                syncToSupabase(); renderAll();
             }
         }
 
@@ -767,7 +793,7 @@ const DEFAULT_CEINTURES = [
             document.getElementById('mecene-montant').value = "";
             document.getElementById('mecene-notes').value = "";
             document.getElementById('form-title').innerText = "➕ Saisir un Mécène ou une Entreprise Cible";
-            document.getElementById('btn-submit').innerText = "💾 Enregistrer le Mécène";
+            document.getElementById('btn-submit').innerText = "☁️ Enregistrer vers Supabase";
             document.getElementById('btn-cancel-edit').style.display = "none";
         }
 
@@ -829,14 +855,14 @@ const DEFAULT_CEINTURES = [
                 div.className = 'page-card';
                 div.innerHTML = `
                     <div class="page-card-header">
-                        <input type="text" class="form-control" style="font-weight:bold; width:65%;" value="${page.titre}" onchange="livretPages[${idx}].titre = this.value">
+                        <input type="text" class="form-control" style="font-weight:bold; width:65%;" value="${page.titre}" onchange="livretPages[${idx}].titre = this.value; syncToSupabase(true);">
                         <div style="display:flex; gap:4px;" class="no-print">
                             <button class="btn btn-secondary btn-xs" onclick="deplacerPageLivret(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>▲ Monter</button>
                             <button class="btn btn-secondary btn-xs" onclick="deplacerPageLivret(${idx}, 1)" ${idx === livretPages.length - 1 ? 'disabled' : ''}>▼ Descendre</button>
                             <button class="btn btn-secondary btn-xs" style="background:var(--rouge);" onclick="supprimerPageLivret(${idx})">✕</button>
                         </div>
                     </div>
-                    <textarea class="form-control" style="height:140px; font-family:monospace; font-size:0.8rem;" onchange="livretPages[${idx}].html = this.value">${page.html}</textarea>
+                    <textarea class="form-control" style="height:140px; font-family:monospace; font-size:0.8rem;" onchange="livretPages[${idx}].html = this.value; syncToSupabase(true);">${page.html}</textarea>
                 `;
                 container.appendChild(div);
             });
@@ -844,6 +870,7 @@ const DEFAULT_CEINTURES = [
 
         function ajouterPageLivret() {
             livretPages.push({ isGarde: false, titre: `Page ${livretPages.length + 1} — Nouvelle Section HTML`, html: `<h3 style="color:#C41E3A;">Titre Section</h3>\n<p>Contenu personnalisable en HTML...</p>` });
+            syncToSupabase();
             renderLivretEditor();
         }
 
@@ -853,12 +880,15 @@ const DEFAULT_CEINTURES = [
             const temp = livretPages[index];
             livretPages[index] = livretPages[newIndex];
             livretPages[newIndex] = temp;
+            syncToSupabase(true);
             renderLivretEditor();
         }
 
         function supprimerPageLivret(index) {
             if(confirm("Supprimer cette page du livret ?")) {
-                livretPages.splice(index, 1); renderLivretEditor();
+                livretPages.splice(index, 1);
+                syncToSupabase();
+                renderLivretEditor();
             }
         }
 

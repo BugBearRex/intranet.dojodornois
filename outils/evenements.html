@@ -161,17 +161,20 @@
             "2027-2028": []
         };
 
-        // --- INTERCONNEXION CLOUD GOOGLE SHEETS ---
+        // --- INTERCONNEXION CLOUD SUPABASE ---
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-const SUPABASE_TABLE = 'evenements';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "evenements";
-function showToast(message) {
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'evenements';
+
+        function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            toast.className = 'toast success';
+            toast.className = `toast ${type}`;
+            if (type === 'error') {
+                toast.style.background = '#C41E3A';
+                toast.style.borderLeft = '4px solid #A3182E';
+            }
             toast.innerText = message;
             container.appendChild(toast);
             setTimeout(() => { toast.remove(); }, 3500);
@@ -181,7 +184,9 @@ function showToast(message) {
             return document.getElementById('select-saison').value;
         }
 
-        function recalculerEtSauvegarder() {
+        async function recalculerEtSauvegarder(silent = true) {
+            if (silent !== true && silent !== false) silent = true;
+
             const saison = obtenirSaisonCourante();
             const tbody = document.getElementById('tbody-events');
             const lignes = tbody.querySelectorAll('tr');
@@ -216,9 +221,6 @@ function showToast(message) {
 
             dataEvenements[saison] = listeSaison;
             
-            // Double sécurité : sauvegarde locale
-            localStorage.setItem('dd_events_data', JSON.stringify(dataEvenements));
-
             document.getElementById('kpi-total-investi').innerText = totalCout.toFixed(2) + " €";
             document.getElementById('kpi-total-recolte').innerText = totalRecette.toFixed(2) + " €";
             
@@ -237,34 +239,47 @@ function showToast(message) {
                 blocCardBenefice.style.borderLeftColor = "var(--bleu)";
             }
 
-            // Envoi automatique au cloud
-            const packet = {
-                targetSheet: TARGET_SHEET,
-                payload: dataEvenements
-            };
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = dataEvenements;
+                localStorage.setItem('dd_events_data', JSON.stringify(payload)); 
 
-            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
-            .then(() => {
-                showToast("✓ Manifestations synchronisées sur Google Sheets !");
-            })
-            .catch(err => console.error("Erreur de sauvegarde Cloud Manifestations:", err));
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+            }
         }
 
-        function chargerEvenementsData() {
-            sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
-                    if (data && (data["2025-2026"] || data["2026-2027"])) {
-                        dataEvenements = data;
-                        console.log("✓ Données Événements chargées depuis le Cloud Google.");
-                    } else {
-                        useFallbackLocalData();
-                    }
+        async function chargerEvenementsData() {
+            // 1. Sync load from localStorage for instant UI
+            const saved = localStorage.getItem('dd_events_data');
+            if (saved) {
+                try {
+                    dataEvenements = JSON.parse(saved);
                     renderView();
-                })
-                .catch(err => {
-                    console.warn("Erreur Cloud Événements, bascule sur la mémoire locale:", err);
-                    useFallbackLocalData();
+                } catch(e) {}
+            } else {
+                useFallbackLocalData();
+                renderView();
+            }
+            
+            // 2. Async fetch from Supabase
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
+                if (result && result.data && (result.data["2025-2026"] || result.data["2026-2027"])) {
+                    dataEvenements = result.data;
+                    localStorage.setItem('dd_events_data', JSON.stringify(dataEvenements));
                     renderView();
-                });
+                    console.log("✓ Données Événements chargées depuis Supabase.");
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+            }
         }
 
         function useFallbackLocalData() {

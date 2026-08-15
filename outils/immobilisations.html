@@ -407,11 +407,9 @@
         let activeImmoForModal = null;
 
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-const SUPABASE_TABLE = 'immobilisations';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "Immobilisations";
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'immobilisations';
 function showToast(message) {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -454,40 +452,43 @@ function showToast(message) {
             reader.readAsDataURL(file);
         }
 
-        function saveImmoData() {
-            localStorage.setItem('dojo_immo_backup', JSON.stringify(immoDB));
-
-            const packet = {
-                targetSheet: TARGET_SHEET,
-                payload: { immobilisations: immoDB }
-            };
-
-            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
-            .then(() => showToast("✓ Registre des immobilisations synchronisé !"))
-            .catch(err => console.error("Erreur Cloud Immo:", err));
+        async function saveImmoData(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = { immobilisations: immoDB };
+                localStorage.setItem('dojo_immo_backup', JSON.stringify(immoDB));
+                
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+            }
         }
 
-        function loadImmoData() {
-            sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
-                    if(data && data.immobilisations && data.immobilisations.length > 0) {
-                        immoDB = data.immobilisations;
-                    } else {
-                        useFallbackLocalData();
-                    }
-                    renderAll();
-                })
-                .catch(() => {
-                    useFallbackLocalData();
-                    renderAll();
-                });
-        }
-
-        function useFallbackLocalData() {
-            const backup = localStorage.getItem('dojo_immo_backup');
-            if(backup) {
-                immoDB = JSON.parse(backup);
+        async function loadImmoData() {
+            const saved = localStorage.getItem('dojo_immo_backup');
+            if (saved) {
+                try {
+                    immoDB = JSON.parse(saved);
+                } catch(e) {}
             } else {
                 immoDB = JSON.parse(JSON.stringify(initialImmoData));
+            }
+            renderAll();
+            
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
+                if (result && result.data && result.data.immobilisations) {
+                    immoDB = result.data.immobilisations;
+                    localStorage.setItem('dojo_immo_backup', JSON.stringify(immoDB));
+                    renderAll();
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
             }
         }
 

@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- HTML2CANVAS FOR PNG EXPORT -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -73,8 +74,8 @@
                 <button onclick="openModal('modal-new-profile')" class="px-4 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition">
                     <i class="fa-solid fa-plus"></i> Nouveau profil
                 </button>
-                <button onclick="syncToSheet()" class="px-4 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Sauvegarder dans Sheet
+                <button onclick="syncToSupabase()" class="px-4 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> ☁️ Enregistrer vers Supabase
                 </button>
             </div>
         </header>
@@ -298,6 +299,11 @@
 
     <!-- SCRIPT LOGIQUE APP STUDIO -->
     <script>
+        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'studio_signature_gmail';
+
         let profiles = {
             dojo: {
                 name: "🥋 Dojo Dornois",
@@ -550,11 +556,53 @@
             showToast("✓ Nouveau profil '" + name + "' créé avec succès !");
         }
 
-        function syncToSheet() {
-            showToast("☁️ Sauvegarde des profils dans le Google Sheet...");
-            setTimeout(() => {
-                showToast("✓ Profils enregistrés dans Google Sheets !");
-            }, 800);
+        async function syncToSupabase(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = { profiles }; 
+                localStorage.setItem('studio_signature_gmail_data', JSON.stringify(payload)); 
+
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)");
+            }
+        }
+
+        async function loadData() {
+            const saved = localStorage.getItem('studio_signature_gmail_data');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && parsed.profiles) {
+                        profiles = parsed.profiles;
+                        renderProfileButtons();
+                        if (!profiles[currentProfileKey]) {
+                            currentProfileKey = Object.keys(profiles)[0] || 'dojo';
+                        }
+                        selectProfile(currentProfileKey);
+                    }
+                } catch(e) {}
+            }
+            
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
+                if (result && result.data && result.data.profiles) {
+                    profiles = result.data.profiles;
+                    localStorage.setItem('studio_signature_gmail_data', JSON.stringify({ profiles }));
+                    renderProfileButtons();
+                    if (!profiles[currentProfileKey]) {
+                        currentProfileKey = Object.keys(profiles)[0] || 'dojo';
+                    }
+                    selectProfile(currentProfileKey);
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+            }
         }
 
         function showToast(msg) {
@@ -570,6 +618,7 @@
         window.onload = function() {
             renderProfileButtons();
             selectProfile('dojo');
+            loadData();
         };
     </script>
 </body>

@@ -102,7 +102,7 @@
                 <i class="fa-solid fa-code text-[#C41E3A]"></i> Code HTML
             </button>
             <button onclick="saveCurrentPoster()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold flex items-center gap-2 shadow-md transition">
-                <i class="fa-solid fa-floppy-disk"></i> Sauvegarder
+                ☁️ Enregistrer vers Supabase
             </button>
         </div>
     </header>
@@ -304,7 +304,13 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'generateur_affiches';
+
         const DEFAULT_LOGO = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png";
         const DEFAULT_BANDEROLE = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/banderole-dojo-dornois.png";
 
@@ -1124,20 +1130,55 @@
 
         function updatePosterTitle() { currentPoster.name = document.getElementById('poster-name-input').value; }
 
-        function saveCurrentPoster() {
+        async function saveCurrentPoster(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
             try {
                 let history = JSON.parse(localStorage.getItem('dojo_posters_history') || "[]");
                 currentPoster.updatedAt = new Date().toLocaleString('fr-FR');
                 const existingIdx = history.findIndex(p => p.id === currentPoster.id);
                 if (existingIdx >= 0) history[existingIdx] = JSON.parse(JSON.stringify(currentPoster));
                 else history.unshift(JSON.parse(JSON.stringify(currentPoster)));
-                localStorage.setItem('dojo_posters_history', JSON.stringify(history));
+                
+                const payload = history;
+                // Save to localStorage as fallback/cache (keep existing keys if possible)
+                localStorage.setItem('dojo_posters_history', JSON.stringify(payload));
                 updateHistoryCounter();
-                alert("Affiche sauvegardée !");
-            } catch(e) {}
+
+                // UPSERT to supabase
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+                else if (!silent) alert("☁️ Enregistrement synchronisé sur Supabase !");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+                else if (!silent) alert("⚠️ Données sauvegardées en local (erreur Supabase)");
+            }
         }
 
-        function loadHistoryFromStorage() { updateHistoryCounter(); }
+        async function loadHistoryFromStorage() {
+            // 1. Sync load from localStorage for instant UI
+            const saved = localStorage.getItem('dojo_posters_history');
+            if (saved) {
+                try {
+                    updateHistoryCounter();
+                } catch(e) {}
+            }
+            
+            // 2. Async fetch from Supabase
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
+                if (result && result.data) {
+                    localStorage.setItem('dojo_posters_history', JSON.stringify(result.data));
+                    updateHistoryCounter();
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+            }
+        }
+
         function updateHistoryCounter() { 
             try { document.getElementById('history-count').textContent = JSON.parse(localStorage.getItem('dojo_posters_history') || "[]").length; 
             } catch(e) { document.getElementById('history-count').textContent = "0"; }
@@ -1175,10 +1216,17 @@
             renderDynamicEditorList(); renderPoster(); closeModal('modal-history');
         }
 
-        function deletePosterFromHistory(idx) {
+        async function deletePosterFromHistory(idx) {
             let history = JSON.parse(localStorage.getItem('dojo_posters_history') || "[]");
             history.splice(idx, 1);
             localStorage.setItem('dojo_posters_history', JSON.stringify(history));
+            
+            try {
+                await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: history });
+            } catch (err) {
+                console.error("Erreur Supabase lors de la suppression:", err);
+            }
+            
             openHistoryModal(); updateHistoryCounter();
         }
 

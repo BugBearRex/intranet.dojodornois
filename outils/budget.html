@@ -197,13 +197,11 @@
     let budgetDB = {};
     let currentSaison = "2026-2027";
 
-    // --- INTERCONNEXION CLOUD GOOGLE SHEETS ---
+// --- INTERCONNEXION CLOUD SUPABASE ---
     const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
 const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'budget';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "budget_previsionnel";
 function showToast(message) {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
@@ -268,30 +266,31 @@ function showToast(message) {
         ]
     };
 
-    function loadBudgetData() {
-        sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
-                if (data && (data["2026-2027"] || data["2025-2026"])) {
-                    budgetDB = data;
-                    console.log("✓ Données budgétaires chargées depuis le Cloud.");
-                } else {
-                    useFallbackLocalData();
-                }
+    async function loadBudgetData() {
+        // 1. Sync load from localStorage for instant UI
+        const saved = localStorage.getItem('dojo_budget_data');
+        if (saved) {
+            try {
+                budgetDB = JSON.parse(saved);
                 finalizeInitialization();
-            })
-            .catch(err => {
-                console.warn("Erreur Cloud Budgétaire, bascule locale:", err);
-                useFallbackLocalData();
-                finalizeInitialization();
-            });
-    }
-
-    function useFallbackLocalData() {
-        const localData = localStorage.getItem('dojo_budget_data');
-        if (localData) {
-            budgetDB = JSON.parse(localData);
+            } catch(e) {}
         } else {
             budgetDB = { "2026-2027": JSON.parse(JSON.stringify(defaultBudgetExample)) };
-            localStorage.setItem('dojo_budget_data', JSON.stringify(budgetDB));
+            finalizeInitialization();
+        }
+        
+        // 2. Async fetch from Supabase
+        try {
+            const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+            if (error) throw error;
+            if (result && result.data && (result.data["2026-2027"] || result.data["2025-2026"])) {
+                budgetDB = result.data;
+                localStorage.setItem('dojo_budget_data', JSON.stringify(budgetDB));
+                finalizeInitialization();
+                console.log("✓ Données budgétaires chargées depuis Supabase.");
+            }
+        } catch(e) {
+            console.error("Erreur chargement Supabase:", e);
         }
     }
 
@@ -311,20 +310,19 @@ function showToast(message) {
         calculerEtAfficherTout(false);
     }
 
-    function sauvegarder(declencherCloud = true) {
+    async function sauvegarder(declencherCloud = true) {
         localStorage.setItem('dojo_budget_data', JSON.stringify(budgetDB));
         
         if (declencherCloud) {
-            const packet = {
-                targetSheet: TARGET_SHEET,
-                payload: budgetDB
-            };
-
-            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
-            .then(() => {
-                showToast("✓ Budget prévisionnel synchronisé sur Google Sheets !");
-            })
-            .catch(err => console.error("Erreur de sauvegarde Cloud Budget:", err));
+            if (typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: budgetDB });
+                if (error) throw error;
+                if (typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+            }
         }
     }
 

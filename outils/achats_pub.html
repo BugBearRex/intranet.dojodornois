@@ -49,6 +49,7 @@
         .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
         .toast { background: #1a472a; border-left: 4px solid #2ecc71; color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="sidebar"></div>
@@ -116,13 +117,18 @@
     </div>
 
     <script>
+        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'achats_pub';
+
         const itemsDefaut = [
             { id: 1, name: "Flyers A5 Rentrée de Judo", supplier: "Imprimerie", qty: 1000, price: 0.08, status: "a-commander" },
             { id: 2, name: "Banderole extérieure club (3x1m)", supplier: "BâcheÉco", qty: 2, price: 45.00, status: "commande" },
             { id: 3, name: "Stickers Logo Adhésif Club", supplier: "StickerMule", qty: 500, price: 0.30, status: "recu" }
         ];
 
-        let items = JSON.parse(localStorage.getItem('dd_achats_publicitaires')) || itemsDefaut;
+        let items = itemsDefaut;
 
         function renderItems() {
             const tbody = document.getElementById('items-tbody');
@@ -177,7 +183,7 @@
             }
 
             items.push({ id: Date.now(), name, supplier, qty, price, status });
-            save();
+            syncToSupabase(true);
             renderItems();
 
             document.getElementById('item-name').value = '';
@@ -197,21 +203,58 @@
                 }
                 return item;
             });
-            save();
+            syncToSupabase(true);
             renderItems();
         }
 
         function deleteItem(id) {
             if (confirm("Supprimer cet article de la liste de vos achats ?")) {
                 items = items.filter(item => item.id !== id);
-                save();
+                syncToSupabase(true);
                 renderItems();
                 showToast("Article supprimé.");
             }
         }
 
-        function save() {
-            localStorage.setItem('dd_achats_publicitaires', JSON.stringify(items));
+        async function syncToSupabase(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = items;
+                localStorage.setItem('dd_achats_publicitaires', JSON.stringify(payload));
+                
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+            }
+        }
+
+        async function loadData() {
+            const saved = localStorage.getItem('dd_achats_publicitaires');
+            if (saved) {
+                try {
+                    items = JSON.parse(saved);
+                    renderItems();
+                } catch(e) {}
+            } else {
+                items = itemsDefaut;
+                renderItems();
+            }
+            
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
+                if (result && result.data) {
+                    items = result.data;
+                    localStorage.setItem('dd_achats_publicitaires', JSON.stringify(items));
+                    renderItems();
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+            }
         }
 
         function showToast(msg) {
@@ -224,7 +267,7 @@
             setTimeout(() => { toast.remove(); }, 3000);
         }
 
-        window.addEventListener('DOMContentLoaded', renderItems);
+        window.addEventListener('DOMContentLoaded', loadData);
     </script>
     <script src="../js/sidebar.js"></script>
 </body>

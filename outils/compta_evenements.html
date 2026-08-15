@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Suivi Financier Événements - Dojo Dornois</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --rouge: #C41E3A;
@@ -211,11 +212,16 @@
 </div>
 
 <script>
+    const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+    const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+    const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+    const SUPABASE_TABLE = 'compta_evenements';
+
     let defaultCategories = {
         RECETTE: ["Repas BBQ", "Buvette", "Inscriptions", "Subventions / Dons", "Divers"],
         DÉPENSE: ["Courses BBQ", "Buvette (Achats)", "Dotations / Prix", "Communication", "Divers"]
     };
-    let globalCategories = JSON.parse(localStorage.getItem('dojo_events_categories')) || defaultCategories;
+    let globalCategories = defaultCategories;
 
     let defaultEvents = {
         "olympiades_2026": {
@@ -232,13 +238,60 @@
         },
         "truffade_2026": { name: "🧀 Soirée Truffade 2026", transactions: [] }
     };
-    let eventsData = JSON.parse(localStorage.getItem('dojo_events_compta')) || defaultEvents;
-    let currentEventKey = Object.keys(eventsData)[0] || "";
+    let eventsData = defaultEvents;
+    let currentEventKey = "";
     let editingRowId = null;
 
-    function saveAll() {
-        localStorage.setItem('dojo_events_compta', JSON.stringify(eventsData));
-        localStorage.setItem('dojo_events_categories', JSON.stringify(globalCategories));
+    async function syncToSupabase(silent = false) {
+        if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+        try {
+            const payload = {
+                eventsData: eventsData,
+                globalCategories: globalCategories
+            };
+
+            localStorage.setItem('dojo_events_compta', JSON.stringify(eventsData));
+            localStorage.setItem('dojo_events_categories', JSON.stringify(globalCategories));
+
+            const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+            if (error) throw error;
+            
+            if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+        } catch (err) {
+            console.error("Erreur Supabase:", err);
+            if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+        }
+    }
+
+    async function loadData() {
+        const savedEvents = localStorage.getItem('dojo_events_compta');
+        if (savedEvents) {
+            try { eventsData = JSON.parse(savedEvents); } catch(e) {}
+        }
+        const savedCategories = localStorage.getItem('dojo_events_categories');
+        if (savedCategories) {
+            try { globalCategories = JSON.parse(savedCategories); } catch(e) {}
+        }
+        
+        currentEventKey = Object.keys(eventsData)[0] || "";
+        initInterface();
+        
+        try {
+            const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+            if (error) throw error;
+            if (result && result.data) {
+                if (result.data.eventsData) eventsData = result.data.eventsData;
+                if (result.data.globalCategories) globalCategories = result.data.globalCategories;
+                
+                localStorage.setItem('dojo_events_compta', JSON.stringify(eventsData));
+                localStorage.setItem('dojo_events_categories', JSON.stringify(globalCategories));
+                
+                if(!eventsData[currentEventKey]) currentEventKey = Object.keys(eventsData)[0] || "";
+                initInterface();
+            }
+        } catch(e) {
+            console.error("Erreur chargement Supabase:", e);
+        }
     }
 
     function switchTab(tabId, btn) {
@@ -292,7 +345,7 @@
         if(!name || name.trim() === "") return;
         currentEventKey = "evt_" + Date.now();
         eventsData[currentEventKey] = { name: name.trim(), transactions: [] };
-        saveAll();
+        syncToSupabase();
         initInterface();
     }
 
@@ -302,7 +355,7 @@
         const newName = prompt(`Modifier le nom de l'événement :`, oldName);
         if(!newName || newName.trim() === "" || newName === oldName) return;
         eventsData[currentEventKey].name = newName.trim();
-        saveAll();
+        syncToSupabase();
         initInterface();
     }
 
@@ -310,7 +363,7 @@
         if(!currentEventKey) return;
         if(confirm(`🚨 Êtes-vous sûr de vouloir détruire définitivement l'événement "${eventsData[currentEventKey].name}" ainsi que toutes ses transactions comptables ?`)){
             delete eventsData[currentEventKey];
-            saveAll();
+            syncToSupabase();
             currentEventKey = Object.keys(eventsData)[0] || "";
             initInterface();
         }
@@ -346,7 +399,7 @@
         }
         globalCategories[type].push(val);
         input.value = '';
-        saveAll();
+        syncToSupabase();
         renderConfigCategories();
         calculateFinance();
     }
@@ -363,7 +416,7 @@
         });
 
         globalCategories[type][index] = newName.trim();
-        saveAll();
+        syncToSupabase();
         renderConfigCategories();
         calculateFinance();
     }
@@ -372,7 +425,7 @@
         const name = globalCategories[type][index];
         if(confirm(`Supprimer la catégorie "${name}" ?`)) {
             globalCategories[type].splice(index, 1);
-            saveAll();
+            syncToSupabase();
             renderConfigCategories();
             calculateFinance();
         }
@@ -394,7 +447,7 @@
             date, type, cat, desc, amount, method
         });
         
-        saveAll();
+        syncToSupabase();
         document.getElementById('t-desc').value = '';
         document.getElementById('t-amount').value = '';
         calculateFinance();
@@ -422,14 +475,14 @@
 
         eventsData[currentEventKey].transactions[idx] = { id, date, type, cat, desc, amount, method };
         editingRowId = null;
-        saveAll();
+        syncToSupabase();
         calculateFinance();
     }
 
     function deleteTransaction(index) {
         if(confirm("Supprimer cette transaction ?")) {
             eventsData[currentEventKey].transactions.splice(index, 1);
-            saveAll();
+            syncToSupabase();
             calculateFinance();
         }
     }
@@ -524,7 +577,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-        initInterface();
+        loadData();
     });
 </script>
 

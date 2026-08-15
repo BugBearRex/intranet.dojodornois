@@ -272,34 +272,61 @@
 
     <script>
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-const SUPABASE_TABLE = 'suivi_evenements_ete';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "EvenementsEte";
-let categories = JSON.parse(localStorage.getItem('dd_evt_categories')) || ["🥋 Challenge Taïso", "🛡️ Self-Défense", "🏋️ Stage Judo Été", "🎈 Autre Événement"];
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'suivi_evenements_ete';
+        
+        let categories = JSON.parse(localStorage.getItem('dd_evt_categories')) || ["🥋 Challenge Taïso", "🛡️ Self-Défense", "🏋️ Stage Judo Été", "🎈 Autre Événement"];
         let events = JSON.parse(localStorage.getItem('dd_summer_events_v2')) || [];
-
         let activeEvtId = null;
 
-        function loadFromCloud() {
-            sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
-                    if (data && data.summer_events) {
-                        events = data.summer_events;
-                        if (data.categories) categories = data.categories;
-                        renderAll();
-                    }
-                })
-                .catch(err => console.warn("Imp. de charger la feuille des événements:", err));
+        async function loadFromCloud() {
+            // 1. Sync load from localStorage for instant UI
+            const savedEvents = localStorage.getItem('dd_summer_events_v2');
+            const savedCats = localStorage.getItem('dd_evt_categories');
+            if (savedEvents) {
+                try {
+                    events = JSON.parse(savedEvents);
+                    if (savedCats) categories = JSON.parse(savedCats);
+                    renderAll();
+                } catch(e) {}
+            }
+            
+            // 2. Async fetch from Supabase
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
+                if (result && result.data) {
+                    if (result.data.summer_events) events = result.data.summer_events;
+                    if (result.data.categories) categories = result.data.categories;
+                    
+                    localStorage.setItem('dd_summer_events_v2', JSON.stringify(events));
+                    localStorage.setItem('dd_evt_categories', JSON.stringify(categories));
+                    renderAll();
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+            }
         }
 
-        function saveToCloudAndLocal() {
-            localStorage.setItem('dd_evt_categories', JSON.stringify(categories));
-            localStorage.setItem('dd_summer_events_v2', JSON.stringify(events));
+        async function saveToCloudAndLocal(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = { summer_events: events, categories: categories };
+                
+                localStorage.setItem('dd_evt_categories', JSON.stringify(categories));
+                localStorage.setItem('dd_summer_events_v2', JSON.stringify(events));
 
-            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: { summer_events: events, categories: categories } }).catch(err => console.error(err));
-
-            renderAll();
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+                renderAll();
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+                renderAll();
+            }
         }
 
         function renderCategoriesSelect() {

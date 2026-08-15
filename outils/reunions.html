@@ -827,15 +827,16 @@
         }
 
         async function saveReunionsToSupabase(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
             autoSaveCurrent();
             
             try {
                 const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: reunionsDB });
                 if (error) throw error;
-                if (!silent) showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
             } catch (e) {
                 console.error("Erreur Supabase:", e);
-                if (!silent) showToast("✓ Données sauvegardées en local (erreur synchronisation Supabase)", "error");
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
             }
         }
 
@@ -853,21 +854,23 @@
             if (savedCurrent) {
                 try { currentReunion = JSON.parse(savedCurrent); } catch (e) {}
             }
+            
+            loadCurrentToForm();
 
             // 2. Synchronisation en direct depuis Supabase
             try {
                 const { data, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
                 if (data && Array.isArray(data.data) && data.data.length > 0) {
                     reunionsDB = data.data;
                     currentReunion = reunionsDB[0];
                     localStorage.setItem('dojo_reunions_db_v5', JSON.stringify(reunionsDB));
                     localStorage.setItem('dojo_current_reunion_v5', JSON.stringify(currentReunion));
+                    loadCurrentToForm();
                 }
             } catch (err) {
-                console.log("Chargement hors ligne ou premier chargement :", err);
+                console.error("Erreur chargement Supabase:", err);
             }
-
-            loadCurrentToForm();
         }
 
         function showToast(msg, type = "success") {

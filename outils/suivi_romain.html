@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title id="page-title">Générateur de Relevé de Prestations - Romain Flammang</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -285,6 +286,7 @@
                     </div>
                     
                     <div class="btn-container">
+                        <button class="btn btn-dark" onclick="syncToSupabase()">☁️ Enregistrer vers Supabase</button>
                         <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimer / Sauvegarder PDF</button>
                     </div>
                 </div>
@@ -301,9 +303,14 @@
     </div>
 
     <script>
-        let imgTampon = localStorage.getItem('club_tampon') || '';
-        let imgTamponPaye = localStorage.getItem('club_tampon_paye') || '';
-        let imgTamponSignature = localStorage.getItem('club_tampon_signature') || '';
+        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'suivi_romain';
+
+        let imgTampon = '';
+        let imgTamponPaye = '';
+        let imgTamponSignature = '';
 
         // Lignes par défaut (Saison Actuelle)
         let lignesPrestations = [
@@ -312,6 +319,76 @@
             { type: 'ajout', desc: 'Self Defense', montant: 25.00 },
             { type: 'ajout', desc: 'Jujitsu (2 interventions)', montant: 50.00 }
         ];
+
+        async function syncToSupabase(silent = false) {
+            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            try {
+                const payload = {
+                    imgTampon,
+                    imgTamponPaye,
+                    imgTamponSignature,
+                    lignesPrestations,
+                    saison: document.getElementById('saison').value,
+                    ref_document: document.getElementById('ref_document').value,
+                    mode_remun: document.getElementById('mode_remun').value,
+                    periode: document.getElementById('periode').value,
+                    date_edition: document.getElementById('date_edition').value,
+                    observations: document.getElementById('observations').value,
+                    reglement: document.getElementById('reglement').value
+                };
+
+                localStorage.setItem('suivi_romain_data', JSON.stringify(payload)); 
+
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                if (error) throw error;
+                
+                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+                else if (!silent) alert("✓ Enregistrement synchronisé sur Supabase !");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+                else if (!silent) alert("⚠️ Données sauvegardées en local (erreur Supabase)");
+            }
+        }
+
+        async function loadData() {
+            const saved = localStorage.getItem('suivi_romain_data');
+            if (saved) {
+                try {
+                    applyData(JSON.parse(saved));
+                } catch(e) {}
+            }
+            
+            try {
+                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (error) throw error;
+                if (result && result.data) {
+                    applyData(result.data);
+                    localStorage.setItem('suivi_romain_data', JSON.stringify(result.data));
+                }
+            } catch(e) {
+                console.error("Erreur chargement Supabase:", e);
+            }
+        }
+
+        function applyData(data) {
+            if (!data) return;
+            if (data.imgTampon !== undefined) imgTampon = data.imgTampon;
+            if (data.imgTamponPaye !== undefined) imgTamponPaye = data.imgTamponPaye;
+            if (data.imgTamponSignature !== undefined) imgTamponSignature = data.imgTamponSignature;
+            if (data.lignesPrestations !== undefined) lignesPrestations = data.lignesPrestations;
+            
+            if (data.saison) document.getElementById('saison').value = data.saison;
+            if (data.ref_document) document.getElementById('ref_document').value = data.ref_document;
+            if (data.mode_remun) document.getElementById('mode_remun').value = data.mode_remun;
+            if (data.periode) document.getElementById('periode').value = data.periode;
+            if (data.date_edition) document.getElementById('date_edition').value = data.date_edition;
+            if (data.observations !== undefined) document.getElementById('observations').value = data.observations;
+            if (data.reglement) document.getElementById('reglement').value = data.reglement;
+            
+            majMinis();
+            afficherLignesBuilder(); 
+        }
 
         function sauvegarderVisuel(type) {
             let inputId = 'upload-tampon';
@@ -326,6 +403,7 @@
                 else if (type === 'tampon_paye') { imgTamponPaye = e.target.result; localStorage.setItem('club_tampon_paye', imgTamponPaye); }
                 else if (type === 'sig_stamp') { imgTamponSignature = e.target.result; localStorage.setItem('club_tampon_signature', imgTamponSignature); }
                 majMinis(); genererApercu();
+                syncToSupabase(true);
             };
             reader.readAsDataURL(file);
         }
@@ -525,7 +603,17 @@
             `;
         }
 
-        window.onload = function() { majMinis(); actualiserReference(); afficherLignesBuilder(); };
+        window.onload = function() {
+            if (!localStorage.getItem('suivi_romain_data')) {
+                imgTampon = localStorage.getItem('club_tampon') || '';
+                imgTamponPaye = localStorage.getItem('club_tampon_paye') || '';
+                imgTamponSignature = localStorage.getItem('club_tampon_signature') || '';
+                majMinis(); 
+                actualiserReference(); 
+                afficherLignesBuilder();
+            }
+            loadData();
+        };
     </script>
 
     <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->

@@ -171,8 +171,8 @@
                 <p>Livre journal, boîte à monnaie, livret d'épargne, remises de chèques et écritures fédérales</p>
             </div>
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                <button class="btn btn-outline btn-xs" style="padding:8px 14px;" onclick="reloadFromGoogleSheets()">🔄 Recharger du Sheet</button>
-                <button class="btn btn-success btn-xs" style="padding:8px 14px;" onclick="syncToGoogleSheets(true)">☁️ Sauvegarder sur Sheet</button>
+                <button class="btn btn-outline btn-xs" style="padding:8px 14px;" onclick="loadData()">🔄 Recharger Supabase</button>
+                <button class="btn btn-success btn-xs" style="padding:8px 14px;" onclick="syncToSupabase(false)">☁️ Enregistrer vers Supabase</button>
                 <a href="../index.html" class="btn btn-dark btn-xs" style="padding:8px 14px;">🏠 Bureau Central</a>
             </div>
         </div>
@@ -727,9 +727,8 @@
 const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
 const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 const SUPABASE_TABLE = 'compta';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzZTxJg0NjykMN3V6KkmCKi6dNsQ1vpblOizH7sHQinMM89qUjcFWevr--YQZMiIg9gw/exec";
-const TARGET_SHEET = "compta_v2";
-function showToast(message) {
+
+function showToast(message, type = 'success') {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = 'toast success';
@@ -775,40 +774,8 @@ function showToast(message) {
 
     /* FONCTION CENTRALE D'ENVOI VERS TON DRIVE */
     async function uploadFileToDrive(file, customFileName = null) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                const result = reader.result;
-                const base64Data = result.split(',')[1];
-                const mimeType = result.split(';')[0].split(':')[1];
-                
-                const fileNameToUse = customFileName ? customFileName : file.name;
-                
-                const packet = {
-                    action: "upload",
-                    fileName: fileNameToUse,
-                    mimeType: mimeType,
-                    base64Data: base64Data
-                };
-                
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: "POST",
-                        body: JSON.stringify(packet)
-                    });
-                    const resData = await response.json();
-                    if (resData.status === "success") {
-                        resolve(resData.url);
-                    } else {
-                        reject(resData.message);
-                    }
-                } catch (e) {
-                    reject(e);
-                }
-            };
-            reader.onerror = error => reject(error);
-        });
+        console.warn("File upload disabled during Supabase migration.");
+        return null;
     }
 
     function removeExistingFile(type) {
@@ -830,56 +797,45 @@ function showToast(message) {
         }
     }
 
-    function syncToGoogleSheets(isManual = false) {
-        if (isManual) {
-            showToast("⏳ Sauvegarde en cours sur Google Sheets...");
-        }
-
+    async function syncToSupabase(silent = false) {
+        if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
         try {
-            localStorage.setItem('dojo_compta_backup', JSON.stringify(comptaDB));
-        } catch (e) {
-            console.error("Erreur de sauvegarde locale:", e);
-        }
-        
-        updateDashboardKPIs();
+            updateDashboardKPIs();
+            const payload = comptaDB;
 
-        const packet = {
-            targetSheet: TARGET_SHEET,
-            payload: comptaDB
-        };
+            localStorage.setItem('dojo_compta_backup', JSON.stringify(payload)); 
 
-        try {
-            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
-            .then(res => res.json())
-            .then(() => {
-                if (isManual) {
-                    showToast("✅ Sauvegarde sur Google Sheets réussie et validée !");
-                } else {
-                    showToast("✓ Données synchronisées sur Google Sheets !");
-                }
-            })
-            .catch(err => {
-                console.error("Erreur de sauvegarde Cloud:", err);
-                if (isManual) {
-                    alert("⚠️ La sauvegarde sur Google Sheets a échoué.");
-                }
-            });
-        } catch (e) {
-            console.error("Erreur critique fetch:", e);
+            const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+            if (error) throw error;
+            
+            if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+        } catch (err) {
+            console.error("Erreur Supabase:", err);
+            if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
         }
     }
 
     function saveComptaData() {
-        syncToGoogleSheets(false);
+        syncToSupabase(true);
     }
 
-    async function reloadFromGoogleSheets() {
+    async function loadData() {
+        const saved = localStorage.getItem('dojo_compta_backup');
+        if (saved) {
+            try {
+                comptaDB = JSON.parse(saved);
+                finalizeInitialization();
+            } catch(e) {}
+        } else {
+            useFallbackLocalData();
+            finalizeInitialization();
+        }
+        
         try {
-            const { data: _sbResult, error: _sbErr } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
-            const data = _sbResult ? _sbResult.data : null;
-
-            if (data && (data.operations || data.caisseFlux || data.cheques || data.livretOps)) {
-                comptaDB = data;
+            const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+            if (error) throw error;
+            if (result && result.data) {
+                comptaDB = result.data;
                 if (!comptaDB.operations) comptaDB.operations = [];
                 if (!comptaDB.livretOps) comptaDB.livretOps = [];
                 if (!comptaDB.caisseFlux) comptaDB.caisseFlux = [];
@@ -891,26 +847,17 @@ function showToast(message) {
                     denoms.forEach(d => comptaDB.monnaieCounts[d] = 0);
                 }
                 comptaDB.cheques.forEach(c => { if(!c.date) c.date = "2026-06-15"; });
-
+                
                 try {
                     localStorage.setItem('dojo_compta_backup', JSON.stringify(comptaDB));
                 } catch(e){}
 
                 finalizeInitialization();
-                showToast("✅ Données rechargées avec succès !");
-            } else {
-                useFallbackLocalData();
-                finalizeInitialization();
+                if (typeof showToast === 'function') showToast("✓ Données rechargées depuis Supabase !");
             }
-        } catch(err) {
-            useFallbackLocalData();
-            finalizeInitialization();
-            showToast("ℹ️ Mode Local Actif (Stockage local chargé).");
+        } catch(e) {
+            console.error("Erreur chargement Supabase:", e);
         }
-    }
-
-    function loadComptaData() {
-        reloadFromGoogleSheets();
     }
 
     function useFallbackLocalData() {
@@ -2238,7 +2185,7 @@ function showToast(message) {
         printWindow.document.close();
     }
 
-    window.onload = loadComptaData;
+    window.onload = loadData;
 </script>
 
 <script src="../js/sidebar.js"></script>
