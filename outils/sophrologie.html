@@ -69,6 +69,10 @@
         .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); }
         .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
 
+        .topbar-actions {
+            display: flex; align-items: center; gap: 10px;
+        }
+
         .app-body {
             flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
         }
@@ -77,6 +81,8 @@
         .btn { font-family: 'Roboto', sans-serif; font-weight: 500; padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
         .btn-violet { background: var(--violet); color: white; }
         .btn-violet:hover { background: var(--violet-fonce); }
+        .btn-success { background: #2ecc71; color: white; }
+        .btn-success:hover { background: #27ae60; }
         .btn-danger { background: var(--rouge); color: white; }
         .btn-danger:hover { background: var(--rouge-hover); }
         .btn-dark { background: var(--noir-doux); color: white; }
@@ -186,7 +192,9 @@
 
         /* TOAST SYSTEM */
         .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
-        .toast { color: white; padding: 12px 18px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); background: #1a472a; border-left: 4px solid #2ecc71; }
+        .toast { color: white; padding: 12px 18px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        .toast.error { background: #7f1d1d; border-left: 4px solid #f87171; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -194,17 +202,18 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- SIDEBAR DYNAMIQUE -->
     <div class="sidebar"></div>
 
-    <!-- MAIN CONTENT -->
     <div class="main-content">
         <div class="topbar">
             <div class="page-title-area">
                 <h2>🧘‍♂️ Gestion des Ateliers de Sophrologie</h2>
                 <p>Suivi des présences, encaissements, fiches d'émargement et analyse d'impact</p>
             </div>
-            <button class="btn btn-violet" onclick="openPrintModal()">🖨️ Imprimer Registre / Bilan Paysage A4</button>
+            <div class="topbar-actions">
+                <button class="btn btn-success" onclick="saveData(false)">☁️ Synchroniser Supabase</button>
+                <button class="btn btn-violet" onclick="openPrintModal()">🖨️ Imprimer Registre / Bilan Paysage A4</button>
+            </div>
         </div>
 
         <div class="app-body">
@@ -214,11 +223,9 @@
                 <button id="btn-tab-analytics" class="tab-btn" onclick="switchTab('analytics')">📈 Analyse &amp; Impact Sophrologie</button>
             </div>
 
-            <!-- ONGLET 1 : ÉMARGEMENT SÉANCE -->
             <div id="tab-session" class="layout">
                 <div class="main-card">
                     
-                    <!-- ZONE SEASONS ET SEANCES EN GRILLE -->
                     <div class="season-section">
                         <div class="season-bar">
                             <div class="season-title">🗓️ Saison sportive :</div>
@@ -229,8 +236,7 @@
                         <div>
                             <div style="font-size:0.8rem; font-weight:600; color:var(--gris-moyen); margin-bottom:8px;">Séances programmées pour cette saison :</div>
                             <div class="sessions-grid" id="sessions-grid-container">
-                                <!-- Généré en JS sous forme de cartes 3-4 par ligne -->
-                            </div>
+                                </div>
                         </div>
 
                         <div class="session-actions-bar">
@@ -242,7 +248,6 @@
                         </div>
                     </div>
 
-                    <!-- Ajouter une nouvelle personne à la séance active -->
                     <div class="form-inline">
                         <input type="text" id="new-name" placeholder="NOM Prénom (Ex: MARTIN Jean)">
                         <select id="new-status">
@@ -265,13 +270,11 @@
                                 </tr>
                             </thead>
                             <tbody id="session-table-body">
-                                <!-- Généré en JS -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Colonne Caisse du jour -->
                 <div style="display: flex; flex-direction: column; gap: 16px;">
                     <div class="summary-box">
                         <div>
@@ -294,7 +297,6 @@
                 </div>
             </div>
 
-            <!-- ONGLET 2 : VUE GLOBALE HISTORIQUE -->
             <div id="tab-global" class="main-card" style="display: none;">
                 <h2>🌐 Matrice Générale des Présences de la Saison Active</h2>
                 <p style="color: var(--gris-moyen); font-size: 0.82rem; margin-top: -5px;">Vue synoptique avec codes couleurs des statuts. Chaque colonne représente une date planifiée pour la saison active.</p>
@@ -302,16 +304,13 @@
                 <div class="table-responsive">
                     <table style="font-size: 0.82rem;">
                         <thead id="global-table-head">
-                            <!-- Généré dynamiquement -->
-                        </thead>
+                            </thead>
                         <tbody id="global-table-body">
-                            <!-- Liste exhaustive des participants -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- ONGLET 3 : ANALYSE ANALYTIQUE & IMPACT -->
             <div id="tab-analytics" style="display: none; flex-direction: column; gap: 20px;">
                 <div class="kpi-grid">
                     <div class="kpi-card purple">
@@ -357,8 +356,7 @@
                                 </tr>
                             </thead>
                             <tbody id="analytics-table-body">
-                                <!-- Généré en JS -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
@@ -367,7 +365,6 @@
         </div>
     </div>
 
-    <!-- MODALE DE CONFIGURATION FICHE IMPRIMABLE -->
     <div class="modal-overlay" id="print-modal">
         <div class="modal-card">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 10px;">
@@ -375,7 +372,6 @@
                 <button class="btn btn-outline" onclick="closePrintModal()">✕ Fermer</button>
             </div>
 
-            <!-- Options de configuration -->
             <div style="display: flex; flex-direction: column; gap: 15px; background: var(--fond); padding: 16px; border-radius: 6px; border: 1px solid var(--gris-tres-clair);">
                 <div>
                     <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 6px;">Type de document à imprimer :</label>
@@ -405,15 +401,13 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT ET GESTION DES DONNÉES -->
     <script>
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-const SUPABASE_TABLE = 'sophrologie';
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec";
-const TARGET_SHEET = "sophrologie";
-const defaultSeasons = ["2025/2026", "2026/2027"];
+        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_TABLE = 'sophrologie';
+
+        const defaultSeasons = ["2025/2026", "2026/2027"];
         const defaultDatesBySeason = {
             "2025/2026": ["19/06", "12/09", "10/10", "14/11", "12/12", "20/01", "20/02", "20/03", "03/04", "24/04"],
             "2026/2027": ["15/10", "12/11", "10/12", "14/01", "11/02", "18/03", "15/04", "13/05", "10/06"]
@@ -428,10 +422,10 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
             presences: {}
         };
 
-        function showToast(message) {
+        function showToast(message, type = "success") {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            toast.className = 'toast';
+            toast.className = `toast ${type}`;
             toast.innerText = message;
             container.appendChild(toast);
             setTimeout(() => { toast.remove(); }, 3500);
@@ -450,32 +444,44 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
             return { name: fullName.toUpperCase(), status: status };
         }
 
-        function loadData() {
-            sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single().then(({data: _sbResult, error: _sbErr}) => { let data = _sbResult ? _sbResult.data : null;
-                    if (data) {
-                        if (data.participants && Array.isArray(data.participants)) {
-                            state.participants = data.participants.map(normalizeParticipant);
-                        }
-                        if (data.seasons) state.seasons = data.seasons;
-                        if (data.activeSeason) state.activeSeason = data.activeSeason;
-                        
-                        if (data.seasonDates) {
-                            state.seasonDates = data.seasonDates;
-                        } else if (data.dates) {
-                            state.seasonDates[state.activeSeason] = data.dates;
-                        }
+        async function loadData() {
+            // 1. Chargement préalable du cache local pour réactivité immédiate
+            useFallbackLocalData();
+            finalizeInitialization();
 
-                        if (data.activeDate) state.activeDate = data.activeDate;
-                        if (data.presences) state.presences = data.presences;
-                    } else {
-                        useFallbackLocalData();
+            // 2. Synchronisation prioritaire depuis Supabase
+            try {
+                const { data, error } = await sbClient
+                    .from(SUPABASE_TABLE)
+                    .select('data')
+                    .eq('id', 1)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') {
+                    console.error("Erreur de lecture Supabase:", error);
+                } else if (data && data.data) {
+                    const serverState = data.data;
+                    if (serverState.participants && Array.isArray(serverState.participants)) {
+                        state.participants = serverState.participants.map(normalizeParticipant);
                     }
+                    if (serverState.seasons) state.seasons = serverState.seasons;
+                    if (serverState.activeSeason) state.activeSeason = serverState.activeSeason;
+                    
+                    if (serverState.seasonDates) {
+                        state.seasonDates = serverState.seasonDates;
+                    } else if (serverState.dates) {
+                        state.seasonDates[state.activeSeason] = serverState.dates;
+                    }
+
+                    if (serverState.activeDate) state.activeDate = serverState.activeDate;
+                    if (serverState.presences) state.presences = serverState.presences;
+
+                    localStorage.setItem('dojo_sophro_backup', JSON.stringify(state));
                     finalizeInitialization();
-                })
-                .catch(err => {
-                    useFallbackLocalData();
-                    finalizeInitialization();
-                });
+                }
+            } catch (err) {
+                console.warn("Connexion distante indisponible, mode local actif :", err);
+            }
         }
 
         function useFallbackLocalData() {
@@ -494,7 +500,7 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
             if (!state.seasons.length) state.seasons = [...defaultSeasons];
             if (!state.activeSeason) state.activeSeason = state.seasons[0];
             if (!state.seasonDates[state.activeSeason]) state.seasonDates[state.activeSeason] = [...defaultDatesBySeason["2025/2026"]];
-            if (!state.activeDate) state.activeDate = state.seasonDates[state.activeSeason][0];
+            if (!state.activeDate) state.activeDate = state.seasonDates[state.activeSeason][0] || "";
             if (!state.presences) state.presences = {};
         }
 
@@ -518,17 +524,22 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
             renderSession();
         }
 
-        function saveData() {
+        async function saveData(silent = true) {
             localStorage.setItem('dojo_sophro_backup', JSON.stringify(state));
 
-            const packet = {
-                targetSheet: TARGET_SHEET,
-                payload: state
-            };
+            if (!silent) showToast("Synchronisation Supabase en cours...");
 
-            sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: packet.payload })
-            .then(() => showToast("✓ Enregistré dans le Sheet Sophrologie !"))
-            .catch(err => console.error("Erreur Cloud:", err));
+            try {
+                const { error } = await sbClient
+                    .from(SUPABASE_TABLE)
+                    .upsert({ id: 1, data: state });
+
+                if (error) throw error;
+                if (!silent) showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+            } catch (err) {
+                console.error("Erreur Cloud:", err);
+                if (!silent) showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+            }
         }
 
         function renderSeasons() {
@@ -544,7 +555,7 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
             });
         }
 
-        function selectSeason(s) {
+        async function selectSeason(s) {
             state.activeSeason = s;
             if (!state.seasonDates[s]) {
                 state.seasonDates[s] = [];
@@ -554,13 +565,13 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
             } else {
                 state.activeDate = "";
             }
-            saveData();
+            await saveData(true);
             renderSeasons();
             renderSessionsGrid();
             renderSession();
         }
 
-        function addSeasonPrompt() {
+        async function addSeasonPrompt() {
             const val = prompt("Saisir la nouvelle saison (ex: 2026/2027) :");
             if(val && !state.seasons.includes(val.trim())) {
                 const seasonName = val.trim();
@@ -568,7 +579,7 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
                 state.seasonDates[seasonName] = [];
                 state.activeSeason = seasonName;
                 state.activeDate = "";
-                saveData();
+                await saveData(true);
                 renderSeasons();
                 renderSessionsGrid();
                 renderSession();
@@ -601,15 +612,15 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
             });
         }
 
-        function selectSessionDate(date) {
+        async function selectSessionDate(date) {
             state.activeDate = date;
             if(!state.presences[state.activeDate]) state.presences[state.activeDate] = [];
-            saveData();
+            await saveData(true);
             renderSessionsGrid();
             renderSession();
         }
 
-        function addNewSessionDate() {
+        async function addNewSessionDate() {
             const dateInput = document.getElementById('new-session-date');
             const newDate = dateInput.value.trim();
 
@@ -626,12 +637,12 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
             
             state.activeDate = newDate;
             dateInput.value = '';
-            saveData();
+            await saveData(true);
             renderSessionsGrid();
             renderSession();
         }
 
-        function deleteActiveSessionDate() {
+        async function deleteActiveSessionDate() {
             const currentDates = state.seasonDates[state.activeSeason] || [];
             if(currentDates.length === 0) return;
 
@@ -641,13 +652,13 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
                 state.seasonDates[state.activeSeason] = currentDates.filter(d => d !== dateToDelete);
                 state.activeDate = state.seasonDates[state.activeSeason][0] || "";
                 
-                saveData();
+                await saveData(true);
                 renderSessionsGrid();
                 renderSession();
             }
         }
 
-        function addCustomPerson() {
+        async function addCustomPerson() {
             const nameInput = document.getElementById('new-name');
             const statusSelect = document.getElementById('new-status');
             const name = nameInput.value.trim().toUpperCase();
@@ -675,35 +686,35 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
             }
 
             nameInput.value = '';
-            saveData();
+            await saveData(true);
             renderSessionsGrid();
             renderSession();
         }
 
-        function deletePerson(name) {
+        async function deletePerson(name) {
             if(confirm(`Retirer définitivement ${name} de l'annuaire de sophrologie ?`)) {
                 state.participants = state.participants.filter(p => p.name !== name);
                 Object.keys(state.presences).forEach(d => {
                     state.presences[d] = state.presences[d].filter(n => n !== name);
                 });
-                saveData();
+                await saveData(true);
                 renderSessionsGrid();
                 renderSession();
             }
         }
 
-        function toggleStatus(name) {
+        async function toggleStatus(name) {
             const person = state.participants.find(p => p.name === name);
             if (person) {
                 if (person.status === 'licencie') person.status = 'nonlicencie';
                 else if (person.status === 'nonlicencie') person.status = 'premiere';
                 else person.status = 'licencie';
-                saveData();
+                await saveData(true);
                 renderSession();
             }
         }
 
-        function togglePresence(name) {
+        async function togglePresence(name) {
             if (!state.activeDate) return;
             let list = state.presences[state.activeDate] || [];
             if (list.includes(name)) {
@@ -711,7 +722,7 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
             } else {
                 state.presences[state.activeDate].push(name);
             }
-            saveData();
+            await saveData(true);
             renderSessionsGrid();
             renderSession();
         }
@@ -833,7 +844,7 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
             const totalPeople = state.participants.length;
             let licenciesCount = 0;
             let exterieursCount = 0;
-            let loyalCount = 0; // Personnes venues >= 2 séances
+            let loyalCount = 0;
 
             const tbody = document.getElementById('analytics-table-body');
             tbody.innerHTML = '';
@@ -897,7 +908,6 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
                 tbody.appendChild(tr);
             });
 
-            // Mettre à jour les KPIs
             document.getElementById('kpi-total-people').innerText = totalPeople;
             document.getElementById('kpi-licencies-count').innerText = licenciesCount;
             document.getElementById('kpi-licencies-pct').innerText = totalPeople > 0 ? `${Math.round((licenciesCount / totalPeople) * 100)}% du public` : '0%';
@@ -1181,7 +1191,6 @@ const defaultSeasons = ["2025/2026", "2026/2027"];
         });
     </script>
 
-    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
     <script src="../js/sidebar.js"></script>
 
 </body>
