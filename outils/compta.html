@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Dojo Manager - Comptabilité & Trésorerie</title>
+    <title>Dojo Manager - Comptabilité & Trésorerie V3</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
@@ -30,10 +30,7 @@
 
         /* BARRE LATÉRALE */
         .sidebar { width: var(--sidebar-width); background: var(--noir-doux); color: var(--blanc); display: flex; flex-direction: column; height: 100%; position: relative; box-shadow: 4px 0 15px rgba(0,0,0,0.1); flex-shrink: 0; }
-        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
-        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
-        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
-
+        
         /* CONTENU DE L'APPLICATION */
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
@@ -44,7 +41,7 @@
         .app-body { flex: 1; padding: 30px; overflow-y: auto; }
 
         /* Boutons */
-        .btn { font-family: 'Roboto', sans-serif; font-weight: bold; padding: 10px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+        .btn { font-family: 'Roboto', sans-serif; font-weight: bold; padding: 10px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
         .btn-dark { background: var(--noir-doux); color: white; }
         .btn-dark:hover { background: #333; }
         .btn-outline { background: transparent; border: 1px solid var(--gris-moyen); color: var(--gris-fonce); }
@@ -61,6 +58,8 @@
         .tabs { display: flex; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
         .tab-btn { padding: 10px 18px; border-radius: 6px; border: 1px solid var(--gris-clair); background: white; cursor: pointer; font-family: 'Fredoka', sans-serif; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
         .tab-btn.active { background: var(--rouge); color: white; border-color: var(--rouge); }
+        .tab-btn-cat { border-left: 4px solid var(--violet); }
+        .tab-btn-ana { border-left: 4px solid var(--bleu); font-weight: bold; }
 
         /* KPI Blocks */
         .dashboard-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 25px; }
@@ -71,12 +70,12 @@
         .stat-card .value { font-family: 'Fredoka', sans-serif; font-size: 1.4rem; margin-top: 6px; font-weight: bold; color: var(--noir-doux); }
 
         .main-card { background: var(--blanc); padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid var(--gris-tres-clair); margin-bottom: 25px; }
-        .card-header-actions { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 12px; margin-bottom: 20px; }
+        .card-header-actions { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 12px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .card-header-actions h2 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0; font-size: 1.3rem; }
 
         .filter-box { display: flex; gap: 15px; align-items: center; background: #f1f7fc; padding: 12px 20px; border-radius: 6px; border: 1px solid #d0e3f0; margin-bottom: 20px; flex-wrap: wrap; }
         .filter-box label { font-size: 0.85rem; font-weight: bold; color: #2c3e50; }
-        .filter-box input[type="date"] { padding: 6px 10px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 0.9rem; }
+        .filter-box input[type="date"], .filter-box select { padding: 6px 10px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 0.9rem; }
 
         .form-grid { display: flex; flex-wrap: wrap; gap: 12px; background: #fafafa; padding: 20px; border-radius: 6px; border: 1px dashed var(--gris-clair); margin-bottom: 20px; align-items: flex-end; }
         .form-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 150px; }
@@ -92,30 +91,13 @@
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
         .badge-credit { background: #e8f8f0; color: var(--vert-fonce); }
         .badge-debit { background: #fcebe9; color: var(--rouge); }
-
-        .caisse-layout { display: grid; grid-template-columns: 1fr 380px; gap: 25px; }
-        @media(max-width: 950px) { .caisse-layout { grid-template-columns: 1fr; } }
-        .monnaie-table input { width: 60px; padding: 4px; text-align: center; border: 1px solid var(--gris-clair); border-radius: 4px; }
-
-        .depot-grid-split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; width: 100%; }
-        @media(max-width: 768px) { .depot-grid-split { grid-template-columns: 1fr; } }
-        .depot-box { background: #fff; border: 1px solid var(--gris-clair); padding: 15px; border-radius: 6px; }
-        .depot-box h4 { margin-top: 0; font-family: 'Fredoka', sans-serif; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 5px; }
-        .depot-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.85rem; }
-        .depot-item input { width: 50px; padding: 4px; text-align: center; border: 1px solid var(--gris-clair); border-radius: 4px; }
-        .depot-total-sub { text-align: right; font-weight: bold; margin-top: 10px; font-size: 0.95rem; color: var(--gris-fonce); border-top: 1px dashed var(--gris-clair); padding-top: 5px; }
-
-        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
-        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
-        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .badge-cat { background: #e1f0fa; color: var(--bleu-fonce); font-size: 0.7rem; border: 1px solid #b3d7f0; }
 
         /* FENÊTRES MODALES */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px); display: flex; align-items: center;
-            justify-content: center; z-index: 10000; opacity: 0; visibility: hidden;
+            display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden;
             transition: opacity 0.25s ease, visibility 0.25s ease; padding: 15px;
         }
         .modal-overlay.active { opacity: 1; visibility: visible; }
@@ -123,52 +105,40 @@
             background: var(--blanc); border-radius: 12px; width: 100%; max-width: 680px;
             max-height: 90vh; overflow-y: auto; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
             transform: translateY(-20px) scale(0.98); transition: transform 0.25s ease;
-            border: 1px solid var(--gris-tres-clair);
         }
         .modal-overlay.active .modal-container { transform: translateY(0) scale(1); }
-        .modal-header {
-            padding: 18px 24px; border-bottom: 1px solid var(--gris-tres-clair); display: flex;
-            align-items: center; justify-content: space-between; background: #FAFAFA;
-            border-radius: 12px 12px 0 0;
-        }
+        .modal-header { padding: 18px 24px; border-bottom: 1px solid var(--gris-tres-clair); display: flex; align-items: center; justify-content: space-between; background: #FAFAFA; border-radius: 12px 12px 0 0; }
         .modal-header h3 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.25rem; color: var(--noir-doux); }
-        .modal-close-btn {
-            background: transparent; border: none; font-size: 1.6rem; cursor: pointer; color: var(--gris-moyen);
-            line-height: 1; padding: 0; width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .modal-close-btn { background: transparent; border: none; font-size: 1.6rem; cursor: pointer; color: var(--gris-moyen); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .modal-close-btn:hover { background: var(--rouge-clair); color: var(--rouge); }
         .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
-        .modal-footer {
-            padding: 16px 24px; border-top: 1px solid var(--gris-tres-clair); display: flex;
-            justify-content: flex-end; gap: 12px; background: #FAFAFA; border-radius: 0 0 12px 12px;
-        }
-        
-        .file-attachment-box { background: #F8F9FA; border: 1px dashed var(--gris-clair); border-radius: 8px; padding: 16px; margin-top: 5px; }
-        .file-existing-badge {
-            display: flex; align-items: center; justify-content: space-between; background: #EBF3FA;
-            border: 1px solid #BEE0F7; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; font-size: 0.88rem;
-        }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gris-tres-clair); display: flex; justify-content: flex-end; gap: 12px; background: #FAFAFA; border-radius: 0 0 12px 12px; }
 
-        /* CLASSE POUR MASQUER A L'ECRAN (MAIS VISIBLE A L'IMPRESSION) */
-        @media screen {
-            .hide-on-screen { display: none !important; }
-        }
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Layout Analytique */
+        .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media(max-width: 900px) { .analytics-grid { grid-template-columns: 1fr; } }
+        .analytics-table-container { background: #fafafa; border: 1px solid var(--gris-tres-clair); border-radius: 8px; padding: 15px; }
+        .analytics-table-container h3 { margin-top: 0; border-bottom: 2px solid var(--gris-clair); padding-bottom: 10px; font-family: 'Fredoka', sans-serif; }
+
+        @media screen { .hide-on-screen { display: none !important; } }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
     <div class="toast-container" id="toastContainer"></div>
-
     <div class="sidebar"></div>
 
     <div class="main-content">
-        
         <div class="topbar">
             <div class="topbar-title-block">
-                <h2>Comptabilité & Trésorerie Générale</h2>
-                <p>Livre journal, boîte à monnaie, livret d'épargne, remises de chèques et écritures fédérales</p>
+                <h2>Comptabilité & Trésorerie Analytique</h2>
+                <p>Gestion par catégories, Livre journal, Bilan et Compte de Résultat</p>
             </div>
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                 <button class="btn btn-outline btn-xs" style="padding:8px 14px;" onclick="loadData()">🔄 Recharger Supabase</button>
@@ -178,60 +148,56 @@
         </div>
 
         <div class="app-body">
-
             <div class="dashboard-grid">
                 <div class="stat-card" style="border-left: 4px solid var(--bleu);">
                     <h3>🏦 Solde Banque</h3>
-                    <div class="value" id="dash-banque">0.00&nbsp;€</div>
+                    <div class="value" id="dash-banque">0.00 €</div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid var(--violet);">
                     <h3>📈 Livret Épargne</h3>
-                    <div class="value" id="dash-livret" style="color: var(--violet);">0.00&nbsp;€</div>
+                    <div class="value" id="dash-livret" style="color: var(--violet);">0.00 €</div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid var(--vert);">
-                    <h3>🪙 Solde Caisse (Espèces)</h3>
-                    <div class="value" id="dash-caisse">0.00&nbsp;€</div>
+                    <h3>🪙 Solde Caisse</h3>
+                    <div class="value" id="dash-caisse">0.00 €</div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid #e67e22;">
                     <h3>✍️ Chèques Attente</h3>
-                    <div class="value" id="dash-cheques-attente" style="color: #e67e22;">0.00&nbsp;€</div>
+                    <div class="value" id="dash-cheques-attente" style="color: #e67e22;">0.00 €</div>
                 </div>
-                <div class="stat-card" style="border-left: 4px solid var(--rouge);">
-                    <h3>🥋 Licences Saison</h3>
-                    <div class="value" id="dash-licences">0.00&nbsp;€</div>
+                <div class="stat-card" style="border-left: 4px solid var(--noir-doux);">
+                    <h3>💎 TRESORERIE NETTE</h3>
+                    <div class="value" id="dash-treso-nette">0.00 €</div>
                 </div>
             </div>
 
             <div class="tabs">
-                <button id="btn-tab-banque" class="tab-btn active" onclick="switchTab('banque')">🏦 1. Opérations Bancaires</button>
-                <button id="btn-tab-livret" class="tab-btn" onclick="switchTab('livret')">📈 2. Livret Épargne</button>
-                <button id="btn-tab-caisse" class="tab-btn" onclick="switchTab('caisse')">🪙 3. Caisse / Monnaie</button>
-                <button id="btn-tab-cheques" class="tab-btn" onclick="switchTab('cheques')">✍️ 4. Portefeuille Chèques</button>
-                <button id="btn-tab-licences" class="tab-btn" onclick="switchTab('licences')">🥋 5. Bordereaux FFJDA</button>
-                <button id="btn-tab-depots" class="tab-btn" onclick="switchTab('depots')">💰 6. Dépôts Espèces</button>
+                <button id="btn-tab-banque" class="tab-btn active" onclick="switchTab('banque')">🏦 1. Banque</button>
+                <button id="btn-tab-livret" class="tab-btn" onclick="switchTab('livret')">📈 2. Livret</button>
+                <button id="btn-tab-caisse" class="tab-btn" onclick="switchTab('caisse')">🪙 3. Caisse</button>
+                <button id="btn-tab-cheques" class="tab-btn" onclick="switchTab('cheques')">✍️ 4. Chèques</button>
+                <button id="btn-tab-licences" class="tab-btn" onclick="switchTab('licences')">🥋 5. Licences FFJDA</button>
+                <button id="btn-tab-depots" class="tab-btn" onclick="switchTab('depots')">💰 6. Dépôts</button>
+                <button id="btn-tab-categories" class="tab-btn tab-btn-cat" onclick="switchTab('categories')">📂 7. Catégories</button>
+                <button id="btn-tab-analytique" class="tab-btn tab-btn-ana" onclick="switchTab('analytique')">📊 8. Analytique & Bilan</button>
             </div>
 
-            <!-- PANE 1: Opérations Bancaires Courantes -->
             <div id="pane-banque" class="main-card tab-pane">
                 <div class="card-header-actions">
-                    <h2>Journal Général des Opérations Bancaires (Compte Courant)</h2>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <button class="btn btn-dark" onclick="openModalBanque()">➕ Nouvelle Opération Bancaire</button>
-                        <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('banque', 'JOURNAL GÉNÉRAL DES OPÉRATIONS BANCAIRES', 'table-banque-printable', 'landscape')">📄 Exporter (A4 Paysage)</button>
+                    <h2>Journal Général des Opérations Bancaires</h2>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-dark" onclick="openModalBanque()">➕ Nouvelle Opération</button>
+                        <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('banque', 'JOURNAL GÉNÉRAL DES OPÉRATIONS BANCAIRES', 'table-banque-printable', 'landscape')">📄 Exporter A4 Paysage</button>
                     </div>
                 </div>
-
                 <div class="filter-box">
-                    <span>🔍 <strong>Filtrer la période :</strong></span>
-                    <div>
-                        <label>Du :</label>
-                        <input type="date" id="filter-start-date" onchange="renderOperationsBanque()">
-                    </div>
-                    <div>
-                        <label>Au :</label>
-                        <input type="date" id="filter-end-date" onchange="renderOperationsBanque()">
-                    </div>
-                    <button class="btn btn-outline btn-xs" onclick="clearDateFilter('banque')" style="padding: 6px 10px;">Réinitialiser</button>
+                    <span>🔍 <strong>Filtrer :</strong></span>
+                    <input type="date" id="filter-start-date" onchange="renderOperationsBanque()"> au 
+                    <input type="date" id="filter-end-date" onchange="renderOperationsBanque()">
+                    <select id="filter-cat-banque" onchange="renderOperationsBanque()">
+                        <option value="">-- Toutes les catégories --</option>
+                    </select>
+                    <button class="btn btn-outline btn-xs" onclick="clearDateFilter('banque')">Réinitialiser</button>
                 </div>
                 <div class="table-responsive">
                     <table id="table-banque-printable">
@@ -240,14 +206,14 @@
                                 <th>Date</th>
                                 <th>Réf. Interne</th>
                                 <th>Flux</th>
+                                <th>Catégorie</th>
                                 <th>Moyen</th>
                                 <th>Désignation</th>
                                 <th class="hide-on-screen">Réf. Facture</th>
-                                <th data-html-export="ignore">Justificatif</th>
-                                <th>Auteur</th>
+                                <th data-html-export="ignore">Doc</th>
                                 <th>Montant</th>
-                                <th>Solde Actif</th>
-                                <th style="text-align:center;" data-html-export="ignore">Action</th>
+                                <th>Solde</th>
+                                <th style="text-align:center;" data-html-export="ignore">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="table-banque-body"></tbody>
@@ -255,27 +221,19 @@
                 </div>
             </div>
 
-            <!-- PANE 2: Compte Livret Épargne -->
             <div id="pane-livret" class="main-card tab-pane" style="display:none;">
                 <div class="card-header-actions">
                     <h2>Suivi du Compte Livret Épargne</h2>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <button class="btn btn-dark" style="background: var(--violet);" onclick="openModalLivret()">➕ Nouvelle Opération Livret</button>
-                        <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('livret', 'SUIVI DU COMPTE LIVRET EPARGNE', 'table-livret-printable', 'landscape')">📄 Exporter (A4 Paysage)</button>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-dark" style="background: var(--violet);" onclick="openModalLivret()">➕ Nouvelle Opération</button>
+                        <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('livret', 'SUIVI DU COMPTE LIVRET EPARGNE', 'table-livret-printable', 'landscape')">📄 Exporter A4 Paysage</button>
                     </div>
                 </div>
-
                 <div class="filter-box">
                     <span>🔍 <strong>Filtrer la période :</strong></span>
-                    <div>
-                        <label>Du :</label>
-                        <input type="date" id="filter-start-date-livret" onchange="renderOperationsLivret()">
-                    </div>
-                    <div>
-                        <label>Au :</label>
-                        <input type="date" id="filter-end-date-livret" onchange="renderOperationsLivret()">
-                    </div>
-                    <button class="btn btn-outline btn-xs" onclick="clearDateFilter('livret')" style="padding: 6px 10px;">Réinitialiser</button>
+                    <input type="date" id="filter-start-date-livret" onchange="renderOperationsLivret()"> au 
+                    <input type="date" id="filter-end-date-livret" onchange="renderOperationsLivret()">
+                    <button class="btn btn-outline btn-xs" onclick="clearDateFilter('livret')">Réinitialiser</button>
                 </div>
                 <div class="table-responsive">
                     <table id="table-livret-printable">
@@ -283,12 +241,11 @@
                             <tr>
                                 <th>Date</th>
                                 <th>Flux</th>
+                                <th>Catégorie</th>
                                 <th>Désignation / Référence</th>
-                                <th data-html-export="ignore">Justificatif</th>
-                                <th>Auteur</th>
                                 <th>Montant</th>
-                                <th>Solde Livret</th>
-                                <th style="text-align:center;" data-html-export="ignore">Action</th>
+                                <th>Solde</th>
+                                <th style="text-align:center;" data-html-export="ignore">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="table-livret-body"></tbody>
@@ -296,705 +253,333 @@
                 </div>
             </div>
 
-            <!-- PANE 3: Caisse / Monnaie -->
             <div id="pane-caisse" class="main-card tab-pane" style="display:none;">
-                <div class="caisse-layout">
-                    <div>
-                        <div class="card-header-actions">
-                            <h2>Journal des Flux de la Boîte à Monnaie</h2>
-                            <div style="display:flex; gap:10px; align-items:center;">
-                                <button class="btn btn-dark" onclick="openModalCaisse()">➕ Saisir Mouvement Caisse</button>
-                                <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('caisse', 'JOURNAL DES FLUX DE LA BOÎTE À MONNAIE', 'table-caisse-printable', 'portrait')">📄 Exporter (A4 HTML)</button>
-                            </div>
-                        </div>
-
-                        <div class="filter-box">
-                            <span>🔍 <strong>Filtrer la période :</strong></span>
-                            <div>
-                                <label>Du :</label>
-                                <input type="date" id="filter-start-date-caisse" onchange="renderCaisseFlux()">
-                            </div>
-                            <div>
-                                <label>Au :</label>
-                                <input type="date" id="filter-end-date-caisse" onchange="renderCaisseFlux()">
-                            </div>
-                            <button class="btn btn-outline btn-xs" onclick="clearDateFilter('caisse')" style="padding: 6px 10px;">Réinitialiser</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="table-caisse-printable">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Flux</th>
-                                        <th>Désignation</th>
-                                        <th data-html-export="ignore">Justificatif</th>
-                                        <th>Auteur</th>
-                                        <th>Montant</th>
-                                        <th>Solde Caisse</th>
-                                        <th style="text-align:center;" data-html-export="ignore">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-caisse-body"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div style="background: #fafafa; border: 1px solid var(--gris-tres-clair); padding: 20px; border-radius: 8px;">
-                        <h3 style="font-family:'Fredoka'; margin-top:0; color:var(--noir-doux);">🪙 Calculateur de Fond de Caisse</h3>
-                        <p style="font-size:0.8rem; color:var(--gris-moyen);">Saisissez les quantités réelles pour vérifier votre boîte.</p>
-                        <table class="monnaie-table" style="font-size:0.85rem;">
-                            <thead><tr><th>Billet/Pièce</th><th>Quantité</th><th>Total</th></tr></thead>
-                            <tbody id="monnaie-calc-body"></tbody>
-                        </table>
-                        <div style="margin-top:15px; padding:12px; background:var(--blanc); border-radius:6px; display:flex; justify-content:space-between; font-weight:bold;">
-                            <span>Total physique pesé :</span><span id="monnaie-physique-total" style="color:var(--vert-fonce);">0.00&nbsp;€</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PANE 4: Portefeuille Chèques -->
-            <div id="pane-cheques" class="main-card tab-pane" style="display:none;">
                 <div class="card-header-actions">
-                    <h2>Gestion des Chèques Reçus & Remises en Banque</h2>
-                    <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('cheques', 'LISTE DES CHÈQUES À ENCAISSER', 'table-cheques-printable', 'portrait')">📄 Exporter cette vue (A4 HTML)</button>
+                    <h2>Journal des Flux de la Boîte à Monnaie (Espèces)</h2>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-dark" onclick="openModalCaisse()">➕ Saisir Mouvement Caisse</button>
+                        <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('caisse', 'JOURNAL DES FLUX DE LA BOÎTE À MONNAIE', 'table-caisse-printable', 'portrait')">📄 Exporter A4 Portrait</button>
+                    </div>
                 </div>
-
                 <div class="filter-box">
-                    <span>🔍 <strong>Filtrer les chèques par date de réception :</strong></span>
-                    <div>
-                        <label>Du :</label>
-                        <input type="date" id="filter-start-date-cheques" onchange="renderChequesAttente()">
-                    </div>
-                    <div>
-                        <label>Au :</label>
-                        <input type="date" id="filter-end-date-cheques" onchange="renderChequesAttente()">
-                    </div>
-                    <button class="btn btn-outline btn-xs" onclick="clearDateFilter('cheques')" style="padding: 6px 10px;">Réinitialiser</button>
+                    <span>🔍 <strong>Filtrer la période :</strong></span>
+                    <input type="date" id="filter-start-date-caisse" onchange="renderCaisseFlux()"> au 
+                    <input type="date" id="filter-end-date-caisse" onchange="renderCaisseFlux()">
+                    <button class="btn btn-outline btn-xs" onclick="clearDateFilter('caisse')">Réinitialiser</button>
                 </div>
-                
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:25px;">
-                    <div style="background:#fafafa; padding:20px; border-radius:6px; border:1px dashed var(--gris-clair);">
-                        <h3 style="font-family:'Fredoka'; margin-top:0;">✍️ Enregistrer un Chèque Entrant</h3>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                            <div class="form-group"><label>Date de réception</label><input type="date" id="chq-date"></div>
-                            <div class="form-group"><label>Montant (€)</label><input type="number" step="0.01" id="chq-montant"></div>
-                            <div class="form-group"><label>N° Chèque</label><input type="text" id="chq-num"></div>
-                            <div class="form-group"><label>Titulaire Compte</label><input type="text" id="chq-titulaire"></div>
-                            <div class="form-group"><label>Banque Émettrice</label><input type="text" id="chq-banque"></div>
-                            <div class="form-group"><label>Objet / Référence</label><input type="text" id="chq-objet" placeholder="Ex: Cotisation"></div>
-                        </div>
-                        <button class="btn btn-dark" style="margin-top:12px; width:100%; justify-content:center;" onclick="addChequeAttente()">📥 Placer en attente de remise</button>
-                    </div>
-
-                    <div style="background:#f4f9f5; padding:20px; border-radius:6px; border:1px solid #cceadb;">
-                        <h3 style="font-family:'Fredoka'; margin-top:0; color:var(--vert-fonce);">🏦 Préparer une Remise de Chèques</h3>
-                        <p style="font-size:0.8rem; color:var(--gris-moyen);">Cochez les chèques de la liste ci-dessous puis donnez un numéro de bordereau pour l'injecter en banque.</p>
-                        <div style="display:flex; gap:10px; margin-top:15px; align-items:flex-end;">
-                            <div class="form-group"><label>N° Bordereau Remise</label><input type="text" id="remise-num" placeholder="Ex: 3735786"></div>
-                            <div class="form-group"><label>Responsable</label><input type="text" id="remise-resp" placeholder="Prénom"></div>
-                            <button class="btn btn-success" onclick="processRemiseChèques()">⚙️ Valider l'encaissement</button>
-                        </div>
-                    </div>
-                </div>
-
-                <h3>📋 Liste des Chèques Détenus (En attente d'encaissement)</h3>
                 <div class="table-responsive">
-                    <table id="table-cheques-printable">
+                    <table id="table-caisse-printable">
                         <thead>
-                            <tr><th data-html-export="ignore">Sélection</th><th>Date Recu</th><th>N° Chèque</th><th>Titulaire / Banque</th><th>Objet</th><th>Montant</th><th style="text-align:center;" data-html-export="ignore">Action</th></tr>
+                            <tr>
+                                <th>Date</th>
+                                <th>Flux</th>
+                                <th>Catégorie</th>
+                                <th>Désignation</th>
+                                <th>Auteur</th>
+                                <th>Montant</th>
+                                <th>Solde</th>
+                                <th style="text-align:center;" data-html-export="ignore">Actions</th>
+                            </tr>
                         </thead>
-                        <tbody id="table-cheques-attente-body"></tbody>
+                        <tbody id="table-caisse-body"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- PANE 5: Bordereaux FFJDA -->
+            <div id="pane-cheques" class="main-card tab-pane" style="display:none;">
+                <h2>Gestion des Chèques Reçus</h2>
+                <div class="table-responsive"><table id="table-cheques-printable"><thead><tr><th>Sélection</th><th>Date Recu</th><th>N° Chèque</th><th>Titulaire / Banque</th><th>Objet</th><th>Montant</th></tr></thead><tbody id="table-cheques-attente-body"></tbody></table></div>
+            </div>
+
             <div id="pane-licences" class="main-card tab-pane" style="display:none;">
-                <div class="card-header-actions">
-                    <h2>Suivi des Bordereaux de Licences Extranet FFJDA</h2>
-                    <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('licences', 'SUIVI DES BORDEREAUX DE LICENCES EXTRANET FFJDA', 'table-licences-printable', 'landscape')">📄 Exporter (A4 Paysage)</button>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group"><label>Date Bordereau</label><input type="date" id="lic-date"></div>
-                    <div class="form-group"><label>N° Bordereau Club</label><input type="text" id="lic-num-club" placeholder="Ex: 1"></div>
-                    <div class="form-group"><label>N° National Fédéral</label><input type="text" id="lic-num-fed" placeholder="Ex: 1589008"></div>
-                    <div class="form-group"><label>Nombre Licenciés</label><input type="number" id="lic-count" placeholder="Ex: 9"></div>
-                    <div class="form-group"><label>Montant Global Fédé (€)</label><input type="number" step="0.01" id="lic-total" placeholder="0.00"></div>
-                    <button class="btn btn-dark" onclick="addBordereauLicence()">💾 Enregistrer le Bordereau</button>
-                </div>
-
-                <div class="table-responsive">
-                    <table id="table-licences-printable">
-                        <thead>
-                            <tr><th>Date</th><th>N° Dojo</th><th>N° Fédéral</th><th>Nb Licences</th><th>Montant Global</th><th>Enregistré ?</th><th>Imprimé ?</th><th>Prlevé Banque ?</th><th style="text-align:center;" data-html-export="ignore">Action</th></tr>
-                        </thead>
-                        <tbody id="table-licences-body"></tbody>
-                    </table>
-                </div>
+                <h2>Suivi des Bordereaux de Licences Extranet FFJDA</h2>
+                <div class="table-responsive"><table id="table-licences-printable"><thead><tr><th>Date</th><th>N° Dojo</th><th>N° Fédéral</th><th>Nb Licences</th><th>Montant Global</th></tr></thead><tbody id="table-licences-body"></tbody></table></div>
             </div>
 
-            <!-- PANE 6: Historique Dépôts Espèces -->
             <div id="pane-depots" class="main-card tab-pane" style="display:none;">
+                <h2>Mise en Banque des Espèces (Bordereaux Détaillés)</h2>
+                <div class="table-responsive"><table id="table-depots-printable"><thead><tr><th>Date</th><th>Référence</th><th>Détail</th><th>Total General</th></tr></thead><tbody id="table-depots-body"></tbody></table></div>
+            </div>
+
+            <div id="pane-categories" class="main-card tab-pane" style="display:none;">
                 <div class="card-header-actions">
-                    <h2>Mise en Banque des Espèces (Bordereau Détaillé)</h2>
-                    <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('depots', 'HISTORIQUE DES DEPOTS EN ESPECES EFFECTUES', 'table-depots-printable', 'landscape')">📄 Exporter (A4 Paysage)</button>
+                    <h2>Gestion des Catégories (Analytique)</h2>
+                    <button class="btn btn-dark" onclick="openModalCategory()">➕ Nouvelle Catégorie</button>
                 </div>
-                <p style="font-size: 0.9rem; color: var(--gris-moyen); margin-top: -5px; margin-bottom: 20px;">
-                    Saisissez les quantités exactes déposées à la banque. L'outil calculera les distinctions réglementaires pièces/billets pour les écritures comptables.
-                </p>
-                
-                <div style="background: #fafafa; padding: 20px; border-radius: 8px; border: 1px dashed var(--gris-clair); margin-bottom: 25px;">
-                    <div class="depot-grid-split">
-                        <div class="depot-box">
-                            <h4>💶 Ventilation Billets</h4>
-                            <div class="depot-item"><span>Billet de 100 €</span><input type="number" min="0" id="dp-b-100" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-item"><span>Billet de 50 €</span><input type="number" min="0" id="dp-b-50" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-item"><span>Billet de 20 €</span><input type="number" min="0" id="dp-b-20" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-item"><span>Billet de 10 €</span><input type="number" min="0" id="dp-b-10" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-item"><span>Billet de 5 €</span><input type="number" min="0" id="dp-b-5" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-total-sub">Total Billets : <span id="lbl-total-b">0.00</span> €</div>
-                        </div>
-
-                        <div class="depot-box">
-                            <h4>🪙 Ventilation Pièces (Monnaie)</h4>
-                            <div class="depot-item"><span>Pièce de 2 €</span><input type="number" min="0" id="dp-p-2" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-item"><span>Pièce de 1 €</span><input type="number" min="0" id="dp-p-1" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-item"><span>Pièce de 0.50 €</span><input type="number" min="0" id="dp-p-0.5" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-item"><span>Pièce de 0.20 €</span><input type="number" min="0" id="dp-p-0.2" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-item"><span>Pièce de 0.10 €</span><input type="number" min="0" id="dp-p-0.1" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-item"><span>Pièce de 0.05 €</span><input type="number" min="0" id="dp-p-0.05" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-item"><span>Pièce de 0.02 €</span><input type="number" min="0" id="dp-p-0.02" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-item"><span>Pièce de 0.01 €</span><input type="number" min="0" id="dp-p-0.01" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-total-sub">Total Pièces : <span id="lbl-total-p">0.00</span> €</div>
-                        </div>
-                    </div>
-
-                    <div class="form-grid" style="background:transparent; border:none; padding:0; margin:0;">
-                        <div class="form-group"><label>Date du Dépôt</label><input type="date" id="d-date"></div>
-                        <div class="form-group"><label>N° Réf / Bordereau</label><input type="text" id="d-ref" placeholder="Ex: Remise Populaire 45"></div>
-                        <div class="form-group"><label>Responsable</label><input type="text" id="d-resp" placeholder="Prénom"></div>
-                        <div class="form-group" style="min-width: 200px;">
-                            <label style="font-weight: bold; color: var(--vert-fonce);">Grand Total à Déposer</label>
-                            <input type="text" id="d-grand-total" readonly value="0.00 €" style="font-weight: bold; color: var(--vert-fonce); background: #e8f8f0; border-color: #2ecc71;">
-                        </div>
-                        <button class="btn btn-success" style="height: 40px;" onclick="addDepotEspecesDetaille()">🏦 Valider et Ventiler le Dépôt</button>
-                    </div>
-                </div>
-
-                <h3>📋 Historique des Dépôts d'Espèces Effectués</h3>
+                <p style="font-size: 0.9rem; color: var(--gris-moyen);">Créez ici vos propres postes de recettes et dépenses pour personnaliser le bilan analytique.</p>
                 <div class="table-responsive">
-                    <table id="table-depots-printable">
+                    <table>
                         <thead>
-                            <tr><th>Date</th><th>Référence</th><th>Détail des Coupures</th><th>Total Billets</th><th>Total Pièces</th><th>Total Général</th><th>Auteur</th><th style="text-align:center;" data-html-export="ignore">Action</th></tr>
+                            <tr>
+                                <th>Nom de la Catégorie</th>
+                                <th>Type</th>
+                                <th style="text-align:center;">Action</th>
+                            </tr>
                         </thead>
-                        <tbody id="table-depots-body"></tbody>
+                        <tbody id="table-categories-body"></tbody>
                     </table>
                 </div>
             </div>
+
+            <div id="pane-analytique" class="main-card tab-pane" style="display:none;">
+                <div class="card-header-actions">
+                    <h2>Tableau de Bord Analytique & Compte de Résultat</h2>
+                    <button class="btn btn-blue" onclick="exporterBilanA4()">📄 Exporter le Bilan (PDF/Imprimable)</button>
+                </div>
+                
+                <div class="filter-box" style="background:#e8f4fc; border-color:#bce0fd;">
+                    <span>🔍 <strong>Période & Compte :</strong></span>
+                    <input type="date" id="ana-start" onchange="renderAnalytique()"> au 
+                    <input type="date" id="ana-end" onchange="renderAnalytique()">
+                    <select id="ana-source" onchange="renderAnalytique()" style="font-weight:bold;">
+                        <option value="ALL">Comptes Consolidés (Banque + Livret + Caisse)</option>
+                        <option value="BANQUE">Compte Courant (Banque) Uniquement</option>
+                        <option value="LIVRET">Livret d'Épargne Uniquement</option>
+                        <option value="CAISSE">Boîte à Monnaie (Caisse) Uniquement</option>
+                    </select>
+                </div>
+
+                <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="stat-card" style="border-left-color: var(--vert);">
+                        <h3>Total Recettes</h3>
+                        <div class="value" id="ana-kpi-recettes" style="color:var(--vert-fonce);">0.00 €</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--rouge);">
+                        <h3>Total Dépenses</h3>
+                        <div class="value" id="ana-kpi-depenses" style="color:var(--rouge);">0.00 €</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--bleu);">
+                        <h3>Résultat Net (Bénéfice/Déficit)</h3>
+                        <div class="value" id="ana-kpi-resultat">0.00 €</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--violet);">
+                        <h3>Taux de Rentabilité</h3>
+                        <div class="value" id="ana-kpi-taux" style="color:var(--violet);">0 %</div>
+                    </div>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="analytics-table-container">
+                        <h3 style="color: var(--vert-fonce);">🟢 RECETTES (PRODUITS)</h3>
+                        <table style="font-size:0.85rem;">
+                            <thead><tr><th>Catégorie</th><th style="text-align:right;">Montant</th></tr></thead>
+                            <tbody id="ana-table-recettes"></tbody>
+                            <tfoot>
+                                <tr style="background:#e8f8f0; font-weight:bold;">
+                                    <td>TOTAL RECETTES</td>
+                                    <td style="text-align:right; color:var(--vert-fonce);" id="ana-tot-recettes">0.00 €</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="analytics-table-container">
+                        <h3 style="color: var(--rouge);">🔴 DÉPENSES (CHARGES)</h3>
+                        <table style="font-size:0.85rem;">
+                            <thead><tr><th>Catégorie</th><th style="text-align:right;">Montant</th></tr></thead>
+                            <tbody id="ana-table-depenses"></tbody>
+                            <tfoot>
+                                <tr style="background:#fcebe9; font-weight:bold;">
+                                    <td>TOTAL DÉPENSES</td>
+                                    <td style="text-align:right; color:var(--rouge);" id="ana-tot-depenses">0.00 €</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- MODALE OPÉRATIONS BANCAIRES (COMPTE COURANT) -->
-    <div class="modal-overlay" id="modal-banque-overlay" onclick="handleOverlayClick(event, 'modal-banque-overlay')">
+    <div class="modal-overlay" id="modal-banque-overlay">
         <div class="modal-container">
             <div class="modal-header">
-                <h3 id="modal-banque-title">➕ Nouvelle Opération Bancaire</h3>
+                <h3 id="modal-banque-title">➕ Opération Bancaire</h3>
                 <button class="modal-close-btn" onclick="closeModal('modal-banque-overlay')">&times;</button>
             </div>
             <div class="modal-body">
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
+                    <div class="form-group"><label>Date *</label><input type="date" id="mb-date"></div>
                     <div class="form-group">
-                        <label>Date *</label>
-                        <input type="date" id="mb-date">
-                    </div>
-                    <div class="form-group">
-                        <label>Type d'opération *</label>
-                        <select id="mb-type">
-                            <option value="Crédit">🟢 Crédit (Entrée +)</option>
-                            <option value="Débit">🔴 Débit (Sortie -)</option>
+                        <label>Type *</label>
+                        <select id="mb-type" onchange="updateCategorySelects()">
+                            <option value="Crédit">🟢 Crédit (+)</option>
+                            <option value="Débit">🔴 Débit (-)</option>
                         </select>
                     </div>
+                    <div class="form-group"><label>Catégorie *</label><select id="mb-cat"></select></div>
                 </div>
                 <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px;">
-                    <div class="form-group">
-                        <label>Désignation / Objet *</label>
-                        <input type="text" id="mb-desig" placeholder="Ex: Achat matériel club">
-                    </div>
-                    <div class="form-group">
-                        <label>Référence / Facture</label>
-                        <input type="text" id="mb-ref" placeholder="Optionnel">
-                    </div>
+                    <div class="form-group"><label>Désignation *</label><input type="text" id="mb-desig"></div>
+                    <div class="form-group"><label>Réf/Facture</label><input type="text" id="mb-ref"></div>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
-                    <div class="form-group">
-                        <label>Responsable *</label>
-                        <input type="text" id="mb-resp" placeholder="Prénom">
-                    </div>
-                    <div class="form-group">
-                        <label>Moyen Paiement *</label>
+                    <div class="form-group"><label>Resp.</label><input type="text" id="mb-resp"></div>
+                    <div class="form-group"><label>Moyen</label>
                         <select id="mb-moyen">
                             <option value="VIREMENT">Virement</option>
                             <option value="CHÈQUE">Chèque</option>
-                            <option value="Prélèvement">Prélèvement</option>
-                            <option value="Rem CHQ">Remise Chèque</option>
-                            <option value="Dépôt ESP">Dépôt Espèces</option>
                             <option value="CB">Carte Bancaire</option>
+                            <option value="Prélèvement">Prélèvement</option>
+                            <option value="Rem CHQ">Remise Chèques</option>
+                            <option value="Dépôt ESP">Dépôt Espèces</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Montant (€) *</label>
-                        <input type="number" step="0.01" id="mb-montant" placeholder="0.00">
-                    </div>
-                </div>
-                
-                <!-- ZONE UPLOAD AUTOMATIQUE BANQUE -->
-                <div class="file-attachment-box" style="grid-column: 1 / -1; margin-top: 5px;">
-                    <label style="font-weight:bold; font-size:0.85rem; color:var(--noir-doux); display:block; margin-bottom:6px;">📎 Justificatif (Optionnel)</label>
-                    
-                    <div id="mb-existing-file-box" style="display:none;" class="file-existing-badge">
-                        <span id="mb-existing-filename" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">📎 Fichier déjà joint</span>
-                        <div style="display:flex; gap:6px;">
-                            <a id="mb-existing-link" href="#" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">👁️ Ouvrir</a>
-                            <button type="button" class="btn btn-danger btn-xs" onclick="removeExistingFile('banque')">🗑️</button>
-                        </div>
-                    </div>
-                    
-                    <div id="mb-file-input-box">
-                        <input type="file" id="mb-file" accept="image/*,application/pdf" style="width:100%;">
-                        <small style="color:var(--gris-moyen); font-size:0.78rem;">Le document sera automatiquement classé dans ton Google Drive et renommé avec la référence de l'opération.</small>
-                    </div>
+                    <div class="form-group"><label>Montant (€) *</label><input type="number" step="0.01" id="mb-montant"></div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('modal-banque-overlay')">Annuler</button>
-                <button class="btn btn-dark" onclick="saveModalBanque()">💾 Enregistrer l'opération</button>
+                <button class="btn btn-dark" onclick="saveModalBanque()">💾 Enregistrer</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE COMPTE LIVRET ÉPARGNE -->
-    <div class="modal-overlay" id="modal-livret-overlay" onclick="handleOverlayClick(event, 'modal-livret-overlay')">
+    <div class="modal-overlay" id="modal-livret-overlay">
         <div class="modal-container">
-            <div class="modal-header">
-                <h3 id="modal-livret-title">➕ Nouvelle Opération Livret</h3>
-                <button class="modal-close-btn" onclick="closeModal('modal-livret-overlay')">&times;</button>
-            </div>
+            <div class="modal-header"><h3 id="modal-livret-title">➕ Opération Livret</h3><button class="modal-close-btn" onclick="closeModal('modal-livret-overlay')">&times;</button></div>
             <div class="modal-body">
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                    <div class="form-group">
-                        <label>Date *</label>
-                        <input type="date" id="ml-date">
-                    </div>
-                    <div class="form-group">
-                        <label>Type d'opération *</label>
-                        <select id="ml-type">
-                            <option value="Crédit">🟢 Dépôt / Intérêts (+)</option>
-                            <option value="Débit">🔴 Retrait (-)</option>
-                        </select>
-                    </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
+                    <div class="form-group"><label>Date *</label><input type="date" id="ml-date"></div>
+                    <div class="form-group"><label>Type *</label><select id="ml-type" onchange="updateCategorySelects()"><option value="Crédit">🟢 Dépôt (+)</option><option value="Débit">🔴 Retrait (-)</option></select></div>
+                    <div class="form-group"><label>Catégorie *</label><select id="ml-cat"></select></div>
                 </div>
                 <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px;">
-                    <div class="form-group">
-                        <label>Désignation / Motif *</label>
-                        <input type="text" id="ml-desig" placeholder="Ex: Virement depuis compte courant ou Intérêts annuels">
-                    </div>
-                    <div class="form-group">
-                        <label>Référence / Note</label>
-                        <input type="text" id="ml-ref" placeholder="Optionnel">
-                    </div>
-                </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                    <div class="form-group">
-                        <label>Responsable *</label>
-                        <input type="text" id="ml-resp" placeholder="Prénom">
-                    </div>
-                    <div class="form-group">
-                        <label>Montant (€) *</label>
-                        <input type="number" step="0.01" id="ml-montant" placeholder="0.00">
-                    </div>
-                </div>
-                
-                <!-- ZONE UPLOAD AUTOMATIQUE LIVRET -->
-                <div class="file-attachment-box" style="grid-column: 1 / -1; margin-top: 5px;">
-                    <label style="font-weight:bold; font-size:0.85rem; color:var(--noir-doux); display:block; margin-bottom:6px;">📎 Justificatif (Optionnel)</label>
-                    
-                    <div id="ml-existing-file-box" style="display:none;" class="file-existing-badge">
-                        <span id="ml-existing-filename" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">📎 Fichier déjà joint</span>
-                        <div style="display:flex; gap:6px;">
-                            <a id="ml-existing-link" href="#" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">👁️ Ouvrir</a>
-                            <button type="button" class="btn btn-danger btn-xs" onclick="removeExistingFile('livret')">🗑️</button>
-                        </div>
-                    </div>
-                    
-                    <div id="ml-file-input-box">
-                        <input type="file" id="ml-file" accept="image/*,application/pdf" style="width:100%;">
-                        <small style="color:var(--gris-moyen); font-size:0.78rem;">Le document sera automatiquement classé dans ton Google Drive.</small>
-                    </div>
+                    <div class="form-group"><label>Désignation *</label><input type="text" id="ml-desig"></div>
+                    <div class="form-group"><label>Montant (€) *</label><input type="number" step="0.01" id="ml-montant"></div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeModal('modal-livret-overlay')">Annuler</button>
-                <button class="btn btn-dark" style="background: var(--violet);" onclick="saveModalLivret()">💾 Saisir sur le Livret</button>
-            </div>
+            <div class="modal-footer"><button class="btn btn-dark" onclick="saveModalLivret()">💾 Enregistrer</button></div>
         </div>
     </div>
 
-    <!-- MODALE CAISSE / MONNAIE -->
-    <div class="modal-overlay" id="modal-caisse-overlay" onclick="handleOverlayClick(event, 'modal-caisse-overlay')">
+    <div class="modal-overlay" id="modal-caisse-overlay">
         <div class="modal-container">
-            <div class="modal-header">
-                <h3 id="modal-caisse-title">➕ Saisir Mouvement de Caisse</h3>
-                <button class="modal-close-btn" onclick="closeModal('modal-caisse-overlay')">&times;</button>
-            </div>
+            <div class="modal-header"><h3 id="modal-caisse-title">➕ Mouvement Caisse</h3><button class="modal-close-btn" onclick="closeModal('modal-caisse-overlay')">&times;</button></div>
             <div class="modal-body">
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                    <div class="form-group">
-                        <label>Date *</label>
-                        <input type="date" id="mc-date">
-                    </div>
-                    <div class="form-group">
-                        <label>Type Flux *</label>
-                        <select id="mc-type">
-                            <option value="Recette">🟢 Recette (+)</option>
-                            <option value="Dépense">🔴 Dépense (-)</option>
-                        </select>
-                    </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
+                    <div class="form-group"><label>Date *</label><input type="date" id="mc-date"></div>
+                    <div class="form-group"><label>Type *</label><select id="mc-type" onchange="updateCategorySelects()"><option value="Recette">🟢 Recette (+)</option><option value="Dépense">🔴 Dépense (-)</option></select></div>
+                    <div class="form-group"><label>Catégorie *</label><select id="mc-cat"></select></div>
                 </div>
                 <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px;">
-                    <div class="form-group">
-                        <label>Désignation *</label>
-                        <input type="text" id="mc-desig" placeholder="Ex: Vente Buvette">
-                    </div>
-                    <div class="form-group">
-                        <label>Montant (€) *</label>
-                        <input type="number" step="0.01" id="mc-montant" placeholder="Ex: 20.00">
-                    </div>
+                    <div class="form-group"><label>Désignation *</label><input type="text" id="mc-desig"></div>
+                    <div class="form-group"><label>Montant (€) *</label><input type="number" step="0.01" id="mc-montant"></div>
                 </div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-dark" onclick="saveModalCaisse()">💾 Enregistrer</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-category-overlay">
+        <div class="modal-container" style="max-width: 400px;">
+            <div class="modal-header"><h3 id="modal-cat-title">➕ Nouvelle Catégorie</h3><button class="modal-close-btn" onclick="closeModal('modal-category-overlay')">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Nom de la Catégorie *</label><input type="text" id="mcat-nom" placeholder="Ex: Matériel Pédagogique"></div>
                 <div class="form-group">
-                    <label>Auteur / Responsable *</label>
-                    <input type="text" id="mc-resp" placeholder="Prénom">
-                </div>
-                
-                <!-- ZONE UPLOAD AUTOMATIQUE CAISSE -->
-                <div class="file-attachment-box" style="grid-column: 1 / -1; margin-top: 5px;">
-                    <label style="font-weight:bold; font-size:0.85rem; color:var(--noir-doux); display:block; margin-bottom:6px;">📎 Reçu / Justificatif (Optionnel)</label>
-                    
-                    <div id="mc-existing-file-box" style="display:none;" class="file-existing-badge">
-                        <span id="mc-existing-filename" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">📎 Fichier déjà joint</span>
-                        <div style="display:flex; gap:6px;">
-                            <a id="mc-existing-link" href="#" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">👁️ Ouvrir</a>
-                            <button type="button" class="btn btn-danger btn-xs" onclick="removeExistingFile('caisse')">🗑️</button>
-                        </div>
-                    </div>
-                    
-                    <div id="mc-file-input-box">
-                        <input type="file" id="mc-file" accept="image/*,application/pdf" style="width:100%;">
-                        <small style="color:var(--gris-moyen); font-size:0.78rem;">Le document sera automatiquement classé dans ton Google Drive.</small>
-                    </div>
+                    <label>Type de Flux *</label>
+                    <select id="mcat-type">
+                        <option value="Recette">Recette (Entrée d'argent)</option>
+                        <option value="Dépense">Dépense (Sortie d'argent)</option>
+                        <option value="Interne">Virement Interne / Neutre</option>
+                    </select>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeModal('modal-caisse-overlay')">Annuler</button>
-                <button class="btn btn-dark" onclick="saveModalCaisse()">💾 Saisir l'opération de caisse</button>
-            </div>
+            <div class="modal-footer"><button class="btn btn-dark" onclick="saveCategory()">💾 Sauvegarder</button></div>
         </div>
     </div>
 
 <script>
     let comptaDB = {
-        operations: [],
-        livretOps: [],
-        caisseFlux: [],
-        monnaieCounts: {},
-        cheques: [], 
-        bordereaux: [],
-        depotsEspeces: []
+        operations: [], livretOps: [], caisseFlux: [], cheques: [], bordereaux: [], depotsEspeces: [], monnaieCounts: {}, categories: []
     };
 
-    let editingBanqueId = null;
-    let editingLivretId = null;
-    let editingCaisseId = null;
+    const defaultCategories = [
+        { id: 1, nom: "Cotisations & Inscriptions", type: "Recette" },
+        { id: 2, nom: "Subventions (Mairie, ANS)", type: "Recette" },
+        { id: 3, nom: "Mécénat & Sponsoring", type: "Recette" },
+        { id: 4, nom: "Boutique / Buvette", type: "Recette" },
+        { id: 5, nom: "Licences FFJDA", type: "Dépense" },
+        { id: 6, nom: "Matériel Sportif & Récompenses", type: "Dépense" },
+        { id: 7, nom: "Événements, Stages & Tournois", type: "Dépense" },
+        { id: 8, nom: "Frais de Déplacement", type: "Dépense" },
+        { id: 9, nom: "Prestations (Enseignants)", type: "Dépense" },
+        { id: 10, nom: "Frais Bancaires & Assurances", type: "Dépense" },
+        { id: 11, nom: "Virement Interne", type: "Interne" }
+    ];
 
-    let flagRemoveBanqueFile = false;
-    let flagRemoveLivretFile = false;
-    let flagRemoveCaisseFile = false;
-
-    const denoms = [100, 50, 20, 10, 5, 2, 1, 0.50, 0.20, 0.10, 0.05, 0.02, 0.01];
-    const billetDenoms = [100, 50, 20, 10, 5];
-    const pieceDenoms = [2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01];
+    let editingBanqueId = null; let editingLivretId = null; let editingCaisseId = null; let editingCatId = null;
 
     const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-const SUPABASE_TABLE = 'compta';
+    const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+    const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+    const SUPABASE_TABLE = 'compta';
 
-function showToast(message, type = 'success') {
+    function showToast(message, type = 'success') {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = 'toast success';
         toast.innerText = message;
         container.appendChild(toast);
-        setTimeout(() => { toast.remove(); }, 3500);
-    }
-
-    /* GENERATEUR DE REFERENCE DOJO AUTO-INCREMENTEE */
-    function generateDojoRef(dateStr) {
-        const opsOnDate = comptaDB.operations.filter(o => o.date === dateStr && o.dojoRef && o.dojoRef.startsWith('DD-'));
-        let maxInc = 0;
-        
-        opsOnDate.forEach(o => {
-            const parts = o.dojoRef.split('-');
-            if (parts.length === 5) {
-                const inc = parseInt(parts[4], 10);
-                if (!isNaN(inc) && inc > maxInc) maxInc = inc;
-            }
-        });
-        
-        const nextInc = (maxInc + 1).toString().padStart(3, '0');
-        return `DD-${dateStr}-${nextInc}`;
-    }
-
-    /* GENERATEUR DU NOUVEAU NOM DE FICHIER */
-    function getNewFileName(originalName, operationRef) {
-        if (!operationRef) return originalName;
-        
-        const datePattern = /^\d{4}-\d{2}-\d{2}[_ -]?/;
-        let baseName = originalName;
-        
-        if (datePattern.test(originalName)) {
-            baseName = originalName.replace(datePattern, '');
-        }
-        
-        if (baseName && !baseName.startsWith('-') && !baseName.startsWith('_')) {
-            baseName = '_' + baseName;
-        }
-        
-        return operationRef + baseName;
-    }
-
-    /* FONCTION CENTRALE D'ENVOI VERS TON DRIVE */
-    async function uploadFileToDrive(file, customFileName = null) {
-        console.warn("File upload disabled during Supabase migration.");
-        return null;
-    }
-
-    function removeExistingFile(type) {
-        if (type === 'banque') {
-            flagRemoveBanqueFile = true;
-            document.getElementById('mb-existing-file-box').style.display = 'none';
-            document.getElementById('mb-file-input-box').style.display = 'block';
-            document.getElementById('mb-file').value = "";
-        } else if (type === 'livret') {
-            flagRemoveLivretFile = true;
-            document.getElementById('ml-existing-file-box').style.display = 'none';
-            document.getElementById('ml-file-input-box').style.display = 'block';
-            document.getElementById('ml-file').value = "";
-        } else if (type === 'caisse') {
-            flagRemoveCaisseFile = true;
-            document.getElementById('mc-existing-file-box').style.display = 'none';
-            document.getElementById('mc-file-input-box').style.display = 'block';
-            document.getElementById('mc-file').value = "";
-        }
+        setTimeout(() => toast.remove(), 3500);
     }
 
     async function syncToSupabase(silent = false) {
-        if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+        if (!silent) showToast("Synchronisation Supabase...");
+        localStorage.setItem('dojo_compta_backup', JSON.stringify(comptaDB)); 
         try {
-            updateDashboardKPIs();
-            const payload = comptaDB;
-
-            localStorage.setItem('dojo_compta_backup', JSON.stringify(payload)); 
-
-            const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
-            if (error) throw error;
-            
-            if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
-        } catch (err) {
-            console.error("Erreur Supabase:", err);
-            if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
-        }
+            await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: comptaDB });
+            if (!silent) showToast("✓ Sauvegardé !", "success");
+        } catch(e) { console.warn("Supabase erreur, local conservé"); }
+        rebuildAll();
     }
 
-    function saveComptaData() {
-        syncToSupabase(true);
-    }
-
-    async function loadData() {
-        const saved = localStorage.getItem('dojo_compta_backup');
-        if (saved) {
-            try {
-                comptaDB = JSON.parse(saved);
-                finalizeInitialization();
-            } catch(e) {}
-        } else {
-            useFallbackLocalData();
-            finalizeInitialization();
-        }
-        
-        try {
-            const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
-            if (error) throw error;
-            if (result && result.data) {
-                comptaDB = result.data;
-                if (!comptaDB.operations) comptaDB.operations = [];
-                if (!comptaDB.livretOps) comptaDB.livretOps = [];
-                if (!comptaDB.caisseFlux) comptaDB.caisseFlux = [];
-                if (!comptaDB.cheques) comptaDB.cheques = [];
-                if (!comptaDB.bordereaux) comptaDB.bordereaux = [];
-                if (!comptaDB.depotsEspeces) comptaDB.depotsEspeces = [];
-                if (!comptaDB.monnaieCounts) {
-                    comptaDB.monnaieCounts = {};
-                    denoms.forEach(d => comptaDB.monnaieCounts[d] = 0);
-                }
-                comptaDB.cheques.forEach(c => { if(!c.date) c.date = "2026-06-15"; });
-                
-                try {
-                    localStorage.setItem('dojo_compta_backup', JSON.stringify(comptaDB));
-                } catch(e){}
-
-                finalizeInitialization();
-                if (typeof showToast === 'function') showToast("✓ Données rechargées depuis Supabase !");
-            }
-        } catch(e) {
-            console.error("Erreur chargement Supabase:", e);
-        }
-    }
+    function saveComptaData() { syncToSupabase(true); }
 
     function useFallbackLocalData() {
         const backup = localStorage.getItem('dojo_compta_backup');
         if (backup) {
-            try {
-                comptaDB = JSON.parse(backup);
-            } catch(e) {
-                comptaDB = {};
-            }
-            if (!comptaDB.operations || comptaDB.operations.length === 0) {
-                comptaDB.operations = [{ id: 1, date: "2026-06-15", type: "Crédit", ref: "", desig: "Solde Initial Historique", resp: "Jordan", montant: 1487.10, moyen: "VIREMENT", justificatif: null }];
-            }
-            if (!comptaDB.livretOps) comptaDB.livretOps = [];
-            if (!comptaDB.caisseFlux || comptaDB.caisseFlux.length === 0) {
-                comptaDB.caisseFlux = [
-                    { id: 1, date: "2026-06-15", type: "Recette", desig: "Solde Initial Caisse", resp: "Aurore", montant: 244.38, justificatif: null }
-                ];
-            }
-            if (!comptaDB.cheques) comptaDB.cheques = [];
-            if (!comptaDB.bordereaux) comptaDB.bordereaux = [];
-            if (!comptaDB.depotsEspeces) comptaDB.depotsEspeces = [];
-            if (!comptaDB.monnaieCounts) {
-                comptaDB.monnaieCounts = {};
-                denoms.forEach(d => comptaDB.monnaieCounts[d] = 0);
-            }
-        } else {
-            comptaDB.operations = [{ id: 1, date: "2026-06-15", type: "Crédit", ref: "", desig: "Solde Initial Historique", resp: "Jordan", montant: 1487.10, moyen: "VIREMENT", justificatif: null }];
-            comptaDB.livretOps = [];
-            comptaDB.caisseFlux = [
-                { id: 1, date: "2026-06-15", type: "Recette", desig: "Solde Initial Caisse", resp: "Aurore", montant: 244.38, justificatif: null }
-            ];
-            comptaDB.cheques = [];
-            comptaDB.depotsEspeces = [];
-            comptaDB.bordereaux = [];
-            comptaDB.monnaieCounts = {};
-            denoms.forEach(d => comptaDB.monnaieCounts[d] = 0);
+            try { comptaDB = JSON.parse(backup); } catch(e) { comptaDB = {}; }
         }
-    }
-
-    function finalizeInitialization() {
-        updateDashboardKPIs();
-        initDefaultDateFilters();
-        rebuildAll();
-    }
-
-    function initDefaultDateFilters() {
-        document.getElementById('filter-start-date').value = '';
-        document.getElementById('filter-end-date').value = '';
-        document.getElementById('filter-start-date-livret').value = '';
-        document.getElementById('filter-end-date-livret').value = '';
-        document.getElementById('filter-start-date-caisse').value = '';
-        document.getElementById('filter-end-date-caisse').value = '';
-        document.getElementById('filter-start-date-cheques').value = '';
-        document.getElementById('filter-end-date-cheques').value = '';
-        
-        const now = new Date();
-        const todayStr = now.toISOString().split('T')[0];
-        if(document.getElementById('mb-date')) document.getElementById('mb-date').value = todayStr;
-        if(document.getElementById('ml-date')) document.getElementById('ml-date').value = todayStr;
-        if(document.getElementById('mc-date')) document.getElementById('mc-date').value = todayStr;
-    }
-
-    function rebuildAll() {
+        if (!comptaDB.categories || comptaDB.categories.length === 0) comptaDB.categories = [...defaultCategories];
         if (!comptaDB.operations) comptaDB.operations = [];
         if (!comptaDB.livretOps) comptaDB.livretOps = [];
         if (!comptaDB.caisseFlux) comptaDB.caisseFlux = [];
-        if (!comptaDB.cheques) comptaDB.cheques = [];
-        if (!comptaDB.bordereaux) comptaDB.bordereaux = [];
-        if (!comptaDB.depotsEspeces) comptaDB.depotsEspeces = [];
-        if (!comptaDB.monnaieCounts) {
-            comptaDB.monnaieCounts = {};
-            denoms.forEach(d => comptaDB.monnaieCounts[d] = 0);
-        }
+    }
 
+    async function loadData() {
+        useFallbackLocalData();
+        try {
+            const { data, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+            if (data && data.data) comptaDB = data.data;
+            if (!comptaDB.categories || comptaDB.categories.length === 0) comptaDB.categories = [...defaultCategories];
+        } catch(e) {}
+        rebuildAll();
+    }
+
+    function rebuildAll() {
+        updateCategorySelects();
+        renderCategories();
         renderOperationsBanque();
         renderOperationsLivret();
         renderCaisseFlux();
-        renderMonnaieCalculator();
-        renderChequesAttente();
-        renderBordereaux();
-        renderDepotsEspeces();
         updateDashboardKPIs();
+        renderAnalytique();
     }
 
     function switchTab(tabId) {
         document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        
-        const pane = document.getElementById('pane-' + tabId);
-        const btn = document.getElementById('btn-tab-' + tabId);
-        
-        if (pane) pane.style.display = 'block';
-        if (btn) btn.classList.add('active');
-    }
-
-    function updateDashboardKPIs() {
-        let totalBanque = 0;
-        comptaDB.operations.forEach(op => {
-            const m = parseFloat(op.montant) || 0;
-            if (op.type === 'Crédit') totalBanque += m;
-            else totalBanque -= m;
-        });
-
-        let totalLivret = 0;
-        if (comptaDB.livretOps) {
-            comptaDB.livretOps.forEach(op => {
-                const m = parseFloat(op.montant) || 0;
-                if (op.type === 'Crédit') totalLivret += m;
-                else totalLivret -= m;
-            });
-        }
-
-        let totalCaisse = 0;
-        comptaDB.caisseFlux.forEach(f => {
-            const m = parseFloat(f.montant) || 0;
-            if (f.type === 'Recette') totalCaisse += m;
-            else totalCaisse -= m;
-        });
-
-        let totalChq = 0;
-        comptaDB.cheques.forEach(c => totalChq += (parseFloat(c.montant) || 0));
-
-        let totalLic = 0;
-        if(comptaDB.bordereaux) comptaDB.bordereaux.forEach(b => totalLic += (parseFloat(b.totalFed) || 0));
-
-        document.getElementById('dash-banque').innerText = (totalBanque || 0).toFixed(2) + " €";
-        document.getElementById('dash-livret').innerText = (totalLivret || 0).toFixed(2) + " €";
-        document.getElementById('dash-caisse').innerText = (totalCaisse || 0).toFixed(2) + " €";
-        document.getElementById('dash-cheques-attente').innerText = (totalChq || 0).toFixed(2) + " €";
-        document.getElementById('dash-licences').innerText = (totalLic || 0).toFixed(2) + " €";
+        document.getElementById('pane-' + tabId).style.display = 'block';
+        document.getElementById('btn-tab-' + tabId).classList.add('active');
+        if (tabId === 'analytique') renderAnalytique();
     }
 
     function clearDateFilter(tab) {
         if(tab === 'banque') {
             document.getElementById('filter-start-date').value = '';
             document.getElementById('filter-end-date').value = '';
+            document.getElementById('filter-cat-banque').value = '';
             renderOperationsBanque();
         } else if(tab === 'livret') {
             document.getElementById('filter-start-date-livret').value = '';
@@ -1004,1105 +589,300 @@ function showToast(message, type = 'success') {
             document.getElementById('filter-start-date-caisse').value = '';
             document.getElementById('filter-end-date-caisse').value = '';
             renderCaisseFlux();
-        } else if(tab === 'cheques') {
-            document.getElementById('filter-start-date-cheques').value = '';
-            document.getElementById('filter-end-date-cheques').value = '';
-            renderChequesAttente();
         }
     }
 
-    function openDocumentViewer(dataUrl) {
-        if (!dataUrl) return;
-        const win = window.open();
-        if (dataUrl.startsWith("data:image/")) {
-            win.document.write(`<body style="margin:0; background:#111; display:flex; justify-content:center; align-items:center; height:100vh;"><img src="${dataUrl}" style="max-width:100%; max-height:100vh; object-fit:contain;"></body>`);
-        } else if (dataUrl.startsWith("data:application/pdf")) {
-            win.document.write(`<body style="margin:0;"><iframe src="${dataUrl}" style="width:100%; height:100vh; border:none;"></iframe></body>`);
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    
+    function openModalCategory(id = null) {
+        editingCatId = id;
+        if(id) {
+            const c = comptaDB.categories.find(x => x.id === id);
+            document.getElementById('modal-cat-title').innerText = "✏️ Modifier Catégorie";
+            document.getElementById('mcat-nom').value = c.nom;
+            document.getElementById('mcat-type').value = c.type;
         } else {
-            win.location.href = dataUrl;
+            document.getElementById('modal-cat-title').innerText = "➕ Nouvelle Catégorie";
+            document.getElementById('mcat-nom').value = "";
+            document.getElementById('mcat-type').value = "Dépense";
+        }
+        document.getElementById('modal-category-overlay').classList.add('active');
+    }
+
+    function saveCategory() {
+        const nom = document.getElementById('mcat-nom').value.trim();
+        const type = document.getElementById('mcat-type').value;
+        if(!nom) return alert("Le nom est obligatoire");
+        if(editingCatId) {
+            const cat = comptaDB.categories.find(x => x.id === editingCatId);
+            cat.nom = nom; cat.type = type;
+        } else {
+            comptaDB.categories.push({ id: Date.now(), nom, type });
+        }
+        saveComptaData();
+        closeModal('modal-category-overlay');
+    }
+
+    function deleteCategory(id) {
+        if(confirm("Supprimer cette catégorie ?")) {
+            comptaDB.categories = comptaDB.categories.filter(x => x.id !== id);
+            saveComptaData();
         }
     }
 
-    /* GESTION COMPTE COURANT BANQUE */
-    function renderOperationsBanque() {
-        const tbody = document.getElementById('table-banque-body');
+    function renderCategories() {
+        const tbody = document.getElementById('table-categories-body');
+        if(!tbody) return;
         tbody.innerHTML = '';
+        const selectFiltre = document.getElementById('filter-cat-banque');
+        selectFiltre.innerHTML = '<option value="">-- Toutes les catégories --</option>';
 
-        const start = document.getElementById('filter-start-date').value;
-        const end = document.getElementById('filter-end-date').value;
-
-        let sorted = [...comptaDB.operations].sort((a,b) => new Date(a.date) - new Date(b.date));
-
-        let runningSolde = 0;
-        sorted.forEach(op => {
-            const montant = parseFloat(op.montant) || 0;
-            if (op.type === 'Crédit') runningSolde += montant;
-            else runningSolde -= montant;
-
-            if (start && op.date < start) return;
-            if (end && op.date > end) return;
-
-            const badgeClass = op.type === 'Crédit' ? 'badge-credit' : 'badge-debit';
-            
-            let shortMoyen = op.moyen;
-            if (shortMoyen === 'VIREMENT') shortMoyen = 'VIR.';
-            else if (shortMoyen === 'CHÈQUE' || shortMoyen === 'CHEQUE') shortMoyen = 'CHQ.';
-            else if (shortMoyen === 'Prélèvement' || shortMoyen === 'PRELEVEMENT') shortMoyen = 'PRLV.';
-            else if (shortMoyen === 'Rem CHQ' || shortMoyen === 'REMISE CHÈQUE') shortMoyen = 'REM. C.';
-            else if (shortMoyen === 'Dépôt ESP' || shortMoyen === 'DEPOT ESP') shortMoyen = 'DEP. E.';
-            
-            let docLink = `<span style="color:var(--gris-moyen); font-size:0.8rem;">Aucun</span>`;
-            if (op.justificatif && (op.justificatif.startsWith('http') || op.justificatif.startsWith('www'))) {
-                let url = op.justificatif.startsWith('http') ? op.justificatif : 'https://' + op.justificatif;
-                docLink = `<a href="${url}" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">📎 Ouvrir Drive</a>`;
-            } else if (op.justificatif) {
-                docLink = `<button class="btn btn-outline btn-xs" onclick="openDocumentViewer(comptaDB.operations.find(o=>o.id===${op.id}).justificatif)">📎 Ancien Doc</button>`;
-            }
-
+        comptaDB.categories.forEach(c => {
+            let color = c.type === 'Recette' ? 'var(--vert-fonce)' : (c.type === 'Dépense' ? 'var(--rouge)' : 'var(--gris-moyen)');
             tbody.innerHTML += `
                 <tr>
-                    <td>${formatFrenchDate(op.date)}</td>
-                    <td><strong>${op.dojoRef || 'N/A'}</strong></td>
-                    <td><span class="badge ${badgeClass}">${op.type}</span></td>
-                    <td><strong>${shortMoyen}</strong></td>
-                    <td>${op.desig}</td>
-                    <td class="hide-on-screen">${op.ref || ''}</td>
-                    <td data-html-export="ignore">${docLink}</td>
-                    <td>${op.resp}</td>
-                    <td style="font-weight:bold; color:${op.type==='Crédit'?'var(--vert-fonce)':'var(--rouge)'}">${montant.toFixed(2)}&nbsp;€</td>
-                    <td style="font-weight:700;">${runningSolde.toFixed(2)}&nbsp;€</td>
-                    <td style="text-align:center;" data-html-export="ignore">
-                        <button class="btn btn-blue btn-xs" onclick="editOperationBanque(${op.id})" style="padding:4px 6px; margin-right:2px;">✏️</button>
-                        <button class="btn btn-danger btn-xs" onclick="deleteOperationBanque(${op.id})">🗑️</button>
+                    <td style="font-weight:500;">${c.nom}</td>
+                    <td><span style="color:${color}; font-weight:bold;">${c.type}</span></td>
+                    <td style="text-align:center;">
+                        <button class="btn btn-blue btn-xs" onclick="openModalCategory(${c.id})">✏️</button>
+                        <button class="btn btn-danger btn-xs" onclick="deleteCategory(${c.id})">🗑️</button>
                     </td>
                 </tr>
             `;
+            selectFiltre.innerHTML += `<option value="${c.nom}">${c.nom}</option>`;
         });
     }
 
-    /* GESTION COMPTE LIVRET ÉPARGNE */
-    function renderOperationsLivret() {
-        const tbody = document.getElementById('table-livret-body');
-        if (!tbody) return;
-        tbody.innerHTML = '';
-
-        const startInput = document.getElementById('filter-start-date-livret');
-        const endInput = document.getElementById('filter-end-date-livret');
-        const start = startInput ? startInput.value : '';
-        const end = endInput ? endInput.value : '';
-
-        if (!comptaDB.livretOps || comptaDB.livretOps.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--gris-moyen); padding:20px;">Aucune opération enregistrée sur le livret.</td></tr>';
-            return;
-        }
-
-        let sorted = [...comptaDB.livretOps].sort((a,b) => new Date(a.date) - new Date(b.date));
-        let runningSolde = 0;
-        let displayedCount = 0;
-
-        sorted.forEach(op => {
-            const montant = parseFloat(op.montant) || 0;
-            if (op.type === 'Crédit') runningSolde += montant;
-            else runningSolde -= montant;
-
-            if (start && op.date < start) return;
-            if (end && op.date > end) return;
-
-            displayedCount++;
-            const badgeClass = op.type === 'Crédit' ? 'badge-credit' : 'badge-debit';
+    function updateCategorySelects() {
+        ['mb', 'ml', 'mc'].forEach(prefix => {
+            const typeEl = document.getElementById(`${prefix}-type`);
+            const catEl = document.getElementById(`${prefix}-cat`);
+            if(!typeEl || !catEl) return;
             
-            let docLink = `<span style="color:var(--gris-moyen); font-size:0.8rem;">Aucun</span>`;
-            if (op.justificatif && (op.justificatif.startsWith('http') || op.justificatif.startsWith('www'))) {
-                let url = op.justificatif.startsWith('http') ? op.justificatif : 'https://' + op.justificatif;
-                docLink = `<a href="${url}" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">📎 Ouvrir Drive</a>`;
-            } else if (op.justificatif) {
-                docLink = `<button class="btn btn-outline btn-xs" onclick="openDocumentViewer(comptaDB.livretOps.find(o=>o.id===${op.id}).justificatif)">📎 Ancien Doc</button>`;
-            }
-
-            tbody.innerHTML += `
-                <tr>
-                    <td>${formatFrenchDate(op.date)}</td>
-                    <td><span class="badge ${badgeClass}">${op.type}</span></td>
-                    <td>${op.desig} ${op.ref ? '<span style="color:var(--gris-moyen);">('+op.ref+')</span>' : ''}</td>
-                    <td data-html-export="ignore">${docLink}</td>
-                    <td>${op.resp || ''}</td>
-                    <td style="font-weight:bold; color:${op.type==='Crédit'?'var(--vert-fonce)':'var(--rouge)'}">${montant.toFixed(2)}&nbsp;€</td>
-                    <td style="font-weight:700;">${runningSolde.toFixed(2)}&nbsp;€</td>
-                    <td style="text-align:center;" data-html-export="ignore">
-                        <button class="btn btn-blue btn-xs" onclick="editOperationLivret(${op.id})" style="padding:4px 6px; margin-right:2px;">✏️</button>
-                        <button class="btn btn-danger btn-xs" onclick="deleteOperationLivret(${op.id})">🗑️</button>
-                    </td>
-                </tr>
-            `;
+            const isRecette = typeEl.value === 'Crédit' || typeEl.value === 'Recette';
+            catEl.innerHTML = '';
+            comptaDB.categories.forEach(c => {
+                if((isRecette && c.type !== 'Dépense') || (!isRecette && c.type !== 'Recette')) {
+                    catEl.innerHTML += `<option value="${c.nom}">${c.nom}</option>`;
+                }
+            });
         });
-
-        if (displayedCount === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--gris-moyen); padding:20px;">Aucune opération trouvée pour cette période.</td></tr>';
-        }
     }
 
-    function closeModal(modalId) {
-        const overlay = document.getElementById(modalId);
-        if (overlay) overlay.classList.remove('active');
-    }
-
-    function handleOverlayClick(e, modalId) {
-        if (e.target.id === modalId) closeModal(modalId);
-    }
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeModal('modal-banque-overlay');
-            closeModal('modal-livret-overlay');
-            closeModal('modal-caisse-overlay');
-        }
-    });
-
-    /* GESTION COMPTE COURANT BANQUE (MODALE) */
     function openModalBanque(id = null) {
         editingBanqueId = id;
-        flagRemoveBanqueFile = false;
-        const todayStr = new Date().toISOString().split('T')[0];
-
-        if (id === null) {
-            document.getElementById('modal-banque-title').innerText = "➕ Nouvelle Opération Bancaire";
-            document.getElementById('mb-date').value = todayStr;
-            document.getElementById('mb-type').value = "Crédit";
-            document.getElementById('mb-desig').value = "";
-            document.getElementById('mb-ref').value = "";
-            document.getElementById('mb-resp').value = "";
-            document.getElementById('mb-moyen').value = "VIREMENT";
-            document.getElementById('mb-montant').value = "";
-            document.getElementById('mb-file').value = "";
-            document.getElementById('mb-existing-file-box').style.display = 'none';
-            document.getElementById('mb-file-input-box').style.display = 'block';
-        } else {
+        document.getElementById('mb-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('mb-type').value = "Crédit";
+        updateCategorySelects();
+        document.getElementById('mb-desig').value = ""; document.getElementById('mb-ref').value = "";
+        document.getElementById('mb-resp').value = ""; document.getElementById('mb-montant').value = "";
+        
+        if (id !== null) {
             const op = comptaDB.operations.find(o => o.id === id);
-            if (op) {
-                document.getElementById('modal-banque-title').innerText = "✏️ Modifier l'Opération Bancaire";
-                document.getElementById('mb-date').value = op.date;
-                document.getElementById('mb-type').value = op.type;
-                document.getElementById('mb-desig').value = op.desig;
-                document.getElementById('mb-ref').value = op.ref || "";
-                document.getElementById('mb-resp').value = op.resp;
-                document.getElementById('mb-moyen').value = op.moyen;
-                document.getElementById('mb-montant').value = op.montant;
-                document.getElementById('mb-file').value = "";
-                
-                if (op.justificatif) {
-                    document.getElementById('mb-existing-file-box').style.display = 'flex';
-                    document.getElementById('mb-file-input-box').style.display = 'none';
-                    if (op.justificatif.startsWith('http') || op.justificatif.startsWith('www')) {
-                        let url = op.justificatif.startsWith('http') ? op.justificatif : 'https://' + op.justificatif;
-                        document.getElementById('mb-existing-link').href = url;
-                    }
-                } else {
-                    document.getElementById('mb-existing-file-box').style.display = 'none';
-                    document.getElementById('mb-file-input-box').style.display = 'block';
-                }
-            }
+            document.getElementById('mb-date').value = op.date;
+            document.getElementById('mb-type').value = op.type;
+            updateCategorySelects();
+            if(op.categorie) document.getElementById('mb-cat').value = op.categorie;
+            document.getElementById('mb-desig').value = op.desig;
+            document.getElementById('mb-montant').value = op.montant;
         }
         document.getElementById('modal-banque-overlay').classList.add('active');
     }
 
-    function editOperationBanque(id) {
-        openModalBanque(id);
+    function saveModalBanque() {
+        const date = document.getElementById('mb-date').value;
+        const type = document.getElementById('mb-type').value;
+        const categorie = document.getElementById('mb-cat').value;
+        const desig = document.getElementById('mb-desig').value;
+        const montant = parseFloat(document.getElementById('mb-montant').value);
+
+        if (!date || !desig || !montant) return alert("Champs obligatoires manquants");
+
+        const isEdit = (editingBanqueId !== null);
+        if (isEdit) comptaDB.operations = comptaDB.operations.filter(o => o.id !== editingBanqueId);
+        
+        comptaDB.operations.push({ id: isEdit ? editingBanqueId : Date.now(), date, type, categorie, desig, montant });
+        saveComptaData(); closeModal('modal-banque-overlay');
     }
 
-    async function saveModalBanque() {
-        try {
-            const date = document.getElementById('mb-date').value;
-            const type = document.getElementById('mb-type').value;
-            const desig = document.getElementById('mb-desig').value.trim();
-            const ref = document.getElementById('mb-ref').value.trim();
-            const resp = document.getElementById('mb-resp').value.trim();
-            const moyen = document.getElementById('mb-moyen').value;
-            const montant = parseFloat(document.getElementById('mb-montant').value);
-
-            if (!date || !desig || !resp || isNaN(montant) || montant <= 0) {
-                alert("Veuillez remplir tous les champs obligatoires (Date, Désignation, Responsable et Montant).");
-                return;
-            }
-
-            const isEdit = (editingBanqueId !== null);
-            
-            let finalDojoRef = "";
-            if (isEdit) {
-                const oldOp = comptaDB.operations.find(o => o.id === editingBanqueId);
-                finalDojoRef = (oldOp && oldOp.dojoRef) ? oldOp.dojoRef : generateDojoRef(date);
-            } else {
-                finalDojoRef = generateDojoRef(date);
-            }
-
-            const fileInput = document.getElementById('mb-file');
-            let driveUrl = null;
-
-            if (fileInput && fileInput.files && fileInput.files.length > 0) {
-                showToast("⏳ Envoi du justificatif vers ton Google Drive en cours...");
-                try {
-                    const fileObj = fileInput.files[0];
-                    const newName = getNewFileName(fileObj.name, finalDojoRef);
-                    driveUrl = await uploadFileToDrive(fileObj, newName);
-                    showToast("✅ Justificatif stocké avec succès dans le Drive !");
-                } catch (upErr) {
-                    alert("Erreur lors de l'envoi au Drive: " + upErr);
-                    return; 
-                }
-            }
-
-            if (isEdit && !driveUrl && !flagRemoveBanqueFile) {
-                const oldOp = comptaDB.operations.find(o => o.id === editingBanqueId);
-                if (oldOp && oldOp.justificatif) {
-                    driveUrl = oldOp.justificatif;
-                }
-            }
-            
-            if (isEdit) {
-                comptaDB.operations = comptaDB.operations.filter(o => o.id !== editingBanqueId);
-            }
-
-            const newOp = {
-                id: isEdit ? editingBanqueId : Date.now(),
-                date, type, desig, ref, resp, moyen, montant,
-                justificatif: driveUrl,
-                dojoRef: finalDojoRef
-            };
-
-            comptaDB.operations.push(newOp);
-            
-            saveComptaData();
-            closeModal('modal-banque-overlay');
-            rebuildAll();
-            
-            showToast(isEdit ? "✓ Opération bancaire mise à jour !" : "✓ Opération bancaire enregistrée !");
-            editingBanqueId = null;
-        } catch(err) {
-            console.error("Erreur saveModalBanque:", err);
-            alert("Erreur lors de l'enregistrement de l'opération.");
-        }
-    }
-
-    function deleteOperationBanque(id) {
-        if (confirm("Supprimer cette écriture bancaire ?")) {
-            comptaDB.operations = comptaDB.operations.filter(o => o.id !== id);
-            saveComptaData();
-            rebuildAll();
-        }
-    }
-
-    /* GESTION COMPTE LIVRET ÉPARGNE (MODALE) */
-    function openModalLivret(id = null) {
-        editingLivretId = id;
-        flagRemoveLivretFile = false;
-        const todayStr = new Date().toISOString().split('T')[0];
-
-        if (id === null) {
-            document.getElementById('modal-livret-title').innerText = "➕ Nouvelle Opération Livret";
-            document.getElementById('ml-date').value = todayStr;
-            document.getElementById('ml-type').value = "Crédit";
-            document.getElementById('ml-desig').value = "";
-            document.getElementById('ml-ref').value = "";
-            document.getElementById('ml-resp').value = "";
-            document.getElementById('ml-montant').value = "";
-            document.getElementById('ml-file').value = "";
-            document.getElementById('ml-existing-file-box').style.display = 'none';
-            document.getElementById('ml-file-input-box').style.display = 'block';
-        } else {
-            const op = (comptaDB.livretOps || []).find(o => o.id === id);
-            if (op) {
-                document.getElementById('modal-livret-title').innerText = "✏️ Modifier l'Opération Livret";
-                document.getElementById('ml-date').value = op.date;
-                document.getElementById('ml-type').value = op.type;
-                document.getElementById('ml-desig').value = op.desig;
-                document.getElementById('ml-ref').value = op.ref || "";
-                document.getElementById('ml-resp').value = op.resp;
-                document.getElementById('ml-montant').value = op.montant;
-                document.getElementById('ml-file').value = "";
-                
-                if (op.justificatif) {
-                    document.getElementById('ml-existing-file-box').style.display = 'flex';
-                    document.getElementById('ml-file-input-box').style.display = 'none';
-                    if (op.justificatif.startsWith('http') || op.justificatif.startsWith('www')) {
-                        let url = op.justificatif.startsWith('http') ? op.justificatif : 'https://' + op.justificatif;
-                        document.getElementById('ml-existing-link').href = url;
-                    }
-                } else {
-                    document.getElementById('ml-existing-file-box').style.display = 'none';
-                    document.getElementById('ml-file-input-box').style.display = 'block';
-                }
-            }
-        }
-        document.getElementById('modal-livret-overlay').classList.add('active');
-    }
-
-    function editOperationLivret(id) {
-        openModalLivret(id);
-    }
-
-    async function saveModalLivret() {
-        try {
-            const date = document.getElementById('ml-date').value;
-            const type = document.getElementById('ml-type').value;
-            const desig = document.getElementById('ml-desig').value.trim();
-            const ref = document.getElementById('ml-ref').value.trim();
-            const resp = document.getElementById('ml-resp').value.trim();
-            const montant = parseFloat(document.getElementById('ml-montant').value);
-
-            if (!date || !desig || !resp || isNaN(montant) || montant <= 0) {
-                alert("Veuillez remplir tous les champs obligatoires du livret.");
-                return;
-            }
-
-            if (!comptaDB.livretOps) comptaDB.livretOps = [];
-
-            const fileInput = document.getElementById('ml-file');
-            let driveUrl = null;
-
-            if (fileInput && fileInput.files && fileInput.files.length > 0) {
-                showToast("⏳ Envoi du justificatif vers ton Google Drive en cours...");
-                try {
-                    driveUrl = await uploadFileToDrive(fileInput.files[0]);
-                    showToast("✅ Justificatif stocké avec succès dans le Drive !");
-                } catch (upErr) {
-                    alert("Erreur lors de l'envoi au Drive: " + upErr);
-                    return; 
-                }
-            }
-
-            const isEdit = (editingLivretId !== null);
-            
-            if (isEdit && !driveUrl && !flagRemoveLivretFile) {
-                const oldOp = comptaDB.livretOps.find(o => o.id === editingLivretId);
-                if (oldOp && oldOp.justificatif) {
-                    driveUrl = oldOp.justificatif;
-                }
-            }
-            
-            if (isEdit) {
-                comptaDB.livretOps = comptaDB.livretOps.filter(o => o.id !== editingLivretId);
-            }
-
-            const newOp = {
-                id: isEdit ? editingLivretId : Date.now(),
-                date, type, desig, ref, resp, montant,
-                justificatif: driveUrl
-            };
-
-            comptaDB.livretOps.push(newOp);
-            
-            saveComptaData();
-            closeModal('modal-livret-overlay');
-            rebuildAll();
-            
-            showToast(isEdit ? "✓ Opération livret mise à jour !" : "✓ Opération livret enregistrée !");
-            editingLivretId = null;
-        } catch(err) {
-            console.error("Erreur saveModalLivret:", err);
-            alert("Erreur lors de l'enregistrement sur le livret.");
-        }
-    }
-
-    function deleteOperationLivret(id) {
-        if (confirm("Supprimer cette opération sur le livret d'épargne ?")) {
-            comptaDB.livretOps = comptaDB.livretOps.filter(o => o.id !== id);
-            saveComptaData();
-            rebuildAll();
-        }
-    }
-
-    /* GESTION CAISSE */
-    function renderCaisseFlux() {
-        const tbody = document.getElementById('table-caisse-body');
-        if (!tbody) return;
+    function renderOperationsBanque() {
+        const tbody = document.getElementById('table-banque-body');
         tbody.innerHTML = '';
-
-        const startInput = document.getElementById('filter-start-date-caisse');
-        const endInput = document.getElementById('filter-end-date-caisse');
-        const start = startInput ? startInput.value : '';
-        const end = endInput ? endInput.value : '';
-
-        if (!comptaDB.caisseFlux) comptaDB.caisseFlux = [];
-        let sorted = [...comptaDB.caisseFlux].sort((a,b) => new Date(a.date) - new Date(b.date));
         let runningSolde = 0;
+        const filterCat = document.getElementById('filter-cat-banque').value;
+        const start = document.getElementById('filter-start-date').value;
+        const end = document.getElementById('filter-end-date').value;
 
-        sorted.forEach(f => {
-            const montant = parseFloat(f.montant) || 0;
-            if (f.type === 'Recette') runningSolde += montant;
-            else runningSolde -= montant;
+        [...comptaDB.operations].sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(op => {
+            const m = parseFloat(op.montant) || 0;
+            if (op.type === 'Crédit') runningSolde += m; else runningSolde -= m;
 
-            if (start && f.date < start) return;
-            if (end && f.date > end) return;
-
-            const badgeClass = f.type === 'Recette' ? 'badge-credit' : 'badge-debit';
-            
-            let docLink = `<span style="color:var(--gris-moyen); font-size:0.8rem;">Aucun</span>`;
-            if (f.justificatif && (f.justificatif.startsWith('http') || f.justificatif.startsWith('www'))) {
-                let url = f.justificatif.startsWith('http') ? f.justificatif : 'https://' + f.justificatif;
-                docLink = `<a href="${url}" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">📎 Ouvrir Drive</a>`;
-            } else if (f.justificatif) {
-                docLink = `<button class="btn btn-outline btn-xs" onclick="openDocumentViewer(comptaDB.caisseFlux.find(x=>x.id===${f.id}).justificatif)">📎 Ancien Doc</button>`;
-            }
+            if(filterCat && op.categorie !== filterCat) return;
+            if(start && op.date < start) return;
+            if(end && op.date > end) return;
 
             tbody.innerHTML += `
                 <tr>
-                    <td>${formatFrenchDate(f.date)}</td>
-                    <td><span class="badge ${badgeClass}">${f.type}</span></td>
-                    <td>${f.desig}</td>
-                    <td data-html-export="ignore">${docLink}</td>
-                    <td>${f.resp}</td>
-                    <td style="font-weight:bold; color:${f.type==='Recette'?'var(--vert-fonce)':'var(--rouge)'}">${montant.toFixed(2)}&nbsp;€</td>
-                    <td style="font-weight:700; color:var(--noir-doux);">${runningSolde.toFixed(2)}&nbsp;€</td>
+                    <td>${op.date}</td>
+                    <td>DD-Réf</td>
+                    <td><span class="badge ${op.type === 'Crédit' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td>
+                    <td><span class="badge badge-cat">${op.categorie || 'Non Catégorisé'}</span></td>
+                    <td>VIR.</td>
+                    <td>${op.desig}</td>
+                    <td class="hide-on-screen"></td>
+                    <td data-html-export="ignore">Aucun</td>
+                    <td style="font-weight:bold; color:${op.type==='Crédit'?'var(--vert-fonce)':'var(--rouge)'}">${m.toFixed(2)} €</td>
+                    <td style="font-weight:bold;">${runningSolde.toFixed(2)} €</td>
                     <td style="text-align:center;" data-html-export="ignore">
-                        <button class="btn btn-blue btn-xs" onclick="openModalCaisse(${f.id})" style="padding:4px 6px; margin-right:2px;">✏️</button>
-                        <button class="btn btn-danger btn-xs" onclick="deleteCaisseFlux(${f.id})">🗑️</button>
+                        <button class="btn btn-blue btn-xs" onclick="openModalBanque(${op.id})">✏️</button>
                     </td>
-                </tr>
-            `;
+                </tr>`;
         });
     }
 
-    /* CALCULATEUR DE MONNAIE (VENTILATION CAISSE) */
-    function renderMonnaieCalculator() {
-        const tbody = document.getElementById('monnaie-calc-body');
-        if (!tbody) return;
-        tbody.innerHTML = '';
-        let grandTotal = 0;
+    function openModalLivret() { updateCategorySelects(); document.getElementById('modal-livret-overlay').classList.add('active'); }
+    function saveModalLivret() {
+        comptaDB.livretOps.push({ id: Date.now(), date: document.getElementById('ml-date').value, type: document.getElementById('ml-type').value, categorie: document.getElementById('ml-cat').value, desig: document.getElementById('ml-desig').value, montant: parseFloat(document.getElementById('ml-montant').value) });
+        saveComptaData(); closeModal('modal-livret-overlay');
+    }
+    function renderOperationsLivret() {
+        const tbody = document.getElementById('table-livret-body'); tbody.innerHTML = '';
+        const start = document.getElementById('filter-start-date-livret').value;
+        const end = document.getElementById('filter-end-date-livret').value;
 
-        if (!comptaDB.monnaieCounts) {
-            comptaDB.monnaieCounts = {};
-            denoms.forEach(d => comptaDB.monnaieCounts[d] = 0);
-        }
-
-        denoms.forEach(d => {
-            const qty = comptaDB.monnaieCounts[d] || 0;
-            const sub = qty * d;
-            grandTotal += sub;
-
-            const label = d >= 5 ? `Billet de ${d} €` : `Pièce de ${d.toFixed(2)} €`;
-            tbody.innerHTML += `
-                <tr>
-                    <td>${label}</td>
-                    <td><input type="number" min="0" value="${qty}" onchange="updateMonnaieQty(${d}, this.value)"></td>
-                    <td style="font-weight:500;">${sub.toFixed(2)}&nbsp;€</td>
-                </tr>
-            `;
+        let s=0; comptaDB.livretOps.forEach(op => { 
+            s += op.type==='Crédit'?op.montant:-op.montant; 
+            if(start && op.date < start) return;
+            if(end && op.date > end) return;
+            tbody.innerHTML += `<tr><td>${op.date}</td><td>${op.type}</td><td><span class="badge badge-cat">${op.categorie}</span></td><td>${op.desig}</td><td>${op.montant.toFixed(2)} €</td><td>${s.toFixed(2)} €</td><td></td></tr>`; 
         });
-
-        const totalEl = document.getElementById('monnaie-physique-total');
-        if (totalEl) totalEl.innerText = grandTotal.toFixed(2) + " €";
     }
 
-    function updateMonnaieQty(denom, val) {
-        const qty = parseInt(val) || 0;
-        if (!comptaDB.monnaieCounts) comptaDB.monnaieCounts = {};
-        comptaDB.monnaieCounts[denom] = qty;
-        saveComptaData();
-        renderMonnaieCalculator();
+    function openModalCaisse() { updateCategorySelects(); document.getElementById('modal-caisse-overlay').classList.add('active'); }
+    function saveModalCaisse() {
+        comptaDB.caisseFlux.push({ id: Date.now(), date: document.getElementById('mc-date').value, type: document.getElementById('mc-type').value, categorie: document.getElementById('mc-cat').value, desig: document.getElementById('mc-desig').value, montant: parseFloat(document.getElementById('mc-montant').value) });
+        saveComptaData(); closeModal('modal-caisse-overlay');
+    }
+    function renderCaisseFlux() {
+        const tbody = document.getElementById('table-caisse-body'); tbody.innerHTML = '';
+        const start = document.getElementById('filter-start-date-caisse').value;
+        const end = document.getElementById('filter-end-date-caisse').value;
+
+        let s=0; comptaDB.caisseFlux.forEach(op => { 
+            s += op.type==='Recette'?op.montant:-op.montant; 
+            if(start && op.date < start) return;
+            if(end && op.date > end) return;
+            tbody.innerHTML += `<tr><td>${op.date}</td><td>${op.type}</td><td><span class="badge badge-cat">${op.categorie}</span></td><td>${op.desig}</td><td>Auteur</td><td>${op.montant.toFixed(2)} €</td><td>${s.toFixed(2)} €</td><td></td></tr>`; 
+        });
     }
 
-    /* GESTION CAISSE (MODALE) */
-    function openModalCaisse(id = null) {
-        editingCaisseId = id;
-        flagRemoveCaisseFile = false;
-        const todayStr = new Date().toISOString().split('T')[0];
+    function updateDashboardKPIs() {
+        let b=0; comptaDB.operations.forEach(o => o.type==='Crédit'? b+=o.montant : b-=o.montant);
+        let l=0; comptaDB.livretOps.forEach(o => o.type==='Crédit'? l+=o.montant : l-=o.montant);
+        let c=0; comptaDB.caisseFlux.forEach(o => o.type==='Recette'? c+=o.montant : c-=o.montant);
+        
+        document.getElementById('dash-banque').innerText = b.toFixed(2) + " €";
+        document.getElementById('dash-livret').innerText = l.toFixed(2) + " €";
+        document.getElementById('dash-caisse').innerText = c.toFixed(2) + " €";
+        document.getElementById('dash-treso-nette').innerText = (b+l+c).toFixed(2) + " €";
+    }
 
-        if (id === null) {
-            document.getElementById('modal-caisse-title').innerText = "➕ Saisir Mouvement de Caisse";
-            document.getElementById('mc-date').value = todayStr;
-            document.getElementById('mc-type').value = "Recette";
-            document.getElementById('mc-desig').value = "";
-            document.getElementById('mc-resp').value = "";
-            document.getElementById('mc-montant').value = "";
-            document.getElementById('mc-file').value = "";
-            document.getElementById('mc-existing-file-box').style.display = 'none';
-            document.getElementById('mc-file-input-box').style.display = 'block';
-        } else {
-            const f = comptaDB.caisseFlux.find(x => x.id === id);
-            if (f) {
-                document.getElementById('modal-caisse-title').innerText = "✏️ Modifier Mouvement de Caisse";
-                document.getElementById('mc-date').value = f.date;
-                document.getElementById('mc-type').value = f.type;
-                document.getElementById('mc-desig').value = f.desig;
-                document.getElementById('mc-resp').value = f.resp;
-                document.getElementById('mc-montant').value = f.montant;
-                document.getElementById('mc-file').value = "";
+    function renderAnalytique() {
+        const source = document.getElementById('ana-source').value;
+        const start = document.getElementById('ana-start').value;
+        const end = document.getElementById('ana-end').value;
+
+        let rec_data = {}; let dep_data = {};
+        let totR = 0; let totD = 0;
+
+        function aggregate(ops, isRecetteLogic) {
+            ops.forEach(op => {
+                if (start && op.date < start) return;
+                if (end && op.date > end) return;
                 
-                if (f.justificatif) {
-                    document.getElementById('mc-existing-file-box').style.display = 'flex';
-                    document.getElementById('mc-file-input-box').style.display = 'none';
-                    if (f.justificatif.startsWith('http') || f.justificatif.startsWith('www')) {
-                        let url = f.justificatif.startsWith('http') ? f.justificatif : 'https://' + f.justificatif;
-                        document.getElementById('mc-existing-link').href = url;
-                    }
+                const m = parseFloat(op.montant) || 0;
+                const cat = op.categorie || 'Non Catégorisé';
+                
+                const cObj = comptaDB.categories.find(c => c.nom === cat);
+                if(cObj && cObj.type === 'Interne') return;
+
+                if (isRecetteLogic(op)) {
+                    rec_data[cat] = (rec_data[cat] || 0) + m;
+                    totR += m;
                 } else {
-                    document.getElementById('mc-existing-file-box').style.display = 'none';
-                    document.getElementById('mc-file-input-box').style.display = 'block';
-                }
-            }
-        }
-        document.getElementById('modal-caisse-overlay').classList.add('active');
-    }
-
-    function editCaisseFlux(id) {
-        openModalCaisse(id);
-    }
-
-    async function saveModalCaisse() {
-        try {
-            const date = document.getElementById('mc-date').value;
-            const type = document.getElementById('mc-type').value;
-            const desig = document.getElementById('mc-desig').value.trim();
-            const resp = document.getElementById('mc-resp').value.trim();
-            const montant = parseFloat(document.getElementById('mc-montant').value);
-
-            if (!date || !desig || !resp || isNaN(montant) || montant <= 0) {
-                alert("Veuillez remplir tous les champs obligatoires pour la caisse.");
-                return;
-            }
-
-            const fileInput = document.getElementById('mc-file');
-            let driveUrl = null;
-
-            if (fileInput && fileInput.files && fileInput.files.length > 0) {
-                showToast("⏳ Envoi du justificatif vers ton Google Drive en cours...");
-                try {
-                    driveUrl = await uploadFileToDrive(fileInput.files[0]);
-                    showToast("✅ Justificatif stocké avec succès dans le Drive !");
-                } catch (upErr) {
-                    alert("Erreur lors de l'envoi au Drive: " + upErr);
-                    return; 
-                }
-            }
-
-            const isEdit = (editingCaisseId !== null);
-            
-            if (isEdit && !driveUrl && !flagRemoveCaisseFile) {
-                const oldFlux = comptaDB.caisseFlux.find(x => x.id === editingCaisseId);
-                if (oldFlux && oldFlux.justificatif) {
-                    driveUrl = oldFlux.justificatif;
-                }
-            }
-            
-            if (isEdit) {
-                comptaDB.caisseFlux = comptaDB.caisseFlux.filter(x => x.id !== editingCaisseId);
-            }
-
-            const newFlux = {
-                id: isEdit ? editingCaisseId : Date.now(),
-                date, type, desig, resp, montant,
-                justificatif: driveUrl
-            };
-
-            comptaDB.caisseFlux.push(newFlux);
-            
-            saveComptaData();
-            closeModal('modal-caisse-overlay');
-            rebuildAll();
-            
-            showToast(isEdit ? "✓ Mouvement de caisse mis à jour !" : "✓ Mouvement de caisse enregistré !");
-            editingCaisseId = null;
-        } catch(err) {
-            console.error("Erreur saveModalCaisse:", err);
-            alert("Erreur lors de l'enregistrement du mouvement de caisse.");
-        }
-    }
-
-    function deleteCaisseFlux(id) {
-        if(confirm("Supprimer ce mouvement de caisse physique ?")) {
-            comptaDB.caisseFlux = comptaDB.caisseFlux.filter(f => f.id !== id);
-            saveComptaData();
-            rebuildAll();
-        }
-    }
-
-    function renderChequesAttente() {
-        const tbody = document.getElementById('table-cheques-attente-body');
-        tbody.innerHTML = '';
-
-        const start = document.getElementById('filter-start-date-cheques').value;
-        const end = document.getElementById('filter-end-date-cheques').value;
-
-        if(!comptaDB.cheques || comptaDB.cheques.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--gris-moyen);">Aucun chèque en portefeuille.</td></tr>';
-            return;
-        }
-
-        comptaDB.cheques.forEach(c => {
-            if (start && c.date < start) return;
-            if (end && c.date > end) return;
-            
-            const montant = parseFloat(c.montant) || 0;
-
-            tbody.innerHTML += `
-                <tr>
-                    <td style="text-align:center;" data-html-export="ignore">
-                        <input type="checkbox" class="chq-select-cb" value="${c.id}" data-montant="${montant}">
-                    </td>
-                    <td>${formatFrenchDate(c.date)}</td>
-                    <td><code style="font-size:0.95rem;">n° ${c.num}</code></td>
-                    <td><strong>${c.titulaire}</strong> <br><span style="font-size:0.75rem; color:var(--gris-moyen);">${c.banque}</span></td>
-                    <td>${c.objet}</td>
-                    <td style="font-weight:bold; color:var(--bleu-fonce);">${montant.toFixed(2)}&nbsp;€</td>
-                    <td style="text-align:center;" data-html-export="ignore">
-                        <button class="btn btn-blue btn-xs" onclick="editChequePortefeuille(${c.id})" style="padding:4px 6px; margin-right:2px;">✏️</button>
-                        <button class="btn btn-danger btn-xs" onclick="deleteChequePortefeuille(${c.id})">🗑️</button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    function editChequePortefeuille(id) {
-        const c = comptaDB.cheques.find(chq => chq.id === id);
-        if (c) {
-            document.getElementById('chq-date').value = c.date;
-            document.getElementById('chq-num').value = c.num;
-            document.getElementById('chq-montant').value = c.montant;
-            document.getElementById('chq-titulaire').value = c.titulaire;
-            document.getElementById('chq-banque').value = c.banque;
-            document.getElementById('chq-objet').value = c.objet;
-            comptaDB.cheques = comptaDB.cheques.filter(chq => chq.id !== id);
-            saveComptaData();
-            rebuildAll();
-        }
-    }
-
-    function addChequeAttente() {
-        const date = document.getElementById('chq-date').value;
-        const num = document.getElementById('chq-num').value.trim();
-        const montant = parseFloat(document.getElementById('chq-montant').value);
-        const titulaire = document.getElementById('chq-titulaire').value.trim();
-        const banque = document.getElementById('chq-banque').value.trim();
-        const objet = document.getElementById('chq-objet').value.trim();
-
-        if(!date || !num || isNaN(montant) || !titulaire || !banque || !objet) {
-            alert("Remplissez tous les champs pour le chèque.");
-            return;
-        }
-
-        comptaDB.cheques.push({ id: Date.now(), date, num, montant, titulaire, banque, objet });
-        saveComptaData();
-        rebuildAll();
-
-        document.getElementById('chq-num').value = '';
-        document.getElementById('chq-montant').value = '';
-        document.getElementById('chq-titulaire').value = '';
-        document.getElementById('chq-banque').value = '';
-        document.getElementById('chq-objet').value = '';
-    }
-
-    function deleteChequePortefeuille(id) {
-        if(confirm("Retirer ce chèque du portefeuille ?")) {
-            comptaDB.cheques = comptaDB.cheques.filter(c => c.id !== id);
-            saveComptaData();
-            rebuildAll();
-        }
-    }
-
-    function processRemiseChèques() {
-        const borderau = document.getElementById('remise-num').value.trim();
-        const resp = document.getElementById('remise-resp').value.trim();
-
-        if(!borderau || !resp) {
-            alert("Veuillez renseigner le numéro de bordereau bancaire et l'auteur de la remise.");
-            return;
-        }
-
-        const checkboxes = document.querySelectorAll('.chq-select-cb:checked');
-        if(checkboxes.length === 0) {
-            alert("Cochez au moins un chèque à inclure dans cette remise.");
-            return;
-        }
-
-        let totalRemise = 0;
-        let idsAEncasser = [];
-
-        checkboxes.forEach(cb => {
-            totalRemise += parseFloat(cb.getAttribute('data-montant'));
-            idsAEncasser.push(parseInt(cb.value));
-        });
-
-        if(confirm(`Confirmer l'encaissement de ${checkboxes.length} chèque(s) pour un montant global de ${totalRemise.toFixed(2)} € sur le compte du club ?`)) {
-            comptaDB.cheques = comptaDB.cheques.filter(c => !idsAEncasser.includes(c.id));
-            
-            const date = new Date().toISOString().split('T')[0];
-            const finalDojoRef = generateDojoRef(date);
-
-            comptaDB.operations.push({
-                id: Date.now(),
-                date: date,
-                type: 'Crédit',
-                moyen: 'Rem CHQ',
-                desig: `Remise Chèques Bordereau n°${borderau} (${checkboxes.length} chq)`,
-                ref: borderau,
-                resp: resp,
-                montant: totalRemise,
-                justificatif: null,
-                dojoRef: finalDojoRef
-            });
-
-            saveComptaData();
-            rebuildAll();
-
-            document.getElementById('remise-num').value = '';
-        }
-    }
-
-    function renderBordereaux() {
-        const tbody = document.getElementById('table-licences-body');
-        if(!tbody) return;
-        tbody.innerHTML = '';
-
-        if(!comptaDB.bordereaux || comptaDB.bordereaux.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--gris-moyen);">Aucun bordereau enregistré.</td></tr>';
-            return;
-        }
-
-        comptaDB.bordereaux.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(b => {
-            const total = parseFloat(b.totalFed) || 0;
-            tbody.innerHTML += `
-                <tr>
-                    <td>${formatFrenchDate(b.date)}</td>
-                    <td><strong>Bordereau ${b.numClub}</strong></td>
-                    <td><code>${b.numFed}</code></td>
-                    <td>${b.count} licenciés</td>
-                    <td style="font-weight:bold; color:var(--rouge);">${total.toFixed(2)}&nbsp;€</td>
-                    <td>${b.statusReg ? '✅ Oui' : '❌ Non'}</td>
-                    <td>${b.printed ? '✅ Oui' : '❌ Non'}</td>
-                    <td>${b.bankPulled ? '✅ Oui' : '❌ Non'}</td>
-                    <td style="text-align:center;" data-html-export="ignore">
-                        <button class="btn btn-outline btn-xs" onclick="toggleLicenceStatus(${b.id})">⚙️ Statut</button>
-                        <button class="btn btn-blue btn-xs" onclick="editBordereau(${b.id})" style="padding:4px 6px; margin-right:2px;">✏️</button>
-                        <button class="btn btn-danger btn-xs" onclick="deleteBordereau(${b.id})">🗑️</button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    function editBordereau(id) {
-        const b = comptaDB.bordereaux.find(x => x.id === id);
-        if (b) {
-            document.getElementById('lic-date').value = b.date;
-            document.getElementById('lic-num-club').value = b.numClub;
-            document.getElementById('lic-num-fed').value = b.numFed;
-            document.getElementById('lic-count').value = b.count;
-            document.getElementById('lic-total').value = b.totalFed;
-            comptaDB.bordereaux = comptaDB.bordereaux.filter(x => x.id !== id);
-            saveComptaData();
-            rebuildAll();
-        }
-    }
-
-    function addBordereauLicence() {
-        const date = document.getElementById('lic-date').value;
-        const numClub = document.getElementById('lic-num-club').value.trim();
-        const numFed = document.getElementById('lic-num-fed').value.trim();
-        const count = parseInt(document.getElementById('lic-count').value);
-        const totalFed = parseFloat(document.getElementById('lic-total').value);
-
-        if(!date || !numClub || !numFed || isNaN(count) || isNaN(totalFed)) {
-            alert("Veuillez remplir le formulaire fédéral.");
-            return;
-        }
-
-        comptaDB.bordereaux.push({
-            id: Date.now(), date, numClub, numFed, count, totalFed,
-            statusReg: true, printed: false, bankPulled: false
-        });
-
-        saveComptaData();
-        rebuildAll();
-
-        document.getElementById('lic-num-club').value = '';
-        document.getElementById('lic-num-fed').value = '';
-        document.getElementById('lic-count').value = '';
-        document.getElementById('lic-total').value = '';
-    }
-
-    function toggleLicenceStatus(id) {
-        const b = comptaDB.bordereaux.find(x => x.id === id);
-        if(b) {
-            if(!b.printed && !b.bankPulled) { b.printed = true; }
-            else if(b.printed && !b.bankPulled) { b.bankPulled = true; }
-            else { b.printed = false; b.bankPulled = false; }
-            saveComptaData();
-            renderBordereaux();
-        }
-    }
-
-    function deleteBordereau(id) {
-        if(confirm("Supprimer ce suivi de bordereau ?")) {
-            comptaDB.bordereaux = comptaDB.bordereaux.filter(x => x.id !== id);
-            saveComptaData();
-            rebuildAll();
-        }
-    }
-
-    function calcLiveDepot() {
-        let tB = 0;
-        billetDenoms.forEach(d => {
-            const el = document.getElementById('dp-b-' + d);
-            tB += (parseInt(el.value) || 0) * d;
-        });
-        document.getElementById('lbl-total-b').innerText = tB.toFixed(2);
-
-        let tP = 0;
-        pieceDenoms.forEach(d => {
-            const el = document.getElementById('dp-p-' + d);
-            tP += (parseInt(el.value) || 0) * d;
-        });
-        document.getElementById('lbl-total-p').innerText = tP.toFixed(2);
-
-        const grand = tB + tP;
-        document.getElementById('d-grand-total').value = grand.toFixed(2) + " €";
-    }
-
-    function addDepotEspecesDetaille() {
-        const date = document.getElementById('d-date').value;
-        const ref = document.getElementById('d-ref').value.trim();
-        const resp = document.getElementById('d-resp').value.trim();
-
-        if(!date || !ref || !resp) {
-            alert("Renseignez la date, référence et le responsable du dépôt.");
-            return;
-        }
-
-        let tB = 0; let breakdown = [];
-        billetDenoms.forEach(d => {
-            const q = parseInt(document.getElementById('dp-b-' + d).value) || 0;
-            if(q > 0) { tB += q * d; breakdown.push(`${q}x${d}€`); }
-        });
-
-        let tP = 0;
-        pieceDenoms.forEach(d => {
-            const q = parseInt(document.getElementById('dp-p-' + d).value) || 0;
-            if(q > 0) { tP += q * d; breakdown.push(`${q}x${d}€`); }
-        });
-
-        const grandTotal = tB + tP;
-        if(grandTotal <= 0) {
-            alert("Le montant du dépôt doit être supérieur à 0 €.");
-            return;
-        }
-
-        if(confirm(`Confirmer le dépôt réel en banque de ${grandTotal.toFixed(2)} € ? (Ceci va impacter la caisse et la banque simultanément)`)) {
-            comptaDB.caisseFlux.push({
-                id: Date.now() + 1,
-                date: date,
-                type: 'Dépense',
-                desig: `Mise en Banque Espèces (Réf: ${ref})`,
-                resp: resp,
-                montant: grandTotal,
-                justificatif: null
-            });
-
-            const finalDojoRef = generateDojoRef(date);
-
-            comptaDB.operations.push({
-                id: Date.now() + 2,
-                date: date,
-                type: 'Crédit',
-                moyen: 'Dépôt ESP',
-                desig: `Dépôt Espèces - Réf: ${ref}`,
-                ref: ref,
-                resp: resp,
-                montant: grandTotal,
-                justificatif: null,
-                dojoRef: finalDojoRef
-            });
-
-            comptaDB.depotsEspeces.push({
-                id: Date.now(),
-                date, ref, resp,
-                totalB: tB, totalP: tP, totalG: grandTotal,
-                text: breakdown.join(', '),
-                breakdownDetails: {
-                    b100: parseInt(document.getElementById('dp-b-100').value) || 0,
-                    b50: parseInt(document.getElementById('dp-b-50').value) || 0,
-                    b20: parseInt(document.getElementById('dp-b-20').value) || 0,
-                    b10: parseInt(document.getElementById('dp-b-10').value) || 0,
-                    b5: parseInt(document.getElementById('dp-b-5').value) || 0,
-                    p2: parseInt(document.getElementById('dp-p-2').value) || 0,
-                    p1: parseInt(document.getElementById('dp-p-1').value) || 0,
-                    p05: parseInt(document.getElementById('dp-p-0.5').value) || 0,
-                    p02: parseInt(document.getElementById('dp-p-0.2').value) || 0,
-                    p01: parseInt(document.getElementById('dp-p-0.1').value) || 0,
-                    p005: parseInt(document.getElementById('dp-p-0.05').value) || 0,
-                    p002: parseInt(document.getElementById('dp-p-0.02').value) || 0,
-                    p001: parseInt(document.getElementById('dp-p-0.01').value) || 0
+                    dep_data[cat] = (dep_data[cat] || 0) + m;
+                    totD += m;
                 }
             });
-
-            saveComptaData();
-            rebuildAll();
-
-            document.getElementById('d-ref').value = '';
-            billetDenoms.forEach(d => document.getElementById('dp-b-' + d).value = 0);
-            pieceDenoms.forEach(d => document.getElementById('dp-p-' + d).value = 0);
-            calcLiveDepot();
-        }
-    }
-
-    function renderDepotsEspeces() {
-        const tbody = document.getElementById('table-depots-body');
-        if(!tbody) return;
-        tbody.innerHTML = '';
-
-        if(comptaDB.depotsEspeces.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--gris-moyen);">Aucun dépôt d\'espèces archivé.</td></tr>';
-            return;
         }
 
-        comptaDB.depotsEspeces.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(dp => {
-            const totB = parseFloat(dp.totalB) || 0;
-            const totP = parseFloat(dp.totalP) || 0;
-            const totG = parseFloat(dp.totalG) || 0;
-            
-            tbody.innerHTML += `
-                <tr>
-                    <td>${formatFrenchDate(dp.date)}</td>
-                    <td><strong>${dp.ref}</strong></td>
-                    <td><span style="font-size:0.8rem; color:var(--gris-moyen); font-family:monospace;">${dp.text}</span></td>
-                    <td>${totB.toFixed(2)}&nbsp;€</td>
-                    <td>${totP.toFixed(2)}&nbsp;€</td>
-                    <td style="font-weight:bold; color:var(--vert-fonce);">${totG.toFixed(2)}&nbsp;€</td>
-                    <td>${dp.resp}</td>
-                    <td style="text-align:center;" data-html-export="ignore">
-                        <button class="btn btn-blue btn-xs" onclick="editDepotHistorique(${dp.id})" style="padding:4px 6px; margin-right:2px;">✏️</button>
-                        <button class="btn btn-danger btn-xs" onclick="deleteDepotHistorique(${dp.id})">🗑️</button>
-                    </td>
-                </tr>
-            `;
+        if (source === 'ALL' || source === 'BANQUE') aggregate(comptaDB.operations, o => o.type === 'Crédit');
+        if (source === 'ALL' || source === 'LIVRET') aggregate(comptaDB.livretOps, o => o.type === 'Crédit');
+        if (source === 'ALL' || source === 'CAISSE') aggregate(comptaDB.caisseFlux, o => o.type === 'Recette');
+
+        const tRec = document.getElementById('ana-table-recettes'); tRec.innerHTML = '';
+        Object.keys(rec_data).sort().forEach(k => {
+            tRec.innerHTML += `<tr><td>${k}</td><td style="text-align:right; font-weight:500;">${rec_data[k].toFixed(2)} €</td></tr>`;
         });
+
+        const tDep = document.getElementById('ana-table-depenses'); tDep.innerHTML = '';
+        Object.keys(dep_data).sort().forEach(k => {
+            tDep.innerHTML += `<tr><td>${k}</td><td style="text-align:right; font-weight:500;">${dep_data[k].toFixed(2)} €</td></tr>`;
+        });
+
+        document.getElementById('ana-tot-recettes').innerText = totR.toFixed(2) + " €";
+        document.getElementById('ana-tot-depenses').innerText = totD.toFixed(2) + " €";
+
+        const resultat = totR - totD;
+        document.getElementById('ana-kpi-recettes').innerText = totR.toFixed(2) + " €";
+        document.getElementById('ana-kpi-depenses').innerText = totD.toFixed(2) + " €";
+        
+        const resEl = document.getElementById('ana-kpi-resultat');
+        resEl.innerText = (resultat > 0 ? "+" : "") + resultat.toFixed(2) + " €";
+        resEl.style.color = resultat >= 0 ? "var(--vert-fonce)" : "var(--rouge)";
+
+        let taux = totR > 0 ? ((resultat / totR) * 100) : 0;
+        document.getElementById('ana-kpi-taux').innerText = taux.toFixed(1) + " %";
     }
 
-    function editDepotHistorique(id) {
-        const dp = comptaDB.depotsEspeces.find(x => x.id === id);
-        if (dp) {
-            document.getElementById('d-date').value = dp.date;
-            document.getElementById('d-ref').value = dp.ref;
-            document.getElementById('d-resp').value = dp.resp;
-            
-            if (dp.breakdownDetails) {
-                document.getElementById('dp-b-100').value = dp.breakdownDetails.b100 || 0;
-                document.getElementById('dp-b-50').value = dp.breakdownDetails.b50 || 0;
-                document.getElementById('dp-b-20').value = dp.breakdownDetails.b20 || 0;
-                document.getElementById('dp-b-10').value = dp.breakdownDetails.b10 || 0;
-                document.getElementById('dp-b-5').value = dp.breakdownDetails.b5 || 0;
-                document.getElementById('dp-p-2').value = dp.breakdownDetails.p2 || 0;
-                document.getElementById('dp-p-1').value = dp.breakdownDetails.p1 || 0;
-                document.getElementById('dp-p-0.5').value = dp.breakdownDetails.p05 || 0;
-                document.getElementById('dp-p-0.2').value = dp.breakdownDetails.p02 || 0;
-                document.getElementById('dp-p-0.1').value = dp.breakdownDetails.p01 || 0;
-                document.getElementById('dp-p-0.05').value = dp.breakdownDetails.p005 || 0;
-                document.getElementById('dp-p-0.02').value = dp.breakdownDetails.p002 || 0;
-                document.getElementById('dp-p-0.01').value = dp.breakdownDetails.p001 || 0;
-            }
-            calcLiveDepot();
-            
-            comptaDB.depotsEspeces = comptaDB.depotsEspeces.filter(x => x.id !== id);
-            saveComptaData();
-            rebuildAll();
-        }
-    }
-
-    function deleteDepotHistorique(id) {
-        if(confirm("Supprimer cette ligne d'historique de dépôt ? (Attention, cela ne supprime pas rétroactivement les lignes créées en banque et caisse)")) {
-            comptaDB.depotsEspeces = comptaDB.depotsEspeces.filter(x => x.id !== id);
-            saveComptaData();
-            rebuildAll();
-        }
-    }
-
-    function formatFrenchDate(dStr) {
-        if(!dStr) return '';
-        const parts = dStr.split('-');
-        if(parts.length !== 3) return dStr;
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-
+    /* EXPORT IMPRESSION DES OPERATIONAL LISTS (BANQUE / LIVRET / CAISSE) */
     function exporterTableauA4(clefVue, titreVue, tableId, orientation = 'portrait') {
         const originalTable = document.getElementById(tableId);
         if(!originalTable) return;
 
-        let pDateTexte = "Toutes périodes confondues";
-        let startInput = null;
-        let endInput = null;
-
-        if (clefVue === 'banque') {
-            startInput = document.getElementById('filter-start-date').value;
-            endInput = document.getElementById('filter-end-date').value;
-        } else if (clefVue === 'livret') {
-            startInput = document.getElementById('filter-start-date-livret').value;
-            endInput = document.getElementById('filter-end-date-livret').value;
-        } else if (clefVue === 'caisse') {
-            startInput = document.getElementById('filter-start-date-caisse').value;
-            endInput = document.getElementById('filter-end-date-caisse').value;
-        } else if (clefVue === 'cheques') {
-            startInput = document.getElementById('filter-start-date-cheques').value;
-            endInput = document.getElementById('filter-end-date-cheques').value;
-        }
-
-        if(startInput || endInput) {
-            pDateTexte = `Extrait le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})} • ${orientation === 'landscape' ? 'Paysage' : 'Portrait'}`;
-        } else {
-            pDateTexte = `Extrait le ${new Date().toLocaleDateString('fr-FR')} • ${orientation === 'landscape' ? 'Paysage' : 'Portrait'}`;
-        }
+        let pDateTexte = `Extrait le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}`;
 
         const cloneTable = originalTable.cloneNode(true);
         cloneTable.removeAttribute('id');
         cloneTable.querySelectorAll('[data-html-export="ignore"]').forEach(el => el.remove());
 
-        // On compte les colonnes restantes pour donner la bonne largeur à notre en-tête global
         const theadElement = cloneTable.querySelector('thead');
         const firstRowThs = theadElement.querySelectorAll('tr:first-child th');
         const colCount = firstRowThs.length;
 
-        // Création de l'en-tête global qu'on insère dans le THEAD pour qu'il se répète sur chaque page !
         const headerRow = document.createElement('tr');
         headerRow.innerHTML = `
             <td colspan="${colCount}" style="border: none; padding: 0 0 20px 0; background: #FFFFFF;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #C41E3A; padding-bottom: 12px;">
                     <div style="display: flex; gap: 14px; align-items: center;">
-                        <div style="background-color: #C41E3A; width: 65px; height: 65px; border-radius: 12px; padding: 6px; display: flex; align-items: center; justify-content: center;">
+                        <div style="background-color: #C41E3A; width: 55px; height: 55px; border-radius: 10px; padding: 5px; display: flex; align-items: center; justify-content: center;">
                             <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 100%; height: 100%; object-fit: contain;">
                         </div>
                         <div style="font-size: 8.5pt; line-height: 1.35; color: #3D3D3D;">
-                            <div style="font-family: 'Fredoka', sans-serif; font-size: 13pt; color: #C41E3A; font-weight: bold; margin-bottom: 2px; text-transform: uppercase;">DOJO DORNOIS</div>
+                            <div style="font-family: 'Fredoka', sans-serif; font-size: 12pt; color: #C41E3A; font-weight: bold; margin-bottom: 2px; text-transform: uppercase;">DOJO DORNOIS</div>
                             1 Place de la Mairie - 58390 DORNES<br>
                             FFJDA n° CE 08.58.067.0 • Agrément J&S n° 58.S.471<br>
-                            SIRET 451 928 410 00013 • RNA W583001220<br>
-                            dojodornois@gmail.com • 06.07.13.91.86
+                            SIRET 451 928 410 00013 • RNA W583001220
                         </div>
                     </div>
                     <div style="text-align: right;">
-                        <h1 style="font-family: 'Fredoka', sans-serif; font-size: 14pt; color: #1A1A1A; margin: 0 0 6px 0; text-transform: uppercase; letter-spacing: 0.5px;">${titreVue}</h1>
+                        <h1 style="font-family: 'Fredoka', sans-serif; font-size: 13pt; color: #1A1A1A; margin: 0 0 4px 0; text-transform: uppercase;">${titreVue}</h1>
                         <div style="font-size: 8.5pt; color: #6B6B6B;">${pDateTexte}</div>
                     </div>
                 </div>
             </td>
         `;
         theadElement.insertBefore(headerRow, theadElement.firstChild);
-
-        // Application stricte des couleurs de la charte pour le tableau
-        cloneTable.querySelectorAll('tbody tr').forEach(tr => {
-            const rowText = tr.innerText.toUpperCase();
-            const isCredit = rowText.includes('CRÉDIT') || rowText.includes('RECETTE');
-            const isDebit = rowText.includes('DÉBIT') || rowText.includes('DÉPENSE');
-
-            tr.querySelectorAll('td').forEach(td => {
-                td.style.setProperty('color', '#1A1A1A', 'important'); // Noir Doux
-
-                if (td.innerText.includes('€')) {
-                    if (isCredit) {
-                        td.style.setProperty('color', '#2ECC71', 'important'); // Vert Charte
-                    } else if (isDebit) {
-                        td.style.setProperty('color', '#C41E3A', 'important'); // Rouge Charte
-                    }
-                }
-            });
-        });
 
         const printWindow = window.open('', '_blank');
         printWindow.document.write(`
@@ -2115,58 +895,31 @@ function showToast(message, type = 'success') {
                 <style>
                     @page { 
                         size: A4 ${orientation}; 
-                        margin: 10mm 15mm 15mm 15mm; 
-                        @bottom-left {
-                            content: "Dojo Dornois • Judo & Disciplines Associées • RNA : W583001220";
-                            font-family: 'Roboto', sans-serif;
-                            font-size: 8pt;
-                            color: #6B6B6B;
-                            border-top: 1px solid #E8E8E8;
-                            padding-top: 6px;
-                        }
-                        @bottom-right {
-                            content: "Page " counter(page) " / " counter(pages);
-                            font-family: 'Fredoka', sans-serif;
-                            font-weight: 600;
-                            font-size: 9pt;
-                            color: #C41E3A;
-                            border-top: 1px solid #E8E8E8;
-                            padding-top: 6px;
-                        }
+                        margin: 10mm 12mm 12mm 12mm; 
                     }
                     body { 
                         font-family: 'Roboto', sans-serif; 
                         color: #1A1A1A; 
                         background: #FFFFFF; 
-                        margin: 0; 
-                        padding: 0; 
-                        font-size: 9pt; 
+                        margin: 0; padding: 0; 
+                        font-size: 8.5pt; 
                         -webkit-print-color-adjust: exact !important; 
                         print-color-adjust: exact !important; 
                     }
-                    
-                    /* Composant : Tableau de données avec en-tête intégré */
-                    table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+                    table { width: 100%; border-collapse: collapse; font-size: 8pt; }
                     tr { page-break-inside: avoid; break-inside: avoid; }
-                    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #E8E8E8; }
-                    
-                    /* Pour que la 2ème ligne du Thead (les vrais titres des colonnes) ait le style sombre */
+                    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #E8E8E8; }
                     thead tr:nth-child(2) th { 
                         background-color: #1A1A1A; 
                         font-family: 'Fredoka', sans-serif; 
                         color: #FFFFFF; 
                         font-weight: 500; 
-                        font-size: 9pt; 
-                        border-top: 1px solid #1A1A1A; 
+                        font-size: 8.5pt; 
                     }
-                    tbody tr:hover { background-color: #FFEBEF; }
-                    
-                    /* Badges de Statut */
-                    .badge { padding: 4px 6px; border-radius: 4px; font-size: 7.5pt; font-weight: bold; text-transform: uppercase; display: inline-block; }
+                    .badge { padding: 3px 6px; border-radius: 4px; font-size: 7pt; font-weight: bold; text-transform: uppercase; display: inline-block; }
                     .badge-credit { background: #E8F8F0 !important; color: #2ECC71 !important; }
                     .badge-debit { background: #FFEBEF !important; color: #C41E3A !important; }
-                    
-                    .hide-on-screen { display: table-cell !important; }
+                    .badge-cat { background: #E1F0FA !important; color: #2980B9 !important; }
                 </style>
             </head>
             <body>
@@ -2176,7 +929,7 @@ function showToast(message, type = 'success') {
                         setTimeout(function() {
                             window.print();
                             window.close();
-                        }, 300);
+                        }, 400);
                     };
                 <\/script>
             </body>
@@ -2185,10 +938,98 @@ function showToast(message, type = 'success') {
         printWindow.document.close();
     }
 
+    function exporterBilanA4() {
+        const source = document.getElementById('ana-source').selectedOptions[0].text;
+        const start = document.getElementById('ana-start').value;
+        const end = document.getElementById('ana-end').value;
+        const periode = (start || end) ? `Du ${start || 'début'} au ${end || 'aujourd\'hui'}` : "Exercice global (Toutes périodes)";
+
+        const recHtml = document.getElementById('ana-table-recettes').innerHTML;
+        const depHtml = document.getElementById('ana-table-depenses').innerHTML;
+        const totR = document.getElementById('ana-tot-recettes').innerText;
+        const totD = document.getElementById('ana-tot-depenses').innerText;
+        const res = document.getElementById('ana-kpi-resultat').innerText;
+        const colorRes = res.includes('-') ? '#C41E3A' : '#2ECC71';
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Bilan Analytique - Dojo Dornois</title>
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                <style>
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { font-family: 'Roboto', sans-serif; color: #1A1A1A; font-size: 10pt; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #C41E3A; padding-bottom: 15px; margin-bottom: 25px; }
+                    .title-box { text-align: right; }
+                    .title-box h1 { font-family: 'Fredoka', sans-serif; color: #1A1A1A; margin: 0; font-size: 18pt; text-transform: uppercase; }
+                    .subtitle { color: #6B6B6B; font-size: 10pt; margin-top: 5px; }
+                    
+                    .kpi-row { display: flex; justify-content: space-between; background: #F4F6F9; padding: 15px; border-radius: 8px; margin-bottom: 25px; }
+                    .kpi-box { text-align: center; width: 30%; }
+                    .kpi-box span { display: block; font-size: 8pt; color: #6B6B6B; text-transform: uppercase; margin-bottom: 5px; }
+                    .kpi-box strong { font-family: 'Fredoka', sans-serif; font-size: 16pt; }
+
+                    .tables-container { display: flex; justify-content: space-between; gap: 20px; }
+                    .col { width: 48%; }
+                    h3 { font-family: 'Fredoka', sans-serif; margin-bottom: 10px; border-bottom: 2px solid #E8E8E8; padding-bottom: 5px; }
+                    table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+                    th, td { padding: 8px; border-bottom: 1px solid #E8E8E8; text-align: left; }
+                    td.montant { text-align: right; font-weight: 500; }
+                    .tot-row { font-weight: bold; font-size: 10pt; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div>
+                        <strong style="font-family:'Fredoka'; color:#C41E3A; font-size:14pt;">DOJO DORNOIS</strong><br>
+                        1 Place de la Mairie - 58390 DORNES<br>
+                        RNA W583001220 • SIRET 451 928 410 00013
+                    </div>
+                    <div class="title-box">
+                        <h1>COMPTE DE RÉSULTAT ANALYTIQUE</h1>
+                        <div class="subtitle"><strong>Périmètre :</strong> ${source}<br><strong>Période :</strong> ${periode}</div>
+                    </div>
+                </div>
+
+                <div class="kpi-row">
+                    <div class="kpi-box"><span>Produits (Recettes)</span><strong style="color:#2ECC71;">${totR}</strong></div>
+                    <div class="kpi-box"><span>Charges (Dépenses)</span><strong style="color:#C41E3A;">${totD}</strong></div>
+                    <div class="kpi-box" style="border-left: 2px solid #E8E8E8;"><span>Résultat Net</span><strong style="color:${colorRes};">${res}</strong></div>
+                </div>
+
+                <div class="tables-container">
+                    <div class="col">
+                        <h3 style="color:#27ae60;">PRODUITS (RECETTES)</h3>
+                        <table>
+                            ${recHtml}
+                            <tr class="tot-row" style="background:#e8f8f0;"><td>TOTAL PRODUITS</td><td class="montant" style="color:#27ae60;">${totR}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col">
+                        <h3 style="color:#C41E3A;">CHARGES (DÉPENSES)</h3>
+                        <table>
+                            ${depHtml}
+                            <tr class="tot-row" style="background:#fcebe9;"><td>TOTAL CHARGES</td><td class="montant" style="color:#C41E3A;">${totD}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 50px; text-align: center; font-size: 9pt; color: #6B6B6B;">
+                    Document généré le ${new Date().toLocaleDateString('fr-FR')} par Dojo Manager Intranet.<br>
+                    Le Président / Le Trésorier
+                </div>
+                <script>window.onload = function() { setTimeout(function(){ window.print(); window.close(); }, 500); };<\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
     window.onload = loadData;
 </script>
-
 <script src="../js/sidebar.js"></script>
-
 </body>
 </html>
