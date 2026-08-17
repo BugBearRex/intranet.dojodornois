@@ -106,6 +106,7 @@
         .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
         .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
         .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        .toast.error { background: #78281f; border-left: 4px solid #e74c3c; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 
         .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -578,7 +579,7 @@
                 <div class="file-attachment-box" style="grid-column: 1 / -1; margin-top: 5px;">
                     <label style="font-weight:bold; font-size:0.85rem; color:var(--noir-doux); display:block; margin-bottom:6px;">📎 Justificatif (Optionnel)</label>
                     <div id="mb-existing-file-box" style="display:none;" class="file-existing-badge">
-                        <span id="mb-existing-filename" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">📎 Fichier déjà joint</span>
+                        <span id="mb-existing-filename" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">📎 Fichier joint</span>
                         <div style="display:flex; gap:6px;">
                             <a id="mb-existing-link" href="#" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">👁️ Ouvrir</a>
                             <button type="button" class="btn btn-danger btn-xs" onclick="removeExistingFile('banque')">🗑️</button>
@@ -586,7 +587,7 @@
                     </div>
                     <div id="mb-file-input-box">
                         <input type="file" id="mb-file" accept="image/*,application/pdf" style="width:100%;">
-                        <small style="color:var(--gris-moyen); font-size:0.78rem;">Le document sera classé dans Google Drive avec la référence de l'opération.</small>
+                        <small style="color:var(--gris-moyen); font-size:0.78rem;">Le document sera classé dans Google Drive avec la référence unique du dojo.</small>
                     </div>
                 </div>
 
@@ -615,7 +616,7 @@
                 <div class="file-attachment-box" style="grid-column: 1 / -1; margin-top: 5px;">
                     <label style="font-weight:bold; font-size:0.85rem; color:var(--noir-doux); display:block; margin-bottom:6px;">📎 Justificatif (Optionnel)</label>
                     <div id="ml-existing-file-box" style="display:none;" class="file-existing-badge">
-                        <span id="ml-existing-filename" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">📎 Fichier déjà joint</span>
+                        <span id="ml-existing-filename" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">📎 Fichier joint</span>
                         <div style="display:flex; gap:6px;">
                             <a id="ml-existing-link" href="#" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">👁️ Ouvrir</a>
                             <button type="button" class="btn btn-danger btn-xs" onclick="removeExistingFile('livret')">🗑️</button>
@@ -649,7 +650,7 @@
                 <div class="file-attachment-box" style="grid-column: 1 / -1; margin-top: 5px;">
                     <label style="font-weight:bold; font-size:0.85rem; color:var(--noir-doux); display:block; margin-bottom:6px;">📎 Reçu / Justificatif (Optionnel)</label>
                     <div id="mc-existing-file-box" style="display:none;" class="file-existing-badge">
-                        <span id="mc-existing-filename" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">📎 Fichier déjà joint</span>
+                        <span id="mc-existing-filename" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">📎 Fichier joint</span>
                         <div style="display:flex; gap:6px;">
                             <a id="mc-existing-link" href="#" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">👁️ Ouvrir</a>
                             <button type="button" class="btn btn-danger btn-xs" onclick="removeExistingFile('caisse')">🗑️</button>
@@ -715,16 +716,15 @@
     const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
     const SUPABASE_TABLE = 'compta';
 
-    // REMPLACE SI BESOIN PAR L'URL EXACTE DE TON SCRIPT ACTUEL
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3w2LOiykd2T-63p98zaWIW1IvTvwQiAZBt2ZRjycQqeiGAYXrymBMAW9q-5fHU6yn4A/exec';
 
     function showToast(message, type = 'success') {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
-        toast.className = 'toast success';
+        toast.className = 'toast ' + (type === 'error' ? 'error' : 'success');
         toast.innerText = message;
         container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3500);
+        setTimeout(() => toast.remove(), 4000);
     }
 
     // --- UPLOAD DRIVE FONCTIONS ---
@@ -734,6 +734,15 @@
         let baseName = originalName.replace(datePattern, '');
         if (baseName && !baseName.startsWith('-') && !baseName.startsWith('_')) baseName = '_' + baseName;
         return operationRef + baseName;
+    }
+
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
     }
 
     async function uploadFileToDrive(file, customFileName = null) {
@@ -752,11 +761,14 @@
                             base64Data: base64Data
                         })
                     });
+                    
                     const result = await response.json();
-                    if (result.fileUrl || result.url) {
+                    if (result && (result.fileUrl || result.url)) {
                         resolve(result.fileUrl || result.url);
+                    } else if (result && result.error) {
+                        reject(new Error(result.error));
                     } else {
-                        resolve(null);
+                        reject(new Error("Le script Google n'a pas retourné d'URL de fichier valide."));
                     }
                 } catch (err) {
                     reject(err);
@@ -805,7 +817,9 @@
         try {
             await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: comptaDB });
             if (!silent) showToast("✓ Sauvegardé !", "success");
-        } catch(e) { console.warn("Supabase erreur, local conservé"); }
+        } catch(e) { 
+            console.warn("Supabase erreur, sauvegarde locale conservée", e); 
+        }
         rebuildAll();
     }
 
@@ -1006,7 +1020,7 @@
             if (op.justificatif) {
                 document.getElementById('mb-existing-file-box').style.display = 'flex';
                 document.getElementById('mb-file-input-box').style.display = 'none';
-                let url = op.justificatif.startsWith('http') ? op.justificatif : 'https://' + op.justificatif;
+                let url = (op.justificatif.startsWith('http') || op.justificatif.startsWith('data:')) ? op.justificatif : 'https://' + op.justificatif;
                 document.getElementById('mb-existing-link').href = url;
             } else {
                 document.getElementById('mb-existing-file-box').style.display = 'none';
@@ -1029,7 +1043,7 @@
         const moyen = document.getElementById('mb-moyen').value;
         const montant = parseFloat(document.getElementById('mb-montant').value);
 
-        if (!date || !desig || !montant) return alert("Champs obligatoires manquants");
+        if (!date || !desig || isNaN(montant)) return alert("Veuillez remplir tous les champs obligatoires (*)");
 
         const isEdit = (editingBanqueId !== null);
         let finalDojoRef = "";
@@ -1041,19 +1055,25 @@
             finalDojoRef = generateDojoRef(date);
         }
         
-        // Upload du fichier
         const fileInput = document.getElementById('mb-file');
         let driveUrl = null;
 
         if (fileInput && fileInput.files && fileInput.files.length > 0) {
-            showToast("⏳ Envoi du justificatif dans le Drive...", "success");
+            showToast("⏳ Envoi du justificatif dans le Drive...");
+            const fileObj = fileInput.files[0];
+            const newName = getNewFileName(fileObj.name, finalDojoRef);
             try {
-                const fileObj = fileInput.files[0];
-                const newName = getNewFileName(fileObj.name, finalDojoRef);
                 driveUrl = await uploadFileToDrive(fileObj, newName);
-                showToast("✅ Justificatif stocké !");
+                showToast("✅ Justificatif stocké dans Google Drive !");
             } catch (err) {
-                alert("Erreur Drive: " + err); return; 
+                console.error("Erreur Google Drive :", err);
+                const keepLocal = confirm("⚠️ Erreur lors de l'envoi sur Google Drive (" + err.message + ").\n\nSouhaitez-vous enregistrer le justificatif directement en secours dans l'application ?");
+                if (keepLocal) {
+                    driveUrl = await fileToBase64(fileObj);
+                    showToast("📎 Justificatif stocké localement");
+                } else {
+                    return;
+                }
             }
         }
 
@@ -1065,7 +1085,8 @@
         if (isEdit) comptaDB.operations = comptaDB.operations.filter(o => o.id !== editingBanqueId);
 
         comptaDB.operations.push({ id: isEdit ? editingBanqueId : Date.now(), date, type, categorie, desig, ref, resp, moyen, montant, dojoRef: finalDojoRef, justificatif: driveUrl });
-        saveComptaData(); closeModal('modal-banque-overlay');
+        saveComptaData(); 
+        closeModal('modal-banque-overlay');
     }
 
     function deleteOperationBanque(id) {
@@ -1099,11 +1120,12 @@
             else if (shortMoyen === 'Dépôt ESP') shortMoyen = 'DEP. E.';
 
             let docLink = `<span style="color:var(--gris-moyen); font-size:0.8rem;">Aucun</span>`;
-            if (op.justificatif && (op.justificatif.startsWith('http') || op.justificatif.startsWith('www'))) {
-                let url = op.justificatif.startsWith('http') ? op.justificatif : 'https://' + op.justificatif;
-                docLink = `<a href="${url}" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">📎 Ouvrir</a>`;
-            } else if (op.justificatif) {
-                docLink = `<button class="btn btn-outline btn-xs" onclick="openDocumentViewer(comptaDB.operations.find(o=>o.id===${op.id}).justificatif)">📎 Doc</button>`;
+            if (op.justificatif) {
+                if (op.justificatif.startsWith('http://') || op.justificatif.startsWith('https://')) {
+                    docLink = `<a href="${op.justificatif}" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">📎 Ouvrir</a>`;
+                } else {
+                    docLink = `<button class="btn btn-outline btn-xs" onclick="openDocumentViewer(comptaDB.operations.find(o=>o.id===${op.id}).justificatif)">📎 Doc</button>`;
+                }
             }
 
             tbody.innerHTML += `
@@ -1148,7 +1170,7 @@
             if (op.justificatif) {
                 document.getElementById('ml-existing-file-box').style.display = 'flex';
                 document.getElementById('ml-file-input-box').style.display = 'none';
-                let url = op.justificatif.startsWith('http') ? op.justificatif : 'https://' + op.justificatif;
+                let url = (op.justificatif.startsWith('http') || op.justificatif.startsWith('data:')) ? op.justificatif : 'https://' + op.justificatif;
                 document.getElementById('ml-existing-link').href = url;
             } else {
                 document.getElementById('ml-existing-file-box').style.display = 'none';
@@ -1167,21 +1189,28 @@
         const categorie = document.getElementById('ml-cat').value;
         const desig = document.getElementById('ml-desig').value;
         const montant = parseFloat(document.getElementById('ml-montant').value);
-        if(!date || !desig || !montant) return alert("Champs obligatoires manquants.");
+        if(!date || !desig || isNaN(montant)) return alert("Champs obligatoires manquants.");
 
         const isEdit = (editingLivretId !== null);
         const fileInput = document.getElementById('ml-file');
         let driveUrl = null;
 
         if (fileInput && fileInput.files && fileInput.files.length > 0) {
-            showToast("⏳ Envoi du justificatif dans le Drive...", "success");
+            showToast("⏳ Envoi du justificatif dans le Drive...");
+            const fileObj = fileInput.files[0];
+            const newName = getNewFileName(fileObj.name, "Livret_" + date);
             try {
-                const fileObj = fileInput.files[0];
-                const newName = getNewFileName(fileObj.name, "Livret_" + date);
                 driveUrl = await uploadFileToDrive(fileObj, newName);
-                showToast("✅ Justificatif stocké !");
+                showToast("✅ Justificatif stocké dans Google Drive !");
             } catch (err) {
-                alert("Erreur Drive: " + err); return; 
+                console.error("Erreur Google Drive :", err);
+                const keepLocal = confirm("⚠️ Erreur lors de l'envoi sur Google Drive (" + err.message + ").\n\nSouhaitez-vous enregistrer le justificatif localement ?");
+                if (keepLocal) {
+                    driveUrl = await fileToBase64(fileObj);
+                    showToast("📎 Justificatif stocké localement");
+                } else {
+                    return;
+                }
             }
         }
 
@@ -1192,7 +1221,8 @@
 
         if (isEdit) comptaDB.livretOps = comptaDB.livretOps.filter(o => o.id !== editingLivretId);
         comptaDB.livretOps.push({ id: isEdit ? editingLivretId : Date.now(), date, type, categorie, desig, montant, justificatif: driveUrl });
-        saveComptaData(); closeModal('modal-livret-overlay');
+        saveComptaData(); 
+        closeModal('modal-livret-overlay');
     }
 
     function deleteOperationLivret(id) {
@@ -1214,11 +1244,12 @@
             if(end && op.date > end) return;
 
             let docLink = `<span style="color:var(--gris-moyen); font-size:0.8rem;">Aucun</span>`;
-            if (op.justificatif && (op.justificatif.startsWith('http') || op.justificatif.startsWith('www'))) {
-                let url = op.justificatif.startsWith('http') ? op.justificatif : 'https://' + op.justificatif;
-                docLink = `<a href="${url}" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">📎 Ouvrir</a>`;
-            } else if (op.justificatif) {
-                docLink = `<button class="btn btn-outline btn-xs" onclick="openDocumentViewer(comptaDB.livretOps.find(o=>o.id===${op.id}).justificatif)">📎 Doc</button>`;
+            if (op.justificatif) {
+                if (op.justificatif.startsWith('http://') || op.justificatif.startsWith('https://')) {
+                    docLink = `<a href="${op.justificatif}" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">📎 Ouvrir</a>`;
+                } else {
+                    docLink = `<button class="btn btn-outline btn-xs" onclick="openDocumentViewer(comptaDB.livretOps.find(o=>o.id===${op.id}).justificatif)">📎 Doc</button>`;
+                }
             }
 
             tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Crédit' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Crédit'?'var(--vert-fonce)':'var(--rouge)'}">${op.montant.toFixed(2)} €</td><td style="font-weight:bold;">${s.toFixed(2)} €</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalLivret(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationLivret(${op.id})">🗑️</button></td></tr>`; 
@@ -1247,7 +1278,7 @@
             if (op.justificatif) {
                 document.getElementById('mc-existing-file-box').style.display = 'flex';
                 document.getElementById('mc-file-input-box').style.display = 'none';
-                let url = op.justificatif.startsWith('http') ? op.justificatif : 'https://' + op.justificatif;
+                let url = (op.justificatif.startsWith('http') || op.justificatif.startsWith('data:')) ? op.justificatif : 'https://' + op.justificatif;
                 document.getElementById('mc-existing-link').href = url;
             } else {
                 document.getElementById('mc-existing-file-box').style.display = 'none';
@@ -1266,21 +1297,28 @@
         const categorie = document.getElementById('mc-cat').value;
         const desig = document.getElementById('mc-desig').value;
         const montant = parseFloat(document.getElementById('mc-montant').value);
-        if(!date || !desig || !montant) return alert("Champs obligatoires manquants.");
+        if(!date || !desig || isNaN(montant)) return alert("Champs obligatoires manquants.");
 
         const isEdit = (editingCaisseId !== null);
         const fileInput = document.getElementById('mc-file');
         let driveUrl = null;
 
         if (fileInput && fileInput.files && fileInput.files.length > 0) {
-            showToast("⏳ Envoi du justificatif dans le Drive...", "success");
+            showToast("⏳ Envoi du justificatif dans le Drive...");
+            const fileObj = fileInput.files[0];
+            const newName = getNewFileName(fileObj.name, "Caisse_" + date);
             try {
-                const fileObj = fileInput.files[0];
-                const newName = getNewFileName(fileObj.name, "Caisse_" + date);
                 driveUrl = await uploadFileToDrive(fileObj, newName);
-                showToast("✅ Justificatif stocké !");
+                showToast("✅ Justificatif stocké dans Google Drive !");
             } catch (err) {
-                alert("Erreur Drive: " + err); return; 
+                console.error("Erreur Google Drive :", err);
+                const keepLocal = confirm("⚠️ Erreur lors de l'envoi sur Google Drive (" + err.message + ").\n\nSouhaitez-vous enregistrer le justificatif localement ?");
+                if (keepLocal) {
+                    driveUrl = await fileToBase64(fileObj);
+                    showToast("📎 Justificatif stocké localement");
+                } else {
+                    return;
+                }
             }
         }
 
@@ -1291,7 +1329,8 @@
 
         if (isEdit) comptaDB.caisseFlux = comptaDB.caisseFlux.filter(o => o.id !== editingCaisseId);
         comptaDB.caisseFlux.push({ id: isEdit ? editingCaisseId : Date.now(), date, type, categorie, desig, montant, justificatif: driveUrl });
-        saveComptaData(); closeModal('modal-caisse-overlay');
+        saveComptaData(); 
+        closeModal('modal-caisse-overlay');
     }
 
     function deleteOperationCaisse(id) {
@@ -1313,14 +1352,15 @@
             if(end && op.date > end) return;
 
             let docLink = `<span style="color:var(--gris-moyen); font-size:0.8rem;">Aucun</span>`;
-            if (op.justificatif && (op.justificatif.startsWith('http') || op.justificatif.startsWith('www'))) {
-                let url = op.justificatif.startsWith('http') ? op.justificatif : 'https://' + op.justificatif;
-                docLink = `<a href="${url}" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">📎 Ouvrir</a>`;
-            } else if (op.justificatif) {
-                docLink = `<button class="btn btn-outline btn-xs" onclick="openDocumentViewer(comptaDB.caisseFlux.find(o=>o.id===${op.id}).justificatif)">📎 Doc</button>`;
+            if (op.justificatif) {
+                if (op.justificatif.startsWith('http://') || op.justificatif.startsWith('https://')) {
+                    docLink = `<a href="${op.justificatif}" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">📎 Ouvrir</a>`;
+                } else {
+                    docLink = `<button class="btn btn-outline btn-xs" onclick="openDocumentViewer(comptaDB.caisseFlux.find(o=>o.id===${op.id}).justificatif)">📎 Doc</button>`;
+                }
             }
 
-            tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Recette' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td>Auteur</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Recette'?'var(--vert-fonce)':'var(--rouge)'}">${op.montant.toFixed(2)} €</td><td style="font-weight:bold;">${s.toFixed(2)} €</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalCaisse(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationCaisse(${op.id})">🗑️</button></td></tr>`; 
+            tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Recette' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td>Dojo</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Recette'?'var(--vert-fonce)':'var(--rouge)'}">${op.montant.toFixed(2)} €</td><td style="font-weight:bold;">${s.toFixed(2)} €</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalCaisse(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationCaisse(${op.id})">🗑️</button></td></tr>`; 
         });
     }
 
@@ -1537,11 +1577,8 @@
         if(grandTotal <= 0) return alert("Montant > 0 € obligatoire.");
 
         if(confirm(`Confirmer le dépôt réel en banque de ${grandTotal.toFixed(2)} € ? (Ceci va impacter la caisse et la banque)`)) {
-            // Sortie de caisse
             comptaDB.caisseFlux.push({ id: Date.now() + 1, date: date, type: 'Dépense', categorie: 'Virement Interne', desig: `Mise en Banque (Réf: ${ref})`, resp: resp, montant: grandTotal, justificatif: null });
-            // Entrée en banque
             comptaDB.operations.push({ id: Date.now() + 2, date: date, type: 'Crédit', categorie: 'Virement Interne', moyen: 'Dépôt ESP', desig: `Dépôt Espèces - Réf: ${ref}`, ref: ref, resp: resp, montant: grandTotal, dojoRef: generateDojoRef(date), justificatif: null });
-            // Trace Archive
             comptaDB.depotsEspeces.push({
                 id: Date.now(), date, ref, resp, totalB: tB, totalP: tP, totalG: grandTotal, text: breakdown.join(', '),
                 breakdownDetails: {
