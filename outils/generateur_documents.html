@@ -2,8 +2,10 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Générateur de Documents — Intranet Dojo Dornois</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éditeur de Documents & Autorisations — Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --rouge: #C41E3A;
@@ -15,10 +17,13 @@
             --gris-moyen: #6B6B6B;
             --gris-clair: #B8B8B8;
             --gris-tres-clair: #E8E8E8;
+            --gris-fond-input: #F8FAFC;
             --fond: #F4F6F9;
             --blanc: #FFFFFF;
             --sidebar-width: 280px;
             --topbar-height: 68px;
+            --radius-main: 10px;
+            --radius-sm: 6px;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -31,9 +36,10 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            font-size: 13px;
         }
 
-        /* --- FIX SIDEBAR DÉBORDEMENT --- */
+        /* --- SIDEBAR --- */
         .sidebar { 
             width: var(--sidebar-width); 
             min-width: var(--sidebar-width);
@@ -46,138 +52,408 @@
             position: relative; 
             box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
             flex-shrink: 0; 
-            box-sizing: border-box;
             overflow-x: hidden;
             z-index: 100;
         }
 
-        .sidebar * {
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-
-        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
-        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
-        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
-
-        /* ===== CONTENU PRINCIPAL ===== */
+        /* --- MAIN LAYOUT --- */
         .main-content {
             flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
         }
 
         .topbar {
-            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.04); flex-shrink: 0; z-index: 50;
+            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; z-index: 50;
         }
 
-        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); line-height: 1; }
-        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.3rem; color: var(--noir-doux); line-height: 1.1; }
+        .page-title-area p { margin: 3px 0 0 0; font-size: 0.8rem; color: var(--gris-moyen); }
 
-        /* ===== WORKSPACE GRID ===== */
+        /* ONGLETS NAVIGATION */
+        .tab-nav-bar {
+            display: flex;
+            gap: 8px;
+            background: var(--blanc);
+            padding: 10px 28px 0 28px;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 10px 18px;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            background: var(--fond);
+            color: var(--gris-moyen);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--rouge);
+            background: var(--rouge-clair);
+        }
+
+        .tab-btn.active {
+            background: var(--blanc);
+            color: var(--rouge);
+            font-weight: 600;
+            border-color: var(--gris-tres-clair);
+            border-top: 3px solid var(--rouge);
+            margin-bottom: -1px;
+        }
+
+        .tab-panel-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tab-pane {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        .tab-pane.active {
+            display: flex;
+        }
+
+        /* WORKSPACE GRID */
         .workspace-grid {
-            flex: 1; display: grid; grid-template-columns: 450px 1fr; gap: 24px; padding: 24px 28px; overflow: hidden;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 20px;
+            padding: 20px 28px;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
         }
 
-        /* Colonne de Configuration Formulaire */
+        /* COLONNE CONFIGURATION */
         .config-panel {
-            background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.03); padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto;
+            background: var(--blanc);
+            border-radius: var(--radius-main);
+            border: 1px solid var(--gris-tres-clair);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
         }
 
-        .config-panel h3 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0 0 5px 0; font-size: 1.1rem; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 8px; }
+        .config-panel h3 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--noir-doux);
+            margin: 0 0 4px 0;
+            font-size: 1.05rem;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
         .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--gris-fonce); }
-        .form-control { width: 100%; padding: 10px 12px; border: 1.5px solid var(--gris-tres-clair); border-radius: 7px; font-size: 0.875rem; font-family: 'Roboto', sans-serif; }
-        .form-control:focus { outline: none; border-color: var(--rouge); box-shadow: 0 0 0 3px rgba(196,30,58,0.08); }
-        textarea.form-control { min-height: 280px; resize: vertical; font-family: monospace; font-size: 0.85rem; line-height: 1.4; }
+        .form-control {
+            width: 100%;
+            padding: 8px 11px;
+            border: 1.5px solid var(--gris-tres-clair);
+            background: var(--gris-fond-input);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-family: 'Roboto', sans-serif;
+            color: var(--gris-fonce);
+            outline: none;
+        }
+        .form-control:focus { border-color: var(--rouge); background: var(--blanc); box-shadow: 0 0 0 3px rgba(196,30,58,0.08); }
+        textarea.form-control { min-height: 220px; resize: vertical; font-family: monospace; font-size: 0.82rem; line-height: 1.4; }
 
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-group { display: flex; gap: 8px; margin-top: 6px; }
         .btn {
-            background: var(--rouge); color: white; border: none; padding: 12px 18px; border-radius: 7px; cursor: pointer; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; transition: background 0.15s;
+            background: var(--rouge); color: white; border: none; padding: 10px 14px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 500; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; flex: 1; transition: background 0.15s; font-family: 'Roboto', sans-serif;
         }
         .btn:hover { background: var(--rouge-hover); }
         .btn-secondary { background: var(--gris-moyen); }
         .btn-secondary:hover { background: var(--gris-fonce); }
 
-        /* Colonne d'Aperçu du PDF */
+        /* PREVIEW PANEL */
         .preview-panel {
-            background: #525659; border-radius: 10px; display: flex; justify-content: center; padding: 30px 20px; overflow-y: auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); scrollbar-width: thin;
+            background: #525659;
+            border-radius: var(--radius-main);
+            display: flex;
+            justify-content: center;
+            padding: 24px 16px;
+            overflow-y: auto;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            scrollbar-width: thin;
         }
 
-        /* Page format A4 standardisé à l'écran */
+        /* PAGE A4 */
         .a4-document {
-            background: var(--blanc); width: 210mm; min-height: 297mm; padding: 20mm; box-shadow: 0 4px 25px rgba(0,0,0,0.25); box-sizing: border-box; position: relative; color: #1a1a1a; display: flex; flex-direction: column;
+            background: var(--blanc);
+            width: 210mm;
+            min-height: 297mm;
+            padding: 16mm 20mm;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.25);
+            box-sizing: border-box;
+            position: relative;
+            color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            font-size: 10pt;
+            line-height: 1.45;
         }
 
-        /* Header Club Officiel */
-        .print-header { display: flex; align-items: center; border-bottom: 2px solid var(--rouge); padding-bottom: 14px; margin-bottom: 25px; }
-        .print-logo { height: 65px; width: 65px; object-fit: contain; background: var(--rouge); padding: 4px; border-radius: 6px; margin-right: 18px; }
-        .print-club-info { font-size: 8.5pt; color: var(--gris-fonce); line-height: 1.4; }
-        .print-club-info strong { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 13pt; display: block; margin-bottom: 2px; }
-
-        .doc-meta { text-align: right; font-size: 9.5pt; color: var(--gris-moyen); margin-bottom: 25px; }
-        
-        .doc-title { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 22pt; margin: 0 0 6px 0; text-transform: uppercase; line-height: 1.1; }
-        .doc-subtitle { font-family: 'Roboto', sans-serif; font-weight: 500; color: var(--gris-moyen); font-size: 13pt; margin: 0 0 25px 0; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 12px; }
-        
-        .doc-body { flex: 1; font-size: 11pt; line-height: 1.6; text-align: justify; }
-        .doc-body h3 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); font-size: 14pt; margin-top: 22px; margin-bottom: 8px; border-left: 3px solid var(--rouge); padding-left: 8px; }
-        .doc-body p { margin: 0 0 12px 0; }
-        .doc-body ul, .doc-body ol { margin: 0 0 15px 0; padding-left: 20px; }
-        .doc-body li { margin-bottom: 4px; }
-        
-        .highlight-box { background-color: var(--fond); border-left: 4px solid var(--rouge); padding: 12px 16px; margin: 18px 0; border-radius: 0 6px 6px 0; }
-
-        .print-footer {
-            margin-top: auto; border-top: 1px solid var(--gris-clair); padding-top: 10px; font-size: 8pt; color: var(--gris-moyen); text-align: center; line-height: 1.3;
+        /* EN-TÊTE OFFICIEL CLUB */
+        .print-header-official {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid var(--rouge);
+            padding-bottom: 10px;
+            margin-bottom: 18px;
         }
 
+        .logo-box-wrapper {
+            background-color: var(--rouge);
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(196, 30, 58, 0.25);
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .club-logo-img { width: 100%; height: 100%; object-fit: contain; }
+
+        .club-info-text {
+            font-size: 8.5pt;
+            line-height: 1.35;
+            color: var(--gris-fonce);
+        }
+
+        .club-name-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 14pt;
+            color: var(--rouge);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 2px;
+        }
+
+        /* PIED DE PAGE OFFICIEL */
+        .print-footer-official {
+            margin-top: auto;
+            border-top: 1px solid var(--gris-clair);
+            padding-top: 8px;
+            font-size: 7.5pt;
+            color: var(--gris-moyen);
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* STYLES ONGLET 1 (DOCUMENTS GÉNÉRAUX) */
+        .doc-meta { text-align: right; font-size: 9pt; color: var(--gris-moyen); margin-bottom: 16px; }
+        .doc-title { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 20pt; margin: 0 0 4px 0; text-transform: uppercase; line-height: 1.1; }
+        .doc-subtitle { font-family: 'Roboto', sans-serif; font-weight: 500; color: var(--gris-moyen); font-size: 11.5pt; margin: 0 0 18px 0; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 10px; }
+        
+        .doc-body { flex: 1; font-size: 10pt; line-height: 1.5; text-align: justify; }
+        .doc-body h3 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); font-size: 12.5pt; margin-top: 16px; margin-bottom: 6px; border-left: 3px solid var(--rouge); padding-left: 8px; }
+        .doc-body p { margin: 0 0 10px 0; }
+        .doc-body ul, .doc-body ol { margin: 0 0 12px 0; padding-left: 20px; }
+        .doc-body li { margin-bottom: 3px; }
+        .highlight-box { background-color: var(--fond); border-left: 4px solid var(--rouge); padding: 10px 14px; margin: 14px 0; border-radius: 0 6px 6px 0; }
+
+        /* STYLES ONGLET 2 (AUTORISATION PARENTALE) */
+        .ap-title-bar {
+            text-align: center;
+            border-top: 2px solid var(--rouge);
+            border-bottom: 2px solid var(--rouge);
+            padding: 6px 0;
+            margin: 4px 0 14px 0;
+        }
+        .ap-main-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 15pt;
+            color: var(--rouge);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .ap-sub-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 9.5pt;
+            color: var(--gris-fonce);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .ap-form-line {
+            margin-bottom: 10px;
+            font-size: 9.5pt;
+            line-height: 1.5;
+        }
+        .ap-fill-text {
+            font-weight: 700;
+            color: var(--noir-doux);
+            border-bottom: 1px dashed var(--gris-clair);
+            padding: 0 4px;
+        }
+
+        .ap-highlight-card {
+            background-color: var(--fond);
+            border: 1px solid var(--gris-tres-clair);
+            border-left: 4px solid var(--rouge);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            margin: 12px 0;
+            font-size: 8.8pt;
+            line-height: 1.4;
+        }
+
+        .ap-checkbox-section {
+            margin: 12px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .ap-checkbox-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 9pt;
+        }
+        .ap-checkbox-box {
+            width: 14px;
+            height: 14px;
+            border: 1.5px solid var(--noir-doux);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .ap-warning-box {
+            background-color: #FFF5F5;
+            border: 1px solid #FEB2B2;
+            border-left: 4px solid var(--rouge);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            margin: 12px 0;
+            font-size: 8.5pt;
+            color: #742A2A;
+            line-height: 1.35;
+        }
+
+        .ap-signature-zone {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 14px;
+            padding-top: 10px;
+        }
+        .ap-sig-box {
+            width: 45%;
+            height: 70px;
+            border: 1px dashed var(--gris-clair);
+            border-radius: var(--radius-sm);
+            padding: 8px;
+            font-size: 8pt;
+            color: var(--gris-moyen);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* PRINT STYLES */
         @media print {
-            body { background: white; padding: 0; color: black; display: block !important; }
-            .no-print, .sidebar, .topbar { display: none !important; }
-            .main-content { padding: 0 !important; overflow: visible !important; }
-            .workspace-grid { display: block !important; margin: 0 !important; padding: 0 !important; }
-            .config-panel { display: none !important; }
-            .preview-panel { background: white !important; padding: 0 !important; box-shadow: none !important; }
+            @page {
+                size: A4 portrait;
+                margin: 10mm 15mm;
+            }
+            body { background: white !important; padding: 0 !important; color: black !important; display: block !important; overflow: visible !important; }
+            .no-print, .sidebar, .topbar, .tab-nav-bar, .config-panel { display: none !important; }
+            .main-content, .tab-panel-container { padding: 0 !important; overflow: visible !important; height: auto !important; display: block !important; }
+            .workspace-grid { display: block !important; margin: 0 !important; padding: 0 !important; height: auto !important; }
+            .preview-panel { background: white !important; padding: 0 !important; box-shadow: none !important; display: block !important; overflow: visible !important; }
             .a4-document { box-shadow: none !important; padding: 0 !important; width: 100% !important; min-height: auto !important; }
+            .tab-pane:not(.active) { display: none !important; }
+            .tab-pane.active { display: block !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- CONTENEUR SIDEBAR DYNAMIQUE -->
-    <div class="sidebar"></div>
+    <!-- SIDEBAR DYNAMIQUE -->
+    <div class="sidebar no-print"></div>
 
     <div class="main-content">
+        <!-- TOPBAR -->
         <div class="topbar no-print">
             <div class="page-title-area">
-                <h2>Générateur Graphique de Documents</h2>
-                <p>Création de notes, propositions et rapports au format officiel du club</p>
+                <h2>Générateur & Éditeur de Documents Officiels</h2>
+                <p>Éditeur multi-onglets : Documents généraux & Autorisations parentales au standard du Dojo Dornois</p>
             </div>
         </div>
 
-        <div class="workspace-grid">
-            
-            <div class="config-panel no-print">
-                <h3>Configuration du Document</h3>
-                
-                <div class="form-group">
-                    <label for="docTitle">Titre Principal</label>
-                    <input type="text" id="docTitle" class="form-control" value="Présentation du Dojo au TER" oninput="actualiserApercu()">
-                </div>
-                
-                <div class="form-group">
-                    <label for="docSubtitle">Sous-titre ou Contexte</label>
-                    <input type="text" id="docSubtitle" class="form-control" value="Partenariat Territoire Éducatif Rural de Dornes — Année 2026/2027" oninput="actualiserApercu()">
-                </div>
-                
-                <div class="form-group">
-                    <label for="dateDoc">Lieu et Date</label>
-                    <input type="text" id="dateDoc" class="form-control" value="Fait à Dornes, le 29 juin 2026" oninput="actualiserApercu()">
-                </div>
+        <!-- ONGLETS -->
+        <div class="tab-nav-bar no-print">
+            <button class="tab-btn active" id="btn-tab-general" onclick="switchMainTab('general')">
+                <i class="fa-solid fa-file-lines"></i> Documents Généraux
+            </button>
+            <button class="tab-btn" id="btn-tab-autorisation" onclick="switchMainTab('autorisation')">
+                <i class="fa-solid fa-child-reaching"></i> Autorisations Parentales
+            </button>
+        </div>
 
-                <div class="form-group">
-                    <label for="docContent">Corps du document (HTML supporté)</label>
-                    <textarea id="docContent" class="form-control" oninput="actualiserApercu()"><h3>1. Introduction et Objectifs</h3>
+        <!-- CONTENU DES ONGLETS -->
+        <div class="tab-panel-container">
+            
+            <!-- ========================================== -->
+            <!-- ONGLET 1 : DOCUMENTS GÉNÉRAUX              -->
+            <!-- ========================================== -->
+            <div id="pane-general" class="tab-pane active">
+                <div class="workspace-grid">
+                    
+                    <div class="config-panel no-print">
+                        <h3><i class="fa-solid fa-pen-to-square" style="color:var(--rouge)"></i> Paramètres du Document</h3>
+                        
+                        <div class="form-group">
+                            <label for="docTitle">Titre Principal</label>
+                            <input type="text" id="docTitle" class="form-control" value="Présentation du Dojo au TER" oninput="actualiserDocGeneral()">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="docSubtitle">Sous-titre ou Contexte</label>
+                            <input type="text" id="docSubtitle" class="form-control" value="Partenariat Territoire Éducatif Rural de Dornes - Année 2026/2027" oninput="actualiserDocGeneral()">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dateDoc">Lieu et Date</label>
+                            <input type="text" id="dateDoc" class="form-control" value="Fait à Dornes, le 29 juin 2026" oninput="actualiserDocGeneral()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="docContent">Corps du document (HTML supporté)</label>
+                            <textarea id="docContent" class="form-control" oninput="actualiserDocGeneral()"><h3>1. Introduction et Objectifs</h3>
 <p>Le Dojo Dornois souhaite proposer une intégration renforcée des valeurs du judo au sein du projet éducatif global du Territoire Éducatif Rural (TER). Notre objectif est de favoriser l'accès à la pratique sportive pour tous les jeunes du territoire.</p>
 
 <div class="highlight-box">
@@ -192,39 +468,204 @@
     <li>Organisation de rencontres inter-écoles au dojo.</li>
 </ul>
 
-<div class="page-break"></div>
-
 <h3>3. Moyens et Logistique</h3>
 <p>Le club s'appuie sur son équipe technique diplômée d'État ainsi que sur ses infrastructures modernes situées Place de la Mairie pour assurer un accueil de qualité et sécurisé.</p></textarea>
-                </div>
-                
-                <div class="btn-group">
-                    <button class="btn" onclick="imprimerDocument()">🖨️ Imprimer / PDF</button>
-                    <button class="btn btn-secondary" onclick="remettreAZero()">🔄 Effacer</button>
-                </div>
-            </div>
-            
-            <div class="preview-panel">
-                <div class="a4-document" id="a4-zone">
-                    
-                    <div class="print-header">
-                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo" alt="Logo">
-                        <div class="print-club-info">
-                            <strong>DOJO DORNOIS</strong>
-                            1 Pl. de la Mairie, 58390 Dornes &bull; dojodornois@gmail.com<br>
-                            FFJDA n° CE 08.58.067.0 &bull; SIRET 45192841000013 &bull; RNA W583001220
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button class="btn" onclick="imprimerPageA4('a4-zone-general')">
+                                <i class="fa-solid fa-print"></i> Imprimer / PDF A4
+                            </button>
+                            <button class="btn btn-secondary" onclick="remettreAZeroGeneral()">
+                                <i class="fa-solid fa-rotate-left"></i> Réinitialiser
+                            </button>
                         </div>
                     </div>
                     
-                    <div class="doc-meta" id="render-date"></div>
-                    <h1 class="doc-title" id="render-title"></h1>
-                    <div class="doc-subtitle" id="render-subtitle"></div>
-                    <div class="doc-body" id="render-body"></div>
-                    
-                    <div class="print-footer">
-                        Dojo Dornois &bull; Judo, Jujitsu &amp; Disciplines Associées &bull; Association Loi 1901 &bull; RNA : W583001220<br>
-                        "Entraide et prospérité mutuelle"
+                    <div class="preview-panel">
+                        <div class="a4-document" id="a4-zone-general">
+                            
+                            <!-- EN-TÊTE CHARTE OFFICIELLE -->
+                            <div class="print-header-official">
+                                <div class="logo-box-wrapper">
+                                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo Dojo Dornois" class="club-logo-img">
+                                </div>
+                                <div class="club-info-text">
+                                    <div class="club-name-title">DOJO DORNOIS</div>
+                                    1 Pl. de la Mairie - 58390 Dornes | dojodornois@gmail.com | 06.07.13.91.86<br>
+                                    FFJDA n° CE 08.58.067.0 | SIRET n° 451 928 410 00013 | RNA W583001220
+                                </div>
+                            </div>
+                            
+                            <div class="doc-meta" id="render-date"></div>
+                            <h1 class="doc-title" id="render-title"></h1>
+                            <div class="doc-subtitle" id="render-subtitle"></div>
+                            <div class="doc-body" id="render-body"></div>
+                            
+                            <!-- PIED DE PAGE CHARTE OFFICIELLE -->
+                            <div class="print-footer-official">
+                                dojodornois.fr • Dojo Dornois • Judo, Jujitsu & Disciplines Associées • Association Loi 1901 • RNA : W583001220<br>
+                                Les informations recueillies sont destinées exclusivement à la gestion administrative de l'association.
+                            </div>
+                        </div>
                     </div>
+
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- ONGLET 2 : AUTORISATIONS PARENTALES        -->
+            <!-- ========================================== -->
+            <div id="pane-autorisation" class="tab-pane">
+                <div class="workspace-grid">
+                    
+                    <div class="config-panel no-print">
+                        <h3><i class="fa-solid fa-user-check" style="color:var(--rouge)"></i> Remplir l'Autorisation</h3>
+
+                        <div class="form-group">
+                            <label for="apSaison">Saison Sportive</label>
+                            <input type="text" id="apSaison" class="form-control" value="2026 / 2027" oninput="actualiserAutorisation()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apParent">Nom & Prénom du Parent / Responsable</label>
+                            <input type="text" id="apParent" class="form-control" placeholder="ex: DUPONT Marie" oninput="actualiserAutorisation()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apAdresse">Adresse du domicile</label>
+                            <input type="text" id="apAdresse" class="form-control" placeholder="ex: 12 Rue Principale, 58390 Dornes" oninput="actualiserAutorisation()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apEnfant">Nom & Prénom de l'Enfant</label>
+                            <input type="text" id="apEnfant" class="form-control" placeholder="ex: Lucas DUPONT" oninput="actualiserAutorisation()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apJourHeure">Jour & Heure de récupération</label>
+                            <input type="text" id="apJourHeure" class="form-control" value="le mardi à 16 h 15" oninput="actualiserAutorisation()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apCoursHeure">Horaires du cours de Judo</label>
+                            <input type="text" id="apCoursHeure" class="form-control" value="17 h 30 à 19 h" oninput="actualiserAutorisation()">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fréquence cochée par défaut</label>
+                            <select id="apFreqSelect" class="form-control" onchange="actualiserAutorisation()">
+                                <option value="tous">Tous les mardis (coché)</option>
+                                <option value="occasionnel">Occasionnellement (coché)</option>
+                                <option value="vide">Laisser vierge (à cocher au stylo)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apDateDelivrance">Date de délivrance / signature</label>
+                            <input type="text" id="apDateDelivrance" class="form-control" placeholder="ex: 01/09/2026 (ou laisser vide pour pointillés)" oninput="actualiserAutorisation()">
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn" onclick="imprimerPageA4('a4-zone-autorisation')">
+                                <i class="fa-solid fa-print"></i> Imprimer / PDF A4
+                            </button>
+                            <button class="btn btn-secondary" onclick="remettreAZeroAutorisation()">
+                                <i class="fa-solid fa-rotate-left"></i> Réinitialiser
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="preview-panel">
+                        <div class="a4-document" id="a4-zone-autorisation">
+                            
+                            <!-- EN-TÊTE OFFICIEL -->
+                            <div class="print-header-official">
+                                <div class="logo-box-wrapper">
+                                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo Dojo Dornois" class="club-logo-img">
+                                </div>
+                                <div class="club-info-text">
+                                    <div class="club-name-title">DOJO DORNOIS</div>
+                                    1 Pl. de la Mairie - 58390 Dornes | dojodornois@gmail.com | 06.07.13.91.86<br>
+                                    FFJDA n° CE 08.58.067.0 | SIRET n° 451 928 410 00013 | RNA W583001220
+                                </div>
+                            </div>
+
+                            <!-- TITRE AUTORISATION -->
+                            <div class="ap-title-bar">
+                                <h1 class="ap-main-title">AUTORISATION PARENTALE</h1>
+                                <div class="ap-sub-title">Prise en charge à la sortie de l'École de DORNES (Saison <span id="ap-render-saison">2026 / 2027</span>)</div>
+                            </div>
+
+                            <!-- CORPS DE L'AUTORISATION -->
+                            <div class="ap-form-line">
+                                <strong>Je soussigné(e) :</strong> <span id="ap-render-parent" class="ap-fill-text">.....................................................................................................................................................</span>
+                            </div>
+
+                            <div class="ap-form-line">
+                                <strong>Demeurant au :</strong> <span id="ap-render-adresse" class="ap-fill-text">......................................................................................................................................................</span>
+                            </div>
+
+                            <div class="ap-form-line" style="margin-top: 10px;">
+                                Autorise <strong>Monsieur Jordan LOUDENOT</strong> (Président) ou <strong>Monsieur Romain FLAMMANG</strong> (Professeur), potentiellement accompagnés de membres du Taïso Adapté, à venir récupérer mon enfant :
+                            </div>
+
+                            <div class="ap-form-line" style="text-align: center; margin: 8px 0;">
+                                <span id="ap-render-enfant" class="ap-fill-text" style="font-size: 11pt; font-family: 'Fredoka', sans-serif;">........................................................................................................</span>
+                            </div>
+
+                            <div class="ap-form-line">
+                                <span id="ap-render-jourheure">le mardi à 16 h 15</span> afin qu'il puisse participer à son cours de judo de <span id="ap-render-coursheure">17 h 30 à 19 h</span>.
+                            </div>
+
+                            <div class="ap-highlight-card">
+                                <strong>NB :</strong> Conformément aux exigences de l'école, je m'engage à remplir le cahier de liaison pour chaque séance afin d'informer l'enseignant que le Dojo récupère mon enfant.
+                            </div>
+
+                            <!-- CASES A COCHER FREQUENCE -->
+                            <div class="ap-checkbox-section">
+                                <strong style="color:var(--noir-doux); font-size:9.5pt;">Fréquence de récupération :</strong>
+                                
+                                <div class="ap-checkbox-row">
+                                    <div class="ap-checkbox-box" id="ap-box-tous"></div>
+                                    <div><strong>Tous les mardis :</strong> Je préviens le Dojo uniquement en cas d'absence exceptionnelle.</div>
+                                </div>
+
+                                <div class="ap-checkbox-row">
+                                    <div class="ap-checkbox-box" id="ap-box-occasionnel"></div>
+                                    <div><strong>Occasionnellement :</strong> Je préviens le Dojo uniquement lorsque mon enfant est à récupérer.</div>
+                                </div>
+                            </div>
+
+                            <div class="ap-form-line" style="font-size: 8.5pt; color: var(--gris-fonce); margin-top: 6px;">
+                                Le Dojo est équipé de gilets réfléchissants pour la sécurité des trajets. En cas de besoin, vous pouvez contacter Jordan ou Romain par mail (<strong>dojodornois@gmail.com</strong>) ou SMS (<strong>06 07 13 91 86</strong> ou <strong>07 68 88 78 70</strong>) au plus tard le vendredi précédent.
+                            </div>
+
+                            <div class="ap-warning-box">
+                                <strong>⚠️ Attention :</strong> J'ai noté que l'association se réserve le droit de renoncer à prendre en charge mon enfant s'il est turbulent ou ne respecte pas les consignes du Dojo sur les trajets école-dojo à tout moment de l'année. Cette mesure prendra effet la semaine suivant l'indiscipline de mon enfant.
+                            </div>
+
+                            <div class="ap-form-line" style="font-size: 8.5pt; margin-top: 10px;">
+                                Cette attestation est délivrée au Dojo Dornois et à Monsieur le Président du Dojo Dornois le <span id="ap-render-datedelivrance">____________</span> pour faire valoir ce que de droit.
+                            </div>
+
+                            <!-- ZONE DE SIGNATURE -->
+                            <div class="ap-signature-zone">
+                                <div></div>
+                                <div class="ap-sig-box">
+                                    <strong style="color:var(--noir-doux);">Signature des parents</strong>
+                                    <span style="font-size:7pt; color:var(--gris-clair);">Précédée de la mention "Lu et approuvé"</span>
+                                </div>
+                            </div>
+
+                            <!-- PIED DE PAGE -->
+                            <div class="print-footer-official">
+                                dojodornois.fr • Les informations recueillies sont destinées exclusivement à la gestion administrative de l'association.
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -232,7 +673,22 @@
     </div>
 
     <script>
-    function actualiserApercu() {
+    /* GESTION DES ONGLETS */
+    function switchMainTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+        if(tab === 'general') {
+            document.getElementById('btn-tab-general').classList.add('active');
+            document.getElementById('pane-general').classList.add('active');
+        } else if(tab === 'autorisation') {
+            document.getElementById('btn-tab-autorisation').classList.add('active');
+            document.getElementById('pane-autorisation').classList.add('active');
+        }
+    }
+
+    /* ACTUALISATION DOCUMENT GÉNÉRAL */
+    function actualiserDocGeneral() {
         const title = document.getElementById('docTitle').value;
         const subtitle = document.getElementById('docSubtitle').value;
         const dateDoc = document.getElementById('dateDoc').value;
@@ -244,70 +700,137 @@
         document.getElementById('render-body').innerHTML = content;
     }
 
-    function remettreAZero() {
-        if(confirm("Voulez-vous réinitialiser le document ?")) {
+    function remettreAZeroGeneral() {
+        if(confirm("Voulez-vous réinitialiser le document général ?")) {
             document.getElementById('docTitle').value = "Nouveau Document";
-            document.getElementById('docSubtitle').value = "Contexte ou sous-titre de la note";
-            document.getElementById('docContent').value = "<h3>1. Nouvelle Section</h3>\n<p>Écrivez votre texte ici...</p>";
-            actualiserApercu();
+            document.getElementById('docSubtitle').value = "Sous-titre ou objet";
+            document.getElementById('docContent').value = "<h3>1. Nouvelle Section</h3>\n<p>Rédigez votre texte ici...</p>";
+            actualiserDocGeneral();
         }
     }
 
-    function imprimerDocument() {
-        const contenuPrint = document.getElementById('a4-zone').innerHTML;
+    /* ACTUALISATION AUTORISATION PARENTALE */
+    function actualiserAutorisation() {
+        const saison = document.getElementById('apSaison').value || "2026 / 2027";
+        const parent = document.getElementById('apParent').value;
+        const adresse = document.getElementById('apAdresse').value;
+        const enfant = document.getElementById('apEnfant').value;
+        const jourHeure = document.getElementById('apJourHeure').value || "le mardi à 16 h 15";
+        const coursHeure = document.getElementById('apCoursHeure').value || "17 h 30 à 19 h";
+        const freq = document.getElementById('apFreqSelect').value;
+        const dateDelivrance = document.getElementById('apDateDelivrance').value;
+
+        document.getElementById('ap-render-saison').innerText = saison;
+        document.getElementById('ap-render-parent').innerText = parent.trim() !== "" ? parent : ".....................................................................................................................................................";
+        document.getElementById('ap-render-adresse').innerText = adresse.trim() !== "" ? adresse : "......................................................................................................................................................";
+        document.getElementById('ap-render-enfant').innerText = enfant.trim() !== "" ? enfant : "........................................................................................................";
+        document.getElementById('ap-render-jourheure').innerText = jourHeure;
+        document.getElementById('ap-render-coursheure').innerText = coursHeure;
+
+        // Cases à cocher
+        const boxTous = document.getElementById('ap-box-tous');
+        const boxOccas = document.getElementById('ap-box-occasionnel');
+        
+        boxTous.innerHTML = (freq === 'tous') ? "✓" : "";
+        boxOccas.innerHTML = (freq === 'occasionnel') ? "✓" : "";
+
+        document.getElementById('ap-render-datedelivrance').innerText = dateDelivrance.trim() !== "" ? dateDelivrance : "____________";
+    }
+
+    function remettreAZeroAutorisation() {
+        if(confirm("Voulez-vous effacer les données de l'autorisation ?")) {
+            document.getElementById('apParent').value = "";
+            document.getElementById('apAdresse').value = "";
+            document.getElementById('apEnfant').value = "";
+            document.getElementById('apDateDelivrance').value = "";
+            document.getElementById('apFreqSelect').value = "vide";
+            actualiserAutorisation();
+        }
+    }
+
+    /* FONCTION D'IMPRESSION A4 PORTRAIT PROPRE ET COMPATIBLE PDF */
+    function imprimerPageA4(elementId) {
+        const zonePrint = document.getElementById(elementId).innerHTML;
         
         const fenetreImpression = window.open('', '_blank', 'width=900,height=1000');
         
         fenetreImpression.document.write(`
             <!DOCTYPE html>
-            <html>
+            <html lang="fr">
             <head>
-                <title>Impression Document — Dojo Dornois</title>
-                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=400;600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+                <meta charset="UTF-8">
+                <title>Impression Officielle - Dojo Dornois</title>
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
                 <style>
+                    :root {
+                        --rouge: #C41E3A;
+                        --noir-doux: #1A1A1A;
+                        --gris-fonce: #3D3D3D;
+                        --gris-moyen: #6B6B6B;
+                        --gris-clair: #B8B8B8;
+                        --gris-tres-clair: #E8E8E8;
+                        --fond: #F4F6F9;
+                        --blanc: #FFFFFF;
+                    }
+                    *, *::before, *::after { box-sizing: border-box; }
+                    @page {
+                        size: A4 portrait;
+                        margin: 10mm 15mm;
+                    }
                     body {
                         font-family: 'Roboto', sans-serif;
                         background: #ffffff;
                         color: #1a1a1a;
                         margin: 0; padding: 0;
+                        font-size: 9.8pt;
+                        line-height: 1.4;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
                     }
                     .print-page-wrapper {
-                        width: 210mm;
-                        min-height: 297mm;
-                        padding: 20mm;
-                        box-sizing: border-box;
-                        position: relative;
+                        width: 100%;
+                        min-height: 100%;
                         display: flex;
                         flex-direction: column;
-                        background: #ffffff;
+                        justify-content: space-between;
+                        box-sizing: border-box;
                     }
-                    .print-header { display: flex; align-items: center; border-bottom: 2px solid #C41E3A; padding-bottom: 14px; margin-bottom: 25px; }
-                    .print-logo { height: 65px; width: 65px; object-fit: contain; background: #C41E3A; padding: 4px; border-radius: 6px; margin-right: 18px; }
-                    .print-club-info { font-size: 8.5pt; color: #3D3D3D; line-height: 1.4; }
-                    .print-club-info strong { font-family: 'Fredoka', sans-serif; color: #C41E3A; font-size: 13pt; display: block; margin-bottom: 2px; }
+                    .print-header-official { display: flex; align-items: center; border-bottom: 2px solid #C41E3A; padding-bottom: 8px; margin-bottom: 14px; }
+                    .logo-box-wrapper { background-color: #C41E3A; width: 60px; height: 60px; border-radius: 12px; padding: 4px; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0; }
+                    .club-logo-img { width: 100%; height: 100%; object-fit: contain; }
+                    .club-info-text { font-size: 8pt; line-height: 1.35; color: #3D3D3D; }
+                    .club-name-title { font-family: 'Fredoka', sans-serif; font-size: 13pt; color: #C41E3A; font-weight: 700; line-height: 1.1; margin-bottom: 2px; }
 
-                    .doc-meta { text-align: right; font-size: 9.5pt; color: #6B6B6B; margin-bottom: 25px; }
-                    .doc-title { font-family: 'Fredoka', sans-serif; color: #C41E3A; font-size: 22pt; margin: 0 0 6px 0; text-transform: uppercase; line-height: 1.1; }
-                    .doc-subtitle { font-family: 'Roboto', sans-serif; font-weight: 500; color: #6B6B6B; font-size: 13pt; margin: 0 0 25px 0; border-bottom: 1px solid #E8E8E8; padding-bottom: 12px; }
-                    
-                    .doc-body { flex: 1; font-size: 11pt; line-height: 1.6; text-align: justify; }
-                    .doc-body h3 { font-family: 'Fredoka', sans-serif; color: #1A1A1A; font-size: 14pt; margin-top: 22px; margin-bottom: 8px; border-left: 3px solid #C41E3A; padding-left: 8px; page-break-after: avoid; }
-                    .doc-body p { margin: 0 0 12px 0; page-break-inside: avoid; }
-                    .doc-body ul, .doc-body ol { margin: 0 0 15px 0; padding-left: 20px; page-break-inside: avoid; }
-                    .doc-body li { margin-bottom: 4px; }
-                    
-                    .highlight-box { background-color: #F4F6F9; border-left: 4px solid #C41E3A; padding: 12px 16px; margin: 18px 0; border-radius: 0 6px 6px 0; page-break-inside: avoid; }
-                    .print-footer { border-top: 1px solid #B8B8B8; padding-top: 10px; font-size: 8pt; color: #6B6B6B; text-align: center; line-height: 1.3; margin-top: auto; }
-                    
-                    @media print {
-                        html, body { background: #ffffff; }
-                        .page-break { page-break-before: always !important; }
-                    }
+                    .print-footer-official { border-top: 1px solid #B8B8B8; padding-top: 6px; font-size: 7.5pt; color: #6B6B6B; text-align: center; line-height: 1.3; margin-top: auto; }
+
+                    /* GENERAL */
+                    .doc-meta { text-align: right; font-size: 9pt; color: #6B6B6B; margin-bottom: 14px; }
+                    .doc-title { font-family: 'Fredoka', sans-serif; color: #C41E3A; font-size: 19pt; margin: 0 0 4px 0; text-transform: uppercase; line-height: 1.1; }
+                    .doc-subtitle { font-family: 'Roboto', sans-serif; font-weight: 500; color: #6B6B6B; font-size: 11pt; margin: 0 0 16px 0; border-bottom: 1px solid #E8E8E8; padding-bottom: 8px; }
+                    .doc-body { flex: 1; font-size: 9.8pt; line-height: 1.5; text-align: justify; }
+                    .doc-body h3 { font-family: 'Fredoka', sans-serif; color: #1A1A1A; font-size: 12pt; margin-top: 14px; margin-bottom: 6px; border-left: 3px solid #C41E3A; padding-left: 8px; }
+                    .doc-body p { margin: 0 0 8px 0; }
+                    .doc-body ul, .doc-body ol { margin: 0 0 10px 0; padding-left: 20px; }
+                    .highlight-box { background-color: #F4F6F9; border-left: 4px solid #C41E3A; padding: 8px 12px; margin: 12px 0; border-radius: 0 6px 6px 0; }
+
+                    /* AUTORISATION PARENTALE */
+                    .ap-title-bar { text-align: center; border-top: 2px solid #C41E3A; border-bottom: 2px solid #C41E3A; padding: 5px 0; margin: 4px 0 12px 0; }
+                    .ap-main-title { font-family: 'Fredoka', sans-serif; font-size: 14.5pt; color: #C41E3A; font-weight: 700; text-transform: uppercase; margin: 0; }
+                    .ap-sub-title { font-family: 'Roboto', sans-serif; font-size: 9pt; color: #3D3D3D; font-weight: 600; margin-top: 2px; }
+                    .ap-form-line { margin-bottom: 8px; font-size: 9.2pt; line-height: 1.45; }
+                    .ap-fill-text { font-weight: 700; color: #1A1A1A; border-bottom: 1px dashed #B8B8B8; padding: 0 4px; }
+                    .ap-highlight-card { background-color: #F4F6F9; border: 1px solid #E8E8E8; border-left: 4px solid #C41E3A; padding: 8px 10px; margin: 10px 0; font-size: 8.5pt; }
+                    .ap-checkbox-section { margin: 10px 0; display: flex; flex-direction: column; gap: 5px; }
+                    .ap-checkbox-row { display: flex; align-items: flex-start; gap: 8px; font-size: 8.8pt; }
+                    .ap-checkbox-box { width: 13px; height: 13px; border: 1.5px solid #1A1A1A; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; flex-shrink: 0; margin-top: 1px; }
+                    .ap-warning-box { background-color: #FFF5F5; border: 1px solid #FEB2B2; border-left: 4px solid #C41E3A; padding: 7px 10px; margin: 10px 0; font-size: 8.2pt; color: #742A2A; line-height: 1.3; }
+                    .ap-signature-zone { display: flex; justify-content: space-between; margin-top: 10px; }
+                    .ap-sig-box { width: 45%; height: 65px; border: 1px dashed #B8B8B8; padding: 6px; font-size: 7.5pt; color: #6B6B6B; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
                 </style>
             </head>
             <body>
                 <div class="print-page-wrapper">
-                    ${contenuPrint}
+                    ${zonePrint}
                 </div>
                 <script>
                     window.onload = function() {
@@ -323,8 +846,10 @@
         fenetreImpression.document.close();
     }
 
+    /* INITIALISATION */
     window.addEventListener('DOMContentLoaded', () => {
-        actualiserApercu();
+        actualiserDocGeneral();
+        actualiserAutorisation();
     });
     </script>
 
