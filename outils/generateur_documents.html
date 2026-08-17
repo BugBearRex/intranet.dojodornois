@@ -211,8 +211,8 @@
             color: #1a1a1a;
             display: flex;
             flex-direction: column;
-            font-size: 10pt;
-            line-height: 1.45;
+            font-size: 10.5pt;
+            line-height: 1.5;
         }
 
         /* EN-TÊTE OFFICIEL CLUB */
@@ -220,14 +220,15 @@
             display: flex;
             align-items: center;
             border-bottom: 2px solid var(--rouge);
-            padding-bottom: 10px;
-            margin-bottom: 18px;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
         }
 
         .logo-box-wrapper {
             background-color: var(--rouge);
-            width: 64px;
-            height: 64px;
+            width: 68px;
+            height: 68px;
             border-radius: 12px;
             padding: 5px;
             display: flex;
@@ -235,20 +236,20 @@
             justify-content: center;
             box-shadow: 0 3px 8px rgba(196, 30, 58, 0.25);
             flex-shrink: 0;
-            margin-right: 15px;
+            margin-right: 16px;
         }
 
         .club-logo-img { width: 100%; height: 100%; object-fit: contain; }
 
         .club-info-text {
-            font-size: 8.5pt;
-            line-height: 1.35;
+            font-size: 9pt;
+            line-height: 1.4;
             color: var(--gris-fonce);
         }
 
         .club-name-title {
             font-family: 'Fredoka', sans-serif;
-            font-size: 14pt;
+            font-size: 15pt;
             color: var(--rouge);
             font-weight: 700;
             line-height: 1.1;
@@ -260,42 +261,45 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
         }
 
         /* PIED DE PAGE OFFICIEL */
         .print-footer-official {
             margin-top: auto;
             border-top: 1px solid var(--gris-clair);
-            padding-top: 8px;
-            font-size: 7.5pt;
+            padding-top: 10px;
+            font-size: 8pt;
             color: var(--gris-moyen);
             text-align: center;
-            line-height: 1.3;
+            line-height: 1.35;
+            flex-shrink: 0;
         }
 
         /* STYLES ONGLET 1 (DOCUMENTS GÉNÉRAUX) */
-        .doc-meta { text-align: right; font-size: 9pt; color: var(--gris-moyen); margin-bottom: 16px; }
-        .doc-title { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 20pt; margin: 0 0 4px 0; text-transform: uppercase; line-height: 1.1; }
-        .doc-subtitle { font-family: 'Roboto', sans-serif; font-weight: 500; color: var(--gris-moyen); font-size: 11.5pt; margin: 0 0 18px 0; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 10px; }
+        .doc-meta { text-align: right; font-size: 9.5pt; color: var(--gris-moyen); margin-bottom: 18px; }
+        .doc-title { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 22pt; margin: 0 0 6px 0; text-transform: uppercase; line-height: 1.1; }
+        .doc-subtitle { font-family: 'Roboto', sans-serif; font-weight: 500; color: var(--gris-moyen); font-size: 12.5pt; margin: 0 0 20px 0; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 12px; }
         
-        .doc-body { flex: 1; font-size: 10pt; line-height: 1.5; text-align: justify; }
-        .doc-body h3 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); font-size: 12.5pt; margin-top: 16px; margin-bottom: 6px; border-left: 3px solid var(--rouge); padding-left: 8px; }
-        .doc-body p { margin: 0 0 10px 0; }
-        .doc-body ul, .doc-body ol { margin: 0 0 12px 0; padding-left: 20px; }
-        .doc-body li { margin-bottom: 3px; }
-        .highlight-box { background-color: var(--fond); border-left: 4px solid var(--rouge); padding: 10px 14px; margin: 14px 0; border-radius: 0 6px 6px 0; }
+        .doc-body { flex: 1; font-size: 10.5pt; line-height: 1.6; text-align: justify; }
+        .doc-body h3 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); font-size: 13.5pt; margin-top: 18px; margin-bottom: 8px; border-left: 3px solid var(--rouge); padding-left: 8px; }
+        .doc-body p { margin: 0 0 12px 0; }
+        .doc-body ul, .doc-body ol { margin: 0 0 14px 0; padding-left: 22px; }
+        .doc-body li { margin-bottom: 4px; }
+        .highlight-box { background-color: var(--fond); border-left: 4px solid var(--rouge); padding: 12px 16px; margin: 16px 0; border-radius: 0 6px 6px 0; }
 
         /* STYLES ONGLET 2 (AUTORISATION PARENTALE) */
         .ap-title-bar {
             text-align: center;
             border-top: 2px solid var(--rouge);
             border-bottom: 2px solid var(--rouge);
-            padding: 6px 0;
-            margin: 4px 0 14px 0;
+            padding: 8px 0;
+            margin: 4px 0 18px 0;
+            flex-shrink: 0;
         }
         .ap-main-title {
             font-family: 'Fredoka', sans-serif;
-            font-size: 15pt;
+            font-size: 16.5pt;
             color: var(--rouge);
             font-weight: 700;
             text-transform: uppercase;
@@ -304,16 +308,22 @@
         }
         .ap-sub-title {
             font-family: 'Roboto', sans-serif;
-            font-size: 9.5pt;
+            font-size: 10.5pt;
             color: var(--gris-fonce);
             font-weight: 600;
-            margin-top: 2px;
+            margin-top: 3px;
+        }
+
+        .ap-body-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .ap-form-line {
-            margin-bottom: 10px;
-            font-size: 9.5pt;
-            line-height: 1.5;
+            font-size: 10.5pt;
+            line-height: 1.6;
+            margin: 0;
         }
         .ap-fill-text {
             font-weight: 700;
@@ -327,32 +337,32 @@
             border: 1px solid var(--gris-tres-clair);
             border-left: 4px solid var(--rouge);
             border-radius: var(--radius-sm);
-            padding: 10px 12px;
-            margin: 12px 0;
-            font-size: 8.8pt;
-            line-height: 1.4;
+            padding: 10px 14px;
+            font-size: 9.5pt;
+            line-height: 1.5;
+            margin: 2px 0;
         }
 
         .ap-checkbox-section {
-            margin: 12px 0;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
+            margin: 2px 0;
         }
         .ap-checkbox-row {
             display: flex;
             align-items: flex-start;
-            gap: 8px;
-            font-size: 9pt;
+            gap: 10px;
+            font-size: 10pt;
         }
         .ap-checkbox-box {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             border: 1.5px solid var(--noir-doux);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: bold;
             flex-shrink: 0;
             margin-top: 2px;
@@ -363,32 +373,48 @@
             border: 1px solid #FEB2B2;
             border-left: 4px solid var(--rouge);
             border-radius: var(--radius-sm);
-            padding: 8px 12px;
-            margin: 12px 0;
-            font-size: 8.5pt;
+            padding: 10px 14px;
+            font-size: 9.2pt;
             color: #742A2A;
-            line-height: 1.35;
+            line-height: 1.45;
+            margin: 2px 0;
         }
 
         .ap-signature-zone {
             display: flex;
-            justify-content: space-between;
-            margin-top: auto;
-            padding-top: 10px;
-            margin-bottom: 8px;
+            justify-content: flex-end;
+            margin-top: 14px;
+            margin-bottom: 6px;
         }
         .ap-sig-box {
-            width: 45%;
-            height: 70px;
-            border: 1px dashed var(--gris-clair);
+            width: 50%;
+            height: 110px;
+            border: 1.5px dashed var(--gris-clair);
             border-radius: var(--radius-sm);
-            padding: 8px;
-            font-size: 8pt;
+            padding: 10px 14px;
+            font-size: 8.5pt;
             color: var(--gris-moyen);
             text-align: center;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            background: #FAFAFA;
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm 15mm 10mm 15mm;
+            }
+            body { background: white !important; padding: 0 !important; color: black !important; display: block !important; overflow: visible !important; }
+            .no-print, .sidebar, .topbar, .tab-nav-bar, .config-panel { display: none !important; }
+            .main-content, .tab-panel-container { padding: 0 !important; overflow: visible !important; height: auto !important; display: block !important; }
+            .workspace-grid { display: block !important; margin: 0 !important; padding: 0 !important; height: auto !important; }
+            .preview-panel { background: white !important; padding: 0 !important; box-shadow: none !important; display: block !important; overflow: visible !important; }
+            .a4-document { box-shadow: none !important; padding: 0 !important; width: 100% !important; min-height: auto !important; }
+            .tab-pane:not(.active) { display: none !important; }
+            .tab-pane.active { display: block !important; }
         }
     </style>
 </head>
@@ -488,17 +514,20 @@
                             </div>
                             
                             <div class="doc-content-wrapper">
-                                <div class="doc-meta" id="render-date"></div>
-                                <h1 class="doc-title" id="render-title"></h1>
-                                <div class="doc-subtitle" id="render-subtitle"></div>
-                                <div class="doc-body" id="render-body"></div>
+                                <div>
+                                    <div class="doc-meta" id="render-date"></div>
+                                    <h1 class="doc-title" id="render-title"></h1>
+                                    <div class="doc-subtitle" id="render-subtitle"></div>
+                                    <div class="doc-body" id="render-body"></div>
+                                </div>
+                                
+                                <!-- PIED DE PAGE CHARTE OFFICIELLE -->
+                                <div class="print-footer-official">
+                                    dojodornois.fr • Dojo Dornois • Judo, Jujitsu & Disciplines Associées • Association Loi 1901 • RNA : W583001220<br>
+                                    Les informations recueillies sont destinées exclusivement à la gestion administrative de l'association.
+                                </div>
                             </div>
-                            
-                            <!-- PIED DE PAGE CHARTE OFFICIELLE -->
-                            <div class="print-footer-official">
-                                dojodornois.fr • Dojo Dornois • Judo, Jujitsu & Disciplines Associées • Association Loi 1901 • RNA : W583001220<br>
-                                Les informations recueillies sont destinées exclusivement à la gestion administrative de l'association.
-                            </div>
+
                         </div>
                     </div>
 
@@ -582,77 +611,78 @@
                             </div>
 
                             <div class="doc-content-wrapper">
-                                <!-- TITRE AUTORISATION -->
-                                <div class="ap-title-bar">
-                                    <h1 class="ap-main-title">AUTORISATION PARENTALE</h1>
-                                    <div class="ap-sub-title">Prise en charge à la sortie de l'École de DORNES (Saison <span id="ap-render-saison">2026 / 2027</span>)</div>
-                                </div>
-
-                                <!-- CORPS DE L'AUTORISATION -->
-                                <div class="ap-form-line">
-                                    <strong>Je soussigné(e) :</strong> <span id="ap-render-parent" class="ap-fill-text">.....................................................................................................................................................</span>
-                                </div>
-
-                                <div class="ap-form-line">
-                                    <strong>Demeurant au :</strong> <span id="ap-render-adresse" class="ap-fill-text">......................................................................................................................................................</span>
-                                </div>
-
-                                <div class="ap-form-line" style="margin-top: 8px;">
-                                    Autorise <strong>Monsieur Jordan LOUDENOT</strong> (Président) ou <strong>Monsieur Romain FLAMMANG</strong> (Professeur), potentiellement accompagnés de membres du Taïso Adapté, à venir récupérer mon enfant :
-                                </div>
-
-                                <div class="ap-form-line" style="text-align: center; margin: 6px 0;">
-                                    <span id="ap-render-enfant" class="ap-fill-text" style="font-size: 10.5pt; font-family: 'Fredoka', sans-serif;">........................................................................................................</span>
-                                </div>
-
-                                <div class="ap-form-line">
-                                    <span id="ap-render-jourheure">le mardi à 16 h 15</span> afin qu'il puisse participer à son cours de judo de <span id="ap-render-coursheure">17 h 30 à 19 h</span>.
-                                </div>
-
-                                <div class="ap-highlight-card">
-                                    <strong>NB :</strong> Conformément aux exigences de l'école, je m'engage à remplir le cahier de liaison pour chaque séance afin d'informer l'enseignant que le Dojo récupère mon enfant.
-                                </div>
-
-                                <!-- CASES A COCHER FREQUENCE -->
-                                <div class="ap-checkbox-section">
-                                    <strong style="color:var(--noir-doux); font-size:9.2pt;">Fréquence de récupération :</strong>
-                                    
-                                    <div class="ap-checkbox-row">
-                                        <div class="ap-checkbox-box" id="ap-box-tous"></div>
-                                        <div><strong>Tous les mardis :</strong> Je préviens le Dojo uniquement en cas d'absence exceptionnelle.</div>
+                                <div class="ap-body-content">
+                                    <!-- TITRE AUTORISATION -->
+                                    <div class="ap-title-bar">
+                                        <h1 class="ap-main-title">AUTORISATION PARENTALE</h1>
+                                        <div class="ap-sub-title">Prise en charge à la sortie de l'École de DORNES (Saison <span id="ap-render-saison">2026 / 2027</span>)</div>
                                     </div>
 
-                                    <div class="ap-checkbox-row">
-                                        <div class="ap-checkbox-box" id="ap-box-occasionnel"></div>
-                                        <div><strong>Occasionnellement :</strong> Je préviens le Dojo uniquement lorsque mon enfant est à récupérer.</div>
+                                    <!-- CORPS DE L'AUTORISATION -->
+                                    <div class="ap-form-line">
+                                        <strong>Je soussigné(e) :</strong> <span id="ap-render-parent" class="ap-fill-text">.....................................................................................................................................................</span>
+                                    </div>
+
+                                    <div class="ap-form-line">
+                                        <strong>Demeurant au :</strong> <span id="ap-render-adresse" class="ap-fill-text">......................................................................................................................................................</span>
+                                    </div>
+
+                                    <div class="ap-form-line" style="margin-top: 4px;">
+                                        Autorise <strong>Monsieur Jordan LOUDENOT</strong> (Président) ou <strong>Monsieur Romain FLAMMANG</strong> (Professeur), potentiellement accompagnés de membres du Taïso Adapté, à venir récupérer mon enfant :
+                                    </div>
+
+                                    <div class="ap-form-line" style="text-align: center; margin: 4px 0;">
+                                        <span id="ap-render-enfant" class="ap-fill-text" style="font-size: 11.5pt; font-family: 'Fredoka', sans-serif;">........................................................................................................</span>
+                                    </div>
+
+                                    <div class="ap-form-line">
+                                        <span id="ap-render-jourheure">le mardi à 16 h 15</span> afin qu'il puisse participer à son cours de judo de <span id="ap-render-coursheure">17 h 30 à 19 h</span>.
+                                    </div>
+
+                                    <div class="ap-highlight-card">
+                                        <strong>NB :</strong> Conformément aux exigences de l'école, je m'engage à remplir le cahier de liaison pour chaque séance afin d'informer l'enseignant que le Dojo récupère mon enfant.
+                                    </div>
+
+                                    <!-- CASES A COCHER FREQUENCE -->
+                                    <div class="ap-checkbox-section">
+                                        <strong style="color:var(--noir-doux); font-size:10pt;">Fréquence de récupération :</strong>
+                                        
+                                        <div class="ap-checkbox-row">
+                                            <div class="ap-checkbox-box" id="ap-box-tous"></div>
+                                            <div><strong>Tous les mardis :</strong> Je préviens le Dojo uniquement en cas d'absence exceptionnelle.</div>
+                                        </div>
+
+                                        <div class="ap-checkbox-row">
+                                            <div class="ap-checkbox-box" id="ap-box-occasionnel"></div>
+                                            <div><strong>Occasionnellement :</strong> Je préviens le Dojo uniquement lorsque mon enfant est à récupérer.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="ap-form-line" style="font-size: 9.2pt; color: var(--gris-fonce);">
+                                        Le Dojo est équipé de gilets réfléchissants pour la sécurité des trajets. En cas de besoin, vous pouvez contacter Jordan ou Romain par mail (<strong>dojodornois@gmail.com</strong>) ou SMS (<strong>06 07 13 91 86</strong> ou <strong>07 68 88 78 70</strong>) au plus tard le vendredi précédent.
+                                    </div>
+
+                                    <div class="ap-warning-box">
+                                        <strong>⚠️ Attention :</strong> J'ai noté que l'association se réserve le droit de renoncer à prendre en charge mon enfant s'il est turbulent ou ne respecte pas les consignes du Dojo sur les trajets école-dojo à tout moment de l'année. Cette mesure prendra effet la semaine suivant l'indiscipline de mon enfant.
+                                    </div>
+
+                                    <div class="ap-form-line" style="font-size: 9.5pt;">
+                                        Cette attestation est délivrée au Dojo Dornois et à Monsieur le Président du Dojo Dornois le <span id="ap-render-datedelivrance">____________</span> pour faire valoir ce que de droit.
+                                    </div>
+
+                                    <!-- ZONE DE SIGNATURE AGRANDIE -->
+                                    <div class="ap-signature-zone">
+                                        <div class="ap-sig-box">
+                                            <strong style="color:var(--noir-doux); font-size:9.5pt;">Signature des parents</strong>
+                                            <span style="font-size:7.5pt; color:var(--gris-moyen);">Précédée de la mention manuscrite "Lu et approuvé"</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="ap-form-line" style="font-size: 8.5pt; color: var(--gris-fonce); margin-top: 4px;">
-                                    Le Dojo est équipé de gilets réfléchissants pour la sécurité des trajets. En cas de besoin, vous pouvez contacter Jordan ou Romain par mail (<strong>dojodornois@gmail.com</strong>) ou SMS (<strong>06 07 13 91 86</strong> ou <strong>07 68 88 78 70</strong>) au plus tard le vendredi précédent.
+                                <!-- PIED DE PAGE -->
+                                <div class="print-footer-official">
+                                    dojodornois.fr • Les informations recueillies sont destinées exclusivement à la gestion administrative de l'association.
                                 </div>
-
-                                <div class="ap-warning-box">
-                                    <strong>⚠️ Attention :</strong> J'ai noté que l'association se réserve le droit de renoncer à prendre en charge mon enfant s'il est turbulent ou ne respecte pas les consignes du Dojo sur les trajets école-dojo à tout moment de l'année. Cette mesure prendra effet la semaine suivant l'indiscipline de mon enfant.
-                                </div>
-
-                                <div class="ap-form-line" style="font-size: 8.5pt; margin-top: 6px;">
-                                    Cette attestation est délivrée au Dojo Dornois et à Monsieur le Président du Dojo Dornois le <span id="ap-render-datedelivrance">____________</span> pour faire valoir ce que de droit.
-                                </div>
-
-                                <!-- ZONE DE SIGNATURE -->
-                                <div class="ap-signature-zone">
-                                    <div></div>
-                                    <div class="ap-sig-box">
-                                        <strong style="color:var(--noir-doux);">Signature des parents</strong>
-                                        <span style="font-size:7pt; color:var(--gris-clair);">Précédée de la mention "Lu et approuvé"</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- PIED DE PAGE -->
-                            <div class="print-footer-official">
-                                dojodornois.fr • Les informations recueillies sont destinées exclusivement à la gestion administrative de l'association.
                             </div>
 
                         </div>
@@ -739,7 +769,7 @@
         }
     }
 
-    /* IMPRESSION A4 PLEINE HAUTEUR AVEC FOOTER CALÉ EN BAS */
+    /* IMPRESSION A4 PLEINE HAUTEUR OPTIMISÉE */
     function imprimerPageA4(elementId) {
         const zonePrint = document.getElementById(elementId).innerHTML;
         
@@ -775,8 +805,8 @@
                         background: #ffffff;
                         color: #1a1a1a;
                         font-family: 'Roboto', sans-serif;
-                        font-size: 9.6pt;
-                        line-height: 1.4;
+                        font-size: 10pt;
+                        line-height: 1.45;
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
                     }
@@ -788,23 +818,23 @@
                         justify-content: space-between;
                         box-sizing: border-box;
                     }
-                    .print-header-official { display: flex; align-items: center; border-bottom: 2px solid #C41E3A; padding-bottom: 8px; margin-bottom: 12px; flex-shrink: 0; }
-                    .logo-box-wrapper { background-color: #C41E3A; width: 60px; height: 60px; border-radius: 12px; padding: 4px; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0; }
+                    .print-header-official { display: flex; align-items: center; border-bottom: 2px solid #C41E3A; padding-bottom: 10px; margin-bottom: 14px; flex-shrink: 0; }
+                    .logo-box-wrapper { background-color: #C41E3A; width: 62px; height: 62px; border-radius: 12px; padding: 4px; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0; }
                     .club-logo-img { width: 100%; height: 100%; object-fit: contain; }
-                    .club-info-text { font-size: 8pt; line-height: 1.35; color: #3D3D3D; }
-                    .club-name-title { font-family: 'Fredoka', sans-serif; font-size: 13pt; color: #C41E3A; font-weight: 700; line-height: 1.1; margin-bottom: 2px; }
+                    .club-info-text { font-size: 8.5pt; line-height: 1.35; color: #3D3D3D; }
+                    .club-name-title { font-family: 'Fredoka', sans-serif; font-size: 14pt; color: #C41E3A; font-weight: 700; line-height: 1.1; margin-bottom: 2px; }
 
                     .doc-content-wrapper {
                         flex: 1;
                         display: flex;
                         flex-direction: column;
-                        justify-content: flex-start;
+                        justify-content: space-between;
                     }
 
                     .print-footer-official { 
                         border-top: 1px solid #B8B8B8; 
-                        padding-top: 6px; 
-                        font-size: 7.5pt; 
+                        padding-top: 8px; 
+                        font-size: 8pt; 
                         color: #6B6B6B; 
                         text-align: center; 
                         line-height: 1.3; 
@@ -813,28 +843,29 @@
                     }
 
                     /* GENERAL */
-                    .doc-meta { text-align: right; font-size: 8.8pt; color: #6B6B6B; margin-bottom: 12px; }
-                    .doc-title { font-family: 'Fredoka', sans-serif; color: #C41E3A; font-size: 18pt; margin: 0 0 4px 0; text-transform: uppercase; line-height: 1.1; }
-                    .doc-subtitle { font-family: 'Roboto', sans-serif; font-weight: 500; color: #6B6B6B; font-size: 10.5pt; margin: 0 0 14px 0; border-bottom: 1px solid #E8E8E8; padding-bottom: 8px; }
-                    .doc-body { flex: 1; font-size: 9.6pt; line-height: 1.5; text-align: justify; }
-                    .doc-body h3 { font-family: 'Fredoka', sans-serif; color: #1A1A1A; font-size: 11.5pt; margin-top: 12px; margin-bottom: 4px; border-left: 3px solid #C41E3A; padding-left: 8px; }
-                    .doc-body p { margin: 0 0 8px 0; }
-                    .doc-body ul, .doc-body ol { margin: 0 0 8px 0; padding-left: 20px; }
-                    .highlight-box { background-color: #F4F6F9; border-left: 4px solid #C41E3A; padding: 8px 12px; margin: 10px 0; border-radius: 0 6px 6px 0; }
+                    .doc-meta { text-align: right; font-size: 9pt; color: #6B6B6B; margin-bottom: 12px; }
+                    .doc-title { font-family: 'Fredoka', sans-serif; color: #C41E3A; font-size: 19pt; margin: 0 0 4px 0; text-transform: uppercase; line-height: 1.1; }
+                    .doc-subtitle { font-family: 'Roboto', sans-serif; font-weight: 500; color: #6B6B6B; font-size: 11pt; margin: 0 0 14px 0; border-bottom: 1px solid #E8E8E8; padding-bottom: 8px; }
+                    .doc-body { flex: 1; font-size: 10pt; line-height: 1.55; text-align: justify; }
+                    .doc-body h3 { font-family: 'Fredoka', sans-serif; color: #1A1A1A; font-size: 12.5pt; margin-top: 14px; margin-bottom: 6px; border-left: 3px solid #C41E3A; padding-left: 8px; }
+                    .doc-body p { margin: 0 0 10px 0; }
+                    .doc-body ul, .doc-body ol { margin: 0 0 12px 0; padding-left: 20px; }
+                    .highlight-box { background-color: #F4F6F9; border-left: 4px solid #C41E3A; padding: 10px 14px; margin: 12px 0; border-radius: 0 6px 6px 0; }
 
                     /* AUTORISATION PARENTALE */
-                    .ap-title-bar { text-align: center; border-top: 2px solid #C41E3A; border-bottom: 2px solid #C41E3A; padding: 4px 0; margin: 2px 0 10px 0; }
-                    .ap-main-title { font-family: 'Fredoka', sans-serif; font-size: 14pt; color: #C41E3A; font-weight: 700; text-transform: uppercase; margin: 0; }
-                    .ap-sub-title { font-family: 'Roboto', sans-serif; font-size: 8.8pt; color: #3D3D3D; font-weight: 600; margin-top: 2px; }
-                    .ap-form-line { margin-bottom: 8px; font-size: 9.2pt; line-height: 1.45; }
+                    .ap-body-content { display: flex; flex-direction: column; gap: 10px; }
+                    .ap-title-bar { text-align: center; border-top: 2px solid #C41E3A; border-bottom: 2px solid #C41E3A; padding: 6px 0; margin: 0 0 6px 0; }
+                    .ap-main-title { font-family: 'Fredoka', sans-serif; font-size: 15pt; color: #C41E3A; font-weight: 700; text-transform: uppercase; margin: 0; }
+                    .ap-sub-title { font-family: 'Roboto', sans-serif; font-size: 9.5pt; color: #3D3D3D; font-weight: 600; margin-top: 2px; }
+                    .ap-form-line { font-size: 9.8pt; line-height: 1.5; margin: 0; }
                     .ap-fill-text { font-weight: 700; color: #1A1A1A; border-bottom: 1px dashed #B8B8B8; padding: 0 4px; }
-                    .ap-highlight-card { background-color: #F4F6F9; border: 1px solid #E8E8E8; border-left: 4px solid #C41E3A; padding: 7px 10px; margin: 8px 0; font-size: 8.5pt; }
-                    .ap-checkbox-section { margin: 8px 0; display: flex; flex-direction: column; gap: 4px; }
-                    .ap-checkbox-row { display: flex; align-items: flex-start; gap: 8px; font-size: 8.8pt; }
-                    .ap-checkbox-box { width: 13px; height: 13px; border: 1.5px solid #1A1A1A; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; flex-shrink: 0; margin-top: 1px; }
-                    .ap-warning-box { background-color: #FFF5F5; border: 1px solid #FEB2B2; border-left: 4px solid #C41E3A; padding: 6px 10px; margin: 8px 0; font-size: 8.2pt; color: #742A2A; line-height: 1.3; }
-                    .ap-signature-zone { display: flex; justify-content: space-between; margin-top: auto; padding-top: 8px; margin-bottom: 4px; }
-                    .ap-sig-box { width: 45%; height: 62px; border: 1px dashed #B8B8B8; padding: 6px; font-size: 7.5pt; color: #6B6B6B; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+                    .ap-highlight-card { background-color: #F4F6F9; border: 1px solid #E8E8E8; border-left: 4px solid #C41E3A; padding: 8px 12px; font-size: 9pt; }
+                    .ap-checkbox-section { display: flex; flex-direction: column; gap: 6px; }
+                    .ap-checkbox-row { display: flex; align-items: flex-start; gap: 8px; font-size: 9.5pt; }
+                    .ap-checkbox-box { width: 14px; height: 14px; border: 1.5px solid #1A1A1A; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; flex-shrink: 0; margin-top: 2px; }
+                    .ap-warning-box { background-color: #FFF5F5; border: 1px solid #FEB2B2; border-left: 4px solid #C41E3A; padding: 8px 12px; font-size: 8.8pt; color: #742A2A; line-height: 1.35; }
+                    .ap-signature-zone { display: flex; justify-content: flex-end; margin-top: 10px; margin-bottom: 4px; }
+                    .ap-sig-box { width: 50%; height: 105px; border: 1.5px dashed #B8B8B8; padding: 8px 12px; font-size: 8pt; color: #6B6B6B; text-align: center; display: flex; flex-direction: column; justify-content: space-between; background: #FAFAFA; }
                 </style>
             </head>
             <body>
