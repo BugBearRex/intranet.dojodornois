@@ -443,9 +443,7 @@
         .theme-ceintures .label-header { background: #34495E; }
         .theme-ceintures .label-type-pill { background: #EAECEE; color: #2C3E50; }
 
-        /* ========================================================
-           STYLES OFFICIELS STUDIO VIGNETTES KALISPORT (ZONES HAUTES)
-           ======================================================== */
+        /* VIGNETTES KALISPORT */
         .color-presets-grid {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
@@ -668,18 +666,17 @@
             Studio Créateur & Étiquettes
         </div>
         <nav class="tabs-nav">
-            <button class="tab-btn active" onclick="switchStudioTab('tab-etiquettes')">🏷️ Étiquettes Judogis & Bacs</button>
-            <button class="tab-btn" onclick="switchStudioTab('tab-vignettes')">🖼️ Vignettes Web (Kalisport)</button>
+            <button class="tab-btn active" onclick="switchStudioTab('tab-etiquettes', this)">🏷️ Étiquettes Judogis & Bacs</button>
+            <button class="tab-btn" onclick="switchStudioTab('tab-vignettes', this)">🖼️ Vignettes Web (Kalisport)</button>
         </nav>
     </header>
 
     <div class="workspace">
 
-        <!-- ================= ONGLET ÉTIQUETTES (INCHANGÉ) ================= -->
+        <!-- ================= ONGLET ÉTIQUETTES ================= -->
         <section id="tab-etiquettes" class="tab-content-view active">
             
             <div class="control-panel">
-                
                 <div class="section-title">
                     <span>⚙️ 1. Format & Position</span>
                 </div>
@@ -714,7 +711,6 @@
                 <div class="alert-info-box">
                     💡 <b>Astuce Planche entamée :</b> Indiquez le nombre d'étiquettes déjà décollées dans <i>"Sauter X étiquettes"</i> pour démarrer l'impression exactement sur la case vierge suivante.
                 </div>
-
             </div>
 
             <div class="preview-area">
@@ -726,7 +722,7 @@
 
         </section>
 
-        <!-- ================= ONGLET VIGNETTES KALISPORT INTÉGRAL ================= -->
+        <!-- ================= ONGLET VIGNETTES KALISPORT ================= -->
         <section id="tab-vignettes" class="tab-content-view">
             
             <div class="control-panel">
@@ -884,23 +880,23 @@
     </div>
 
     <script>
-        function switchStudioTab(tabId) {
+        function switchStudioTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content-view').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            const target = document.getElementById(tabId);
+            if (target) target.classList.add('active');
+            if (btnElement) btnElement.classList.add('active');
         }
 
-        /* ========================================================
-           LOGIQUE ÉTIQUETTES JUDOGIS & BACS
-           ======================================================== */
+        /* LOGIQUE ÉTIQUETTES */
         let modelCount = 0;
 
         function addNewModelCard(defaultData = null) {
             modelCount++;
             const id = 'model_' + modelCount;
             const container = document.getElementById('modelsContainer');
+            if (!container) return;
             
             const card = document.createElement('div');
             card.className = 'model-card';
@@ -1072,8 +1068,12 @@
 
         function renderFullSheet() {
             const container = document.getElementById('labelSheetContainer');
-            const layout = document.getElementById('lblLayout').value;
-            const skipCount = parseInt(document.getElementById('lblSkip').value) || 0;
+            const layoutElem = document.getElementById('lblLayout');
+            const skipElem = document.getElementById('lblSkip');
+            if (!container || !layoutElem || !skipElem) return;
+
+            const layout = layoutElem.value;
+            const skipCount = parseInt(skipElem.value) || 0;
 
             container.className = 'a4-sheet layout-' + layout;
             container.innerHTML = '';
@@ -1132,15 +1132,16 @@
             return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        /* ========================================================
-           LOGIQUE VIGNETTES KALISPORT (ZONES HAUTES & COULEURS)
-           ======================================================== */
+        /* LOGIQUE KALISPORT */
         let currentImageSrc = null;
         let currentEmoji = '📊';
 
         function updateDimensions() {
-            const dim = document.getElementById('selectDimensions').value.split('x');
+            const dimElem = document.getElementById('selectDimensions');
             const card = document.getElementById('kalisportCard');
+            if (!dimElem || !card) return;
+
+            const dim = dimElem.value.split('x');
             card.style.width = dim[0] + 'px';
             card.style.height = dim[1] + 'px';
             updateVignetteKalisport();
@@ -1162,24 +1163,31 @@
         function setEmoji(emoji) {
             currentEmoji = emoji;
             currentImageSrc = null;
-            document.getElementById('inputImage').value = '';
+            const inputImg = document.getElementById('inputImage');
+            if (inputImg) inputImg.value = '';
             updateVignetteKalisport();
         }
 
         function clearImage() {
             currentImageSrc = null;
             currentEmoji = null;
-            document.getElementById('inputImage').value = '';
+            const inputImg = document.getElementById('inputImage');
+            if (inputImg) inputImg.value = '';
             updateVignetteKalisport();
         }
 
         function setPresetColor(colorHex) {
-            document.getElementById('inputBadgeColor').value = colorHex;
-            document.getElementById('inputSubColor').value = colorHex;
+            const inputB = document.getElementById('inputBadgeColor');
+            const inputS = document.getElementById('inputSubColor');
+            if (inputB) inputB.value = colorHex;
+            if (inputS) inputS.value = colorHex;
             updateVignetteKalisport();
         }
 
         function updateVignetteKalisport() {
+            const card = document.getElementById('kalisportCard');
+            if (!card) return;
+
             const styleChoice = document.getElementById('selectStyle').value;
             const themeColor = document.getElementById('inputBadgeColor').value;
             const mainText = document.getElementById('inputMainTitle').value;
@@ -1188,7 +1196,6 @@
             const subText = document.getElementById('inputSubTitle').value;
             const subColor = document.getElementById('inputSubColor').value;
 
-            const card = document.getElementById('kalisportCard');
             card.className = 'vignette-card ' + styleChoice;
             card.style.setProperty('--theme-color', themeColor);
 
@@ -1247,11 +1254,7 @@
             });
         }
 
-        /* ========================================================
-           INITIALISATION GÉNÉRALE
-           ======================================================== */
-        window.onload = function() {
-            // Initialisation des modèles d'étiquettes
+        document.addEventListener('DOMContentLoaded', () => {
             addNewModelCard({
                 type: 'JUDOGI COMPLET',
                 size: '100 cm',
@@ -1276,12 +1279,8 @@
                 qty: 2
             });
 
-            // Initialisation de la vignette Kalisport
             updateDimensions();
-        };
+        });
     </script>
-
-    <script src="../js/sidebar.js"></script>
-
 </body>
 </html>
