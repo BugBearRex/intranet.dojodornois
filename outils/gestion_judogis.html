@@ -34,7 +34,7 @@
             overflow: hidden;
         }
 
-        /* --- FIX SIDEBAR DÉBORDEMENT --- */
+        /* --- FIX SIDEBAR DEBORDEMENT --- */
         .sidebar { 
             width: var(--sidebar-width); 
             min-width: var(--sidebar-width);
@@ -401,6 +401,18 @@
 
             <!-- ================= ONGLET 2 : INVENTAIRE ================= -->
             <div id="tab-inventaire" class="tab-content">
+                
+                <!-- Zone de Notes / Stock en attente -->
+                <div class="card no-print" style="margin-bottom: 20px;">
+                    <div class="card-title">📝 Bloc-notes & Tenues à identifier <span style="font-size: 0.8rem; color: var(--gris-moyen); font-family: 'Roboto', sans-serif;">(Tailles inconnues, retouches, remarques)</span></div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <textarea id="stock-notes" class="form-control" rows="3" placeholder="Ex: 4 vestes et 4 pantalons dont la taille est inconnue (étiquettes effacées) - à mesurer." style="resize: vertical;"></textarea>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button type="button" class="btn" onclick="saveNotes()">💾 Enregistrer les notes</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid-inventaire">
                     <!-- Section Vestes -->
                     <div class="card">
@@ -440,7 +452,7 @@
                         </div>
                     </div>
 
-                    <!-- Nouvelle Section Globale : Judogis Complets -->
+                    <!-- Section Judogis Complets -->
                     <div class="card">
                         <div class="card-title">🥋 Judogis Complets Disponibles <span style="font-size: 0.8rem; color: var(--gris-moyen); font-family: 'Roboto', sans-serif;">(Vestes + Pantalons de même taille)</span></div>
                         <div class="table-responsive">
@@ -476,7 +488,8 @@
         let logistiqueDB = {
             prets: [],
             stockVestes: {},
-            stockPantalons: {}
+            stockPantalons: {},
+            notes: ""
         };
 
         const taillesDefaut = [
@@ -522,6 +535,7 @@
             if (unifiedBackup) {
                 try {
                     logistiqueDB = JSON.parse(unifiedBackup);
+                    if (typeof logistiqueDB.notes === 'undefined') logistiqueDB.notes = "";
                 } catch(e) {}
             } else {
                 logistiqueDB.prets = JSON.parse(localStorage.getItem('dd_judogis_prets')) || [
@@ -538,6 +552,7 @@
                     "160 cm": 3, "165 cm": 1, "170 cm": 1, "175 cm": 0, "180 cm": 1, "185 cm": 0, 
                     "190 cm": 0, "195 cm": 0, "200 cm": 1
                 };
+                logistiqueDB.notes = "";
             }
             finalizeInitialization();
 
@@ -545,8 +560,9 @@
             try {
                 const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
                 if (error) throw error;
-                if (result && result.data && (result.data.prets || result.data.stockVestes || result.data.stockPantalons)) {
+                if (result && result.data && (result.data.prets || result.data.stockVestes || result.data.stockPantalons || typeof result.data.notes !== 'undefined')) {
                     logistiqueDB = result.data;
+                    if (typeof logistiqueDB.notes === 'undefined') logistiqueDB.notes = "";
                     localStorage.setItem('dojo_logistique_unified', JSON.stringify(logistiqueDB));
                     finalizeInitialization();
                     console.log("✓ Données Supabase chargées et interface mise à jour.");
@@ -559,8 +575,17 @@
         function finalizeInitialization() {
             initFormSelects();
             document.getElementById('pret-date').valueAsDate = new Date();
+            const notesField = document.getElementById('stock-notes');
+            if (notesField) notesField.value = logistiqueDB.notes || "";
             renderPrets();
             renderStock();
+        }
+
+        // --- GESTION DES NOTES ---
+        function saveNotes() {
+            const notesField = document.getElementById('stock-notes');
+            logistiqueDB.notes = notesField.value;
+            syncToSupabase(false);
         }
 
         // --- REMPLISSAGE DES SELECTS DU FORMULAIRE ---
@@ -731,6 +756,7 @@
         window.editPret = editPret;
         window.deletePret = deletePret;
         window.resetPretForm = resetPretForm;
+        window.saveNotes = saveNotes;
     </script>
 
     <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
