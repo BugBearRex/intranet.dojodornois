@@ -19,6 +19,7 @@
             --gris-tres-clair: #E2E8F0;
             --fond-sombre: #1E1E24;
             --blanc: #FFFFFF;
+            --sidebar-width: 280px;
             --topbar-height: 64px;
         }
 
@@ -35,10 +36,35 @@
             margin: 0; padding: 0;
             color: var(--blanc);
             display: flex;
-            flex-direction: column;
             height: 100vh;
             overflow: hidden;
             font-size: 13px;
+        }
+
+        /* CONTENEUR SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux);
+            color: var(--blanc);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        /* ZONE PRINCIPALE DE L'APPLICATION */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-width: 0;
         }
 
         /* BARRE SUPÉRIEURE & ONGLETS */
@@ -86,7 +112,7 @@
             box-shadow: 0 4px 12px rgba(196, 30, 58, 0.35);
         }
 
-        /* STRUCTURE PRINCIPALE */
+        /* STRUCTURE DU WORKSPACE */
         .workspace {
             display: flex;
             flex: 1;
@@ -159,7 +185,7 @@
             border-color: var(--rouge);
         }
 
-        /* CARTE MODÈLE D'ÉTIQUETTE */
+        /* CARTES MODÈLES ÉTIQUETTES */
         .model-card {
             background: #22222C;
             border: 1px solid #363646;
@@ -633,10 +659,10 @@
                 height: auto !important;
                 overflow: visible !important;
             }
-            .topbar, .control-panel, .no-print {
+            .sidebar, .topbar, .control-panel, .no-print {
                 display: none !important;
             }
-            .workspace, .tab-content-view, .preview-area {
+            .main-content, .workspace, .tab-content-view, .preview-area {
                 padding: 0 !important;
                 margin: 0 !important;
                 background: transparent !important;
@@ -660,222 +686,230 @@
 </head>
 <body>
 
-    <header class="topbar">
-        <div class="topbar-title">
-            <span style="background:var(--rouge); color:#FFF; padding:4px 8px; border-radius:6px; font-size:0.9rem;">DOJO</span>
-            Studio Créateur & Étiquettes
-        </div>
-        <nav class="tabs-nav">
-            <button class="tab-btn active" onclick="switchStudioTab('tab-etiquettes', this)">🏷️ Étiquettes Judogis & Bacs</button>
-            <button class="tab-btn" onclick="switchStudioTab('tab-vignettes', this)">🖼️ Vignettes Web (Kalisport)</button>
-        </nav>
-    </header>
+    <!-- CONTENEUR SIDEBAR UNIFIÉE -->
+    <div class="sidebar"></div>
 
-    <div class="workspace">
+    <!-- CONTENEUR PRINCIPAL DE L'APPLICATION -->
+    <div class="main-content">
 
-        <!-- ================= ONGLET ÉTIQUETTES ================= -->
-        <section id="tab-etiquettes" class="tab-content-view active">
-            
-            <div class="control-panel">
-                <div class="section-title">
-                    <span>⚙️ 1. Format & Position</span>
+        <header class="topbar">
+            <div class="topbar-title">
+                <span style="background:var(--rouge); color:#FFF; padding:4px 8px; border-radius:6px; font-size:0.9rem;">DOJO</span>
+                Studio Créateur & Étiquettes
+            </div>
+            <nav class="tabs-nav">
+                <button class="tab-btn active" onclick="switchStudioTab('tab-etiquettes', this)">🏷️ Étiquettes Judogis & Bacs</button>
+                <button class="tab-btn" onclick="switchStudioTab('tab-vignettes', this)">🖼️ Vignettes Web (Kalisport)</button>
+            </nav>
+        </header>
+
+        <div class="workspace">
+
+            <!-- ================= ONGLET ÉTIQUETTES ================= -->
+            <section id="tab-etiquettes" class="tab-content-view active">
+                
+                <div class="control-panel">
+                    <div class="section-title">
+                        <span>⚙️ 1. Format & Position</span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Planche Action</label>
+                            <select id="lblLayout" onchange="renderFullSheet()">
+                                <option value="24" selected>24 / page (70 × 37 mm)</option>
+                                <option value="4">4 / page (105 × 148 mm)</option>
+                                <option value="2">2 / page (210 × 148 mm)</option>
+                                <option value="1">1 / page (210 × 297 mm)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Sauter X étiquettes</label>
+                            <input type="number" id="lblSkip" value="0" min="0" max="23" oninput="renderFullSheet()" title="Pour les planches déjà entamées">
+                        </div>
+                    </div>
+
+                    <div class="section-title">
+                        <span>🥋 2. Modèles d'étiquettes</span>
+                        <button class="btn-sm-add" onclick="addNewModelCard()">+ Ajouter un modèle</button>
+                    </div>
+
+                    <div id="modelsContainer"></div>
+
+                    <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+                        <button class="btn-action" onclick="window.print()">🖨️ Imprimer la Planche A4</button>
+                    </div>
+
+                    <div class="alert-info-box">
+                        💡 <b>Astuce Planche entamée :</b> Indiquez le nombre d'étiquettes déjà décollées dans <i>"Sauter X étiquettes"</i> pour démarrer l'impression exactement sur la case vierge suivante.
+                    </div>
                 </div>
 
-                <div class="form-row">
+                <div class="preview-area">
+                    <div style="color:#94A3B8; font-size:0.85rem;" class="no-print">
+                        💡 <b>Aperçu Planche A4 en direct</b> (Les cases vides au début correspondent aux étiquettes sautées).
+                    </div>
+                    <div class="a4-sheet layout-24" id="labelSheetContainer"></div>
+                </div>
+
+            </section>
+
+            <!-- ================= ONGLET VIGNETTES KALISPORT ================= -->
+            <section id="tab-vignettes" class="tab-content-view">
+                
+                <div class="control-panel">
+                    <div class="section-title"><span>⚙️ Dimensions & Modèle</span></div>
+
                     <div class="form-group">
-                        <label>Planche Action</label>
-                        <select id="lblLayout" onchange="renderFullSheet()">
-                            <option value="24" selected>24 / page (70 × 37 mm)</option>
-                            <option value="4">4 / page (105 × 148 mm)</option>
-                            <option value="2">2 / page (210 × 148 mm)</option>
-                            <option value="1">1 / page (210 × 297 mm)</option>
+                        <label>Dimensions PNG :</label>
+                        <select id="selectDimensions" onchange="updateDimensions()">
+                            <option value="400x250" selected>400 x 250 px (Standard Kalisport)</option>
+                            <option value="450x280">450 x 280 px (Grand Angle)</option>
+                            <option value="350x220">350 x 220 px (Compact)</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label>Sauter X étiquettes</label>
-                        <input type="number" id="lblSkip" value="0" min="0" max="23" oninput="renderFullSheet()" title="Pour les planches déjà entamées">
+                        <label>Structure Haute (Anti-découpe) :</label>
+                        <select id="selectStyle" onchange="updateVignetteKalisport()">
+                            <option value="style-top-banner" selected>1. Bandeau Supérieur Plein (Dossier)</option>
+                            <option value="style-top-thick-border">2. Bordure Épaisse Haute (Sous-dossier)</option>
+                            <option value="style-top-pill">3. Onglet Centré (Projet / Rubrique)</option>
+                            <option value="style-top-wave">4. Aronde Incurvée (Médiathèque)</option>
+                            <option value="style-top-thin-line">5. Ligne Fine Minimaliste (Archive)</option>
+                            <option value="style-top-double-line">6. Ligne Double Accentuée (Saison)</option>
+                        </select>
                     </div>
-                </div>
 
-                <div class="section-title">
-                    <span>🥋 2. Modèles d'étiquettes</span>
-                    <button class="btn-sm-add" onclick="addNewModelCard()">+ Ajouter un modèle</button>
-                </div>
+                    <div class="section-title"><span>🎨 Couleur Thème (40 Nuances)</span></div>
 
-                <div id="modelsContainer"></div>
-
-                <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
-                    <button class="btn-action" onclick="window.print()">🖨️ Imprimer la Planche A4</button>
-                </div>
-
-                <div class="alert-info-box">
-                    💡 <b>Astuce Planche entamée :</b> Indiquez le nombre d'étiquettes déjà décollées dans <i>"Sauter X étiquettes"</i> pour démarrer l'impression exactement sur la case vierge suivante.
-                </div>
-            </div>
-
-            <div class="preview-area">
-                <div style="color:#94A3B8; font-size:0.85rem;" class="no-print">
-                    💡 <b>Aperçu Planche A4 en direct</b> (Les cases vides au début correspondent aux étiquettes sautées).
-                </div>
-                <div class="a4-sheet layout-24" id="labelSheetContainer"></div>
-            </div>
-
-        </section>
-
-        <!-- ================= ONGLET VIGNETTES KALISPORT ================= -->
-        <section id="tab-vignettes" class="tab-content-view">
-            
-            <div class="control-panel">
-                <div class="section-title"><span>⚙️ Dimensions & Modèle</span></div>
-
-                <div class="form-group">
-                    <label>Dimensions PNG :</label>
-                    <select id="selectDimensions" onchange="updateDimensions()">
-                        <option value="400x250" selected>400 x 250 px (Standard Kalisport)</option>
-                        <option value="450x280">450 x 280 px (Grand Angle)</option>
-                        <option value="350x220">350 x 220 px (Compact)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Structure Haute (Anti-découpe) :</label>
-                    <select id="selectStyle" onchange="updateVignetteKalisport()">
-                        <option value="style-top-banner" selected>1. Bandeau Supérieur Plein (Dossier)</option>
-                        <option value="style-top-thick-border">2. Bordure Épaisse Haute (Sous-dossier)</option>
-                        <option value="style-top-pill">3. Onglet Centré (Projet / Rubrique)</option>
-                        <option value="style-top-wave">4. Aronde Incurvée (Médiathèque)</option>
-                        <option value="style-top-thin-line">5. Ligne Fine Minimaliste (Archive)</option>
-                        <option value="style-top-double-line">6. Ligne Double Accentuée (Saison)</option>
-                    </select>
-                </div>
-
-                <div class="section-title"><span>🎨 Couleur Thème (40 Nuances)</span></div>
-
-                <div class="form-group">
-                    <input type="color" id="inputBadgeColor" value="#C41E3A" onchange="updateVignetteKalisport()">
-                    
-                    <div class="color-presets-grid">
-                        <div class="color-btn" style="background:#C41E3A;" onclick="setPresetColor('#C41E3A')"></div>
-                        <div class="color-btn" style="background:#E11D48;" onclick="setPresetColor('#E11D48')"></div>
-                        <div class="color-btn" style="background:#F43F5E;" onclick="setPresetColor('#F43F5E')"></div>
-                        <div class="color-btn" style="background:#DB2777;" onclick="setPresetColor('#DB2777')"></div>
-                        <div class="color-btn" style="background:#EC4899;" onclick="setPresetColor('#EC4899')"></div>
-                        <div class="color-btn" style="background:#A855F7;" onclick="setPresetColor('#A855F7')"></div>
-                        <div class="color-btn" style="background:#9333EA;" onclick="setPresetColor('#9333EA')"></div>
-                        <div class="color-btn" style="background:#6B21A8;" onclick="setPresetColor('#6B21A8')"></div>
-
-                        <div class="color-btn" style="background:#3B82F6;" onclick="setPresetColor('#3B82F6')"></div>
-                        <div class="color-btn" style="background:#2563EB;" onclick="setPresetColor('#2563EB')"></div>
-                        <div class="color-btn" style="background:#1D4ED8;" onclick="setPresetColor('#1D4ED8')"></div>
-                        <div class="color-btn" style="background:#0284C7;" onclick="setPresetColor('#0284C7')"></div>
-                        <div class="color-btn" style="background:#06B6D4;" onclick="setPresetColor('#06B6D4')"></div>
-                        <div class="color-btn" style="background:#0891B2;" onclick="setPresetColor('#0891B2')"></div>
-                        <div class="color-btn" style="background:#0D9488;" onclick="setPresetColor('#0D9488')"></div>
-                        <div class="color-btn" style="background:#14B8A6;" onclick="setPresetColor('#14B8A6')"></div>
-
-                        <div class="color-btn" style="background:#10B981;" onclick="setPresetColor('#10B981')"></div>
-                        <div class="color-btn" style="background:#059669;" onclick="setPresetColor('#059669')"></div>
-                        <div class="color-btn" style="background:#16A34A;" onclick="setPresetColor('#16A34A')"></div>
-                        <div class="color-btn" style="background:#22C55E;" onclick="setPresetColor('#22C55E')"></div>
-                        <div class="color-btn" style="background:#65A30D;" onclick="setPresetColor('#65A30D')"></div>
-                        <div class="color-btn" style="background:#84CC16;" onclick="setPresetColor('#84CC16')"></div>
-                        <div class="color-btn" style="background:#A3E635;" onclick="setPresetColor('#A3E635')"></div>
-                        <div class="color-btn" style="background:#4D7C0F;" onclick="setPresetColor('#4D7C0F')"></div>
-
-                        <div class="color-btn" style="background:#FACC15;" onclick="setPresetColor('#FACC15')"></div>
-                        <div class="color-btn" style="background:#EAB308;" onclick="setPresetColor('#EAB308')"></div>
-                        <div class="color-btn" style="background:#CA8A04;" onclick="setPresetColor('#CA8A04')"></div>
-                        <div class="color-btn" style="background:#F97316;" onclick="setPresetColor('#F97316')"></div>
-                        <div class="color-btn" style="background:#D97706;" onclick="setPresetColor('#D97706')"></div>
-                        <div class="color-btn" style="background:#EA580C;" onclick="setPresetColor('#EA580C')"></div>
-                        <div class="color-btn" style="background:#C2410C;" onclick="setPresetColor('#C2410C')"></div>
-                        <div class="color-btn" style="background:#78350F;" onclick="setPresetColor('#78350F')"></div>
-
-                        <div class="color-btn" style="background:#A16207;" onclick="setPresetColor('#A16207')"></div>
-                        <div class="color-btn" style="background:#78716C;" onclick="setPresetColor('#78716C')"></div>
-                        <div class="color-btn" style="background:#57534E;" onclick="setPresetColor('#57534E')"></div>
-                        <div class="color-btn" style="background:#6B7280;" onclick="setPresetColor('#6B7280')"></div>
-                        <div class="color-btn" style="background:#4B5563;" onclick="setPresetColor('#4B5563')"></div>
-                        <div class="color-btn" style="background:#1F2937;" onclick="setPresetColor('#1F2937')"></div>
-                        <div class="color-btn" style="background:#0F172A;" onclick="setPresetColor('#0F172A')"></div>
-                        <div class="color-btn" style="background:#18181B;" onclick="setPresetColor('#18181B')"></div>
-                    </div>
-                </div>
-
-                <div class="section-title"><span>🖼️ Visuel & Textes</span></div>
-
-                <div class="form-group">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                        <label style="margin:0;">Image / Emoji :</label>
-                        <button class="btn-reset-img" onclick="clearImage()">Masquer</button>
-                    </div>
-                    <input type="file" id="inputImage" accept="image/*" onchange="handleImageUpload(event)">
-                    <div class="emoji-bar">
-                        <button type="button" class="emoji-btn" onclick="setEmoji('📊')">📊</button>
-                        <button type="button" class="emoji-btn" onclick="setEmoji('📁')">📁</button>
-                        <button type="button" class="emoji-btn" onclick="setEmoji('📂')">📂</button>
-                        <button type="button" class="emoji-btn" onclick="setEmoji('🪙')">🪙</button>
-                        <button type="button" class="emoji-btn" onclick="setEmoji('🥋')">🥋</button>
-                        <button type="button" class="emoji-btn" onclick="setEmoji('📜')">📜</button>
-                        <button type="button" class="emoji-btn" onclick="setEmoji('🏆')">🏆</button>
-                        <button type="button" class="emoji-btn" onclick="setEmoji('📷')">📷</button>
-                        <button type="button" class="emoji-btn" onclick="setEmoji('✉️')">✉️</button>
-                        <button type="button" class="emoji-btn" onclick="setEmoji('📅')">📅</button>
-                        <button type="button" class="emoji-btn" onclick="setEmoji('🌐')">🌐</button>
-                        <button type="button" class="emoji-btn" onclick="setEmoji('📝')">📝</button>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Titre Principal :</label>
-                    <input type="text" id="inputMainTitle" value="EXERCICE COMPTABLE" oninput="updateVignetteKalisport()">
-                </div>
-
-                <div class="form-row">
                     <div class="form-group">
-                        <label>Taille Titre (pt) :</label>
-                        <input type="range" id="inputFontSize" min="14" max="30" value="18" oninput="updateVignetteKalisport()">
-                    </div>
-                    <div class="form-group">
-                        <label>Couleur Titre :</label>
-                        <input type="color" id="inputMainColor" value="#1A1A1A" onchange="updateVignetteKalisport()">
-                    </div>
-                </div>
+                        <input type="color" id="inputBadgeColor" value="#C41E3A" onchange="updateVignetteKalisport()">
+                        
+                        <div class="color-presets-grid">
+                            <div class="color-btn" style="background:#C41E3A;" onclick="setPresetColor('#C41E3A')"></div>
+                            <div class="color-btn" style="background:#E11D48;" onclick="setPresetColor('#E11D48')"></div>
+                            <div class="color-btn" style="background:#F43F5E;" onclick="setPresetColor('#F43F5E')"></div>
+                            <div class="color-btn" style="background:#DB2777;" onclick="setPresetColor('#DB2777')"></div>
+                            <div class="color-btn" style="background:#EC4899;" onclick="setPresetColor('#EC4899')"></div>
+                            <div class="color-btn" style="background:#A855F7;" onclick="setPresetColor('#A855F7')"></div>
+                            <div class="color-btn" style="background:#9333EA;" onclick="setPresetColor('#9333EA')"></div>
+                            <div class="color-btn" style="background:#6B21A8;" onclick="setPresetColor('#6B21A8')"></div>
 
-                <div class="form-group">
-                    <label>Sous-titre :</label>
-                    <input type="text" id="inputSubTitle" value="Saison 2026 - 2027" oninput="updateVignetteKalisport()">
-                </div>
+                            <div class="color-btn" style="background:#3B82F6;" onclick="setPresetColor('#3B82F6')"></div>
+                            <div class="color-btn" style="background:#2563EB;" onclick="setPresetColor('#2563EB')"></div>
+                            <div class="color-btn" style="background:#1D4ED8;" onclick="setPresetColor('#1D4ED8')"></div>
+                            <div class="color-btn" style="background:#0284C7;" onclick="setPresetColor('#0284C7')"></div>
+                            <div class="color-btn" style="background:#06B6D4;" onclick="setPresetColor('#06B6D4')"></div>
+                            <div class="color-btn" style="background:#0891B2;" onclick="setPresetColor('#0891B2')"></div>
+                            <div class="color-btn" style="background:#0D9488;" onclick="setPresetColor('#0D9488')"></div>
+                            <div class="color-btn" style="background:#14B8A6;" onclick="setPresetColor('#14B8A6')"></div>
 
-                <div class="form-group">
-                    <label>Couleur Sous-titre :</label>
-                    <input type="color" id="inputSubColor" value="#C41E3A" onchange="updateVignetteKalisport()">
-                </div>
+                            <div class="color-btn" style="background:#10B981;" onclick="setPresetColor('#10B981')"></div>
+                            <div class="color-btn" style="background:#059669;" onclick="setPresetColor('#059669')"></div>
+                            <div class="color-btn" style="background:#16A34A;" onclick="setPresetColor('#16A34A')"></div>
+                            <div class="color-btn" style="background:#22C55E;" onclick="setPresetColor('#22C55E')"></div>
+                            <div class="color-btn" style="background:#65A30D;" onclick="setPresetColor('#65A30D')"></div>
+                            <div class="color-btn" style="background:#84CC16;" onclick="setPresetColor('#84CC16')"></div>
+                            <div class="color-btn" style="background:#A3E635;" onclick="setPresetColor('#A3E635')"></div>
+                            <div class="color-btn" style="background:#4D7C0F;" onclick="setPresetColor('#4D7C0F')"></div>
 
-                <button class="btn-action" onclick="downloadVignetteKalisportPNG()">📥 Télécharger Vignette PNG</button>
-            </div>
+                            <div class="color-btn" style="background:#FACC15;" onclick="setPresetColor('#FACC15')"></div>
+                            <div class="color-btn" style="background:#EAB308;" onclick="setPresetColor('#EAB308')"></div>
+                            <div class="color-btn" style="background:#CA8A04;" onclick="setPresetColor('#CA8A04')"></div>
+                            <div class="color-btn" style="background:#F97316;" onclick="setPresetColor('#F97316')"></div>
+                            <div class="color-btn" style="background:#D97706;" onclick="setPresetColor('#D97706')"></div>
+                            <div class="color-btn" style="background:#EA580C;" onclick="setPresetColor('#EA580C')"></div>
+                            <div class="color-btn" style="background:#C2410C;" onclick="setPresetColor('#C2410C')"></div>
+                            <div class="color-btn" style="background:#78350F;" onclick="setPresetColor('#78350F')"></div>
 
-            <div class="preview-area">
-                <div style="color:#94A3B8; font-size:0.85rem;" class="no-print">
-                    💡 <b>Aperçu Kalisport</b> (Modèle optimisé en zone haute pour éviter toute découpe par les listes du site).
-                </div>
-                <div class="vignette-preview-wrapper">
-                    <div class="vignette-card style-top-banner" id="kalisportCard">
-                        <div class="header-area">
-                            <div class="brand-text">Dojo <span>Dornois</span></div>
+                            <div class="color-btn" style="background:#A16207;" onclick="setPresetColor('#A16207')"></div>
+                            <div class="color-btn" style="background:#78716C;" onclick="setPresetColor('#78716C')"></div>
+                            <div class="color-btn" style="background:#57534E;" onclick="setPresetColor('#57534E')"></div>
+                            <div class="color-btn" style="background:#6B7280;" onclick="setPresetColor('#6B7280')"></div>
+                            <div class="color-btn" style="background:#4B5563;" onclick="setPresetColor('#4B5563')"></div>
+                            <div class="color-btn" style="background:#1F2937;" onclick="setPresetColor('#1F2937')"></div>
+                            <div class="color-btn" style="background:#0F172A;" onclick="setPresetColor('#0F172A')"></div>
+                            <div class="color-btn" style="background:#18181B;" onclick="setPresetColor('#18181B')"></div>
                         </div>
-                        <div class="card-inner-content">
-                            <div class="icon-image-container" id="cardImageContainer">
-                                <span class="emoji-display">📊</span>
+                    </div>
+
+                    <div class="section-title"><span>🖼️ Visuel & Textes</span></div>
+
+                    <div class="form-group">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <label style="margin:0;">Image / Emoji :</label>
+                            <button class="btn-reset-img" onclick="clearImage()">Masquer</button>
+                        </div>
+                        <input type="file" id="inputImage" accept="image/*" onchange="handleImageUpload(event)">
+                        <div class="emoji-bar">
+                            <button type="button" class="emoji-btn" onclick="setEmoji('📊')">📊</button>
+                            <button type="button" class="emoji-btn" onclick="setEmoji('📁')">📁</button>
+                            <button type="button" class="emoji-btn" onclick="setEmoji('📂')">📂</button>
+                            <button type="button" class="emoji-btn" onclick="setEmoji('🪙')">🪙</button>
+                            <button type="button" class="emoji-btn" onclick="setEmoji('🥋')">🥋</button>
+                            <button type="button" class="emoji-btn" onclick="setEmoji('📜')">📜</button>
+                            <button type="button" class="emoji-btn" onclick="setEmoji('🏆')">🏆</button>
+                            <button type="button" class="emoji-btn" onclick="setEmoji('📷')">📷</button>
+                            <button type="button" class="emoji-btn" onclick="setEmoji('✉️')">✉️</button>
+                            <button type="button" class="emoji-btn" onclick="setEmoji('📅')">📅</button>
+                            <button type="button" class="emoji-btn" onclick="setEmoji('🌐')">🌐</button>
+                            <button type="button" class="emoji-btn" onclick="setEmoji('📝')">📝</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Titre Principal :</label>
+                        <input type="text" id="inputMainTitle" value="EXERCICE COMPTABLE" oninput="updateVignetteKalisport()">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Taille Titre (pt) :</label>
+                            <input type="range" id="inputFontSize" min="14" max="30" value="18" oninput="updateVignetteKalisport()">
+                        </div>
+                        <div class="form-group">
+                            <label>Couleur Titre :</label>
+                            <input type="color" id="inputMainColor" value="#1A1A1A" onchange="updateVignetteKalisport()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sous-titre :</label>
+                        <input type="text" id="inputSubTitle" value="Saison 2026 - 2027" oninput="updateVignetteKalisport()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Couleur Sous-titre :</label>
+                        <input type="color" id="inputSubColor" value="#C41E3A" onchange="updateVignetteKalisport()">
+                    </div>
+
+                    <button class="btn-action" onclick="downloadVignetteKalisportPNG()">📥 Télécharger Vignette PNG</button>
+                </div>
+
+                <div class="preview-area">
+                    <div style="color:#94A3B8; font-size:0.85rem;" class="no-print">
+                        💡 <b>Aperçu Kalisport</b> (Modèle optimisé en zone haute pour éviter toute découpe par les listes du site).
+                    </div>
+                    <div class="vignette-preview-wrapper">
+                        <div class="vignette-card style-top-banner" id="kalisportCard">
+                            <div class="header-area">
+                                <div class="brand-text">Dojo <span>Dornois</span></div>
                             </div>
-                            <div class="title-main" id="cardMainTitle">EXERCICE COMPTABLE</div>
-                            <div class="title-sub" id="cardSubTitle">Saison 2026 - 2027</div>
+                            <div class="card-inner-content">
+                                <div class="icon-image-container" id="cardImageContainer">
+                                    <span class="emoji-display">📊</span>
+                                </div>
+                                <div class="title-main" id="cardMainTitle">EXERCICE COMPTABLE</div>
+                                <div class="title-sub" id="cardSubTitle">Saison 2026 - 2027</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-        </section>
+            </section>
+
+        </div>
 
     </div>
 
@@ -1282,5 +1316,8 @@
             updateDimensions();
         });
     </script>
+
+    <!-- APPEL DU SCRIPT DE LA SIDEBAR -->
+    <script src="../js/sidebar.js"></script>
 </body>
 </html>
