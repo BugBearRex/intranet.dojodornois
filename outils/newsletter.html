@@ -99,6 +99,11 @@
             transition: all 0.2s;
         }
         .tool-btn:hover { background: var(--gris-tres-clair); color: var(--noir-doux); }
+        .tool-btn.active-source {
+            background: #1A1A1A;
+            color: #FFFFFF;
+            border-color: #1A1A1A;
+        }
 
         .tool-select {
             background: #FFFFFF;
@@ -141,6 +146,21 @@
         .editor-workspace p { margin-bottom: 15px; line-height: 1.6; }
         .editor-workspace a { color: #3498DB; text-decoration: underline; }
         .editor-workspace ul { margin-left: 20px; list-style-type: disc; margin-bottom: 15px; }
+
+        /* ÉDITEUR CODE SOURCE */
+        .source-workspace {
+            flex: 1;
+            padding: 20px;
+            background: #1E293B;
+            color: #F8FAFC;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            border: none;
+            outline: none;
+            resize: none;
+            display: none;
+        }
 
         /* ZONE D'APERÇU */
         .preview-box {
@@ -233,78 +253,92 @@
             <div class="panel panel-left flex flex-col">
                 
                 <div class="toolbar-pro">
+                    <!-- BASCULE CODE SOURCE -->
                     <div class="toolbar-group">
-                        <button class="tool-btn" onclick="format('undo')" title="Annuler"><i class="fa-solid fa-rotate-left"></i></button>
-                        <button class="tool-btn" onclick="format('redo')" title="Rétablir"><i class="fa-solid fa-rotate-right"></i></button>
-                        <button class="tool-btn text-red-600" onclick="format('removeFormat')" title="Effacer le formatage"><i class="fa-solid fa-eraser"></i></button>
+                        <button id="btn-toggle-source" class="tool-btn font-bold" onclick="toggleSourceCode()" title="Afficher/Modifier le code HTML source">
+                            <i class="fa-solid fa-code"></i>
+                        </button>
                     </div>
 
-                    <div class="toolbar-group">
-                        <select class="tool-select" onchange="format('formatBlock', this.value); this.selectedIndex=0;" title="Style">
-                            <option value="" disabled selected>Format de texte</option>
-                            <option value="<h1>">Titre 1 (Fredoka, Rouge)</option>
-                            <option value="<h2>">Titre 2 (Fredoka, Noir)</option>
-                            <option value="<p>">Paragraphe normal</option>
-                        </select>
-                    </div>
+                    <div id="wysiwyg-controls" class="flex flex-wrap gap-2 items-center">
+                        <div class="toolbar-group">
+                            <button class="tool-btn" onclick="format('undo')" title="Annuler"><i class="fa-solid fa-rotate-left"></i></button>
+                            <button class="tool-btn" onclick="format('redo')" title="Rétablir"><i class="fa-solid fa-rotate-right"></i></button>
+                            <button class="tool-btn text-red-600" onclick="format('removeFormat')" title="Effacer le formatage"><i class="fa-solid fa-eraser"></i></button>
+                        </div>
 
-                    <div class="toolbar-group">
-                        <button class="tool-btn" onclick="format('bold')" title="Gras"><i class="fa-solid fa-bold"></i></button>
-                        <button class="tool-btn" onclick="format('italic')" title="Italique"><i class="fa-solid fa-italic"></i></button>
-                        <button class="tool-btn" onclick="format('underline')" title="Souligné"><i class="fa-solid fa-underline"></i></button>
-                    </div>
+                        <div class="toolbar-group">
+                            <select class="tool-select" onchange="format('formatBlock', this.value); this.selectedIndex=0;" title="Style">
+                                <option value="" disabled selected>Format de texte</option>
+                                <option value="<h1>">Titre 1 (Fredoka, Rouge)</option>
+                                <option value="<h2>">Titre 2 (Fredoka, Noir)</option>
+                                <option value="<p>">Paragraphe normal</option>
+                            </select>
+                        </div>
 
-                    <div class="toolbar-group">
-                        <button class="tool-btn" onclick="format('justifyLeft')" title="Aligner à gauche"><i class="fa-solid fa-align-left"></i></button>
-                        <button class="tool-btn" onclick="format('justifyCenter')" title="Centrer"><i class="fa-solid fa-align-center"></i></button>
-                        <button class="tool-btn" onclick="format('justifyRight')" title="Aligner à droite"><i class="fa-solid fa-align-right"></i></button>
-                        <button class="tool-btn" onclick="format('justifyFull')" title="Justifier le texte"><i class="fa-solid fa-align-justify"></i></button>
-                        <button class="tool-btn" onclick="format('insertUnorderedList')" title="Liste à puces"><i class="fa-solid fa-list-ul"></i></button>
-                    </div>
+                        <div class="toolbar-group">
+                            <button class="tool-btn" onclick="format('bold')" title="Gras"><i class="fa-solid fa-bold"></i></button>
+                            <button class="tool-btn" onclick="format('italic')" title="Italique"><i class="fa-solid fa-italic"></i></button>
+                            <button class="tool-btn" onclick="format('underline')" title="Souligné"><i class="fa-solid fa-underline"></i></button>
+                        </div>
 
-                    <div class="toolbar-group">
-                        <button class="tool-btn" onclick="ajouterLien()" title="Insérer un lien"><i class="fa-solid fa-link"></i></button>
-                        <button class="tool-btn" onclick="ajouterImage()" title="Insérer une image"><i class="fa-regular fa-image"></i></button>
-                    </div>
+                        <div class="toolbar-group">
+                            <button class="tool-btn" onclick="format('justifyLeft')" title="Aligner à gauche"><i class="fa-solid fa-align-left"></i></button>
+                            <button class="tool-btn" onclick="format('justifyCenter')" title="Centrer"><i class="fa-solid fa-align-center"></i></button>
+                            <button class="tool-btn" onclick="format('justifyRight')" title="Aligner à droite"><i class="fa-solid fa-align-right"></i></button>
+                            <button class="tool-btn" onclick="format('justifyFull')" title="Justifier le texte"><i class="fa-solid fa-align-justify"></i></button>
+                            <button class="tool-btn" onclick="format('insertUnorderedList')" title="Liste à puces"><i class="fa-solid fa-list-ul"></i></button>
+                        </div>
 
-                    <!-- MODÈLES MAILS (Affiché uniquement en mode Mail) -->
-                    <div id="group-modeles-mails" class="toolbar-group hidden">
-                        <select class="tool-select font-bold text-blue-600 border-blue-600" onchange="chargerGabarit(this.value); this.selectedIndex=0;" title="Charger un modèle">
-                            <option value="" disabled selected>✉️ Modèles de Mails</option>
-                            <option value="reponse_officielle">Réponse Administrative Officielle</option>
-                            <option value="relance_adhesion">Relance Dossier / Inscription</option>
-                            <option value="convocation_reunion">Convocation / Invitation Réunion</option>
-                            <option value="texte_vide">Réinitialiser (Texte vide)</option>
-                        </select>
-                    </div>
+                        <div class="toolbar-group">
+                            <button class="tool-btn" onclick="ajouterLien()" title="Insérer un lien"><i class="fa-solid fa-link"></i></button>
+                            <button class="tool-btn" onclick="ajouterImage()" title="Insérer une image"><i class="fa-regular fa-image"></i></button>
+                        </div>
 
-                    <!-- BLOCS NEWSLETTER -->
-                    <div id="group-modules-newsletter" class="toolbar-group">
-                        <select class="tool-select font-bold text-[#C41E3A] border-[#C41E3A]" onchange="insererModule(this.value); this.selectedIndex=0;" title="Insérer un module">
-                            <option value="" disabled selected>🧩 Insérer un bloc</option>
-                            <option value="header_officiel">En-tête : Officiel Dojo (Logo Carré)</option>
-                            <option value="alerte_rouge">Bloc : Alerte Rouge</option>
-                            <option value="encart_gris">Bloc : Information Grise</option>
-                            <option value="bouton_cta">Composant : Bouton d'action</option>
-                            <option value="separateur">Composant : Ligne de séparation</option>
-                            <option value="footer_officiel">Pied de page : Centré Officiel</option>
-                        </select>
-                    </div>
+                        <!-- MODÈLES MAILS (Mode Mail) -->
+                        <div id="group-modeles-mails" class="toolbar-group hidden">
+                            <select class="tool-select font-bold text-blue-600 border-blue-600" onchange="chargerGabarit(this.value); this.selectedIndex=0;" title="Charger un modèle">
+                                <option value="" disabled selected>✉️ Modèles de Mails</option>
+                                <option value="reponse_mairie">Réponse Mairie (Pièces & Réservation)</option>
+                                <option value="reponse_officielle">Réponse Administrative Standard</option>
+                                <option value="relance_adhesion">Relance Dossier / Inscription</option>
+                                <option value="convocation_reunion">Convocation / Invitation Réunion</option>
+                                <option value="texte_vide">Réinitialiser (Texte vide)</option>
+                            </select>
+                        </div>
 
-                    <!-- BLOCS MAILS -->
-                    <div id="group-modules-mail" class="toolbar-group hidden">
-                        <select class="tool-select font-bold text-[#C41E3A] border-[#C41E3A]" onchange="insererModule(this.value); this.selectedIndex=0;" title="Insérer un bloc">
-                            <option value="" disabled selected>🧩 Insérer un bloc</option>
-                            <option value="layout_2col">Layout : 2 Colonnes d'information</option>
-                            <option value="alerte_rouge">Bloc : Alerte Rouge</option>
-                            <option value="encart_gris">Bloc : Information Grise</option>
-                            <option value="bouton_cta">Composant : Bouton d'action</option>
-                            <option value="separateur">Composant : Ligne de séparation</option>
-                        </select>
+                        <!-- BLOCS NEWSLETTER -->
+                        <div id="group-modules-newsletter" class="toolbar-group">
+                            <select class="tool-select font-bold text-[#C41E3A] border-[#C41E3A]" onchange="insererModule(this.value); this.selectedIndex=0;" title="Insérer un bloc">
+                                <option value="" disabled selected>🧩 Insérer un bloc</option>
+                                <option value="header_officiel">En-tête : Officiel Dojo (Logo Carré)</option>
+                                <option value="alerte_rouge">Bloc : Alerte Rouge</option>
+                                <option value="encart_gris">Bloc : Information Grise</option>
+                                <option value="bouton_cta">Composant : Bouton d'action</option>
+                                <option value="separateur">Composant : Ligne de séparation</option>
+                                <option value="footer_officiel">Pied de page : Centré Officiel</option>
+                            </select>
+                        </div>
+
+                        <!-- BLOCS MAILS -->
+                        <div id="group-modules-mail" class="toolbar-group hidden">
+                            <select class="tool-select font-bold text-[#C41E3A] border-[#C41E3A]" onchange="insererModule(this.value); this.selectedIndex=0;" title="Insérer un bloc">
+                                <option value="" disabled selected>🧩 Insérer un bloc</option>
+                                <option value="layout_2col">Layout : 2 Colonnes d'information</option>
+                                <option value="alerte_rouge">Bloc : Alerte Rouge</option>
+                                <option value="encart_gris">Bloc : Information Grise</option>
+                                <option value="bouton_cta">Composant : Bouton d'action</option>
+                                <option value="separateur">Composant : Ligne de séparation</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
+                <!-- ZONE VISUELLE WYSIWYG -->
                 <div id="editor" class="editor-workspace" contenteditable="true" placeholder="Rédigez votre contenu ici..."></div>
+
+                <!-- ZONE CODE SOURCE HTML -->
+                <textarea id="source-editor" class="source-workspace" placeholder="Éditez le code HTML ici..."></textarea>
 
             </div>
 
@@ -336,13 +370,17 @@
 
     <script>
         let modeActuel = 'newsletter'; // 'newsletter' ou 'mail'
+        let modeCodeSource = false;
         const memoireContenu = {
             newsletter: '',
             mail: ''
         };
 
         const editor = document.getElementById('editor');
+        const sourceEditor = document.getElementById('source-editor');
         const previewOutput = document.getElementById('preview-output');
+        const wysiwygControls = document.getElementById('wysiwyg-controls');
+        const btnToggleSource = document.getElementById('btn-toggle-source');
 
         const BLOC_HEADER = `
             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 25px; border-bottom: 2px solid #C41E3A;">
@@ -388,7 +426,30 @@
             </table>
         `;
 
+        function toggleSourceCode() {
+            modeCodeSource = !modeCodeSource;
+            if (modeCodeSource) {
+                sourceEditor.value = editor.innerHTML;
+                editor.style.display = 'none';
+                sourceEditor.style.display = 'block';
+                wysiwygControls.style.display = 'none';
+                btnToggleSource.classList.add('active-source');
+                btnToggleSource.title = "Retourner à l'éditeur visuel";
+            } else {
+                editor.innerHTML = sourceEditor.value;
+                memoireContenu[modeActuel] = editor.innerHTML;
+                sourceEditor.style.display = 'none';
+                editor.style.display = 'block';
+                wysiwygControls.style.display = 'flex';
+                btnToggleSource.classList.remove('active-source');
+                btnToggleSource.title = "Afficher/Modifier le code HTML source";
+                genererApercu();
+            }
+        }
+
         function changerOnglet(onglet) {
+            if (modeCodeSource) toggleSourceCode();
+
             memoireContenu[modeActuel] = editor.innerHTML;
             modeActuel = onglet;
 
@@ -423,7 +484,7 @@
                 editor.setAttribute('placeholder', "Rédigez votre courriel...");
                 
                 if (!memoireContenu.mail) {
-                    chargerGabarit('reponse_officielle');
+                    chargerGabarit('reponse_mairie');
                 } else {
                     editor.innerHTML = memoireContenu.mail;
                 }
@@ -460,9 +521,32 @@
         }
 
         function chargerGabarit(type) {
+            if (modeCodeSource) toggleSourceCode();
             let corpsTexte = '';
 
             switch(type) {
+                case 'reponse_mairie':
+                    corpsTexte = `
+                        <p style="text-align: justify; margin-bottom: 15px;">Bonjour Nicole,</p>
+                        <p style="text-align: justify; margin-bottom: 15px;">Faisant suite à ton mail du 20 août concernant la préparation de la rentrée associative et la réunion du 20 octobre, tu trouveras ci-joint les éléments administratifs relatifs au Dojo Dornois (Dossier Zip nommé : <strong>DojoDornois_PiecesAdministratives_Saison2026-2027.zip</strong>) :</p>
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-radius: 6px; margin: 15px 0;">
+                            <tr>
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #3D3D3D; text-align: justify; line-height: 1.6;">
+                                    <strong>Récapitulatif :</strong><br>
+                                    • <strong>Compte de résultat et Compte rendu d'AG :</strong> transmis le 14/12/2025 <em>(disponibles en pièces jointes à nouveau pour faciliter ton classement)</em><br>
+                                    • <strong>Statuts de l'association :</strong> transmis le 14/12/2025 <em>(inchangés à ce jour)</em><br>
+                                    • <strong>Attestations d'assurance 2026 :</strong> transmises le 12/11/2025 <em>(disponibles en pièces jointes)</em><br>
+                                    • <strong>Récépissé de déclaration en préfecture :</strong> en vigueur <em>(pièce jointe)</em><br>
+                                    • <strong>Budget prévisionnel :</strong> <em>(pièce jointe)</em><br>
+                                    • <strong>Liste des membres du bureau (coordonnées) :</strong> <em>(pièce jointe)</em>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="text-align: justify; margin-bottom: 15px;">Je reste à ta disposition et serai présent lors de la réunion du 20 octobre prochain.</p>
+                        <p style="text-align: justify; margin-bottom: 15px;">Bien cordialement,</p>
+                    `;
+                    break;
+
                 case 'reponse_officielle':
                     corpsTexte = `
                         <p style="text-align: justify;">Bonjour [Nom / Prénom],</p>
@@ -533,6 +617,7 @@
         }
 
         function insererModule(type) {
+            if (modeCodeSource) toggleSourceCode();
             let htmlBloc = '';
             
             switch(type) {
@@ -649,7 +734,7 @@
         }
         
         function getCodeFinal() {
-            let contenu = editor.innerHTML;
+            let contenu = modeCodeSource ? sourceEditor.value : editor.innerHTML;
             
             contenu = contenu.replace(/<h1>/g, '<h1 style="font-family: \'Fredoka\', sans-serif; font-size: 24px; color: #C41E3A; margin-top: 0; margin-bottom: 15px; text-align: left;">');
             contenu = contenu.replace(/<h2>/g, '<h2 style="font-family: \'Fredoka\', sans-serif; font-size: 20px; color: #1A1A1A; margin-top: 0; margin-bottom: 12px; text-align: left;">');
@@ -724,6 +809,10 @@
 
         editor.addEventListener('input', () => {
             memoireContenu[modeActuel] = editor.innerHTML;
+            genererApercu();
+        });
+
+        sourceEditor.addEventListener('input', () => {
             genererApercu();
         });
 
