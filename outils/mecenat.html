@@ -129,7 +129,7 @@
             font-family: 'Fredoka', sans-serif;
         }
 
-        /* ===== WORKSPACE & APERÇU LIVRET MECENAT (STYLE LIVRET ACCUEIL) ===== */
+        /* ===== WORKSPACE & APERÇU LIVRET MECENAT ===== */
         .livret-editor-layout {
             display: flex;
             gap: 20px;
@@ -295,7 +295,7 @@
             background: linear-gradient(135deg, #1A1A1A 0%, #2A080C 50%, #8B1429 100%);
             color: white;
             margin: -16mm -20mm;
-            padding: 22mm 25mm;
+            padding: 20mm 24mm;
             width: 297mm;
             height: 210mm;
             display: flex;
@@ -328,14 +328,14 @@
         }
 
         .cover-logo-box {
-            width: 110px;
-            height: 110px;
+            width: 90px;
+            height: 90px;
             object-fit: contain;
             background: var(--rouge);
-            padding: 10px;
-            border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4), 0 0 15px rgba(196, 30, 58, 0.5);
-            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: 14px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4), 0 0 12px rgba(196, 30, 58, 0.4);
+            margin-bottom: 8px;
         }
 
         .cover-right {
@@ -401,7 +401,8 @@
                 <button class="tab-btn active" onclick="switchTab('tab-prospects')">📊 Prospection</button>
                 <button class="tab-btn" onclick="switchTab('tab-confirmes')">🏅 Mécènes Validés</button>
                 <button class="tab-btn" onclick="switchTab('tab-valorisations')">🥋 Packs Ceintures</button>
-                <button class="tab-btn" onclick="switchTab('tab-livret')">📖 Générateur de Livret HTML</button>
+                <button class="tab-btn" onclick="switchTab('tab-livret')">📖 Générateur de Livret</button>
+                <button class="tab-btn" onclick="switchTab('tab-convention')">📄 Générateur de Convention</button>
             </div>
 
             <a href="../index.html" class="btn btn-dark">🏠 Central</a>
@@ -424,7 +425,7 @@
                     <div class="value" id="kpi-reduction">0,00 €</div>
                 </div>
                 <div class="kpi-card ecoles">
-                    <h4>Impact Écoles du Territoire</h4>
+                    <h4>Impact Territoire</h4>
                     <div class="value">Dornes & Chantenay</div>
                 </div>
             </div>
@@ -457,7 +458,7 @@
 
                         <div class="form-group">
                             <label>Montant du Don / Promesse (€)</label>
-                            <input type="number" step="10" id="mecene-montant" class="form-control" placeholder="500" required>
+                            <input type="number" step="10" id="mecene-montant" class="form-control" placeholder="300" required>
                         </div>
 
                         <div class="form-group">
@@ -544,7 +545,7 @@
                 </div>
             </div>
 
-            <!-- ONGLET 3 : GESTION DES TYPES DE VALORISATIONS PAR CEINTURES DE JUDO -->
+            <!-- ONGLET 3 : GESTION DES 4 PACKS DE VALORISATION PAR CEINTURES -->
             <div class="tab-content" id="tab-valorisations">
                 <div class="main-card no-print">
                     <div class="card-header-actions">
@@ -557,27 +558,27 @@
                     <div class="form-grid">
                         <div class="form-group" style="grid-column: span 2;">
                             <label>Intitulé du Pack (Nom de la ceinture / Niveau)</label>
-                            <input type="text" id="val-nom" class="form-control" placeholder="Ex: Ceinture Rouge — Pack Grand Maître" required>
+                            <input type="text" id="val-nom" class="form-control" placeholder="Ex: Ceinture Verte — Pack Engagé" required>
                         </div>
 
                         <div class="form-group">
                             <label>Seuil Don Conseillé / Indicatif (€)</label>
-                            <input type="text" id="val-seuil" class="form-control" placeholder="Ex: 500 € à 1000 €" value="Dès 100 €">
+                            <input type="text" id="val-seuil" class="form-control" placeholder="Ex: Dès 300 €" value="Dès 300 €">
                         </div>
 
                         <div class="form-group">
                             <label>Couleur de Fond (Carte)</label>
-                            <input type="color" id="val-bg-color" class="form-control" value="#FFEBEF" style="height:38px; cursor:pointer;">
+                            <input type="color" id="val-bg-color" class="form-control" value="#D1FAE5" style="height:38px; cursor:pointer;">
                         </div>
 
                         <div class="form-group">
                             <label>Couleur Bordure / Ceinture</label>
-                            <input type="color" id="val-border-color" class="form-control" value="#C41E3A" style="height:38px; cursor:pointer;">
+                            <input type="color" id="val-border-color" class="form-control" value="#059669" style="height:38px; cursor:pointer;">
                         </div>
 
                         <div class="form-group" style="grid-column: span 2;">
                             <label>Description détaillée des contreparties accordées</label>
-                            <input type="text" id="val-desc" class="form-control" placeholder="Banderole d'honneur 3m + Parrainage de l'équipe compétition">
+                            <input type="text" id="val-desc" class="form-control" placeholder="Logo sur calendrier + Publication web + Logo sur les flyers du club">
                         </div>
 
                         <div>
@@ -588,8 +589,8 @@
 
                 <div class="main-card">
                     <div class="card-header-actions">
-                        <h3>🥋 Grille des Packs de Valorisation (Usage Interne Intranet)</h3>
-                        <button class="btn btn-secondary btn-xs no-print" onclick="reinitialiserPacksCeintures()">🔄 Réinitialiser la grille des ceintures</button>
+                        <h3>🥋 Grille des 4 Paliers Officiels de Mécénat</h3>
+                        <button class="btn btn-secondary btn-xs no-print" onclick="reinitialiserPacksCeintures()">🔄 Réinitialiser la grille officielle</button>
                     </div>
 
                     <div class="table-container">
@@ -598,7 +599,7 @@
                                 <tr>
                                     <th>Badge Ceinture</th>
                                     <th>Nom du Pack</th>
-                                    <th style="color:var(--rouge); font-weight:bold;">Seuil Indicatif (Interne)</th>
+                                    <th style="color:var(--rouge); font-weight:bold;">Seuil Don Indicatif</th>
                                     <th>Détail des Contreparties</th>
                                     <th style="text-align:center;" class="no-print">Actions</th>
                                 </tr>
@@ -632,6 +633,62 @@
                         <div class="livret-workspace-area" id="livret-workspace">
                             <!-- Feuilles A4 générées en direct -->
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOUVEL ONGLET 5 : GÉNÉRATEUR RAPIDE DE CONVENTION DE MÉCÉNAT & PARTENARIAT -->
+            <div class="tab-content" id="tab-convention">
+                <div class="main-card no-print">
+                    <div class="card-header-actions">
+                        <h3>📄 Rédiger & Générer une Convention Officielle de Partenariat</h3>
+                        <button class="btn btn-blue btn-xs" onclick="imprimerConventionDepuisFormulaire()">🖨️ Imprimer / Export PDF de la Convention</button>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Sélectionner un Mécène existant (ou saisir manuellement)</label>
+                            <select id="conv-select-mecene" class="form-control" onchange="prechargerConventionDepuisSelect(this.value)">
+                                <option value="-1">-- Saisie Manuelle --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Raison Sociale de l'Entreprise Mécène</label>
+                            <input type="text" id="conv-societe" class="form-control" placeholder="Ex: Bâtiment Nivernais SAS">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Représenté(e) par (Nom, Prénom & Qualité)</label>
+                            <input type="text" id="conv-contact" class="form-control" placeholder="Ex: M. Jean Dupont, Gérant">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Adresse du siège de l'entreprise</label>
+                            <input type="text" id="conv-adresse" class="form-control" placeholder="Ex: 12 Rue des Métiers, 58390 Dornes">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Montant du Don Financier (€)</label>
+                            <input type="number" id="conv-montant" class="form-control" placeholder="300" oninput="calculerApercuConvention()">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pack de Valorisation Associé</label>
+                            <select id="conv-val-id" class="form-control" onchange="calculerApercuConvention()"></select>
+                        </div>
+
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>Précision des contreparties accordées (personnalisable)</label>
+                            <input type="text" id="conv-desc-custom" class="form-control" placeholder="Présence du logo sur le calendrier officiel, banderole dojo...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- APERÇU EN DIRECT DU DOCUMENT CONVENTION A4 -->
+                <div class="main-card" style="align-items:center; background:#525659; padding:25px;">
+                    <div id="convention-preview-a4" style="background:white; width:210mm; min-height:297mm; padding:20mm 22mm; box-shadow:0 8px 25px rgba(0,0,0,0.3); border-radius:4px; font-size:9.5pt; line-height:1.5; color:#1A1A1A; box-sizing:border-box;">
+                        <!-- Contenu injecté dynamiquement -->
                     </div>
                 </div>
             </div>
@@ -688,8 +745,8 @@
             </div>
 
             <div class="form-group" id="livret-cover-left-group" style="display:none;">
-                <label style="color:var(--rouge-deep);">HTML de la Colonne de Gauche (Couverture uniquement : infos, RNA...)</label>
-                <textarea id="edit-livret-left-code" class="form-control" style="font-family:monospace; min-height:80px;"></textarea>
+                <label style="color:var(--rouge-deep);">HTML de la Colonne de Gauche (Couverture uniquement : photo, RNA...)</label>
+                <textarea id="edit-livret-left-code" class="form-control" style="font-family:monospace; min-height:100px;"></textarea>
             </div>
 
             <div class="form-group">
@@ -709,77 +766,271 @@
         const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
         const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
         const SUPABASE_TABLE = 'mecenat';
+        
         const logoUrl = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png";
+        const photoClubUrl = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/1-201.jpg";
 
+        /* LES 4 PALIERS OFFICIELS DE MÉCÉNAT CITOYEN */
         const DEFAULT_CEINTURES = [
-            { id: 1, nom: "⚪ Ceinture Blanche — Pack Découverte", seuil: "< 150 €", bgColor: "#F8FAFC", borderColor: "#94A3B8", desc: "Mention sur le site internet et remerciement officiel newsletter." },
-            { id: 2, nom: "🟡 Ceinture Jaune — Pack Supporteur", seuil: "150 € - 300 €", bgColor: "#FEF9C3", borderColor: "#CA8A04", desc: "Logo sur le site web + Affiche officielle des partenaires dans le dojo." },
-            { id: 3, nom: "🟠 Ceinture Orange — Pack Engagé", seuil: "300 € - 500 €", bgColor: "#FFEDD5", borderColor: "#EA580C", desc: "Banderole 2x1m dans le dojo + visuels réseaux sociaux." },
-            { id: 4, nom: "🟢 Ceinture Verte — Pack Écoles & Citoyenneté", seuil: "500 € - 800 €", bgColor: "#D1FAE5", borderColor: "#059669", desc: "Soutien aux interventions scolaires (TER Dornes, Chantenay-Saint-Imbert, Lucenay-lès-Aix, Cossaye) + Banderole." },
-            { id: 5, nom: "🔵 Ceinture Bleue — Pack Partenaire", seuil: "800 € - 1 200 €", bgColor: "#E0F2FE", borderColor: "#0284C7", desc: "Logo sur les t-shirts du club + Banderole d'honneur + Réseaux sociaux." },
-            { id: 6, nom: "🟤 Ceinture Marron — Pack Majeur", seuil: "1 200 € - 2 000 €", bgColor: "#F5E6D3", borderColor: "#8B4513", desc: "Présence sur tous les supports évènementiels (Truffade, Gala) + Stand offert." },
-            { id: 7, nom: "⚫ Ceinture Noire — Pack Prestige", seuil: "2 000 € - 3 500 €", bgColor: "#E2E8F0", borderColor: "#0F172A", desc: "Parrainage d'une équipe compétition + Banderole centrale + Remise de prix." },
-            { id: 8, nom: "🔴 Ceinture Rouge — Pack Maître / Fondateur", seuil: "Dès 3 500 €", bgColor: "#FFEBEF", borderColor: "#C41E3A", desc: "Mécène d'Honneur exclusif. Logo sur tenues officielles + Banderole d'honneur 3M." }
+            { 
+                id: 1, 
+                nom: "⚪/🟡 Ceinture Jaune — Pack Supporteur", 
+                seuil: "Dès 100 € (coût : 40 €)", 
+                bgColor: "#FEF9C3", 
+                borderColor: "#CA8A04", 
+                desc: "Logo sur le calendrier annuel officiel + Remerciement réseaux sociaux & site web." 
+            },
+            { 
+                id: 2, 
+                nom: "🟢 Ceinture Verte — Pack Engagé", 
+                seuil: "Dès 300 € (coût : 120 €)", 
+                bgColor: "#D1FAE5", 
+                borderColor: "#059669", 
+                desc: "Contreparties Jaune + Logo sur tous les flyers et dépliants distribués par le club." 
+            },
+            { 
+                id: 3, 
+                nom: "🟤 Ceinture Marron — Pack Partenaire", 
+                seuil: "Dès 500 € (coût : 200 €)", 
+                bgColor: "#F5E6D3", 
+                borderColor: "#8B4513", 
+                desc: "Contreparties Verte + Banderole dédiée installée au dojo (impression incluse)." 
+            },
+            { 
+                id: 4, 
+                nom: "⚫/🔴 Ceinture Noire — Mécène Majeur", 
+                seuil: "Dès 1 000 € (coût : 400 €)", 
+                bgColor: "#FFEBEF", 
+                borderColor: "#C41E3A", 
+                desc: "Contreparties Marron + Logo sur les tenues sportives du club (t-shirts/vestes)." 
+            }
         ];
 
         let DEFAULT_MECENES = [
             {
                 id: 101, societe: "Entreprise Bâtiment Nivernais", contact: "Jean-Pierre Martin",
-                coordonnees: "06 12 34 56 78 / contact@ebn.fr", montant: 500, statut: "Confirme",
-                valId: 4, notes: "Chèque reçu en juin. Grand merci à eux.", fileName: "", fileData: ""
+                coordonnees: "06 12 34 56 78 / contact@ebn.fr", montant: 300, statut: "Confirme",
+                valId: 2, notes: "Chèque reçu en juin. Grand merci à eux.", fileName: "", fileData: ""
             },
             {
                 id: 102, societe: "Transports Decize-Dornes", contact: "Sophie Bernard",
-                coordonnees: "03 86 00 00 00", montant: 1000, statut: "Negociation",
-                valId: 5, notes: "Dossier transmis. En attente de validation comptable.", fileName: "", fileData: ""
+                coordonnees: "03 86 00 00 00", montant: 500, statut: "Negociation",
+                valId: 3, notes: "Dossier transmis. En attente de validation comptable.", fileName: "", fileData: ""
             }
         ];
 
+        /* PAGES OFFICIELLES DU DOSSIER DE MÉCÉNAT */
         let DEFAULT_LIVRET_PAGES = [
             {
                 type: "cover",
                 titre: "DOSSIER DE MÉCÉNAT",
-                subtitle: "Saison 2026 / 2027",
-                leftContent: `Association Loi 1901<br>RNA : W583001220<br>SIRET : 451 928 410 00013`,
-                html: `<p style="font-size:11pt; line-height:1.7;">Pour le développement du judo et la transmission des valeurs éducatives auprès de la jeunesse de notre territoire.</p>
-<div style="margin-top:25px; padding:15px; background:rgba(255,255,255,0.08); border-radius:8px; border-left:3px solid var(--rouge);">
-    <p style="font-size:10pt;">📍 <b>Dojo Henri Pierrehumbert</b> — 38 Route de Decize, 58390 Dornes</p>
-    <p style="font-size:10pt;">📧 dojodornois@gmail.com | 📞 06.07.13.91.86</p>
-    <p style="font-size:10pt; color:#FFB3C1; margin-top:4px;">🌐 dojodornois.fr</p>
+                subtitle: "Partenariat & Engagement Citoyen",
+                leftContent: `<div style="margin:16px 0 12px 0; width:100%;">
+    <img src="${photoClubUrl}" alt="Judokas Dojo Dornois" style="width:100%; height:125px; object-fit:cover; border-radius:10px; border:1.5px solid rgba(255,255,255,0.3); box-shadow:0 6px 16px rgba(0,0,0,0.45);" onerror="this.onerror=null; this.src='https://dojodornois.fr/public/10057/upload/files/base-de-donnees/1-201.jpg';">
+</div>
+<div style="font-size:8.5pt; opacity:0.85; line-height:1.5;">
+    Club affilié France Judo<br>
+    Label Fédéral Bronze 2026-2028<br>
+    RNA : W583001220<br>
+    SIRET : 451 928 410 00013
+</div>`,
+                html: `<div style="display:flex; flex-direction:column; gap:18px; margin-top:5px;">
+    <p style="font-size:12pt; line-height:1.65; color:#ffffff; margin:0; text-align:justify;">
+        Soutenez le développement du judo, l'inclusion et la transmission des valeurs éducatives auprès de la jeunesse de notre territoire : <b>cycles d'initiation scolaire</b> (Dornes & Chantenay-Saint-Imbert), <b>baby motricité dès 12 mois</b> et <b>taïso adapté</b>.
+    </p>
+    <div style="background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.2); border-left:6px solid var(--rouge,#c92a2a); border-radius:10px; padding:15px 18px;">
+        <div style="font-size:11.5pt; font-weight:bold; color:#ffffff; margin-bottom:4px;">
+            🏛️ Dispositif Mécénat d'Intérêt Général (Art. 238 bis du CGI)
+        </div>
+        <div style="font-size:9.5pt; color:#ffb3c1; line-height:1.5;">
+            <b>60 % de déduction directe</b> sur l'Impôt sur les Sociétés (IS) ou l'IR &bull; Délivrance immédiate du <b>reçu fiscal officiel CERFA 11580*05</b>.
+        </div>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.35); border-radius:10px; padding:12px 18px; font-size:9pt; color:#f1f5f9; border:1px solid rgba(255,255,255,0.1);">
+        <div>
+            📍 <b>Dojo Henri Pierrehumbert</b> &bull; Dornes<br>
+            ✉️ <b>dojodornois@gmail.com</b>
+        </div>
+        <div style="text-align:right;">
+            📞 <b>06 07 13 91 86</b><br>
+            🌐 <b>dojodornois.fr</b>
+        </div>
+    </div>
 </div>`
             },
             {
                 type: "standard",
-                titre: "NOTRE ENGAGEMENT SCOLAIRE",
-                subtitle: "Transmission & Éducation sur le Territoire",
-                html: `<div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
-    <div class="box">
-        <h3>🥋 Le Judo à l'École : Des valeurs pour grandir</h3>
-        <p style="font-size:9.5pt; line-height:1.55; text-align:justify;">Le Dojo Dornois s'engage activement au cœur des écoles primaires de notre secteur : <b>Dornes, Chantenay-Saint-Imbert, Lucenay-lès-Aix et Cossaye</b>.</p>
-        <p style="font-size:9.5pt; line-height:1.55; text-align:justify; margin-top:8px;">Grâce au soutien du <b>TER de Dornes</b>, des équipes pédagogiques et au cofinancement pris en charge directement par notre club, nous offrons aux écoliers une initiation sportive complète basée sur le respect et la maîtrise corporelle.</p>
+                titre: "NOTRE IMPACT & ENGAGEMENT CITOYEN",
+                subtitle: "Éducation par le sport, inclusion et vitalité du territoire",
+                html: `<div style="display:flex; flex-direction:column; gap:14px; margin-top:15px;">
+    <div class="box" style="padding:12px 18px; background:#fafafa; border:1px solid #e5e7eb; border-radius:10px; border-left:6px solid var(--rouge,#c92a2a); display:flex; align-items:center; justify-content:space-between;">
+        <div>
+            <h3 style="margin:0 0 3px 0; font-size:11pt; color:#1e293b;">🥋 Un club ancré au cœur de la vie locale depuis 1973</h3>
+            <p style="font-size:8.5pt; line-height:1.45; color:#475569; margin:0; text-align:justify;">
+                Labellisé <b>Bronze par France Judo</b>, le Dojo Dornois porte un projet éducatif et citoyen fort, fondé sur la transmission des valeurs martiales, l'accessibilité dès le plus jeune âge et l'inclusion sportive.
+            </p>
+        </div>
+        <div style="text-align:center; background:#fff; border:1px solid #fed7aa; border-radius:8px; padding:4px 10px; margin-left:14px; min-width:85px;">
+            <div style="font-size:11pt; font-weight:bold; color:var(--rouge,#c92a2a); font-family:'Fredoka',sans-serif;">Label Fédéral</div>
+            <div style="font-size:7.5pt; color:#9a3412; text-transform:uppercase; font-weight:600;">Bronze 2026-2028</div>
+        </div>
     </div>
-    <div class="box" style="border-left-color:var(--noir-doux); background:#ffffff;">
-        <h3>🌿 Le Code Moral au quotidien</h3>
-        <p style="font-size:9pt; line-height:1.5; color:#475569; text-align:justify;">Politesse, Courage, Sincérité, Honneur, Modestie, Respect, Contrôle de soi et Amitié : des repères précieux transmis à chaque séance sur les tatamis scolaires.</p>
+
+    <div style="display:grid; grid-template-columns:1.15fr 0.85fr; gap:12px;">
+        <div class="box" style="padding:12px 16px; background:#ffffff; border:1px solid #e5e7eb; border-radius:8px; border-left:4px solid var(--rouge,#c92a2a); display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <h3 style="margin:0 0 6px 0; font-size:10.5pt; color:#1e293b;">🏫 Le Judo à l'École : Cycles d'Initiation</h3>
+                <p style="font-size:8.5pt; line-height:1.5; color:#4b5563; margin:0 0 8px 0; text-align:justify;">
+                    Notre professeur diplômé d'État dispense des <b>cycles pédagogiques complets</b> en milieu scolaire. Cette saison, nous intervenons auprès des élèves de <b>Dornes</b> (cadre TER) et de <b>Chantenay-Saint-Imbert</b> au titre de notre ancrage territorial.
+                </p>
+                <p style="font-size:8.5pt; line-height:1.5; color:#4b5563; margin:0; text-align:justify;">
+                    Grâce au cofinancement pris en charge par le club, les écoliers bénéficient de plusieurs séances pour développer motricité, confiance et respect mutuel.
+                </p>
+            </div>
+            <div style="background:#fff5f5; border-radius:6px; padding:6px 10px; border:1px dashed #fecaca; margin-top:8px;">
+                <div style="font-size:7.5pt; font-weight:bold; color:var(--rouge,#c92a2a); text-transform:uppercase; margin-bottom:2px;">Le Code Moral transmis :</div>
+                <div style="font-size:7.5pt; color:#7f1d1d; line-height:1.3;">Politesse, Courage, Sincérité, Honneur, Modestie, Respect, Contrôle de soi et Amitié.</div>
+            </div>
+        </div>
+
+        <div class="box" style="padding:12px 16px; background:#ffffff; border:1px solid #e5e7eb; border-radius:8px; border-left:4px solid rgb(10,0,150); display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <h3 style="margin:0 0 6px 0; font-size:10.5pt; color:#1e293b;">🤝 Inclusion, Santé & Vitalité Locale</h3>
+                <ul style="list-style:none; padding:0; margin:0; font-size:8.5pt; color:#4b5563; line-height:1.55; text-align:justify;">
+                    <li>• <b>Baby Motricité (12-36 mois) :</b> éveil dès la petite enfance avec les parents.</li>
+                    <li>• <b>Taïso Adapté :</b> créneaux dédiés aux seniors (50+) et au public PSH (handicap physique).</li>
+                    <li>• <b>Ramassage scolaire :</b> prise en charge des enfants le mardi à 16h15.</li>
+                    <li>• <b>Manifestations :</b> stages, compétitions et fête des familles.</li>
+                </ul>
+            </div>
+            <div style="background:#f0f9ff; border-radius:6px; padding:6px 10px; border:1px solid #bae6fd; margin-top:8px;">
+                <span style="font-size:7.5pt; color:#0369a1; font-weight:600;">🎯 Objectif de saison : franchir le cap des 100 licenciés actifs.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="box" style="padding:10px 16px; background:#fffdfa; border:1px solid #fed7aa; border-radius:8px; border-left:4px solid #cd7f32; display:flex; align-items:center; gap:12px;">
+        <span style="font-size:16pt;">💡</span>
+        <div style="font-size:8.5pt; line-height:1.4; color:#7c2d12; text-align:justify;">
+            <b>À quoi sert concrètement votre soutien ?</b> Votre don finance l'encadrement professionnel en milieu scolaire, l'acquisition de matériel pédagogique et garantit des tarifs accessibles pour toutes les familles.
+        </div>
     </div>
 </div>`
             },
             {
                 type: "standard",
-                titre: "AVANTAGES FISCAUX DU MÉCÉNAT",
-                subtitle: "Dispositif officiel de déduction d'impôt (60%)",
-                html: `<div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
-    <div class="box" style="border-left-color:#27ae60;">
-        <h3 style="color:#27ae60;">📊 Une réduction d'impôt avantageuse (Art. 238 bis du CGI)</h3>
-        <p style="font-size:9.5pt; line-height:1.55; text-align:justify;">En tant qu'association d'intérêt général, les dons versés au Dojo Dornois ouvrent droit à une <b>réduction d'impôt sur les sociétés (IS) de 60 %</b> de leur montant.</p>
-        <p style="font-size:9pt; color:#475569; margin-top:6px;">Délivrance immédiate et conforme du <b>Reçu Fiscal officiel CERFA n° 11580*05</b>.</p>
+                titre: "AVANTAGES FISCAUX & VALORISATION DU DON",
+                subtitle: "Dispositif légal à 60% et reconnaissance de votre engagement",
+                html: `<div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+    <div style="display:grid; grid-template-columns:1.05fr 0.95fr; gap:12px; align-items:stretch;">
+        <div class="box" style="padding:10px 14px; background:#fafafa; border:1px solid #e5e7eb; border-radius:8px; border-left:5px solid #16a34a; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <h3 style="margin:0 0 4px 0; font-size:10.5pt; color:#15803d;">🏛️ Déduction d'Impôt IS de 60 % (Art. 238 bis du CGI)</h3>
+                <p style="font-size:8.5pt; line-height:1.45; color:#374151; margin:0; text-align:justify;">
+                    En soutenant le Dojo Dornois (association d'intérêt général), votre don ouvre droit à une <b>réduction d'impôt directe de 60 %</b> sur l'Impôt sur les Sociétés (IS) ou l'IR.
+                </p>
+            </div>
+            <div style="background:#f0fdf4; border:1px dashed #bbf7d0; border-radius:6px; padding:4px 8px; margin-top:6px; font-size:7.5pt; color:#166534;">
+                🧾 <b>Reçu Fiscal officiel CERFA n° 11580*05</b> délivré dès réception du don.
+            </div>
+        </div>
+
+        <div style="border-radius:8px; overflow:hidden; border:1px solid #e5e7eb; background:#ffffff;">
+            <table style="width:100%; border-collapse:collapse; font-size:8pt; text-align:left; margin:0;">
+                <thead>
+                    <tr style="background:#1e293b; color:#ffffff;">
+                        <th style="padding:6px 10px; font-weight:600;">Montant Don</th>
+                        <th style="padding:6px 10px; font-weight:600; color:#86efac;">Déduction (-60%)</th>
+                        <th style="padding:6px 10px; font-weight:600; text-align:right;">Coût Réel</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:5px 10px; font-weight:bold;">100 €</td><td style="padding:5px 10px; color:#16a34a; font-weight:600;">- 60 €</td><td style="padding:5px 10px; text-align:right; font-weight:bold;">40 €</td></tr>
+                    <tr style="border-bottom:1px solid #f1f5f9; background:#f8fafc;"><td style="padding:5px 10px; font-weight:bold;">300 €</td><td style="padding:5px 10px; color:#16a34a; font-weight:600;">- 180 €</td><td style="padding:5px 10px; text-align:right; font-weight:bold;">120 €</td></tr>
+                    <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:5px 10px; font-weight:bold;">500 €</td><td style="padding:5px 10px; color:#16a34a; font-weight:600;">- 300 €</td><td style="padding:5px 10px; text-align:right; font-weight:bold;">200 €</td></tr>
+                    <tr style="background:#fffcfc;"><td style="padding:5px 10px; font-weight:bold; color:var(--rouge,#c92a2a);">1 000 €</td><td style="padding:5px 10px; color:#16a34a; font-weight:bold;">- 600 €</td><td style="padding:5px 10px; text-align:right; font-weight:bold; color:var(--rouge,#c92a2a);">400 €</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <table style="width:100%; border-collapse:collapse; margin-top:6px;">
-        <tr style="background:#1A1A1A; color:white;"><th style="padding:8px 12px;">Montant du Don</th><th style="padding:8px 12px;">Déduction Fiscale (-60%)</th><th style="padding:8px 12px; text-align:right;">Coût Réel Entreprise</th></tr>
-        <tr><td style="padding:8px 12px; border-bottom:1px solid #ddd;"><b>300 €</b></td><td style="padding:8px 12px; border-bottom:1px solid #ddd; color:#27ae60; font-weight:bold;">180 €</td><td style="padding:8px 12px; border-bottom:1px solid #ddd; text-align:right; font-weight:bold;">120 €</td></tr>
-        <tr><td style="padding:8px 12px; border-bottom:1px solid #ddd;"><b>500 €</b></td><td style="padding:8px 12px; border-bottom:1px solid #ddd; color:#27ae60; font-weight:bold;">300 €</td><td style="padding:8px 12px; border-bottom:1px solid #ddd; text-align:right; font-weight:bold;">200 €</td></tr>
-        <tr><td style="padding:8px 12px;"><b>1 000 €</b></td><td style="padding:8px 12px; color:#27ae60; font-weight:bold;">600 €</td><td style="padding:8px 12px; text-align:right; font-weight:bold;">400 €</td></tr>
-    </table>
+
+    <div style="border-radius:8px; overflow:hidden; border:1px solid #e5e7eb; background:#ffffff;">
+        <table style="width:100%; border-collapse:collapse; font-size:8pt; text-align:left; margin:0;">
+            <thead>
+                <tr style="background:var(--rouge,#c92a2a); color:#ffffff;">
+                    <th style="padding:7px 10px; width:32%;">Supports & Valorisation Citoyenne</th>
+                    <th style="padding:7px 8px; text-align:center; width:17%;">⚪/🟡 Jaune<br><span style="font-weight:normal; font-size:7pt;">Dès 100 € (coût : 40 €)</span></th>
+                    <th style="padding:7px 8px; text-align:center; width:17%;">🟢 Verte<br><span style="font-weight:normal; font-size:7pt;">Dès 300 € (coût : 120 €)</span></th>
+                    <th style="padding:7px 8px; text-align:center; width:17%;">🟤 Marron<br><span style="font-weight:normal; font-size:7pt;">Dès 500 € (coût : 200 €)</span></th>
+                    <th style="padding:7px 8px; text-align:center; width:17%;">⚫/🔴 Noire<br><span style="font-weight:normal; font-size:7pt;">Dès 1 000 € (coût : 400 €)</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:5px 10px; color:#334155;">Logo sur le calendrier annuel officiel</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td></tr>
+                <tr style="border-bottom:1px solid #f1f5f9; background:#fafafa;"><td style="padding:5px 10px; color:#334155;">Remerciement réseaux sociaux & site web</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td></tr>
+                <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:5px 10px; color:#334155;">Logo sur les flyers du club</td><td style="padding:5px 8px; text-align:center; color:#9ca3af;">-</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td></tr>
+                <tr style="border-bottom:1px solid #f1f5f9; background:#fafafa;"><td style="padding:5px 10px; color:#334155;">Banderole dédiée au dojo (impression incluse)</td><td style="padding:5px 8px; text-align:center; color:#9ca3af;">-</td><td style="padding:5px 8px; text-align:center; color:#9ca3af;">-</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td></tr>
+                <tr><td style="padding:5px 10px; color:#334155;">Logo sur les tenues sportives du club</td><td style="padding:5px 8px; text-align:center; color:#9ca3af;">-</td><td style="padding:5px 8px; text-align:center; color:#9ca3af;">-</td><td style="padding:5px 8px; text-align:center; color:#9ca3af;">-</td><td style="padding:5px 8px; text-align:center; color:#16a34a; font-weight:bold;">✓</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>`
+            },
+            {
+                type: "standard",
+                titre: "CONCRÉTISER VOTRE ENGAGEMENT",
+                subtitle: "Modalités simples, contacts & remerciements",
+                html: `<div style="display:flex; flex-direction:column; gap:14px; margin-top:15px;">
+    <div class="box" style="padding:12px 18px; background:#fafafa; border:1px solid #e5e7eb; border-radius:10px; border-left:6px solid var(--rouge,#c92a2a); display:flex; align-items:center; justify-content:space-between;">
+        <div>
+            <h3 style="margin:0 0 3px 0; font-size:11pt; color:#1e293b;">🥋 Merci de faire grandir le judo dornois à nos côtés !</h3>
+            <p style="font-size:8.5pt; line-height:1.45; color:#475569; margin:0; text-align:justify;">
+                Chaque soutien permet de maintenir une pratique de qualité, accessible à tous, et d'encourager la jeunesse de notre territoire dans son apprentissage citoyen et sportif.
+            </p>
+        </div>
+        <div style="text-align:center; background:#fff; border:1px solid #fed7aa; border-radius:8px; padding:4px 12px; margin-left:14px; min-width:90px;">
+            <div style="font-size:11pt; font-weight:bold; color:var(--rouge,#c92a2a); font-family:'Fredoka',sans-serif;">Ensemble</div>
+            <div style="font-size:7.5pt; color:#9a3412; text-transform:uppercase; font-weight:600;">Sur le Tatami</div>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="box" style="padding:12px 16px; background:#ffffff; border:1px solid #e5e7eb; border-radius:8px; border-left:4px solid rgb(10,0,150);">
+            <h3 style="margin:0 0 6px 0; font-size:10.5pt; color:#1e293b;">📋 Comment devenir mécène ? (En 3 étapes)</h3>
+            <ol style="padding-left:16px; margin:0; font-size:8.5pt; color:#4b5563; line-height:1.6; text-align:justify;">
+                <li><b>Choix du don :</b> vous déterminez librement le montant de votre soutien citoyen.</li>
+                <li><b>Convention de mécénat :</b> nous établissons ensemble un document clair précisant le projet soutenu et les valorisations prévues.</li>
+                <li><b>Reçu CERFA immédiat :</b> délivrance de votre reçu fiscal officiel permettant l'application directe des 60 % de déduction IS.</li>
+            </ol>
+        </div>
+
+        <div class="box" style="padding:12px 16px; background:#ffffff; border:1px solid #e5e7eb; border-radius:8px; border-left:4px solid #16a34a;">
+            <h3 style="margin:0 0 6px 0; font-size:10.5pt; color:#1e293b;">💳 Modalités & Transparence</h3>
+            <ul style="list-style:none; padding:0; margin:0; font-size:8.5pt; color:#4b5563; line-height:1.6; text-align:justify;">
+                <li>• <b>Règlements acceptés :</b> virement bancaire (RIB club sur demande) ou chèque à l'ordre du <i>Dojo Dornois</i>.</li>
+                <li>• <b>Transparence totale :</b> présentation de l'affectation des fonds lors de l'assemblée générale.</li>
+                <li>• <b>Logo & communication :</b> transmission simple de votre fichier HD par e-mail.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="box" style="padding:12px 18px; background:#fffdfa; border:1px solid #fed7aa; border-radius:8px; border-left:5px solid #f59e0b; display:flex; align-items:center; justify-content:space-between; gap:14px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:20pt; line-height:1;">🤝</span>
+            <div>
+                <h3 style="margin:0 0 3px 0; font-size:10.5pt; color:#9a3412;">Un projet, un échange ou une question ?</h3>
+                <p style="font-size:8.5pt; line-height:1.45; color:#7c2d12; margin:0; text-align:justify;">
+                    Nous sommes à votre entière disposition pour vous rencontrer, échanger sur nos actions et bâtir un partenariat sur-mesure pour votre entreprise.
+                </p>
+            </div>
+        </div>
+        <div style="text-align:right; font-size:8.5pt; color:#7c2d12; white-space:nowrap; border-left:1px dashed #fed7aa; padding-left:14px;">
+            <b>Jordan LOUDENOT</b> (Président)<br>
+            📞 <b>06 07 13 91 86</b><br>
+            ✉️ <b>dojodornois@gmail.com</b><br>
+            🌐 <b>dojodornois.fr</b>
+        </div>
+    </div>
 </div>`
             }
         ];
@@ -805,10 +1056,15 @@
             
             if(event && event.target) event.target.classList.add('active');
             document.getElementById(tabId).classList.add('active');
+
+            if(tabId === 'tab-convention') {
+                populateConventionMecenesSelect();
+                calculerApercuConvention();
+            }
         }
 
         function reinitialiserPacksCeintures() {
-            if(confirm("Réinitialiser les packs avec la grille complète des ceintures et leurs seuils d'origine ?")) {
+            if(confirm("Réinitialiser les 4 packs avec la grille officielle du club ?")) {
                 valorisationsDB = JSON.parse(JSON.stringify(DEFAULT_CEINTURES));
                 syncToSupabase(); renderAll();
             }
@@ -818,9 +1074,9 @@
             if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
             try {
                 const payload = { mecenes: mecenesDB, valorisations: valorisationsDB, livretPages: livretPages };
-                localStorage.setItem('dojo_mecenes_v8', JSON.stringify(mecenesDB));
-                localStorage.setItem('dojo_val_v8', JSON.stringify(valorisationsDB));
-                localStorage.setItem('dojo_livret_v8', JSON.stringify(livretPages));
+                localStorage.setItem('dojo_mecenes_v10', JSON.stringify(mecenesDB));
+                localStorage.setItem('dojo_val_v10', JSON.stringify(valorisationsDB));
+                localStorage.setItem('dojo_livret_v10', JSON.stringify(livretPages));
 
                 const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
                 if (error) throw error;
@@ -832,12 +1088,24 @@
         }
 
         async function loadAllData() {
-            const backupMec = localStorage.getItem('dojo_mecenes_v8');
-            const backupVal = localStorage.getItem('dojo_val_v8');
-            const backupLivret = localStorage.getItem('dojo_livret_v8');
+            const backupMec = localStorage.getItem('dojo_mecenes_v10');
+            const backupVal = localStorage.getItem('dojo_val_v10');
+            const backupLivret = localStorage.getItem('dojo_livret_v10');
 
             if(backupMec) mecenesDB = JSON.parse(backupMec);
-            if(backupVal && JSON.parse(backupVal).length >= 8) valorisationsDB = JSON.parse(backupVal);
+            
+            // Forcer les 4 packs si l'ancien format 8 ceintures est présent
+            if(backupVal) {
+                const parsedVal = JSON.parse(backupVal);
+                if(parsedVal.length === 4) {
+                    valorisationsDB = parsedVal;
+                } else {
+                    valorisationsDB = JSON.parse(JSON.stringify(DEFAULT_CEINTURES));
+                }
+            } else {
+                valorisationsDB = JSON.parse(JSON.stringify(DEFAULT_CEINTURES));
+            }
+
             if(backupLivret) {
                 try {
                     livretPages = JSON.parse(backupLivret);
@@ -853,12 +1121,16 @@
                 if (error && error.code !== 'PGRST116') throw error;
                 if (result && result.data) {
                     if (result.data.mecenes) mecenesDB = result.data.mecenes;
-                    if (result.data.valorisations) valorisationsDB = result.data.valorisations;
-                    if (result.data.livretPages) livretPages = result.data.livretPages;
+                    if (result.data.valorisations && result.data.valorisations.length === 4) {
+                        valorisationsDB = result.data.valorisations;
+                    } else {
+                        valorisationsDB = JSON.parse(JSON.stringify(DEFAULT_CEINTURES));
+                    }
+                    if (result.data.livretPages && result.data.livretPages.length > 0) livretPages = result.data.livretPages;
 
-                    localStorage.setItem('dojo_mecenes_v8', JSON.stringify(mecenesDB));
-                    localStorage.setItem('dojo_val_v8', JSON.stringify(valorisationsDB));
-                    localStorage.setItem('dojo_livret_v8', JSON.stringify(livretPages));
+                    localStorage.setItem('dojo_mecenes_v10', JSON.stringify(mecenesDB));
+                    localStorage.setItem('dojo_val_v10', JSON.stringify(valorisationsDB));
+                    localStorage.setItem('dojo_livret_v10', JSON.stringify(livretPages));
                     renderAll();
                 }
             } catch(e) {
@@ -873,14 +1145,25 @@
             renderValorisationsTable();
             renderLivret();
             updateKPIs();
+            populateConventionMecenesSelect();
+            calculerApercuConvention();
         }
 
         function populateValSelect() {
             const select = document.getElementById('mecene-valorisation-id');
-            select.innerHTML = '';
-            valorisationsDB.forEach(v => {
-                select.innerHTML += `<option value="${v.id}">${v.nom} (${v.seuil || 'Libre'})</option>`;
-            });
+            const convSelect = document.getElementById('conv-val-id');
+            if(select) {
+                select.innerHTML = '';
+                valorisationsDB.forEach(v => {
+                    select.innerHTML += `<option value="${v.id}">${v.nom} (${v.seuil || 'Libre'})</option>`;
+                });
+            }
+            if(convSelect) {
+                convSelect.innerHTML = '';
+                valorisationsDB.forEach(v => {
+                    convSelect.innerHTML += `<option value="${v.id}">${v.nom}</option>`;
+                });
+            }
         }
 
         function updateKPIs() {
@@ -906,6 +1189,7 @@
 
         function renderValorisationsTable() {
             const tbody = document.getElementById('valorisations-tbody');
+            if(!tbody) return;
             tbody.innerHTML = '';
 
             valorisationsDB.forEach((val, idx) => {
@@ -977,6 +1261,7 @@
 
         function renderProspectsTable() {
             const tbody = document.getElementById('mecenes-tbody');
+            if(!tbody) return;
             tbody.innerHTML = '';
 
             mecenesDB.forEach((item, idx) => {
@@ -1013,6 +1298,7 @@
 
         function renderConfirmesTable() {
             const tbody = document.getElementById('confirmes-tbody');
+            if(!tbody) return;
             tbody.innerHTML = '';
 
             mecenesDB.filter(m => m.statut === "Confirme").forEach((item) => {
@@ -1114,7 +1400,6 @@
             win.document.write(`<iframe src="${item.fileData}" frameborder="0" style="width:100%; height:100vh;"></iframe>`);
         }
 
-        /* GESTION MODALE DETAILED MECENE */
         function ouvrirModalMecene(index) {
             activeMeceneModal = mecenesDB[index];
             const m = activeMeceneModal;
@@ -1146,7 +1431,7 @@
 
         function closeModal() { document.getElementById('meceneModal').classList.remove('active'); }
 
-        /* ===== NOUVEL ÉDITEUR ET APERÇU DYNAMIQUE DU LIVRET MÉCÉNAT ===== */
+        /* ===== GESTION ÉDITEUR ET APERÇU DYNAMIQUE DU LIVRET ===== */
         function renderLivret() {
             const sidebar = document.getElementById('livret-sidebar-list');
             const workspace = document.getElementById('livret-workspace');
@@ -1171,7 +1456,6 @@
                     pageLabel = `Page ${currentNum}`;
                 }
 
-                // Carte latérale
                 const card = document.createElement('div');
                 card.className = 'livret-page-card';
                 card.innerHTML = `
@@ -1189,27 +1473,26 @@
                 `;
                 sidebar.appendChild(card);
 
-                // Feuille A4 en direct
                 const pageWrapper = document.createElement('div');
                 pageWrapper.className = 'a4-landscape';
 
                 if (isCover) {
-                    const leftHtml = p.leftContent || `Association Loi 1901<br>RNA : W583001220<br>SIRET : 451 928 410 00013`;
+                    const leftHtml = p.leftContent || `<div style="margin:16px 0 12px 0; width:100%;"><img src="${photoClubUrl}" style="width:100%; height:125px; object-fit:cover; border-radius:10px;"></div>Club affilié France Judo<br>Label Fédéral Bronze 2026-2028<br>RNA : W583001220<br>SIRET : 451 928 410 00013`;
                     pageWrapper.innerHTML = `
                         <div class="cover-style">
                             <div class="cover-left">
                                 <div>
                                     <img src="${logoUrl}" class="cover-logo-box" alt="Logo Dojo Dornois">
-                                    <h1 style="font-family:'Fredoka',sans-serif; color:white; font-size:24pt; letter-spacing:1px; margin-top:8px;">DOJO DORNOIS</h1>
-                                    <p style="color:#FFB3C1; font-size:11pt; margin-top:2px; font-weight:500;">Judo • Ju-Jitsu • Taïso</p>
+                                    <h1 style="font-family:'Fredoka',sans-serif; color:white; font-size:22pt; letter-spacing:1px; margin:4px 0 0 0;">DOJO DORNOIS</h1>
+                                    <p style="color:#FFB3C1; font-size:10.5pt; margin-top:2px; font-weight:500;">Judo • Ju-Jitsu • Taïso</p>
                                 </div>
-                                <div style="font-size:8.5pt; opacity:0.75; line-height:1.4;">
+                                <div style="width:100%;">
                                     ${leftHtml}
                                 </div>
                             </div>
                             <div class="cover-right">
-                                <h1 style="font-family:'Fredoka',sans-serif; font-size:32pt; line-height:1.1; margin-bottom:8px; color:white;">${escapeHtml(p.titre)}</h1>
-                                <h3 style="color:#FFB3C1; font-size:15pt; font-weight:400; margin-bottom:20px;">${escapeHtml(p.subtitle || '')}</h3>
+                                <h1 style="font-family:'Fredoka',sans-serif; font-size:32pt; line-height:1.1; margin-bottom:6px; color:white;">${escapeHtml(p.titre)}</h1>
+                                <h3 style="color:#FFB3C1; font-size:14.5pt; font-weight:400; margin-bottom:18px;">${escapeHtml(p.subtitle || '')}</h3>
                                 <div>${p.html || ''}</div>
                             </div>
                         </div>
@@ -1272,7 +1555,7 @@
             document.getElementById('edit-livret-title').value = p.titre || '';
             document.getElementById('edit-livret-subtitle').value = p.subtitle || '';
             document.getElementById('edit-livret-type').value = p.type || 'standard';
-            document.getElementById('edit-livret-left-code').value = p.leftContent || `Association Loi 1901<br>RNA : W583001220<br>SIRET : 451 928 410 00013`;
+            document.getElementById('edit-livret-left-code').value = p.leftContent || `<div style="margin:16px 0 12px 0; width:100%;"><img src="${photoClubUrl}" alt="Judokas Dojo Dornois" style="width:100%; height:125px; object-fit:cover; border-radius:10px; border:1.5px solid rgba(255,255,255,0.3); box-shadow:0 6px 16px rgba(0,0,0,0.45);"></div>Club affilié France Judo<br>Label Fédéral Bronze 2026-2028<br>RNA : W583001220<br>SIRET : 451 928 410 00013`;
             document.getElementById('edit-livret-content-code').value = p.html || '';
 
             toggleLivretCoverFields();
@@ -1340,59 +1623,131 @@
             return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        /* IMPRESSIONS OFFICIELLES CHARTE DOJO DORNOIS */
-        function imprimerConventionModal() {
-            if(!activeMeceneModal) return;
-            const m = activeMeceneModal;
-            const val = valorisationsDB.find(v => v.id === parseInt(m.valId)) || { nom: "Sur-mesure", desc: "Contrepartie personnalisée", borderColor: "#C41E3A", bgColor: "#FFEBEF" };
+        /* ===== MODULE GÉNÉRATEUR DE CONVENTION ===== */
+        function populateConventionMecenesSelect() {
+            const select = document.getElementById('conv-select-mecene');
+            if(!select) return;
+            select.innerHTML = '<option value="-1">-- Saisie Manuelle / Nouveau Mécène --</option>';
+            mecenesDB.forEach(m => {
+                select.innerHTML += `<option value="${m.id}">${m.societe} (${parseFloat(m.montant).toFixed(0)} €)</option>`;
+            });
+        }
 
+        function prechargerConventionDepuisSelect(meceneId) {
+            const m = mecenesDB.find(x => x.id === parseInt(meceneId));
+            if(m) {
+                document.getElementById('conv-societe').value = m.societe || '';
+                document.getElementById('conv-contact').value = m.contact || '';
+                document.getElementById('conv-adresse').value = m.coordonnees || '';
+                document.getElementById('conv-montant').value = m.montant || '300';
+                if(m.valId) document.getElementById('conv-val-id').value = m.valId;
+                
+                const valObj = valorisationsDB.find(v => v.id === parseInt(m.valId));
+                document.getElementById('conv-desc-custom').value = valObj ? valObj.desc : '';
+            }
+            calculerApercuConvention();
+        }
+
+        function calculerApercuConvention() {
+            const societe = document.getElementById('conv-societe').value || '[Nom de l\'Entreprise Mécène]';
+            const contact = document.getElementById('conv-contact').value || '[Nom et qualité du Représentant]';
+            const adresse = document.getElementById('conv-adresse').value || '[Adresse du Siège Social]';
+            const montant = parseFloat(document.getElementById('conv-montant').value) || 300;
+            const valId = parseInt(document.getElementById('conv-val-id').value) || 1;
+            const customDesc = document.getElementById('conv-desc-custom').value;
+
+            const val = valorisationsDB.find(v => v.id === valId) || valorisationsDB[0];
+            const descFinale = customDesc || val.desc;
+            const reduction = (montant * 0.6).toFixed(2);
+            const coutReel = (montant * 0.4).toFixed(2);
+
+            const preview = document.getElementById('convention-preview-a4');
+            if(!preview) return;
+
+            preview.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #C41E3A; padding-bottom:10px; margin-bottom:16px;">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <img src="${logoUrl}" style="height:55px; width:55px; background:#C41E3A; padding:5px; border-radius:8px; object-fit:contain;">
+                        <div>
+                            <h1 style="font-family:'Fredoka',sans-serif; color:#C41E3A; margin:0; font-size:19pt; text-transform:uppercase;">DOJO DORNOIS</h1>
+                            <p style="margin:2px 0 0 0; font-size:9pt; color:#666;">Association Sportive & Citoyenne d'Intérêt Général (Loi 1901)</p>
+                        </div>
+                    </div>
+                    <div style="text-align:right; font-size:8pt; color:#333; line-height:1.35;">
+                        <b>Dojo Henri Pierrehumbert</b><br>
+                        38 Route de Decize, 58390 DORNES<br>
+                        RNA : W583001220 &bull; SIRET : 451 928 410 00013<br>
+                        dojodornois@gmail.com &bull; 06.07.13.91.86
+                    </div>
+                </div>
+
+                <div style="text-align:center; background:#1A1A1A; color:white; padding:8px 14px; font-family:'Fredoka',sans-serif; font-size:12pt; border-radius:6px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px;">
+                    Convention Officielle de Mécénat Citoyen
+                </div>
+
+                <p style="margin:0 0 8px 0;"><strong>ENTRE LES SOUSSIGNÉS :</strong></p>
+                <div style="background:#F8FAFC; padding:10px 14px; border-radius:6px; border-left:4px solid #C41E3A; margin-bottom:12px; font-size:9pt; line-height:1.5;">
+                    • <strong>L'Organisme Bénéficiaire :</strong> L'association <strong>DOJO DORNOIS</strong>, représentée par son Président en exercice, M. Jordan LOUDENOT.<br>
+                    • <strong>L'Entreprise Mécène :</strong> <strong>${escapeHtml(societe)}</strong>, sise ${escapeHtml(adresse)}, représentée par ${escapeHtml(contact)}.
+                </div>
+
+                <p><strong>Article 1 : Objet & Destination du Don</strong><br>
+                L'Entreprise effectue un don financier d'intérêt général d'un montant de <strong>${montant.toFixed(2)} €</strong> au profit du Dojo Dornois. Ce versement est expressément destiné à cofinancer les actions éducatives et scolaires menées par le club (cycles d'initiation dans les écoles primaires de Dornes et de Chantenay-Saint-Imbert, motricité et sport adapté), ainsi que l'acquisition de matériel pédagogique.</p>
+
+                <p><strong>Article 2 : Régime Fiscal & Délivrance du CERFA (Art. 238 bis du CGI)</strong><br>
+                Le Dojo Dornois répond aux critères des organismes d'intérêt général au sens de l'article 238 bis du Code Général des Impôts. À ce titre, le versement ouvre droit pour l'Entreprise à une <strong>réduction d'impôt égale à 60 % du montant du don</strong> (soit une déduction fiscale directe de <strong>${reduction} €</strong>, ramenant le coût réel net pour l'entreprise à <strong>${coutReel} €</strong>). Un reçu fiscal officiel <strong>CERFA n° 11580*05</strong> sera délivré immédiatement.</p>
+
+                <p><strong>Article 3 : Reconnaissance & Valorisation Citoyenne</strong><br>
+                En témoignage de sa reconnaissance et dans le respect strict du cadre du mécénat (absence de prestation publicitaire commerciale directe), le Dojo Dornois attribue la valorisation suivante :<br>
+                <span style="display:inline-block; padding:4px 10px; border-radius:4px; font-weight:bold; background:${val.bgColor}; border-left:4px solid ${val.borderColor}; margin:5px 0; font-size:8.5pt;">
+                    🥋 ${val.nom}
+                </span><br>
+                <span style="font-size:8.5pt; color:#475569;"><b>Contreparties accordées :</b> ${escapeHtml(descFinale)}</span>
+                </p>
+
+                <p><strong>Article 4 : Durée & Engagements</strong><br>
+                La présente convention est conclue pour la saison sportive 2026 / 2027. Les parties s'engagent à respecter les valeurs d'éthique et de transparence inhérentes au sport et au mécénat citoyen.</p>
+
+                <div style="display:flex; justify-content:space-between; margin-top:35px; font-size:9pt;">
+                    <div>
+                        Fait à Dornes, le ${new Date().toLocaleDateString('fr-FR')}<br>
+                        <strong>Pour le Dojo Dornois</strong><br>
+                        Le Président, Jordan LOUDENOT<br><br><br>
+                        <i>(Signature)</i>
+                    </div>
+                    <div style="text-align:right;">
+                        Fait à Dornes, le ${new Date().toLocaleDateString('fr-FR')}<br>
+                        <strong>Pour l'Entreprise Mécène</strong><br>
+                        ${escapeHtml(contact)}<br><br><br>
+                        <i>(Signature et cachet)</i>
+                    </div>
+                </div>
+            `;
+        }
+
+        function imprimerConventionDepuisFormulaire() {
+            calculerApercuConvention();
+            const content = document.getElementById('convention-preview-a4').innerHTML;
             const win = window.open('', '_blank');
             win.document.write(`
-                <!DOCTYPE html><html><head><title>Convention Mécénat — ${m.societe}</title>
+                <!DOCTYPE html><html><head><title>Convention de Mécénat — Dojo Dornois</title>
                 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
                 <style>
                     @page { size: A4 portrait; margin: 15mm; }
-                    body { font-family:'Roboto',sans-serif; color:#1a1a1a; font-size:9.5pt; line-height:1.45; }
-                    .print-header { display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #C41E3A; padding-bottom:10px; margin-bottom:18px; }
-                    .print-logo { height:55px; width:55px; background:#C41E3A; padding:4px; border-radius:6px; object-fit:contain; }
-                    .doc-title { background:#1A1A1A; color:white; padding:8px 14px; font-family:'Fredoka',sans-serif; font-size:12pt; display:inline-block; border-radius:5px; text-transform:uppercase; margin-bottom:15px; }
-                    .box { background:#F4F6F9; padding:12px 16px; border-radius:6px; border-left:4px solid #C41E3A; margin-bottom:14px; }
-                    .val-badge { display:inline-block; padding:4px 10px; border-radius:4px; font-weight:bold; background:${val.bgColor}; border-left:4px solid ${val.borderColor}; margin-top:4px; }
+                    body { font-family:'Roboto',sans-serif; color:#1a1a1a; font-size:9.5pt; line-height:1.5; margin:0; padding:0; }
                 </style></head><body>
-                    <div class="print-header">
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <img src="${logoUrl}" class="print-logo">
-                            <div><h1 style="font-family:'Fredoka',sans-serif; color:#C41E3A; margin:0; font-size:18pt;">DOJO DORNOIS</h1><p style="margin:0; font-size:8.5pt; color:#666;">Association Sportive & Citoyenne (Loi 1901)</p></div>
-                        </div>
-                        <div style="text-align:right; font-size:8pt; color:#333;">38 Route de Decize, 58390 DORNES<br>dojodornois@gmail.com &bull; RNA W583001220</div>
-                    </div>
-
-                    <div class="doc-title">Convention Officielle de Mécénat Citoyen</div>
-
-                    <p><strong>ENTRE LES SOUSSIGNÉS :</strong></p>
-                    <div class="box">
-                        <strong>Le Bénéficiaire :</strong> Dojo Dornois, représenté par son Président Jordan Loudenot.<br>
-                        <strong>Le Mécène :</strong> ${m.societe}, représenté(e) par ${m.contact || 'son dirigeant'}.
-                    </div>
-
-                    <p><strong>Article 1 : Engagement & Soutien financier</strong><br>Le Mécène effectue un don d'intérêt général d'un montant de <strong>${parseFloat(m.montant).toFixed(2)} €</strong> au profit du Dojo Dornois afin de cofinancer ses cycles éducatifs et ses interventions judo au sein des écoles primaires du territoire (Dornes, Chantenay-Saint-Imbert, Lucenay-lès-Aix, Cossaye).</p>
-
-                    <p><strong>Article 2 : Régime Fiscal (Art. 238 bis du CGI)</strong><br>Ce don ouvre droit à une déduction d'impôt sur les sociétés égale à 60 % de son montant, soit une économie d'impôt direct de <strong>${(m.montant * 0.6).toFixed(2)} €</strong>. Le coût réel net pour l'entreprise s'élève à <strong>${(m.montant * 0.4).toFixed(2)} €</strong>. Un reçu fiscal CERFA n° 11580*05 est émis à cet effet.</p>
-
-                    <p><strong>Article 3 : Pack Valorisation Accordé</strong><br>
-                    En contrepartie du soutien citoyen apporté par l'entreprise, le Dojo Dornois attribue la valorisation suivante :<br>
-                    <span class="val-badge">${val.nom}</span><br>
-                    <span style="font-size:8.5pt; color:#555;">Détails : ${val.desc}</span>
-                    </p>
-
-                    <div style="display:flex; justify-content:space-between; margin-top:40px;">
-                        <div>Fait à Dornes, le ${new Date().toLocaleDateString('fr-FR')}<br><strong>Pour le Dojo Dornois</strong><br><br><br>Le Président</div>
-                        <div>Fait à Dornes, le ${new Date().toLocaleDateString('fr-FR')}<br><strong>Pour l'Entreprise Mécène</strong><br><br><br>Signature & Cachet</div>
-                    </div>
+                    ${content}
                     <script>window.onload = function() { setTimeout(() => { window.print(); window.close(); }, 400); };<\/script>
                 </body></html>
             `);
             win.document.close();
+        }
+
+        function imprimerConventionModal() {
+            if(!activeMeceneModal) return;
+            document.getElementById('conv-select-mecene').value = activeMeceneModal.id;
+            prechargerConventionDepuisSelect(activeMeceneModal.id);
+            imprimerConventionDepuisFormulaire();
         }
 
         function imprimerCerfaModal() {
@@ -1458,23 +1813,23 @@
                 if (!isCover) currentNum++;
 
                 if (isCover) {
-                    const leftHtml = p.leftContent || `Association Loi 1901<br>RNA : W583001220<br>SIRET : 451 928 410 00013`;
+                    const leftHtml = p.leftContent || `<div style="margin:16px 0 12px 0;"><img src="${photoClubUrl}" style="width:100%; height:125px; object-fit:cover; border-radius:10px;"></div>Association Loi 1901<br>RNA : W583001220<br>SIRET : 451 928 410 00013`;
                     htmlPages += `
                         <div class="a4-print-page">
                             <div class="cover-style-print">
                                 <div class="cover-left-print">
                                     <div>
                                         <img src="${logoUrl}" class="cover-logo-box-print" alt="Logo">
-                                        <h1 style="font-family:'Fredoka',sans-serif; color:white; font-size:24pt; letter-spacing:1px; margin-top:8px;">DOJO DORNOIS</h1>
-                                        <p style="color:#FFB3C1; font-size:11pt; margin-top:2px; font-weight:500;">Judo • Ju-Jitsu • Taïso</p>
+                                        <h1 style="font-family:'Fredoka',sans-serif; color:white; font-size:22pt; letter-spacing:1px; margin:4px 0 0 0;">DOJO DORNOIS</h1>
+                                        <p style="color:#FFB3C1; font-size:10.5pt; margin-top:2px; font-weight:500;">Judo • Ju-Jitsu • Taïso</p>
                                     </div>
-                                    <div style="font-size:8.5pt; opacity:0.75; line-height:1.4;">
+                                    <div style="width:100%;">
                                         ${leftHtml}
                                     </div>
                                 </div>
                                 <div class="cover-right-print">
-                                    <h1 style="font-family:'Fredoka',sans-serif; font-size:32pt; line-height:1.1; margin-bottom:8px; color:white;">${escapeHtml(p.titre)}</h1>
-                                    <h3 style="color:#FFB3C1; font-size:15pt; font-weight:400; margin-bottom:24px;">${escapeHtml(p.subtitle || '')}</h3>
+                                    <h1 style="font-family:'Fredoka',sans-serif; font-size:32pt; line-height:1.1; margin-bottom:6px; color:white;">${escapeHtml(p.titre)}</h1>
+                                    <h3 style="color:#FFB3C1; font-size:14.5pt; font-weight:400; margin-bottom:18px;">${escapeHtml(p.subtitle || '')}</h3>
                                     <div>${p.html || ''}</div>
                                 </div>
                             </div>
@@ -1520,9 +1875,9 @@
                     .logo-header-box-print { width: 48px; height: 48px; object-fit: contain; background: #C41E3A; padding: 4px; border-radius: 8px; }
                     .body-page-print { flex: 1; font-size: 10pt; line-height: 1.55; }
                     .footer-page-print { border-top: 1px solid #E2E8F0; padding-top: 8px; display: flex; justify-content: space-between; font-size: 8.5pt; color: #6B6B6B; font-weight: 500; }
-                    .cover-style-print { background: linear-gradient(135deg, #1A1A1A 0%, #2A080C 50%, #8B1429 100%); color: white; width: 100%; height: 100%; padding: 22mm 25mm; display: flex; box-sizing: border-box; }
+                    .cover-style-print { background: linear-gradient(135deg, #1A1A1A 0%, #2A080C 50%, #8B1429 100%); color: white; width: 100%; height: 100%; padding: 20mm 24mm; display: flex; box-sizing: border-box; }
                     .cover-left-print { width: 38%; border-right: 3px solid #C41E3A; padding-right: 25px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; }
-                    .cover-logo-box-print { width: 110px; height: 110px; object-fit: contain; background: #C41E3A; padding: 10px; border-radius: 16px; }
+                    .cover-logo-box-print { width: 90px; height: 90px; object-fit: contain; background: #C41E3A; padding: 8px; border-radius: 14px; }
                     .cover-right-print { width: 62%; padding-left: 35px; display: flex; flex-direction: column; justify-content: center; }
                     .box { background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #C41E3A; padding: 14px 16px; border-radius: 8px; margin-bottom: 10px; }
                     .box h3 { font-family: 'Fredoka', sans-serif; color: #C41E3A; margin: 0 0 6px 0; font-size: 11.5pt; }
