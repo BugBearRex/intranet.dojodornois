@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Gestion du Mécénat & Livrets — Intranet Dojo Dornois</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --rouge: #C41E3A;
@@ -129,9 +129,239 @@
             font-family: 'Fredoka', sans-serif;
         }
 
-        /* LIVRET GENERATOR STYLES */
-        .page-card { background: #fafafa; border: 1px solid var(--gris-clair); border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
-        .page-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 8px; }
+        /* ===== WORKSPACE & APERÇU LIVRET MECENAT (STYLE LIVRET ACCUEIL) ===== */
+        .livret-editor-layout {
+            display: flex;
+            gap: 20px;
+            min-height: calc(100vh - 250px);
+            background: #eef2f5;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--gris-tres-clair);
+        }
+
+        .livret-sidebar {
+            width: 320px;
+            min-width: 320px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #E2E8F0;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            max-height: 800px;
+        }
+
+        .livret-sidebar h4 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--rouge-deep);
+            font-size: 1.05rem;
+            margin: 0 0 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .livret-page-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-left: 4px solid var(--rouge);
+            padding: 12px 14px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .livret-page-card:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            background: white;
+        }
+
+        .livret-page-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 12.5px;
+        }
+
+        .livret-workspace-area {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 35px;
+            padding: 10px;
+        }
+
+        /* FEUILLE A4 MECENAT PAYSAGE APERÇU */
+        .a4-landscape {
+            width: 297mm;
+            min-height: 210mm;
+            height: 210mm;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            box-sizing: border-box;
+            padding: 16mm 20mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transform: scale(0.72);
+            transform-origin: top center;
+            margin-bottom: -55mm;
+            border: 1px solid #E2E8F0;
+        }
+
+        .header-page {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--rouge);
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-header-box {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            background: var(--rouge);
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(196, 30, 58, 0.25);
+            flex-shrink: 0;
+        }
+
+        .header-page h2 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--rouge-deep);
+            font-size: 18pt;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin: 0;
+        }
+
+        .header-page p {
+            color: var(--gris-moyen);
+            font-size: 9.5pt;
+            font-weight: 400;
+            margin: 2px 0 0 0;
+        }
+
+        .badge-dojo {
+            background: linear-gradient(135deg, var(--rouge) 0%, var(--rouge-deep) 100%);
+            color: white;
+            font-weight: 700;
+            font-family: 'Fredoka', sans-serif;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .body-page {
+            flex: 1;
+            font-size: 9.5pt;
+            line-height: 1.6;
+            color: var(--noir-doux);
+        }
+
+        .footer-page {
+            border-top: 1px solid #E2E8F0;
+            padding-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 8.5pt;
+            color: var(--gris-moyen);
+            font-weight: 500;
+        }
+
+        .cover-style {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A080C 50%, #8B1429 100%);
+            color: white;
+            margin: -16mm -20mm;
+            padding: 22mm 25mm;
+            width: 297mm;
+            height: 210mm;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .cover-style::after {
+            content: "";
+            position: absolute;
+            bottom: -50px;
+            right: -50px;
+            width: 300px;
+            height: 300px;
+            background: rgba(196, 30, 58, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cover-left {
+            width: 38%;
+            border-right: 3px solid var(--rouge);
+            padding-right: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 2;
+        }
+
+        .cover-logo-box {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            background: var(--rouge);
+            padding: 10px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4), 0 0 15px rgba(196, 30, 58, 0.5);
+            margin-bottom: 12px;
+        }
+
+        .cover-right {
+            width: 62%;
+            padding-left: 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .box {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-left: 4px solid var(--rouge);
+            padding: 14px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .box h3 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--rouge);
+            margin: 0 0 8px 0;
+            font-size: 11.5pt;
+        }
 
         /* MODALES */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
@@ -379,19 +609,30 @@
                 </div>
             </div>
 
-            <!-- ONGLET 4 : GENERATEUR DE DOSSIER DE MECENAT HTML -->
+            <!-- ONGLET 4 : GENERATEUR DE DOSSIER DE MECENAT HTML AVEC APERÇU ET MODALES -->
             <div class="tab-content" id="tab-livret">
                 <div class="main-card">
                     <div class="card-header-actions">
-                        <h3>📖 Personnalisation du Livret (Éditeur HTML & Page de Garde)</h3>
+                        <h3>📖 Générateur & Personnalisation du Livret Mécénat</h3>
                         <div style="display:flex; gap:8px;" class="no-print">
-                            <button class="btn btn-green btn-xs" onclick="ajouterPageLivret()">➕ Ajouter une page HTML</button>
+                            <button class="btn btn-green btn-xs" onclick="ajouterPageLivret()">➕ Ajouter une page</button>
+                            <button class="btn btn-secondary btn-xs" onclick="reinitialiserLivretDefaut()">🔄 Réinitialiser par défaut</button>
                             <button class="btn btn-blue btn-xs" onclick="imprimerLivretMecenetPDF()">🖨️ Imprimer le Livret PDF Officiel</button>
                         </div>
                     </div>
-                    <p style="font-size:0.85rem; color:var(--gris-moyen); margin:0;">Chaque page dispose de son code HTML. Tu peux modifier le contenu, monter/descendre les pages et réorganiser la Page de Garde.</p>
+                    <p style="font-size:0.85rem; color:var(--gris-moyen); margin:0;">Éditez vos pages HTML via la modale, réorganisez-les et visualisez le rendu A4 en direct ci-dessous.</p>
 
-                    <div id="livret-pages-container"></div>
+                    <!-- LAYOUT DOUBLE COLONNE : SIDEBAR ET WORKSPACE -->
+                    <div class="livret-editor-layout">
+                        <div class="livret-sidebar no-print">
+                            <h4>📑 Pages du Livret</h4>
+                            <div id="livret-sidebar-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+                        </div>
+
+                        <div class="livret-workspace-area" id="livret-workspace">
+                            <!-- Feuilles A4 générées en direct -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -419,11 +660,57 @@
         </div>
     </div>
 
+    <!-- MODALE ÉDITEUR HTML DU LIVRET MECENAT -->
+    <div class="modal-overlay" id="livretModal">
+        <div class="modal-card">
+            <div class="card-header-actions">
+                <h3 id="livret-modal-title" style="font-family:'Fredoka',sans-serif; color:var(--rouge-deep); margin:0;">Édition HTML de la page</h3>
+                <button class="btn btn-secondary btn-xs" onclick="closeLivretModal()">✕</button>
+            </div>
+
+            <div class="form-group">
+                <label>Titre de la Page</label>
+                <input type="text" id="edit-livret-title" class="form-control">
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div class="form-group">
+                    <label>Sous-titre / En-tête</label>
+                    <input type="text" id="edit-livret-subtitle" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Type de Mise en Page</label>
+                    <select id="edit-livret-type" class="form-control" onchange="toggleLivretCoverFields()">
+                        <option value="standard">Standard (En-tête & Pied de page)</option>
+                        <option value="cover">Couverture Pleine Page</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" id="livret-cover-left-group" style="display:none;">
+                <label style="color:var(--rouge-deep);">HTML de la Colonne de Gauche (Couverture uniquement : infos, RNA...)</label>
+                <textarea id="edit-livret-left-code" class="form-control" style="font-family:monospace; min-height:80px;"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label id="livret-label-content-code">Code HTML du Contenu</label>
+                <textarea id="edit-livret-content-code" class="form-control" style="font-family:monospace; min-height:220px; background:#1E293B; color:#F8FAFC; padding:12px;"></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                <button class="btn btn-secondary" onclick="closeLivretModal()">Annuler</button>
+                <button class="btn" onclick="saveLivretModal()">Appliquer les modifications</button>
+            </div>
+        </div>
+    </div>
+
     <script type="text/javascript">
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
         const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
         const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
         const SUPABASE_TABLE = 'mecenat';
+        const logoUrl = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png";
+
         const DEFAULT_CEINTURES = [
             { id: 1, nom: "⚪ Ceinture Blanche — Pack Découverte", seuil: "< 150 €", bgColor: "#F8FAFC", borderColor: "#94A3B8", desc: "Mention sur le site internet et remerciement officiel newsletter." },
             { id: 2, nom: "🟡 Ceinture Jaune — Pack Supporteur", seuil: "150 € - 300 €", bgColor: "#FEF9C3", borderColor: "#CA8A04", desc: "Logo sur le site web + Affiche officielle des partenaires dans le dojo." },
@@ -448,53 +735,61 @@
             }
         ];
 
-        let valorisationsDB = JSON.parse(JSON.stringify(DEFAULT_CEINTURES));
-        let mecenesDB = JSON.parse(JSON.stringify(DEFAULT_MECENES));
-
-        let livretPages = [
+        let DEFAULT_LIVRET_PAGES = [
             {
-                isGarde: true,
-                titre: "Page 1 — Page de Garde Officielle",
-                html: `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; height:100%; padding:0 20px;">
-    <div style="background:#C41E3A; width:150px; height:150px; margin-bottom:30px; border-radius:28px; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 30px rgba(196,30,58,0.35);">
-        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width:120px; height:120px; object-fit:contain;">
-    </div>
-    <h1 style="font-family:'Fredoka',sans-serif; font-size:36pt; color:#C41E3A; margin:0; text-transform:uppercase; letter-spacing:1px;">DOJO DORNOIS</h1>
-    <p style="font-size:15pt; color:#1A1A1A; font-weight:700; margin-top:10px; letter-spacing:0.5px;">DOSSIER OFFICIEL DE MÉCÉNAT & PARTENARIAT CITOYEN</p>
-    <div style="width:100px; height:4px; background:#C41E3A; margin:35px 0;"></div>
-    <p style="font-size:11pt; color:#6B6B6B; max-width:550px; line-height:1.5;">Saison 2026 / 2027 &bull; Pour le développement du judo et la transmission des valeurs éducatives auprès de la jeunesse du territoire</p>
+                type: "cover",
+                titre: "DOSSIER DE MÉCÉNAT",
+                subtitle: "Saison 2026 / 2027",
+                leftContent: `Association Loi 1901<br>RNA : W583001220<br>SIRET : 451 928 410 00013`,
+                html: `<p style="font-size:11pt; line-height:1.7;">Pour le développement du judo et la transmission des valeurs éducatives auprès de la jeunesse de notre territoire.</p>
+<div style="margin-top:25px; padding:15px; background:rgba(255,255,255,0.08); border-radius:8px; border-left:3px solid var(--rouge);">
+    <p style="font-size:10pt;">📍 <b>Dojo Henri Pierrehumbert</b> — 38 Route de Decize, 58390 Dornes</p>
+    <p style="font-size:10pt;">📧 dojodornois@gmail.com | 📞 06.07.13.91.86</p>
+    <p style="font-size:10pt; color:#FFB3C1; margin-top:4px;">🌐 dojodornois.fr</p>
 </div>`
             },
             {
-                isGarde: false,
-                titre: "Page 2 — Notre Engagement Scolaire sur le Territoire",
-                html: `<h3 style="color:#C41E3A; font-family:'Fredoka',sans-serif; font-size:16pt;">🥋 Le Judo à l'École : Transmission & Éducation</h3>
-<p>Le Dojo Dornois s'engage activement au cœur des écoles de notre territoire : <strong>Dornes, Chantenay-Saint-Imbert, Lucenay-lès-Aix et Cossaye</strong>.</p>
-<p>Grâce au soutien du <strong>TER de Dornes</strong>, des écoles partenaires et au financement complémentaire pris en charge directement par le <strong>Dojo Dornois</strong>, nous permettons aux enfants du secteur d'apprendre les bases du judo et ses valeurs morales.</p>
-<div style="background:#FFEBEF; padding:15px; border-radius:8px; border-left:4px solid #C41E3A; margin:15px 0;">
-    <strong>Le Code Moral transmis à nos jeunes judokas :</strong><br>
-    Politesse, Courage, Sincérité, Honneur, Modestie, Respect, Contrôle de soi et Amitié.
-</div>
-<p>Votre soutien en mécénat nous aide directement à pérenniser l'encadrement professionnel et le matériel dédié à ces cycles scolaires !</p>`
+                type: "standard",
+                titre: "NOTRE ENGAGEMENT SCOLAIRE",
+                subtitle: "Transmission & Éducation sur le Territoire",
+                html: `<div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
+    <div class="box">
+        <h3>🥋 Le Judo à l'École : Des valeurs pour grandir</h3>
+        <p style="font-size:9.5pt; line-height:1.55; text-align:justify;">Le Dojo Dornois s'engage activement au cœur des écoles primaires de notre secteur : <b>Dornes, Chantenay-Saint-Imbert, Lucenay-lès-Aix et Cossaye</b>.</p>
+        <p style="font-size:9.5pt; line-height:1.55; text-align:justify; margin-top:8px;">Grâce au soutien du <b>TER de Dornes</b>, des équipes pédagogiques et au cofinancement pris en charge directement par notre club, nous offrons aux écoliers une initiation sportive complète basée sur le respect et la maîtrise corporelle.</p>
+    </div>
+    <div class="box" style="border-left-color:var(--noir-doux); background:#ffffff;">
+        <h3>🌿 Le Code Moral au quotidien</h3>
+        <p style="font-size:9pt; line-height:1.5; color:#475569; text-align:justify;">Politesse, Courage, Sincérité, Honneur, Modestie, Respect, Contrôle de soi et Amitié : des repères précieux transmis à chaque séance sur les tatamis scolaires.</p>
+    </div>
+</div>`
             },
             {
-                isGarde: false,
-                titre: "Page 3 — Avantages Fiscaux du Mécénat (60%)",
-                html: `<h3 style="color:#C41E3A; font-family:'Fredoka',sans-serif; font-size:16pt;">📊 Réduction d'Impôt IS de 60 %</h3>
-<p>En soutenant le Dojo Dornois (association d'intérêt général), votre entreprise bénéficie d'un avantage fiscal avantageux :</p>
-<ul style="line-height:1.8;">
-    <li><strong>60 % du montant du don</strong> est directement déductible de votre Impôt sur les Sociétés (IS).</li>
-    <li>Délivrance immédiate du <strong>Reçu Fiscal officiel CERFA 11580*05</strong>.</li>
-</ul>
-<table style="width:100%; border-collapse:collapse; margin-top:15px;">
-    <tr style="background:#1A1A1A; color:white;"><th style="padding:8px;">Montant du Don</th><th style="padding:8px;">Déduction Fiscale (-60%)</th><th style="padding:8px;">Coût Réel Entreprise</th></tr>
-    <tr><td style="padding:8px; border:1px solid #ddd;">500 €</td><td style="padding:8px; border:1px solid #ddd; color:#27ae60; font-weight:bold;">300 €</td><td style="padding:8px; border:1px solid #ddd; font-weight:bold;">200 €</td></tr>
-    <tr><td style="padding:8px; border:1px solid #ddd;">1 000 €</td><td style="padding:8px; border:1px solid #ddd; color:#27ae60; font-weight:bold;">600 €</td><td style="padding:8px; border:1px solid #ddd; font-weight:bold;">400 €</td></tr>
-</table>`
+                type: "standard",
+                titre: "AVANTAGES FISCAUX DU MÉCÉNAT",
+                subtitle: "Dispositif officiel de déduction d'impôt (60%)",
+                html: `<div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
+    <div class="box" style="border-left-color:#27ae60;">
+        <h3 style="color:#27ae60;">📊 Une réduction d'impôt avantageuse (Art. 238 bis du CGI)</h3>
+        <p style="font-size:9.5pt; line-height:1.55; text-align:justify;">En tant qu'association d'intérêt général, les dons versés au Dojo Dornois ouvrent droit à une <b>réduction d'impôt sur les sociétés (IS) de 60 %</b> de leur montant.</p>
+        <p style="font-size:9pt; color:#475569; margin-top:6px;">Délivrance immédiate et conforme du <b>Reçu Fiscal officiel CERFA n° 11580*05</b>.</p>
+    </div>
+    <table style="width:100%; border-collapse:collapse; margin-top:6px;">
+        <tr style="background:#1A1A1A; color:white;"><th style="padding:8px 12px;">Montant du Don</th><th style="padding:8px 12px;">Déduction Fiscale (-60%)</th><th style="padding:8px 12px; text-align:right;">Coût Réel Entreprise</th></tr>
+        <tr><td style="padding:8px 12px; border-bottom:1px solid #ddd;"><b>300 €</b></td><td style="padding:8px 12px; border-bottom:1px solid #ddd; color:#27ae60; font-weight:bold;">180 €</td><td style="padding:8px 12px; border-bottom:1px solid #ddd; text-align:right; font-weight:bold;">120 €</td></tr>
+        <tr><td style="padding:8px 12px; border-bottom:1px solid #ddd;"><b>500 €</b></td><td style="padding:8px 12px; border-bottom:1px solid #ddd; color:#27ae60; font-weight:bold;">300 €</td><td style="padding:8px 12px; border-bottom:1px solid #ddd; text-align:right; font-weight:bold;">200 €</td></tr>
+        <tr><td style="padding:8px 12px;"><b>1 000 €</b></td><td style="padding:8px 12px; color:#27ae60; font-weight:bold;">600 €</td><td style="padding:8px 12px; text-align:right; font-weight:bold;">400 €</td></tr>
+    </table>
+</div>`
             }
         ];
 
+        let valorisationsDB = JSON.parse(JSON.stringify(DEFAULT_CEINTURES));
+        let mecenesDB = JSON.parse(JSON.stringify(DEFAULT_MECENES));
+        let livretPages = JSON.parse(JSON.stringify(DEFAULT_LIVRET_PAGES));
+
         let activeMeceneModal = null;
+        let editingLivretPageIndex = null;
 
         function showToast(msg) {
             const container = document.getElementById('toastContainer');
@@ -543,7 +838,13 @@
 
             if(backupMec) mecenesDB = JSON.parse(backupMec);
             if(backupVal && JSON.parse(backupVal).length >= 8) valorisationsDB = JSON.parse(backupVal);
-            if(backupLivret) livretPages = JSON.parse(backupLivret);
+            if(backupLivret) {
+                try {
+                    livretPages = JSON.parse(backupLivret);
+                } catch(e) {
+                    livretPages = JSON.parse(JSON.stringify(DEFAULT_LIVRET_PAGES));
+                }
+            }
 
             renderAll();
 
@@ -570,7 +871,7 @@
             renderProspectsTable();
             renderConfirmesTable();
             renderValorisationsTable();
-            renderLivretEditor();
+            renderLivret();
             updateKPIs();
         }
 
@@ -845,33 +1146,167 @@
 
         function closeModal() { document.getElementById('meceneModal').classList.remove('active'); }
 
-        /* GENERATEUR ET EDITEUR DE LIVRET DE MECENAT HTML */
-        function renderLivretEditor() {
-            const container = document.getElementById('livret-pages-container');
-            container.innerHTML = '';
+        /* ===== NOUVEL ÉDITEUR ET APERÇU DYNAMIQUE DU LIVRET MÉCÉNAT ===== */
+        function renderLivret() {
+            const sidebar = document.getElementById('livret-sidebar-list');
+            const workspace = document.getElementById('livret-workspace');
+            if(!sidebar || !workspace) return;
 
-            livretPages.forEach((page, idx) => {
-                const div = document.createElement('div');
-                div.className = 'page-card';
-                div.innerHTML = `
-                    <div class="page-card-header">
-                        <input type="text" class="form-control" style="font-weight:bold; width:65%;" value="${page.titre}" onchange="livretPages[${idx}].titre = this.value; syncToSupabase(true);">
-                        <div style="display:flex; gap:4px;" class="no-print">
-                            <button class="btn btn-secondary btn-xs" onclick="deplacerPageLivret(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>▲ Monter</button>
-                            <button class="btn btn-secondary btn-xs" onclick="deplacerPageLivret(${idx}, 1)" ${idx === livretPages.length - 1 ? 'disabled' : ''}>▼ Descendre</button>
-                            <button class="btn btn-secondary btn-xs" style="background:var(--rouge);" onclick="supprimerPageLivret(${idx})">✕</button>
-                        </div>
+            sidebar.innerHTML = '';
+            workspace.innerHTML = '';
+
+            const totalNumberedPages = livretPages.filter(p => p.type !== 'cover').length;
+            let numberedCounter = 0;
+
+            livretPages.forEach((p, idx) => {
+                const isCover = p.type === 'cover';
+                let pageLabel = '';
+                let currentNum = 0;
+
+                if (isCover) {
+                    pageLabel = idx === 0 ? 'Couverture (Début)' : 'Couverture (Fin)';
+                } else {
+                    numberedCounter++;
+                    currentNum = numberedCounter;
+                    pageLabel = `Page ${currentNum}`;
+                }
+
+                // Carte latérale
+                const card = document.createElement('div');
+                card.className = 'livret-page-card';
+                card.innerHTML = `
+                    <div class="livret-page-card-header">
+                        <span><b>${pageLabel}</b></span>
+                        <span style="font-size:11px; color:var(--gris-moyen);">${p.type || 'standard'}</span>
                     </div>
-                    <textarea class="form-control" style="height:140px; font-family:monospace; font-size:0.8rem;" onchange="livretPages[${idx}].html = this.value; syncToSupabase(true);">${page.html}</textarea>
+                    <div style="font-size:12px; font-weight:bold; color:var(--noir-doux);">${escapeHtml(p.titre || 'Page')}</div>
+                    <div style="display:flex; gap:4px; justify-content:flex-end; flex-wrap:wrap;">
+                        <button class="btn btn-xs" style="padding:3px 8px; font-size:11px;" onclick="openLivretModal(${idx})">📝 Éditer HTML</button>
+                        <button class="btn btn-secondary btn-xs" style="padding:3px 8px; font-size:11px;" onclick="deplacerPageLivret(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>⬆️</button>
+                        <button class="btn btn-secondary btn-xs" style="padding:3px 8px; font-size:11px;" onclick="deplacerPageLivret(${idx}, 1)" ${idx === livretPages.length - 1 ? 'disabled' : ''}>⬇️</button>
+                        <button class="btn btn-secondary btn-xs" style="background:var(--rouge); padding:3px 8px; font-size:11px;" onclick="supprimerPageLivret(${idx})">🗑️</button>
+                    </div>
                 `;
-                container.appendChild(div);
+                sidebar.appendChild(card);
+
+                // Feuille A4 en direct
+                const pageWrapper = document.createElement('div');
+                pageWrapper.className = 'a4-landscape';
+
+                if (isCover) {
+                    const leftHtml = p.leftContent || `Association Loi 1901<br>RNA : W583001220<br>SIRET : 451 928 410 00013`;
+                    pageWrapper.innerHTML = `
+                        <div class="cover-style">
+                            <div class="cover-left">
+                                <div>
+                                    <img src="${logoUrl}" class="cover-logo-box" alt="Logo Dojo Dornois">
+                                    <h1 style="font-family:'Fredoka',sans-serif; color:white; font-size:24pt; letter-spacing:1px; margin-top:8px;">DOJO DORNOIS</h1>
+                                    <p style="color:#FFB3C1; font-size:11pt; margin-top:2px; font-weight:500;">Judo • Ju-Jitsu • Taïso</p>
+                                </div>
+                                <div style="font-size:8.5pt; opacity:0.75; line-height:1.4;">
+                                    ${leftHtml}
+                                </div>
+                            </div>
+                            <div class="cover-right">
+                                <h1 style="font-family:'Fredoka',sans-serif; font-size:32pt; line-height:1.1; margin-bottom:8px; color:white;">${escapeHtml(p.titre)}</h1>
+                                <h3 style="color:#FFB3C1; font-size:15pt; font-weight:400; margin-bottom:20px;">${escapeHtml(p.subtitle || '')}</h3>
+                                <div>${p.html || ''}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    pageWrapper.innerHTML = `
+                        <div class="header-page">
+                            <div class="header-left">
+                                <img src="${logoUrl}" class="logo-header-box" alt="Logo">
+                                <div>
+                                    <h2>${escapeHtml(p.titre)}</h2>
+                                    <p>${escapeHtml(p.subtitle || 'Dossier Mécénat & Citoyenneté')}</p>
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                <span class="badge-dojo">DOJO DORNOIS</span>
+                            </div>
+                        </div>
+                        <div class="body-page">
+                            ${p.html || ''}
+                        </div>
+                        <div class="footer-page">
+                            <span>Dossier Officiel de Mécénat — Dojo Dornois</span>
+                            <span>Page ${currentNum} / ${totalNumberedPages}</span>
+                        </div>
+                    `;
+                }
+
+                workspace.appendChild(pageWrapper);
             });
         }
 
+        function toggleLivretCoverFields() {
+            const type = document.getElementById('edit-livret-type').value;
+            const leftGroup = document.getElementById('livret-cover-left-group');
+            const labelContent = document.getElementById('livret-label-content-code');
+            if (type === 'cover') {
+                leftGroup.style.display = 'flex';
+                labelContent.innerText = "Code HTML de la Colonne de Droite (Contenu principal)";
+            } else {
+                leftGroup.style.display = 'none';
+                labelContent.innerText = "Code HTML du Contenu";
+            }
+        }
+
+        function openLivretModal(idx) {
+            editingLivretPageIndex = idx;
+            const p = livretPages[idx];
+            
+            const isCover = p.type === 'cover';
+            let titlePrefix = `Édition de la Page`;
+            if (isCover) {
+                titlePrefix = idx === 0 ? `Édition de la Couverture (Début)` : `Édition de la Couverture (Fin)`;
+            } else {
+                const num = livretPages.slice(0, idx + 1).filter(item => item.type !== 'cover').length;
+                titlePrefix = `Édition de la Page ${num}`;
+            }
+
+            document.getElementById('livret-modal-title').innerText = titlePrefix;
+            document.getElementById('edit-livret-title').value = p.titre || '';
+            document.getElementById('edit-livret-subtitle').value = p.subtitle || '';
+            document.getElementById('edit-livret-type').value = p.type || 'standard';
+            document.getElementById('edit-livret-left-code').value = p.leftContent || `Association Loi 1901<br>RNA : W583001220<br>SIRET : 451 928 410 00013`;
+            document.getElementById('edit-livret-content-code').value = p.html || '';
+
+            toggleLivretCoverFields();
+            document.getElementById('livretModal').classList.add('active');
+        }
+
+        function closeLivretModal() {
+            document.getElementById('livretModal').classList.remove('active');
+            editingLivretPageIndex = null;
+        }
+
+        function saveLivretModal() {
+            if (editingLivretPageIndex === null) return;
+            livretPages[editingLivretPageIndex].titre = document.getElementById('edit-livret-title').value;
+            livretPages[editingLivretPageIndex].subtitle = document.getElementById('edit-livret-subtitle').value;
+            livretPages[editingLivretPageIndex].type = document.getElementById('edit-livret-type').value;
+            livretPages[editingLivretPageIndex].leftContent = document.getElementById('edit-livret-left-code').value;
+            livretPages[editingLivretPageIndex].html = document.getElementById('edit-livret-content-code').value;
+
+            closeLivretModal();
+            syncToSupabase(true);
+            renderLivret();
+        }
+
         function ajouterPageLivret() {
-            livretPages.push({ isGarde: false, titre: `Page ${livretPages.length + 1} — Nouvelle Section HTML`, html: `<h3 style="color:#C41E3A;">Titre Section</h3>\n<p>Contenu personnalisable en HTML...</p>` });
+            livretPages.push({ 
+                type: "standard", 
+                titre: `NOUVELLE SECTION`, 
+                subtitle: `Dossier Mécénat 2026-2027`, 
+                html: `<div class="box"><h3>Titre de la section</h3><p>Présentation du projet et des opportunités de partenariat...</p></div>` 
+            });
             syncToSupabase();
-            renderLivretEditor();
+            renderLivret();
+            openLivretModal(livretPages.length - 1);
         }
 
         function deplacerPageLivret(index, direction) {
@@ -881,15 +1316,28 @@
             livretPages[index] = livretPages[newIndex];
             livretPages[newIndex] = temp;
             syncToSupabase(true);
-            renderLivretEditor();
+            renderLivret();
         }
 
         function supprimerPageLivret(index) {
-            if(confirm("Supprimer cette page du livret ?")) {
+            if (livretPages.length <= 1) return alert("Le livret doit contenir au moins une page.");
+            if(confirm("Supprimer cette page du livret mécénat ?")) {
                 livretPages.splice(index, 1);
                 syncToSupabase();
-                renderLivretEditor();
+                renderLivret();
             }
+        }
+
+        function reinitialiserLivretDefaut() {
+            if(confirm("Réinitialiser toutes les pages du livret avec le modèle officiel par défaut ?")) {
+                livretPages = JSON.parse(JSON.stringify(DEFAULT_LIVRET_PAGES));
+                syncToSupabase();
+                renderLivret();
+            }
+        }
+
+        function escapeHtml(str) {
+            return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
         /* IMPRESSIONS OFFICIELLES CHARTE DOJO DORNOIS */
@@ -913,10 +1361,10 @@
                 </style></head><body>
                     <div class="print-header">
                         <div style="display:flex; align-items:center; gap:12px;">
-                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                            <img src="${logoUrl}" class="print-logo">
                             <div><h1 style="font-family:'Fredoka',sans-serif; color:#C41E3A; margin:0; font-size:18pt;">DOJO DORNOIS</h1><p style="margin:0; font-size:8.5pt; color:#666;">Association Sportive & Citoyenne (Loi 1901)</p></div>
                         </div>
-                        <div style="text-align:right; font-size:8pt; color:#333;">38 rue de Decize, 58390 DORNES<br>dojodornois@gmail.com &bull; RNA W583001220</div>
+                        <div style="text-align:right; font-size:8pt; color:#333;">38 Route de Decize, 58390 DORNES<br>dojodornois@gmail.com &bull; RNA W583001220</div>
                     </div>
 
                     <div class="doc-title">Convention Officielle de Mécénat Citoyen</div>
@@ -973,7 +1421,7 @@
                         <div class="section">
                             <div class="section-title">1. Organisme Bénéficiaire :</div>
                             <strong>Nom :</strong> DOJO DORNOIS (Association Sportive Loi 1901)<br>
-                            <strong>Adresse :</strong> 38 rue de Decize, 58390 DORNES<br>
+                            <strong>Adresse :</strong> 38 Route de Decize, 58390 DORNES<br>
                             <strong>SIRET :</strong> 451 928 410 00013 &bull; <strong>RNA :</strong> W583001220
                         </div>
                         <div class="section">
@@ -1002,35 +1450,82 @@
 
         function imprimerLivretMecenetPDF() {
             let htmlPages = '';
-            livretPages.forEach((p, i) => {
-                let footerContent = p.isGarde 
-                    ? `Dojo Dornois &bull; Association Loi 1901 &bull; RNA W583001220 &bull; SIRET 45192841000013`
-                    : `Livret Mécénat Dojo Dornois &bull; Page ${i+1} / ${livretPages.length}`;
+            const totalNumberedPages = livretPages.filter(p => p.type !== 'cover').length;
+            let currentNum = 0;
 
-                htmlPages += `
-                    <div class="livret-page">
-                        ${!p.isGarde ? `
-                        <div class="print-header">
-                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
-                            <div><h1 style="font-family:'Fredoka',sans-serif; color:#C41E3A; margin:0; font-size:16pt;">DOJO DORNOIS</h1><p style="margin:0; font-size:8pt; color:#666;">Dossier de Mécénat & Partenariat Citoyen</p></div>
-                        </div>` : ''}
-                        ${p.html}
-                        <div class="page-footer">${footerContent}</div>
-                    </div>
-                `;
+            livretPages.forEach((p) => {
+                const isCover = p.type === 'cover';
+                if (!isCover) currentNum++;
+
+                if (isCover) {
+                    const leftHtml = p.leftContent || `Association Loi 1901<br>RNA : W583001220<br>SIRET : 451 928 410 00013`;
+                    htmlPages += `
+                        <div class="a4-print-page">
+                            <div class="cover-style-print">
+                                <div class="cover-left-print">
+                                    <div>
+                                        <img src="${logoUrl}" class="cover-logo-box-print" alt="Logo">
+                                        <h1 style="font-family:'Fredoka',sans-serif; color:white; font-size:24pt; letter-spacing:1px; margin-top:8px;">DOJO DORNOIS</h1>
+                                        <p style="color:#FFB3C1; font-size:11pt; margin-top:2px; font-weight:500;">Judo • Ju-Jitsu • Taïso</p>
+                                    </div>
+                                    <div style="font-size:8.5pt; opacity:0.75; line-height:1.4;">
+                                        ${leftHtml}
+                                    </div>
+                                </div>
+                                <div class="cover-right-print">
+                                    <h1 style="font-family:'Fredoka',sans-serif; font-size:32pt; line-height:1.1; margin-bottom:8px; color:white;">${escapeHtml(p.titre)}</h1>
+                                    <h3 style="color:#FFB3C1; font-size:15pt; font-weight:400; margin-bottom:24px;">${escapeHtml(p.subtitle || '')}</h3>
+                                    <div>${p.html || ''}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    htmlPages += `
+                        <div class="a4-print-page standard-page-print">
+                            <div class="header-page-print">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <img src="${logoUrl}" class="logo-header-box-print" alt="Logo">
+                                    <div>
+                                        <h2 style="font-family:'Fredoka',sans-serif; color:#8B1429; font-size:18pt; margin:0; text-transform:uppercase;">${escapeHtml(p.titre)}</h2>
+                                        <p style="margin:2px 0 0 0; color:#6B6B6B; font-size:9.5pt;">${escapeHtml(p.subtitle || 'Dossier de Mécénat')}</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span style="background:#C41E3A; color:white; font-family:'Fredoka',sans-serif; font-weight:bold; padding:5px 12px; border-radius:6px; font-size:11px;">DOJO DORNOIS</span>
+                                </div>
+                            </div>
+                            <div class="body-page-print">
+                                ${p.html || ''}
+                            </div>
+                            <div class="footer-page-print">
+                                <span>Dossier Officiel de Mécénat — Dojo Dornois</span>
+                                <span>Page ${currentNum} / ${totalNumberedPages}</span>
+                            </div>
+                        </div>
+                    `;
+                }
             });
 
             const win = window.open('', '_blank');
             win.document.write(`
-                <!DOCTYPE html><html><head><title>Livret Mécénat Dojo Dornois</title>
-                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                <!DOCTYPE html><html><head><title>Livret Mécénat — Dojo Dornois</title>
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
                 <style>
-                    @page { size: A4 portrait; margin: 15mm; }
-                    body { font-family:'Roboto',sans-serif; color:#1a1a1a; margin:0; padding:0; }
-                    .livret-page { page-break-after: always; height: 91vh; position: relative; box-sizing:border-box; }
-                    .print-header { display:flex; align-items:center; gap:12px; border-bottom:2px solid #C41E3A; padding-bottom:8px; margin-bottom:20px; }
-                    .print-logo { height:45px; width:45px; background:#C41E3A; padding:3px; border-radius:5px; object-fit:contain; }
-                    .page-footer { position:absolute; bottom:0; left:0; right:0; text-align:center; font-size:8pt; color:#888; border-top:1px solid #ddd; padding-top:6px; }
+                    @page { size: A4 landscape; margin: 0; }
+                    html, body { margin: 0; padding: 0; background: white; font-family: 'Roboto', sans-serif; color: #1a1a1a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .a4-print-page { width: 297mm; height: 210mm; page-break-after: always; page-break-inside: avoid; position: relative; box-sizing: border-box; overflow: hidden; }
+                    .standard-page-print { padding: 16mm 20mm; display: flex; flex-direction: column; justify-content: space-between; }
+                    .header-page-print { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #C41E3A; padding-bottom: 10px; margin-bottom: 15px; }
+                    .logo-header-box-print { width: 48px; height: 48px; object-fit: contain; background: #C41E3A; padding: 4px; border-radius: 8px; }
+                    .body-page-print { flex: 1; font-size: 10pt; line-height: 1.55; }
+                    .footer-page-print { border-top: 1px solid #E2E8F0; padding-top: 8px; display: flex; justify-content: space-between; font-size: 8.5pt; color: #6B6B6B; font-weight: 500; }
+                    .cover-style-print { background: linear-gradient(135deg, #1A1A1A 0%, #2A080C 50%, #8B1429 100%); color: white; width: 100%; height: 100%; padding: 22mm 25mm; display: flex; box-sizing: border-box; }
+                    .cover-left-print { width: 38%; border-right: 3px solid #C41E3A; padding-right: 25px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; }
+                    .cover-logo-box-print { width: 110px; height: 110px; object-fit: contain; background: #C41E3A; padding: 10px; border-radius: 16px; }
+                    .cover-right-print { width: 62%; padding-left: 35px; display: flex; flex-direction: column; justify-content: center; }
+                    .box { background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #C41E3A; padding: 14px 16px; border-radius: 8px; margin-bottom: 10px; }
+                    .box h3 { font-family: 'Fredoka', sans-serif; color: #C41E3A; margin: 0 0 6px 0; font-size: 11.5pt; }
                 </style></head><body>
                     ${htmlPages}
                     <script>window.onload = function() { setTimeout(() => { window.print(); window.close(); }, 500); };<\/script>
@@ -1097,7 +1592,7 @@
 
                     <div class="print-header">
                         <div class="brand-area">
-                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                            <img src="${logoUrl}" class="print-logo">
                             <div class="brand-titles">
                                 <h1>Dojo Dornois</h1>
                                 <p>Registre Général du Mécénat & Démarchage Entreprises</p>
@@ -1105,7 +1600,7 @@
                         </div>
                         <div class="print-club-info">
                             <strong>DOJO DORNOIS</strong><br>
-                            38 rue de Decize, 58390 DORNES &bull; dojodornois@gmail.com<br>
+                            38 Route de Decize, 58390 DORNES &bull; dojodornois@gmail.com<br>
                             RNA W583001220 &bull; SIRET 45192841000013
                         </div>
                     </div>
