@@ -578,7 +578,7 @@
 
         const logoUrl = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png";
 
-       const initialPages = [
+        const initialPages = [
     {
         title: "LIVRET D'ACCUEIL",
         subtitle: "Saison Officielle 2026 - 2027",
@@ -762,7 +762,6 @@
         let editingPageIndex = null;
 
         async function loadData() {
-            // 1. Sync load from localStorage for instant UI
             const saved = localStorage.getItem('dojo_livret_data_v5');
             if (saved) {
                 try {
@@ -775,7 +774,6 @@
             }
             render(false);
 
-            // 2. Async fetch from Supabase
             try {
                 const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
                 if (error && error.code !== 'PGRST116') throw error;
@@ -810,12 +808,29 @@
             sidebar.innerHTML = '';
             workspace.innerHTML = '';
 
+            // Nombre total de pages intérieures numérotées
+            const totalNumberedPages = pagesData.filter(p => p.type !== 'cover').length;
+
+            let numberedCounter = 0;
+
             pagesData.forEach((p, idx) => {
+                const isCover = p.type === 'cover';
+                let pageLabel = '';
+                let currentNum = 0;
+
+                if (isCover) {
+                    pageLabel = idx === 0 ? 'Couverture (Début)' : 'Couverture (Fin)';
+                } else {
+                    numberedCounter++;
+                    currentNum = numberedCounter;
+                    pageLabel = `Page ${currentNum}`;
+                }
+
                 const card = document.createElement('div');
                 card.className = 'page-item-card';
                 card.innerHTML = `
                     <div class="page-item-header">
-                        <span><b>Page ${idx + 1}</b></span>
+                        <span><b>${pageLabel}</b></span>
                         <span style="font-size:11px; color:var(--gris-moyen);">${p.type}</span>
                     </div>
                     <div style="font-size:12px; font-weight:bold; color:var(--noir-doux);">${escapeHtml(p.title)}</div>
@@ -831,7 +846,7 @@
                 const pageWrapper = document.createElement('div');
                 pageWrapper.className = 'a4-landscape';
 
-                if (p.type === 'cover') {
+                if (isCover) {
                     const leftHtml = p.leftContent || `Club affilié France Judo<br>RNA : W583001220`;
                     pageWrapper.innerHTML = `
                         <div class="cover-style">
@@ -871,7 +886,7 @@
                         </div>
                         <div class="footer-page">
                             <span>Dojo Dornois — Club de Judo, Ju-Jitsu & Disciplines Associées</span>
-                            <span>Page ${idx + 1} / ${pagesData.length}</span>
+                            <span>Page ${currentNum} / ${totalNumberedPages}</span>
                         </div>
                     `;
                 }
@@ -900,7 +915,17 @@
         function openModal(idx) {
             editingPageIndex = idx;
             const p = pagesData[idx];
-            document.getElementById('modal-title').innerText = `Édition de la Page ${idx + 1}`;
+            
+            const isCover = p.type === 'cover';
+            let titlePrefix = `Édition de la Page`;
+            if (isCover) {
+                titlePrefix = idx === 0 ? `Édition de la Couverture (Début)` : `Édition de la Couverture (Fin)`;
+            } else {
+                const num = pagesData.slice(0, idx + 1).filter(item => item.type !== 'cover').length;
+                titlePrefix = `Édition de la Page ${num}`;
+            }
+
+            document.getElementById('modal-title').innerText = titlePrefix;
             document.getElementById('edit-title').value = p.title || '';
             document.getElementById('edit-subtitle').value = p.subtitle || '';
             document.getElementById('edit-type').value = p.type || 'standard';
