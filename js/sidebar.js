@@ -17,6 +17,7 @@
         window.location.href = isAtRoot ? 'login.html' : '../login.html';
     }
 })();
+
 (function() {
     const styleId = 'dojo-sidebar-auto-styles';
     if (!document.getElementById(styleId)) {
@@ -145,7 +146,7 @@
                 font-weight: 700;
                 text-transform: uppercase;
                 color: var(--text-muted);
-                padding: 6px 8px 6px 8px;
+                padding: 6px 8px;
                 letter-spacing: 0.5px;
             }
 
@@ -245,7 +246,7 @@
                 text-decoration: none;
                 border-radius: 8px;
                 font-weight: 500;
-                font-size: 0.9rem;
+                font-size: 0.88rem;
                 margin-bottom: 4px;
                 transition: all 0.2s ease;
                 border: 1px solid transparent;
@@ -262,7 +263,7 @@
                 box-shadow: 0 4px 15px rgba(196,30,58,0.4);
                 border: 1px solid rgba(255,255,255,0.2);
             }
-            .nav-link-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+            .nav-link-icon { font-size: 1.05rem; width: 22px; text-align: center; }
 
             .sidebar-footer {
                 padding: 12px 16px;
@@ -278,14 +279,117 @@
         document.head.appendChild(styleEl);
     }
 
-    function renderSidebar() {
-        let structure = [];
-        try {
-            const saved = localStorage.getItem('dd_catalog_structure_v6');
-            if (saved) structure = JSON.parse(saved);
-        } catch(e) {}
+    // CATALOGUE COMPLET EXACT ISSU DE L'INDEX (+ LE NOUVEAU CALENDRIER)
+    const masterDefaultCatalog = [
+        {
+            id: "compta",
+            titre: "💰 Comptabilité & Finances",
+            outils: [
+                { name: "💰 Trésorerie & Compta", url: "outils/compta.html" },
+                { name: "📊 Suivi Budget", url: "outils/budget.html" },
+                { name: "🚗 Notes de Frais", url: "outils/generateur_frais.html" },
+                { name: "🪙 Mécénat", url: "outils/mecenat.html" },
+                { name: "🖨️ Facturation", url: "outils/facturation.html" },
+                { name: "🏷️ Achats Publicitaires", url: "outils/achats_pub.html" }
+            ]
+        },
+        {
+            id: "admin",
+            titre: "📑 Administration, Devis & Documents",
+            outils: [
+                { name: "📝 Éditeur Documents", url: "outils/generateur_documents.html" },
+                { name: "💼 Générateur de Devis", url: "outils/generateur_devis.html" },
+                { name: "📜 Attestations & Reçus", url: "outils/generateur_recus.html" },
+                { name: "✉️ Courriers Officiels", url: "outils/generateur_courriers.html" },
+                { name: "📨 Convocations Club", url: "outils/generateur_convocations.html" },
+                { name: "📑 Comptes-Rendus", url: "outils/generateur_cr.html" },
+                { name: "📖 Livret Accueil", url: "outils/livretaccueil.html" },
+                { name: "🛠️ Charte Création Outils", url: "outils/charte_creation_outils.html" }
+            ]
+        },
+        {
+            id: "materiel",
+            titre: "🥋 Gestion Club, Matériel & Boutique",
+            outils: [
+                { name: "🥋 Gestion Judogis", url: "outils/gestion_judogis.html" },
+                { name: "⚙️ Immobilisations & Matériels", url: "outils/immobilisations.html" },
+                { name: "📦 Stocks & Logistique", url: "outils/logistique.html" },
+                { name: "🛍️ Boutique & Ventes", url: "outils/boutique.html" },
+                { name: "🎟️ Tombola Club", url: "outils/tombola.html" },
+                { name: "⏱️ Heures Romain", url: "outils/heures_romain.html" }
+            ]
+        },
+        {
+            id: "communication",
+            titre: "🎨 Communication, Studio & Visuels",
+            outils: [
+                { name: "📜 Charte Graphique", url: "outils/chartegraphique.html" },
+                { name: "🖊️ Studio Tampon", url: "outils/studio_tampon.html" },
+                { name: "🎨 Studio Icônes Dojo", url: "outils/studio_icones_dojo.html" },
+                { name: "📁 Icônes Dossiers Dojo", url: "outils/icones_dossiers_dojo.html" },
+                { name: "✉️ Newsletter Club", url: "outils/newsletter.html" },
+                { name: "🖼️ Générateur Affiches", url: "outils/generateur_affiches.html" },
+                { name: "🎬 Studio Vignettes", url: "outils/studio_vignettes.html" },
+                { name: "📱 Générateur QR Code", url: "outils/generateur_qr_code.html" },
+                { name: "✍️ Signature Gmail", url: "outils/studio_signature_gmail.html" },
+                { name: "📅 Planning Réseaux", url: "outils/planning_reseaux.html" }
+            ]
+        },
+        {
+            id: "activites",
+            titre: "🥋 Activités, Écoles & Événements",
+            outils: [
+                { name: "🏆 Calendrier des Tournois", url: "outils/calendrier-evenements.html" },
+                { name: "🥋 Suivi Romain", url: "outils/suivi_romain.html" },
+                { name: "🎈 Événements Club", url: "outils/evenements.html" },
+                { name: "🎟️ Compta Événements", url: "outils/compta_evenements.html" },
+                { name: "🏫 Suivi Écoles", url: "outils/suivi_ecoles.html" },
+                { name: "🌼 Suivi Événements Été", url: "outils/suivi_evenements_ete.html" },
+                { name: "🧘 Sophrologie", url: "outils/sophrologie.html" },
+                { name: "🌐 Éditeur Kalisport", url: "outils/editeur_kalisport.html" }
+            ]
+        },
+        {
+            id: "pilotage",
+            titre: "⚙️ Pilotage, Projets & Organisation",
+            outils: [
+                { name: "📓 Workspace Notes", url: "outils/notion_board.html" },
+                { name: "🚀 Futur Dojo / Projets", url: "outils/futur_dojo.html" },
+                { name: "📅 Réunions & ODJ", url: "outils/reunions.html" },
+                { name: "📊 Logistique & Planning", url: "outils/logistique.html" },
+                { name: "📝 Générateur Kalisport", url: "outils/generateur_kalisport.html" }
+            ]
+        }
+    ];
 
-        if (!structure || structure.length === 0) return;
+    function renderSidebar() {
+        let structure = masterDefaultCatalog;
+        try {
+            const saved = localStorage.getItem('dd_catalog_structure_v7') || localStorage.getItem('dd_catalog_structure_v6');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    structure = parsed;
+                    
+                    // Vérifier et injecter automatiquement calendrier-evenements s'il n'y est pas
+                    let hasEventTool = false;
+                    structure.forEach(cat => {
+                        if (cat.outils && cat.outils.some(t => t.url.includes('calendrier-evenements.html'))) {
+                            hasEventTool = true;
+                        }
+                    });
+                    if (!hasEventTool) {
+                        const targetCat = structure.find(c => c.id === 'activites') || structure[0];
+                        if (targetCat && targetCat.outils) {
+                            targetCat.outils.unshift({ name: "🏆 Calendrier des Tournois", url: "outils/calendrier-evenements.html" });
+                            localStorage.setItem('dd_catalog_structure_v7', JSON.stringify(structure));
+                        }
+                    }
+                }
+            } else {
+                localStorage.setItem('dd_catalog_structure_v7', JSON.stringify(masterDefaultCatalog));
+            }
+        } catch(e) {}
 
         const currentFilename = window.location.pathname.split('/').pop() || 'index.html';
         const isAtRoot = !window.location.pathname.includes('/outils/');
@@ -414,5 +518,9 @@
         }
     });
 
-    document.addEventListener("DOMContentLoaded", renderSidebar);
+    if (document.readyState === 'loading') {
+        document.addEventListener("DOMContentLoaded", renderSidebar);
+    } else {
+        renderSidebar();
+    }
 })();
