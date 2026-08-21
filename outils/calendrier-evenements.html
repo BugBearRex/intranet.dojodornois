@@ -52,11 +52,11 @@
 
         .club-logo-img { width: 100%; height: 100%; object-fit: contain; }
 
+        /* CARTES D'ÉVÉNEMENTS & THÈMES PAR DISCIPLINE */
         .event-card {
             border-radius: 8px;
             border: 1px solid var(--gris-tres-clair);
-            border-left: 5px solid var(--rouge);
-            background: #FFFFFF;
+            border-left: 6px solid var(--rouge);
             transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
         .event-card:hover {
@@ -64,20 +64,40 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
 
-        .badge-type {
+        .theme-Tournoi { border-left-color: #C41E3A !important; background: #FFF9FA; }
+        .theme-Tournoi .date-badge-col { background: #FFEBEF; color: #C41E3A; border: 1px solid #FECDD3; }
+        .theme-Tournoi .badge-tag { background: #C41E3A; color: white; }
+
+        .theme-Stage { border-left-color: #2563EB !important; background: #F8FAFF; }
+        .theme-Stage .date-badge-col { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+        .theme-Stage .badge-tag { background: #2563EB; color: white; }
+
+        .theme-Interclub { border-left-color: #059669 !important; background: #F6FDF9; }
+        .theme-Interclub .date-badge-col { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+        .theme-Interclub .badge-tag { background: #059669; color: white; }
+
+        .theme-UV { border-left-color: #D97706 !important; background: #FFFDF5; }
+        .theme-UV .date-badge-col { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
+        .theme-UV .badge-tag { background: #D97706; color: white; }
+
+        .theme-Autre { border-left-color: #7C3AED !important; background: #FAF5FF; }
+        .theme-Autre .date-badge-col { background: #F3E8FF; color: #6D28D9; border: 1px solid #DDD6FE; }
+        .theme-Autre .badge-tag { background: #7C3AED; color: white; }
+
+        .date-badge-col {
+            width: 72px;
+            min-height: 68px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             font-family: 'Fredoka', sans-serif;
-            font-size: 10px;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 12px;
-            display: inline-block;
-            text-transform: uppercase;
+            text-align: center;
+            flex-shrink: 0;
+            line-height: 1;
+            padding: 4px;
         }
-        .badge-tournoi { background: #FEE2E2; color: #B91C1C; }
-        .badge-stage { background: #DBEAFE; color: #1D4ED8; }
-        .badge-interclub { background: #D1FAE5; color: #047857; }
-        .badge-uv { background: #FEF3C7; color: #B45309; }
-        .badge-autre { background: #EDE9FE; color: #6D28D9; }
 
         @page { size: A4 landscape; margin: 8mm 10mm; }
 
@@ -97,9 +117,7 @@
             .print-event-card {
                 page-break-inside: avoid;
                 border: 1px solid #E8E8E8 !important;
-                border-left: 6px solid #C41E3A !important;
                 padding: 10px 14px !important;
-                background: #FFF !important;
             }
         }
     </style>
@@ -315,7 +333,6 @@
                 if (!error && data && data.length > 0) {
                     events = data;
                 } else if (!error && data && data.length === 0) {
-                    // Si la table vient d'être créée, insérer le jeu d'essai complet
                     const cleaned = events.map(({ id, ...rest }) => rest);
                     await supabaseClient.from('club_events').insert(cleaned);
                 }
@@ -348,19 +365,6 @@
             renderEvents();
         }
 
-        function formatDateLabel(startDateStr, endDateStr) {
-            const start = new Date(startDateStr);
-            const options = { day: 'numeric', month: 'long' };
-            if (!endDateStr || startDateStr === endDateStr) {
-                return start.toLocaleDateString('fr-FR', options);
-            }
-            const end = new Date(endDateStr);
-            if (start.getMonth() === end.getMonth()) {
-                return `${start.getDate()} et ${end.getDate()} ${start.toLocaleDateString('fr-FR', { month: 'long' })}`;
-            }
-            return `${start.toLocaleDateString('fr-FR', options)} au ${end.toLocaleDateString('fr-FR', options)}`;
-        }
-
         function renderEvents() {
             const grid = document.getElementById('events-grid');
             const typeFilter = document.getElementById('filterType').value;
@@ -380,34 +384,49 @@
                 document.getElementById('empty-message').classList.add('hidden');
                 
                 filtered.forEach(ev => {
-                    let badgeClass = 'badge-autre';
-                    if (ev.category === 'Tournoi') badgeClass = 'badge-tournoi';
-                    if (ev.category === 'Stage') badgeClass = 'badge-stage';
-                    if (ev.category === 'Interclub') badgeClass = 'badge-interclub';
-                    if (ev.category === 'UV / Grades') badgeClass = 'badge-uv';
+                    let themeClass = 'theme-Autre';
+                    if (ev.category === 'Tournoi') themeClass = 'theme-Tournoi';
+                    if (ev.category === 'Stage') themeClass = 'theme-Stage';
+                    if (ev.category === 'Interclub') themeClass = 'theme-Interclub';
+                    if (ev.category.includes('UV') || ev.category.includes('Grades')) themeClass = 'theme-UV';
 
-                    const dateFormatted = formatDateLabel(ev.event_date, ev.end_date);
+                    const start = new Date(ev.event_date);
+                    const dayNum = start.getDate();
+                    const monthStr = start.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '').toUpperCase();
+
+                    let dayLabel = dayNum;
+                    if (ev.end_date && ev.end_date !== ev.event_date) {
+                        const end = new Date(ev.end_date);
+                        dayLabel = `${dayNum}-${end.getDate()}`;
+                    }
 
                     const card = document.createElement('div');
-                    card.className = 'event-card print-event-card p-4 flex flex-col justify-between';
+                    card.className = `event-card print-event-card p-3.5 flex items-center gap-3.5 ${themeClass}`;
                     card.innerHTML = `
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="badge-type ${badgeClass}">${ev.category}</span>
-                                <div class="flex items-center gap-2">
-                                    ${ev.kalisport_synced ? '<span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-medium no-print"><i class="fa-solid fa-check"></i> Kalisport</span>' : ''}
-                                    <button onclick="editEvent(${ev.id})" class="no-print text-slate-400 hover:text-slate-700 text-xs"><i class="fa-solid fa-pen"></i></button>
+                        <!-- Bloc Date Visuel -->
+                        <div class="date-badge-col">
+                            <span style="font-size: 15pt; font-weight: 700;">${dayLabel}</span>
+                            <span style="font-size: 8pt; font-weight: 600; margin-top: 2px;">${monthStr}</span>
+                        </div>
+
+                        <!-- Détails de l'événement -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start gap-2 mb-1">
+                                <span class="badge-tag text-[9px] font-fredoka px-2 py-0.5 rounded font-bold uppercase">${ev.category}</span>
+                                <div class="flex items-center gap-1.5 no-print">
+                                    ${ev.kalisport_synced ? '<span class="text-[9px] text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded font-semibold"><i class="fa-solid fa-check"></i> Kalisport</span>' : ''}
+                                    <button onclick="editEvent(${ev.id})" class="text-slate-400 hover:text-slate-700 text-xs p-1"><i class="fa-solid fa-pen"></i></button>
                                 </div>
                             </div>
-                            <h4 class="font-fredoka text-base font-bold text-[#1A1A1A] leading-tight mb-1">${ev.title}</h4>
-                            <div class="text-xs text-[#C41E3A] font-semibold mb-2 flex items-center gap-1.5">
-                                <i class="fa-regular fa-calendar"></i> ${dateFormatted}
+
+                            <h4 class="font-fredoka text-[13px] font-bold text-slate-900 leading-tight truncate" title="${ev.title}">${ev.title}</h4>
+                            
+                            <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 mt-1 text-[11px] text-slate-600">
+                                <div class="truncate"><strong class="text-slate-800">📍</strong> ${ev.location}</div>
+                                <div class="truncate"><strong class="text-slate-800">🥋</strong> <span class="font-semibold text-slate-900">${ev.target_public}</span></div>
                             </div>
-                            <div class="space-y-1 text-xs text-slate-600">
-                                <div><strong class="text-slate-800">📍 Lieu :</strong> ${ev.location}</div>
-                                <div><strong class="text-slate-800">🥋 Public :</strong> ${ev.target_public}</div>
-                                ${ev.notes ? `<div class="text-[11px] text-slate-500 italic mt-1.5 pt-1 border-t border-slate-100">${ev.notes}</div>` : ''}
-                            </div>
+                            
+                            ${ev.notes ? `<div class="text-[10px] text-slate-500 italic mt-1 pt-1 border-t border-slate-200/60 truncate">${ev.notes}</div>` : ''}
                         </div>
                     `;
                     grid.appendChild(card);
