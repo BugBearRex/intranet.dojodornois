@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendrier des Événements & Tournois - Dojo Dornois</title>
+
+    <!-- POLICES OFFICIELLES CHARTE DOJO DORNOIS -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- TAILWIND CSS & FONTAWESOME -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SUPABASE JS CLIENT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --rouge-deep: #8B1429;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #B8B8B8;
+            --gris-tres-clair: #E8E8E8;
+            --fond: #F4F6F9;
+            --vert-succes: #2ECC71;
+            --vert-fond: #E8F8F0;
+            --bleu-info: #3498DB;
+            --bleu-fond: #EBF5FB;
+            --orange-warning: #F39C12;
+            --orange-fond: #FEF5E7;
+            --violet-fond: #F3E8FF;
+            --violet-txt: #6B21A8;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            color: var(--gris-fonce);
+            margin: 0;
+            padding: 0;
+            font-size: 13px;
+        }
+
+        h1, h2, h3, h4, h5, h6, .font-fredoka {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* En-tête print logo */
+        .logo-box-wrapper {
+            background-color: var(--rouge);
+            width: 58px;
+            height: 58px;
+            border-radius: 10px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(196, 30, 58, 0.25);
+            flex-shrink: 0;
+        }
+
+        .club-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Cartes d'événements */
+        .event-card {
+            border-radius: 8px;
+            border: 1px solid var(--gris-tres-clair);
+            border-left: 5px solid var(--rouge);
+            background: #FFFFFF;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .event-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        /* Badges de types d'événements */
+        .badge-type {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+        .badge-tournoi { background: #FEE2E2; color: #B91C1C; }
+        .badge-stage { background: #DBEAFE; color: #1D4ED8; }
+        .badge-interclub { background: #D1FAE5; color: #047857; }
+        .badge-uv { background: #FEF3C7; color: #B45309; }
+        .badge-autre { background: #EDE9FE; color: #6D28D9; }
+
+        /* Configuration Spécifique A4 PAYSAGE pour les réseaux et l'impression */
+        @page {
+            size: A4 landscape;
+            margin: 8mm 10mm;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body {
+                background: white !important;
+                color: #1A1A1A !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .main-content {
+                height: auto !important;
+                overflow: visible !important;
+                display: block !important;
+                padding: 0 !important;
+            }
+            .print-container {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+            .print-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px !important;
+            }
+            .print-event-card {
+                page-break-inside: avoid;
+                border: 1px solid #E8E8E8 !important;
+                border-left: 6px solid #C41E3A !important;
+                padding: 10px 14px !important;
+                background: #FFF !important;
+            }
+        }
+    </style>
+</head>
+<body class="h-full flex text-slate-800 antialiased">
+
+    <!-- SIDEBAR UNIFIÉE AUTO-INJECTÉE -->
+    <div class="sidebar no-print"></div>
+
+    <!-- ZONE DE CONTENU PRINCIPALE -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden main-content h-screen">
+        
+        <!-- Topbar -->
+        <header class="no-print bg-white border-b border-slate-200 px-6 py-3.5 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="logo-box-wrapper !w-9 !h-9 !rounded-md">
+                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo" class="club-logo-img">
+                </div>
+                <div>
+                    <h1 class="font-fredoka text-lg font-bold text-[#1A1A1A]">Calendrier des Événements & Tournois</h1>
+                    <p class="text-xs text-slate-500">Saison 2026-2027 • Export mensuel A4 paysage pour publication & réseaux</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="openModalEvent()" class="px-3.5 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-medium flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-plus"></i> Ajouter un événement
+                </button>
+                <button onclick="window.print()" class="px-3.5 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-xs font-medium flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-print"></i> Imprimer / Export Réseaux (Paysage)
+                </button>
+                <button onclick="exportKalisportCSV()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-file-csv"></i> Export Kalisport
+                </button>
+            </div>
+        </header>
+
+        <!-- Filtres et Barre des Mois -->
+        <div class="no-print bg-white border-b border-slate-200 px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-1.5 overflow-x-auto py-1">
+                <button onclick="filterMonth('ALL')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-[#C41E3A] text-white" id="btn-m-ALL">Toute la saison</button>
+                <button onclick="filterMonth('2026-08')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" id="btn-m-2026-08">Août 26</button>
+                <button onclick="filterMonth('2026-09')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" id="btn-m-2026-09">Septembre 26</button>
+                <button onclick="filterMonth('2026-10')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" id="btn-m-2026-10">Octobre 26</button>
+                <button onclick="filterMonth('2026-11')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" id="btn-m-2026-11">Novembre 26</button>
+                <button onclick="filterMonth('2026-12')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" id="btn-m-2026-12">Décembre 26</button>
+                <button onclick="filterMonth('2027-01')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" id="btn-m-2027-01">Janvier 27</button>
+                <button onclick="filterMonth('2027-02')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" id="btn-m-2027-02">Février 27</button>
+                <button onclick="filterMonth('2027-03')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" id="btn-m-2027-03">Mars 27</button>
+                <button onclick="filterMonth('2027-04')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" id="btn-m-2027-04">Avril 27</button>
+                <button onclick="filterMonth('2027-05')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" id="btn-m-2027-05">Mai 27</button>
+                <button onclick="filterMonth('2027-06')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200" id="btn-m-2027-06">Juin 27</button>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <select id="filterType" onchange="renderEvents()" class="border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs bg-slate-50 text-slate-700 outline-none">
+                    <option value="ALL">Toutes les catégories</option>
+                    <option value="Tournoi">Tournois & Compétitions</option>
+                    <option value="Stage">Stages & Regroupements</option>
+                    <option value="Interclub">Interclubs</option>
+                    <option value="UV / Grades">Passages de Grades & UV</option>
+                    <option value="Autre">Autres rencontres</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ZONE D'AFFICHAGE & IMPRESSION A4 PAYSAGE -->
+        <main class="flex-1 overflow-y-auto p-6">
+            <div id="print-container" class="print-container bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto">
+                
+                <!-- En-tête officiel du document (visible à l'écran et au print) -->
+                <div class="flex justify-between items-center border-b-2 border-[#C41E3A] pb-3 mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="logo-box-wrapper">
+                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo" class="club-logo-img">
+                        </div>
+                        <div>
+                            <div class="font-fredoka text-xl font-bold text-[#C41E3A] leading-none">DOJO DORNOIS</div>
+                            <div class="text-[9pt] font-semibold text-slate-700 uppercase mt-0.5" id="print-subtitle">CALENDRIER OFFICIEL DES ÉVÉNEMENTS & TOURNOIS</div>
+                            <div class="text-[8pt] text-slate-500">Judo • Jujitsu • Taïso • RNA : W583001220</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="bg-[#1A1A1A] text-white font-fredoka text-xs px-3 py-1 rounded-full uppercase" id="selected-month-badge">Saison 2026-2027</span>
+                        <div class="text-[8pt] text-slate-400 mt-1">Édité le <span class="today-str">--/--/----</span></div>
+                    </div>
+                </div>
+
+                <!-- Grille des événements -->
+                <div id="events-grid" class="print-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Rempli en JavaScript -->
+                </div>
+
+                <!-- Message si aucun événement -->
+                <div id="empty-message" class="hidden text-center py-12 text-slate-400">
+                    <i class="fa-solid fa-calendar-xmark text-4xl mb-2 text-slate-300"></i>
+                    <p class="font-fredoka text-base">Aucun événement répertorié pour cette sélection.</p>
+                </div>
+
+                <!-- Pied de page officiel -->
+                <div class="mt-6 pt-3 border-t border-slate-200 flex justify-between items-center text-[8pt] text-slate-500">
+                    <div>🥋 <strong>Dojo Dornois</strong> • 38 Route de Decize, 58390 Dornes • 06.07.13.91.86 • dojodornois@gmail.com</div>
+                    <div>🌐 dojodornois.fr • Suivez-nous sur les réseaux !</div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALE D'AJOUT / MODIFICATION D'ÉVÉNEMENT -->
+    <div id="modal-event" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden no-print">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-100">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-800 font-fredoka text-base" id="modal-title">Ajouter un événement</h3>
+                <button onclick="closeModalEvent()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <form id="eventForm" onsubmit="saveEvent(event)" class="p-6 space-y-4">
+                <input type="hidden" id="event-id">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Intitulé de l'événement *</label>
+                    <input type="text" id="event-title" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:bg-white focus:border-[#C41E3A] outline-none" placeholder="Ex: Tournoi Label A, Interclub, BFC...">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Catégorie *</label>
+                        <select id="event-category" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:bg-white focus:border-[#C41E3A] outline-none">
+                            <option value="Tournoi">Tournoi / Compétition</option>
+                            <option value="Stage">Stage</option>
+                            <option value="Interclub">Interclub</option>
+                            <option value="UV / Grades">Passage de Grade / UV</option>
+                            <option value="Autre">Autre rencontre / Rentrée</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Lieu *</label>
+                        <input type="text" id="event-location" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:bg-white focus:border-[#C41E3A] outline-none" placeholder="Ex: St Marcel, Nevers, Dojo...">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Publics concernés / Catégories d'âges *</label>
+                    <input type="text" id="event-public" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:bg-white focus:border-[#C41E3A] outline-none" placeholder="Ex: Benjamins, Minimes, Cadets, Tous...">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Date de début *</label>
+                        <input type="date" id="event-date" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:bg-white focus:border-[#C41E3A] outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Date de fin (si sur 2 jours)</label>
+                        <input type="date" id="event-end-date" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:bg-white focus:border-[#C41E3A] outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Notes / Horaires complémentaires</label>
+                    <textarea id="event-notes" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:bg-white focus:border-[#C41E3A] outline-none" placeholder="Horaires des pesées, matériel, covoiturage..."></textarea>
+                </div>
+
+                <div class="flex items-center gap-2 pt-2">
+                    <input type="checkbox" id="event-kalisport" class="rounded text-[#C41E3A]">
+                    <label for="event-kalisport" class="text-xs text-slate-600">Déjà saisi dans Kalisport</label>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
+                    <button type="button" id="btn-delete" onclick="deleteCurrentEvent()" class="hidden px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-medium">
+                        <i class="fa-solid fa-trash"></i> Supprimer
+                    </button>
+                    <div class="flex gap-2 ml-auto">
+                        <button type="button" onclick="closeModalEvent()" class="px-4 py-2 border border-slate-200 rounded-lg text-xs text-slate-600 hover:bg-slate-50">Annuler</button>
+                        <button type="submit" class="px-4 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-medium">Enregistrer</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+    <script>
+        // CONFIGURATION SUPABASE (remplace si besoin par tes variables globales du projet)
+        const SUPABASE_URL = "VOTRE_SUPABASE_URL";
+        const SUPABASE_ANON_KEY = "VOTRE_SUPABASE_ANON_KEY";
+        let supabaseClient = null;
+        if (SUPABASE_URL !== "VOTRE_SUPABASE_URL" && typeof supabase !== 'undefined') {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
+        // DONNÉES PRÉ-REMPLIES DU PLANNING DE ROMAIN (SAISON 2026-2027)
+        let events = [
+            { id: 1, title: "Rentrée Sportive", category: "Autre", target_public: "TOUS", event_date: "2026-08-29", end_date: null, location: "Dojo Dornois", notes: "Reprise des entraînements et inscriptions", kalisport_synced: false },
+            { id: 2, title: "Tournoi Label A", category: "Tournoi", target_public: "Cadets", event_date: "2026-09-26", end_date: null, location: "St Marcel", notes: "", kalisport_synced: false },
+            { id: 3, title: "Open", category: "Tournoi", target_public: "Benjamins, Minimes", event_date: "2026-10-18", end_date: null, location: "Sens", notes: "", kalisport_synced: false },
+            { id: 4, title: "Rencontre Club", category: "Autre", target_public: "Benjamins et +", event_date: "2026-11-01", end_date: null, location: "Dornes", notes: "Au Dojo Henri Pierrehumbert", kalisport_synced: false },
+            { id: 5, title: "Interclub", category: "Interclub", target_public: "Pré-Poussins, Poussins", event_date: "2026-11-07", end_date: null, location: "Varennes-Vauzelles", notes: "", kalisport_synced: false },
+            { id: 6, title: "Tournoi", category: "Tournoi", target_public: "Benjamins, Minimes", event_date: "2026-11-08", end_date: null, location: "Varennes-Vauzelles", notes: "", kalisport_synced: false },
+            { id: 7, title: "Open", category: "Tournoi", target_public: "Benjamins, Minimes", event_date: "2026-11-15", end_date: null, location: "St Marcel", notes: "", kalisport_synced: false },
+            { id: 8, title: "Para Judo Adapté", category: "Autre", target_public: "Personnes en situation de handicap", event_date: "2026-11-19", end_date: null, location: "Fourchambault", notes: "Section Taïso Adapté & Judo", kalisport_synced: false },
+            { id: 9, title: "Passage Grades UV1, UV2, UV3", category: "UV / Grades", target_public: "Cadets et +", event_date: "2026-12-12", end_date: "2026-12-13", location: "Lons-Le-Saunier", notes: "Examen officiel", kalisport_synced: false },
+            { id: 10, title: "Interclub", category: "Interclub", target_public: "Pré-Poussins, Poussins", event_date: "2026-12-19", end_date: null, location: "Nevers", notes: "", kalisport_synced: false },
+            { id: 11, title: "Open", category: "Tournoi", target_public: "Benjamins, Minimes", event_date: "2026-12-20", end_date: null, location: "Nevers", notes: "", kalisport_synced: false },
+            { id: 12, title: "BFC Jujitsu", category: "Tournoi", target_public: "Cadets +", event_date: "2026-12-20", end_date: null, location: "Épinal", notes: "Championnat régional", kalisport_synced: false },
+            { id: 13, title: "Stage de Noël", category: "Stage", target_public: "Benjamins, Minimes", event_date: "2026-12-21", end_date: "2026-12-22", location: "Nevers", notes: "Perfectionnement technique", kalisport_synced: false },
+            { id: 14, title: "BFC Minimes & Cadets", category: "Tournoi", target_public: "Minimes, Cadets", event_date: "2027-02-13", end_date: "2027-02-14", location: "Besançon", notes: "Championnat de Bourgogne-Franche-Comté", kalisport_synced: false },
+            { id: 15, title: "Passage Grades UV1 et UV2", category: "UV / Grades", target_public: "Cadets +", event_date: "2027-02-27", end_date: null, location: "Nevers", notes: "", kalisport_synced: false },
+            { id: 16, title: "Passage Grades UV3", category: "UV / Grades", target_public: "Cadets +", event_date: "2027-02-28", end_date: null, location: "Nevers", notes: "", kalisport_synced: false },
+            { id: 17, title: "Championnat de Bourgogne", category: "Tournoi", target_public: "Benjamins", event_date: "2027-03-14", end_date: null, location: "St Marcel", notes: "Phase qualificative", kalisport_synced: false },
+            { id: 18, title: "Tournoi de Guérigny", category: "Tournoi", target_public: "Pré-Poussins à Minimes", event_date: "2027-03-28", end_date: "2027-03-29", location: "Guérigny", notes: "", kalisport_synced: false },
+            { id: 19, title: "BFC 2D 3D", category: "Tournoi", target_public: "Cadets / Espoirs, Seniors", event_date: "2027-04-03", end_date: "2027-04-04", location: "Besançon", notes: "", kalisport_synced: false },
+            { id: 20, title: "Passage Grades UV1, UV2, UV3", category: "UV / Grades", target_public: "Cadets +", event_date: "2027-04-24", end_date: "2027-04-25", location: "Sanvignes-les-Mines", notes: "", kalisport_synced: false },
+            { id: 21, title: "Stage Jeunes", category: "Stage", target_public: "Pré-Poussins", event_date: "2027-05-01", end_date: null, location: "Dojo Dornois", notes: "Au club de Dornes", kalisport_synced: false },
+            { id: 22, title: "Stage Multi-Jujitsu", category: "Stage", target_public: "Jujitsu Contact, Combat, Ne Waza", event_date: "2027-05-02", end_date: null, location: "Dojo Dornois", notes: "Stage technique régional au Dojo Dornois", kalisport_synced: false },
+            { id: 23, title: "Open de France Jujitsu Brésilien", category: "Tournoi", target_public: "Jujitsu Brésilien", event_date: "2027-06-26", end_date: "2027-06-27", location: "Dojo de Paris", notes: "Institut du Judo (Paris)", kalisport_synced: false }
+        ];
+
+        let currentMonth = "ALL";
+
+        // Initialisation
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('.today-str').forEach(el => el.textContent = new Date().toLocaleDateString('fr-FR'));
+            loadEventsFromSupabase();
+        });
+
+        // CHARGEMENT SUPABASE OU LOCAL
+        async function loadEventsFromSupabase() {
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient.from('club_events').select('*').order('event_date', { ascending: true });
+                    if (!error && data && data.length > 0) {
+                        events = data;
+                    }
+                } catch (e) {
+                    console.log("Supabase non connecté, utilisation des données locales");
+                }
+            }
+            renderEvents();
+        }
+
+        // GESTION DU FILTRE MOIS
+        function filterMonth(monthKey) {
+            currentMonth = monthKey;
+            document.querySelectorAll('.month-btn').forEach(btn => {
+                btn.classList.remove('bg-[#C41E3A]', 'text-white');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById('btn-m-' + monthKey);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+                activeBtn.classList.add('bg-[#C41E3A]', 'text-white');
+            }
+
+            const monthNames = {
+                'ALL': 'Saison 2026-2027 Complète',
+                '2026-08': 'Août 2026', '2026-09': 'Septembre 2026', '2026-10': 'Octobre 2026',
+                '2026-11': 'Novembre 2026', '2026-12': 'Décembre 2026', '2027-01': 'Janvier 2027',
+                '2027-02': 'Février 2027', '2027-03': 'Mars 2027', '2027-04': 'Avril 2027',
+                '2027-05': 'Mai 2027', '2027-06': 'Juin 2027'
+            };
+            document.getElementById('selected-month-badge').textContent = monthNames[monthKey] || monthKey;
+            renderEvents();
+        }
+
+        // FORMATTAGE DES DATES
+        function formatDateLabel(startDateStr, endDateStr) {
+            const start = new Date(startDateStr);
+            const options = { day: 'numeric', month: 'long' };
+            if (!endDateStr || startDateStr === endDateStr) {
+                return start.toLocaleDateString('fr-FR', options);
+            }
+            const end = new Date(endDateStr);
+            if (start.getMonth() === end.getMonth()) {
+                return `${start.getDate()} et ${end.getDate()} ${start.toLocaleDateString('fr-FR', { month: 'long' })}`;
+            }
+            return `${start.toLocaleDateString('fr-FR', options)} au ${end.toLocaleDateString('fr-FR', options)}`;
+        }
+
+        // RENDU HTML DES CARTES
+        function renderEvents() {
+            const grid = document.getElementById('events-grid');
+            const typeFilter = document.getElementById('filterType').value;
+            grid.innerHTML = '';
+
+            let filtered = events.filter(e => {
+                const matchMonth = (currentMonth === 'ALL') || e.event_date.startsWith(currentMonth);
+                const matchType = (typeFilter === 'ALL') || e.category === typeFilter;
+                return matchMonth && matchType;
+            });
+
+            // Tri par date
+            filtered.sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
+
+            if (filtered.length === 0) {
+                document.getElementById('empty-message').classList.remove('hidden');
+            } else {
+                document.getElementById('empty-message').classList.add('hidden');
+                
+                filtered.forEach(ev => {
+                    let badgeClass = 'badge-autre';
+                    if (ev.category === 'Tournoi') badgeClass = 'badge-tournoi';
+                    if (ev.category === 'Stage') badgeClass = 'badge-stage';
+                    if (ev.category === 'Interclub') badgeClass = 'badge-interclub';
+                    if (ev.category === 'UV / Grades') badgeClass = 'badge-uv';
+
+                    const dateFormatted = formatDateLabel(ev.event_date, ev.end_date);
+
+                    const card = document.createElement('div');
+                    card.className = 'event-card print-event-card p-4 flex flex-col justify-between';
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="badge-type ${badgeClass}">${ev.category}</span>
+                                <div class="flex items-center gap-2">
+                                    ${ev.kalisport_synced ? '<span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-medium no-print"><i class="fa-solid fa-check"></i> Kalisport</span>' : ''}
+                                    <button onclick="editEvent(${ev.id})" class="no-print text-slate-400 hover:text-slate-700 text-xs"><i class="fa-solid fa-pen"></i></button>
+                                </div>
+                            </div>
+                            <h4 class="font-fredoka text-base font-bold text-[#1A1A1A] leading-tight mb-1">${ev.title}</h4>
+                            <div class="text-xs text-[#C41E3A] font-semibold mb-2 flex items-center gap-1.5">
+                                <i class="fa-regular fa-calendar"></i> ${dateFormatted}
+                            </div>
+                            <div class="space-y-1 text-xs text-slate-600">
+                                <div><strong class="text-slate-800">📍 Lieu :</strong> ${ev.location}</div>
+                                <div><strong class="text-slate-800">🥋 Public :</strong> ${ev.target_public}</div>
+                                ${ev.notes ? `<div class="text-[11px] text-slate-500 italic mt-1.5 pt-1 border-t border-slate-100">${ev.notes}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        // GESTION MODALE & CRUD
+        function openModalEvent() {
+            document.getElementById('eventForm').reset();
+            document.getElementById('event-id').value = '';
+            document.getElementById('modal-title').textContent = "Ajouter un événement";
+            document.getElementById('btn-delete').classList.add('hidden');
+            document.getElementById('modal-event').classList.remove('hidden');
+        }
+
+        function closeModalEvent() {
+            document.getElementById('modal-event').classList.add('hidden');
+        }
+
+        function editEvent(id) {
+            const ev = events.find(e => e.id === id);
+            if (!ev) return;
+            document.getElementById('event-id').value = ev.id;
+            document.getElementById('event-title').value = ev.title;
+            document.getElementById('event-category').value = ev.category;
+            document.getElementById('event-location').value = ev.location;
+            document.getElementById('event-public').value = ev.target_public;
+            document.getElementById('event-date').value = ev.event_date;
+            document.getElementById('event-end-date').value = ev.end_date || '';
+            document.getElementById('event-notes').value = ev.notes || '';
+            document.getElementById('event-kalisport').checked = ev.kalisport_synced || false;
+
+            document.getElementById('modal-title').textContent = "Modifier l'événement";
+            document.getElementById('btn-delete').classList.remove('hidden');
+            document.getElementById('modal-event').classList.remove('hidden');
+        }
+
+        async function saveEvent(e) {
+            e.preventDefault();
+            const idVal = document.getElementById('event-id').value;
+            const newEvent = {
+                title: document.getElementById('event-title').value,
+                category: document.getElementById('event-category').value,
+                location: document.getElementById('event-location').value,
+                target_public: document.getElementById('event-public').value,
+                event_date: document.getElementById('event-date').value,
+                end_date: document.getElementById('event-end-date').value || null,
+                notes: document.getElementById('event-notes').value,
+                kalisport_synced: document.getElementById('event-kalisport').checked
+            };
+
+            if (idVal) {
+                // Modification
+                const id = parseInt(idVal);
+                const index = events.findIndex(ev => ev.id === id);
+                if (index !== -1) {
+                    events[index] = { ...events[index], ...newEvent };
+                }
+                if (supabaseClient) {
+                    await supabaseClient.from('club_events').update(newEvent).eq('id', id);
+                }
+            } else {
+                // Ajout
+                const newId = events.length > 0 ? Math.max(...events.map(e => e.id || 0)) + 1 : 1;
+                const created = { id: newId, ...newEvent };
+                events.push(created);
+                if (supabaseClient) {
+                    await supabaseClient.from('club_events').insert([newEvent]);
+                }
+            }
+
+            closeModalEvent();
+            renderEvents();
+        }
+
+        async function deleteCurrentEvent() {
+            const idVal = document.getElementById('event-id').value;
+            if (!idVal) return;
+            if (confirm("Supprimer cet événement du calendrier ?")) {
+                const id = parseInt(idVal);
+                events = events.filter(e => e.id !== id);
+                if (supabaseClient) {
+                    await supabaseClient.from('club_events').delete().eq('id', id);
+                }
+                closeModalEvent();
+                renderEvents();
+            }
+        }
+
+        // EXPORT CSV POUR KALISPORT
+        function exportKalisportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Titre;Categorie;Date Debut;Date Fin;Lieu;Public;Notes\n";
+            events.forEach(e => {
+                const row = [
+                    `"${e.title}"`,
+                    `"${e.category}"`,
+                    `"${e.event_date}"`,
+                    `"${e.end_date || ''}"`,
+                    `"${e.location}"`,
+                    `"${e.target_public}"`,
+                    `"${e.notes || ''}"`
+                ].join(";");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `kalisport_events_dojo_dornois_${currentMonth}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
