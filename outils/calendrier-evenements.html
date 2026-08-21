@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendrier des Événements & Tournois - Dojo Dornois</title>
 
-    <!-- POLICES OFFICIELLES CHARTE DOJO DORNOIS -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
-    <!-- TAILWIND CSS & FONTAWESOME -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SUPABASE JS CLIENT -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -26,14 +22,6 @@
             --gris-clair: #B8B8B8;
             --gris-tres-clair: #E8E8E8;
             --fond: #F4F6F9;
-            --vert-succes: #2ECC71;
-            --vert-fond: #E8F8F0;
-            --bleu-info: #3498DB;
-            --bleu-fond: #EBF5FB;
-            --orange-warning: #F39C12;
-            --orange-fond: #FEF5E7;
-            --violet-fond: #F3E8FF;
-            --violet-txt: #6B21A8;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -47,11 +35,8 @@
             font-size: 13px;
         }
 
-        h1, h2, h3, h4, h5, h6, .font-fredoka {
-            font-family: 'Fredoka', sans-serif;
-        }
+        h1, h2, h3, h4, h5, h6, .font-fredoka { font-family: 'Fredoka', sans-serif; }
 
-        /* En-tête print logo */
         .logo-box-wrapper {
             background-color: var(--rouge);
             width: 58px;
@@ -65,13 +50,8 @@
             flex-shrink: 0;
         }
 
-        .club-logo-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+        .club-logo-img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* Cartes d'événements */
         .event-card {
             border-radius: 8px;
             border: 1px solid var(--gris-tres-clair);
@@ -84,7 +64,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
 
-        /* Badges de types d'événements */
         .badge-type {
             font-family: 'Fredoka', sans-serif;
             font-size: 10px;
@@ -100,11 +79,7 @@
         .badge-uv { background: #FEF3C7; color: #B45309; }
         .badge-autre { background: #EDE9FE; color: #6D28D9; }
 
-        /* Configuration Spécifique A4 PAYSAGE pour les réseaux et l'impression */
-        @page {
-            size: A4 landscape;
-            margin: 8mm 10mm;
-        }
+        @page { size: A4 landscape; margin: 8mm 10mm; }
 
         @media print {
             .no-print { display: none !important; }
@@ -116,24 +91,9 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            .main-content {
-                height: auto !important;
-                overflow: visible !important;
-                display: block !important;
-                padding: 0 !important;
-            }
-            .print-container {
-                border: none !important;
-                box-shadow: none !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                width: 100% !important;
-            }
-            .print-grid {
-                display: grid !important;
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 12px !important;
-            }
+            .main-content { height: auto !important; overflow: visible !important; display: block !important; padding: 0 !important; }
+            .print-container { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
+            .print-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
             .print-event-card {
                 page-break-inside: avoid;
                 border: 1px solid #E8E8E8 !important;
@@ -146,13 +106,10 @@
 </head>
 <body class="h-full flex text-slate-800 antialiased">
 
-    <!-- SIDEBAR UNIFIÉE AUTO-INJECTÉE -->
     <div class="sidebar no-print"></div>
 
-    <!-- ZONE DE CONTENU PRINCIPALE -->
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden main-content h-screen">
         
-        <!-- Topbar -->
         <header class="no-print bg-white border-b border-slate-200 px-6 py-3.5 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-3">
                 <div class="logo-box-wrapper !w-9 !h-9 !rounded-md">
@@ -177,7 +134,6 @@
             </div>
         </header>
 
-        <!-- Filtres et Barre des Mois -->
         <div class="no-print bg-white border-b border-slate-200 px-6 py-3 flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-1.5 overflow-x-auto py-1">
                 <button onclick="filterMonth('ALL')" class="month-btn px-3 py-1.5 rounded-lg text-xs font-fredoka font-semibold bg-[#C41E3A] text-white" id="btn-m-ALL">Toute la saison</button>
@@ -206,11 +162,9 @@
             </div>
         </div>
 
-        <!-- ZONE D'AFFICHAGE & IMPRESSION A4 PAYSAGE -->
         <main class="flex-1 overflow-y-auto p-6">
             <div id="print-container" class="print-container bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto">
                 
-                <!-- En-tête officiel du document (visible à l'écran et au print) -->
                 <div class="flex justify-between items-center border-b-2 border-[#C41E3A] pb-3 mb-5">
                     <div class="flex items-center gap-3">
                         <div class="logo-box-wrapper">
@@ -228,18 +182,13 @@
                     </div>
                 </div>
 
-                <!-- Grille des événements -->
-                <div id="events-grid" class="print-grid grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Rempli en JavaScript -->
-                </div>
+                <div id="events-grid" class="print-grid grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 
-                <!-- Message si aucun événement -->
                 <div id="empty-message" class="hidden text-center py-12 text-slate-400">
                     <i class="fa-solid fa-calendar-xmark text-4xl mb-2 text-slate-300"></i>
                     <p class="font-fredoka text-base">Aucun événement répertorié pour cette sélection.</p>
                 </div>
 
-                <!-- Pied de page officiel -->
                 <div class="mt-6 pt-3 border-t border-slate-200 flex justify-between items-center text-[8pt] text-slate-500">
                     <div>🥋 <strong>Dojo Dornois</strong> • 38 Route de Decize, 58390 Dornes • 06.07.13.91.86 • dojodornois@gmail.com</div>
                     <div>🌐 dojodornois.fr • Suivez-nous sur les réseaux !</div>
@@ -249,7 +198,6 @@
         </main>
     </div>
 
-    <!-- MODALE D'AJOUT / MODIFICATION D'ÉVÉNEMENT -->
     <div id="modal-event" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden no-print">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-100">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -321,19 +269,13 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
     <script src="../js/sidebar.js"></script>
 
     <script>
-        // CONFIGURATION SUPABASE (remplace si besoin par tes variables globales du projet)
-        const SUPABASE_URL = "VOTRE_SUPABASE_URL";
-        const SUPABASE_ANON_KEY = "VOTRE_SUPABASE_ANON_KEY";
-        let supabaseClient = null;
-        if (SUPABASE_URL !== "VOTRE_SUPABASE_URL" && typeof supabase !== 'undefined') {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
+        const SUPABASE_URL = "https://tumrbyxfnkqobyfzucax.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // DONNÉES PRÉ-REMPLIES DU PLANNING DE ROMAIN (SAISON 2026-2027)
         let events = [
             { id: 1, title: "Rentrée Sportive", category: "Autre", target_public: "TOUS", event_date: "2026-08-29", end_date: null, location: "Dojo Dornois", notes: "Reprise des entraînements et inscriptions", kalisport_synced: false },
             { id: 2, title: "Tournoi Label A", category: "Tournoi", target_public: "Cadets", event_date: "2026-09-26", end_date: null, location: "St Marcel", notes: "", kalisport_synced: false },
@@ -362,28 +304,27 @@
 
         let currentMonth = "ALL";
 
-        // Initialisation
         document.addEventListener("DOMContentLoaded", () => {
             document.querySelectorAll('.today-str').forEach(el => el.textContent = new Date().toLocaleDateString('fr-FR'));
             loadEventsFromSupabase();
         });
 
-        // CHARGEMENT SUPABASE OU LOCAL
         async function loadEventsFromSupabase() {
-            if (supabaseClient) {
-                try {
-                    const { data, error } = await supabaseClient.from('club_events').select('*').order('event_date', { ascending: true });
-                    if (!error && data && data.length > 0) {
-                        events = data;
-                    }
-                } catch (e) {
-                    console.log("Supabase non connecté, utilisation des données locales");
+            try {
+                const { data, error } = await supabaseClient.from('club_events').select('*').order('event_date', { ascending: true });
+                if (!error && data && data.length > 0) {
+                    events = data;
+                } else if (!error && data && data.length === 0) {
+                    // Si la table vient d'être créée, insérer le jeu d'essai complet
+                    const cleaned = events.map(({ id, ...rest }) => rest);
+                    await supabaseClient.from('club_events').insert(cleaned);
                 }
+            } catch (e) {
+                console.warn("Utilisation du cache local");
             }
             renderEvents();
         }
 
-        // GESTION DU FILTRE MOIS
         function filterMonth(monthKey) {
             currentMonth = monthKey;
             document.querySelectorAll('.month-btn').forEach(btn => {
@@ -407,7 +348,6 @@
             renderEvents();
         }
 
-        // FORMATTAGE DES DATES
         function formatDateLabel(startDateStr, endDateStr) {
             const start = new Date(startDateStr);
             const options = { day: 'numeric', month: 'long' };
@@ -421,7 +361,6 @@
             return `${start.toLocaleDateString('fr-FR', options)} au ${end.toLocaleDateString('fr-FR', options)}`;
         }
 
-        // RENDU HTML DES CARTES
         function renderEvents() {
             const grid = document.getElementById('events-grid');
             const typeFilter = document.getElementById('filterType').value;
@@ -433,7 +372,6 @@
                 return matchMonth && matchType;
             });
 
-            // Tri par date
             filtered.sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
 
             if (filtered.length === 0) {
@@ -477,7 +415,6 @@
             }
         }
 
-        // GESTION MODALE & CRUD
         function openModalEvent() {
             document.getElementById('eventForm').reset();
             document.getElementById('event-id').value = '';
@@ -523,22 +460,17 @@
             };
 
             if (idVal) {
-                // Modification
                 const id = parseInt(idVal);
                 const index = events.findIndex(ev => ev.id === id);
-                if (index !== -1) {
-                    events[index] = { ...events[index], ...newEvent };
-                }
-                if (supabaseClient) {
-                    await supabaseClient.from('club_events').update(newEvent).eq('id', id);
-                }
+                if (index !== -1) events[index] = { ...events[index], ...newEvent };
+                await supabaseClient.from('club_events').update(newEvent).eq('id', id);
             } else {
-                // Ajout
-                const newId = events.length > 0 ? Math.max(...events.map(e => e.id || 0)) + 1 : 1;
-                const created = { id: newId, ...newEvent };
-                events.push(created);
-                if (supabaseClient) {
-                    await supabaseClient.from('club_events').insert([newEvent]);
+                const { data } = await supabaseClient.from('club_events').insert([newEvent]).select();
+                if (data && data[0]) {
+                    events.push(data[0]);
+                } else {
+                    const newId = events.length > 0 ? Math.max(...events.map(e => e.id || 0)) + 1 : 1;
+                    events.push({ id: newId, ...newEvent });
                 }
             }
 
@@ -552,15 +484,12 @@
             if (confirm("Supprimer cet événement du calendrier ?")) {
                 const id = parseInt(idVal);
                 events = events.filter(e => e.id !== id);
-                if (supabaseClient) {
-                    await supabaseClient.from('club_events').delete().eq('id', id);
-                }
+                await supabaseClient.from('club_events').delete().eq('id', id);
                 closeModalEvent();
                 renderEvents();
             }
         }
 
-        // EXPORT CSV POUR KALISPORT
         function exportKalisportCSV() {
             let csvContent = "data:text/csv;charset=utf-8,Titre;Categorie;Date Debut;Date Fin;Lieu;Public;Notes\n";
             events.forEach(e => {
