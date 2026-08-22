@@ -20,6 +20,13 @@
             --glass-bg: rgba(255, 255, 255, 0.75);
             --glass-border: rgba(255, 255, 255, 0.5);
             --topbar-height: 75px;
+
+            /* Nuances sobres Tatamis */
+            --tatami-rouge: #C41E3A;
+            --tatami-vert: #2D6A4F;
+            --tatami-bleu: #2B6CB0;
+            --tatami-jaune: #F4D35E;
+            --tatami-bleu-ciel: #64B5F6;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -35,9 +42,7 @@
             overflow: hidden;
         }
 
-        .sidebar {
-            flex-shrink: 0;
-        }
+        .sidebar { flex-shrink: 0; }
 
         .main-content {
             flex: 1;
@@ -92,23 +97,69 @@
         .search-input:focus { outline: none; background: #FFF; border-color: var(--rouge); box-shadow: 0 0 10px rgba(196, 30, 58, 0.15); }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--rouge); opacity: 0.7; }
 
-        .dashboard-body { flex: 1; padding: 24px 28px; overflow-y: auto; }
+        .dashboard-body { flex: 1; padding: 20px 28px; overflow-y: auto; }
+
+        /* BANDEAU KPI */
+        .kpi-banner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(196,30,58,0.08); }
+        .kpi-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            background: rgba(196, 30, 58, 0.1);
+            color: var(--rouge);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .kpi-details { display: flex; flex-direction: column; }
+        .kpi-val { font-family: 'Fredoka', sans-serif; font-size: 1.4rem; color: var(--rouge); line-height: 1.1; font-weight: 600; }
+        .kpi-label { font-size: 0.75rem; color: var(--gris-moyen); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
         .catalog-controls { display: flex; gap: 12px; margin-bottom: 20px; }
 
-        .main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+        .main-grid { display: grid; grid-template-columns: 1fr 390px; gap: 24px; }
         
-        .catalog-card, .info-card { 
+        .catalog-card, .info-card, .tatamis-card { 
             background: var(--glass-bg); 
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border-radius: 12px; border: 1px solid var(--glass-border); 
-            padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.04);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
         }
-        .catalog-card:hover { box-shadow: 0 15px 40px rgba(196, 30, 58, 0.08); }
+        .catalog-card:hover, .tatamis-card:hover { box-shadow: 0 15px 40px rgba(196, 30, 58, 0.08); }
 
         .catalog-section { margin-bottom: 28px; }
         .catalog-category-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px dashed rgba(196, 30, 58, 0.2); padding-bottom: 8px; margin-bottom: 14px; }
+        .catalog-category-title-wrap { display: flex; align-items: center; gap: 8px; }
         .catalog-category-title { font-family: 'Fredoka', sans-serif; font-size: 1.15rem; color: var(--rouge); margin: 0; text-shadow: 0 1px 1px rgba(255,255,255,0.8); }
+        .category-counter-badge {
+            background: rgba(196, 30, 58, 0.1);
+            color: var(--rouge);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(196, 30, 58, 0.2);
+        }
 
         .catalog-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; min-height: 50px; padding: 8px; border: 1.5px transparent dashed; border-radius: 8px; transition: all 0.3s ease; }
         body.edit-mode .catalog-list { border-color: rgba(196, 30, 58, 0.3); background: rgba(196,30,58,0.03); }
@@ -136,6 +187,39 @@
         .btn-secondary { background: rgba(255,255,255,0.9); color: var(--gris-fonce); border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
         .btn-secondary:hover { background: #FFF; color: var(--rouge); border-color: rgba(196, 30, 58, 0.3); }
         .btn-active-edit { background: #e67e22; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3); }
+
+        /* MODULE PLAN TATAMIS */
+        .tatamis-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .tatamis-title { font-family: 'Fredoka', sans-serif; margin: 0; color: var(--rouge); font-size: 1.15rem; }
+        .tatami-tabs { display: flex; gap: 6px; background: rgba(0,0,0,0.04); padding: 4px; border-radius: 8px; margin-bottom: 14px; }
+        .tatami-tab-btn { flex: 1; border: none; background: transparent; padding: 6px 8px; font-size: 0.75rem; font-weight: 600; border-radius: 6px; cursor: pointer; color: var(--gris-moyen); transition: all 0.2s; }
+        .tatami-tab-btn.active { background: #FFF; color: var(--rouge); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+
+        .tatamis-badges { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
+        .tatami-badge { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .tatami-badge span.count { font-size: 0.95rem; font-weight: 700; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 6px; }
+
+        .tatami-badge-rouge { background: #C41E3A; color: #FFF; }
+        .tatami-badge-vert { background: #2D6A4F; color: #FFF; }
+        .tatami-badge-bleu { background: #2B6CB0; color: #FFF; }
+        .tatami-badge-jaune { background: #E5C347; color: #333; }
+        .tatami-badge-bleu-ciel { background: #5B9BD5; color: #FFF; }
+
+        .tatami-svg-container {
+            background: #FAFAFA;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .tatami-svg-container svg {
+            width: 100%;
+            max-width: 320px;
+            height: auto;
+            display: block;
+        }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; transition: opacity 0.3s; }
         .modal-overlay.open { display: flex; }
@@ -206,21 +290,271 @@
         </div>
 
         <div class="dashboard-body">
+
+            <!-- BANDEAU KPI DYNAMIQUE -->
+            <div class="kpi-banner">
+                <div class="kpi-card">
+                    <div class="kpi-icon">🛠️</div>
+                    <div class="kpi-details">
+                        <span class="kpi-val" id="kpi-total-tools">0</span>
+                        <span class="kpi-label">Outils Disponibles</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">📁</div>
+                    <div class="kpi-details">
+                        <span class="kpi-val" id="kpi-total-cats">0</span>
+                        <span class="kpi-label">Catégories Actives</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">🥋</div>
+                    <div class="kpi-details">
+                        <span class="kpi-val" id="kpi-tatamis-count">56</span>
+                        <span class="kpi-label">Tatamis Installés</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">⚡</div>
+                    <div class="kpi-details">
+                        <span class="kpi-val" style="color:#27ae60;">100%</span>
+                        <span class="kpi-label">Services Opérationnels</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="catalog-controls">
                 <button class="btn" id="btnToggleEdit" onclick="toggleEditMode()">⚙️ Mode Édition / Organiser</button>
                 <button class="btn btn-secondary" onclick="openNewToolModal()">➕ Créer un outil</button>
                 <button class="btn btn-secondary" onclick="openModal('catModal')">📁 Ajouter une catégorie</button>
-                <button class="btn btn-secondary" style="margin-left:auto; color:#e74c3c;" onclick="resetToDefault()">🔄 Réinitialiser les 41 Outils</button>
+                <button class="btn btn-secondary" style="margin-left:auto; color:#e74c3c;" id="btnResetTools" onclick="resetToDefault()">🔄 Réinitialiser les Outils</button>
             </div>
 
             <div class="main-grid">
                 <div class="catalog-card" id="catalogCard"></div>
+                
+                <!-- COLONNE DE DROITE : PLAN TATAMIS -->
                 <div>
+                    <div class="tatamis-card">
+                        <div class="tatamis-header">
+                            <h3 class="tatamis-title">🥋 Plan des Tatamis</h3>
+                        </div>
+
+                        <!-- SÉLECTEUR DISPOSITION -->
+                        <div class="tatami-tabs">
+                            <button class="tatami-tab-btn active" id="tabDisp1" onclick="switchTatamiDisp(1)">Disposition 1 (Officielle - 56)</button>
+                            <button class="tatami-tab-btn" id="tabDisp2" onclick="switchTatamiDisp(2)">Disposition 2 (Bleu Ciel - 49)</button>
+                        </div>
+
+                        <!-- VUE 1 : DISPOSITION 1 (56 TATAMIS) -->
+                        <div id="tatamiView1">
+                            <div class="tatamis-badges">
+                                <div class="tatami-badge tatami-badge-rouge">Rouge <span class="count">16</span></div>
+                                <div class="tatami-badge tatami-badge-jaune">Jaune <span class="count">20</span></div>
+                                <div class="tatami-badge tatami-badge-bleu">Bleu <span class="count">10</span></div>
+                                <div class="tatami-badge tatami-badge-vert">Vert <span class="count">10</span></div>
+                            </div>
+                            
+                            <div class="tatami-svg-container">
+                                <svg viewBox="0 0 70 160" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <style>
+                                            .t-r { fill: var(--tatami-rouge); stroke: #222; stroke-width: 0.4; }
+                                            .t-v { fill: var(--tatami-vert); stroke: #222; stroke-width: 0.4; }
+                                            .t-b { fill: var(--tatami-bleu); stroke: #222; stroke-width: 0.4; }
+                                            .t-j { fill: var(--tatami-jaune); stroke: #222; stroke-width: 0.4; }
+                                        </style>
+                                    </defs>
+
+                                    <!-- BORDURES GAUCHE ET DROITE (16 Rouges verticaux) -->
+                                    <g class="t-r">
+                                        <rect x="0" y="0" width="10" height="20" />
+                                        <rect x="0" y="20" width="10" height="20" />
+                                        <rect x="0" y="40" width="10" height="20" />
+                                        <rect x="0" y="60" width="10" height="20" />
+                                        <rect x="0" y="80" width="10" height="20" />
+                                        <rect x="0" y="100" width="10" height="20" />
+                                        <rect x="0" y="120" width="10" height="20" />
+                                        <rect x="0" y="140" width="10" height="20" />
+
+                                        <rect x="60" y="0" width="10" height="20" />
+                                        <rect x="60" y="20" width="10" height="20" />
+                                        <rect x="60" y="40" width="10" height="20" />
+                                        <rect x="60" y="60" width="10" height="20" />
+                                        <rect x="60" y="80" width="10" height="20" />
+                                        <rect x="60" y="100" width="10" height="20" />
+                                        <rect x="60" y="120" width="10" height="20" />
+                                        <rect x="60" y="140" width="10" height="20" />
+                                    </g>
+
+                                    <!-- BORDURES HAUT ET BAS (10 Verts verticaux) -->
+                                    <g class="t-v">
+                                        <rect x="10" y="0" width="10" height="20" />
+                                        <rect x="20" y="0" width="10" height="20" />
+                                        <rect x="30" y="0" width="10" height="20" />
+                                        <rect x="40" y="0" width="10" height="20" />
+                                        <rect x="50" y="0" width="10" height="20" />
+
+                                        <rect x="10" y="140" width="10" height="20" />
+                                        <rect x="20" y="140" width="10" height="20" />
+                                        <rect x="30" y="140" width="10" height="20" />
+                                        <rect x="40" y="140" width="10" height="20" />
+                                        <rect x="50" y="140" width="10" height="20" />
+                                    </g>
+
+                                    <!-- BLOC HAUT : JAUNE (10 tatamis) -->
+                                    <g class="t-j">
+                                        <rect x="10" y="20" width="20" height="10" />
+                                        <rect x="10" y="30" width="20" height="10" />
+                                        <rect x="30" y="20" width="10" height="20" />
+                                        <rect x="40" y="20" width="20" height="10" />
+                                        <rect x="40" y="30" width="20" height="10" />
+
+                                        <rect x="10" y="40" width="10" height="20" />
+                                        <rect x="20" y="40" width="10" height="20" />
+                                        <rect x="30" y="40" width="20" height="10" />
+                                        <rect x="30" y="50" width="20" height="10" />
+                                        <rect x="50" y="40" width="10" height="20" />
+                                    </g>
+
+                                    <!-- BLOC MILIEU : BLEU (10 tatamis) -->
+                                    <g class="t-b">
+                                        <rect x="10" y="60" width="20" height="10" />
+                                        <rect x="10" y="70" width="20" height="10" />
+                                        <rect x="30" y="60" width="10" height="20" />
+                                        <rect x="40" y="60" width="20" height="10" />
+                                        <rect x="40" y="70" width="20" height="10" />
+
+                                        <rect x="10" y="80" width="10" height="20" />
+                                        <rect x="20" y="80" width="10" height="20" />
+                                        <rect x="30" y="80" width="20" height="10" />
+                                        <rect x="30" y="90" width="20" height="10" />
+                                        <rect x="50" y="80" width="10" height="20" />
+                                    </g>
+
+                                    <!-- BLOC BAS : JAUNE (10 tatamis) -->
+                                    <g class="t-j">
+                                        <rect x="10" y="100" width="20" height="10" />
+                                        <rect x="10" y="110" width="20" height="10" />
+                                        <rect x="30" y="100" width="10" height="20" />
+                                        <rect x="40" y="100" width="20" height="10" />
+                                        <rect x="40" y="110" width="20" height="10" />
+
+                                        <rect x="10" y="120" width="10" height="20" />
+                                        <rect x="20" y="120" width="10" height="20" />
+                                        <rect x="30" y="120" width="20" height="10" />
+                                        <rect x="30" y="130" width="20" height="10" />
+                                        <rect x="50" y="120" width="10" height="20" />
+                                    </g>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- VUE 2 : DISPOSITION 2 (BLEU CIEL & JAUNE) -->
+                        <div id="tatamiView2" style="display:none;">
+                            <div class="tatamis-badges">
+                                <div class="tatami-badge tatami-badge-bleu-ciel">Bleu Ciel <span class="count">29</span></div>
+                                <div class="tatami-badge tatami-badge-jaune">Jaune <span class="count">20</span></div>
+                            </div>
+
+                            <div class="tatami-svg-container">
+                                <svg viewBox="0 0 70 140" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <style>
+                                            .t-ciel { fill: var(--tatami-bleu-ciel); stroke: #222; stroke-width: 0.4; }
+                                            .t-j2 { fill: var(--tatami-jaune); stroke: #222; stroke-width: 0.4; }
+                                            .lbl { font-family: 'Roboto', sans-serif; font-size: 3.5px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: #1A1A1A; }
+                                        </style>
+                                    </defs>
+
+                                    <!-- 1. BANDE HAUTE BLEU CIEL (1 à 7) -->
+                                    <g class="t-ciel">
+                                        <rect x="0" y="0" width="10" height="20" /><text x="5" y="10" class="lbl">1</text>
+                                        <rect x="10" y="0" width="10" height="20" /><text x="15" y="10" class="lbl">2</text>
+                                        <rect x="20" y="0" width="10" height="20" /><text x="25" y="10" class="lbl">3</text>
+                                        <rect x="30" y="0" width="10" height="20" /><text x="35" y="10" class="lbl">4</text>
+                                        <rect x="40" y="0" width="10" height="20" /><text x="45" y="10" class="lbl">5</text>
+                                        <rect x="50" y="0" width="10" height="20" /><text x="55" y="10" class="lbl">6</text>
+                                        <rect x="60" y="0" width="10" height="20" /><text x="65" y="10" class="lbl">7</text>
+                                    </g>
+
+                                    <!-- 2. BORDURES HAUTES BLEU CIEL (8, 9 / 18, 17) -->
+                                    <g class="t-ciel">
+                                        <rect x="0" y="20" width="10" height="20" /><text x="5" y="30" class="lbl">8</text>
+                                        <rect x="0" y="40" width="10" height="20" /><text x="5" y="50" class="lbl">9</text>
+                                        <rect x="60" y="20" width="10" height="20" /><text x="65" y="30" class="lbl">18</text>
+                                        <rect x="60" y="40" width="10" height="20" /><text x="65" y="50" class="lbl">17</text>
+                                    </g>
+
+                                    <!-- 3. ZONE JAUNE 1 (1 à 10) -->
+                                    <g class="t-j2">
+                                        <rect x="10" y="20" width="20" height="10" /><text x="20" y="25" class="lbl">1</text>
+                                        <rect x="10" y="30" width="20" height="10" /><text x="20" y="35" class="lbl">2</text>
+                                        <rect x="30" y="20" width="10" height="20" /><text x="35" y="30" class="lbl">3</text>
+                                        <rect x="40" y="20" width="20" height="10" /><text x="50" y="25" class="lbl">4</text>
+                                        <rect x="40" y="30" width="20" height="10" /><text x="50" y="35" class="lbl">5</text>
+                                        
+                                        <rect x="10" y="40" width="10" height="20" /><text x="15" y="50" class="lbl">6</text>
+                                        <rect x="20" y="40" width="10" height="20" /><text x="25" y="50" class="lbl">7</text>
+                                        <rect x="30" y="40" width="20" height="10" /><text x="40" y="45" class="lbl">8</text>
+                                        <rect x="30" y="50" width="20" height="10" /><text x="40" y="55" class="lbl">9</text>
+                                        <rect x="50" y="40" width="10" height="20" /><text x="55" y="50" class="lbl">10</text>
+                                    </g>
+
+                                    <!-- 4. BANDE MILIEU BLEU CIEL (10 à 16) -->
+                                    <g class="t-ciel">
+                                        <rect x="0" y="60" width="10" height="20" /><text x="5" y="70" class="lbl">10</text>
+                                        <rect x="10" y="60" width="10" height="20" /><text x="15" y="70" class="lbl">11</text>
+                                        <rect x="20" y="60" width="10" height="20" /><text x="25" y="70" class="lbl">12</text>
+                                        <rect x="30" y="60" width="10" height="20" /><text x="35" y="70" class="lbl">13</text>
+                                        <rect x="40" y="60" width="10" height="20" /><text x="45" y="70" class="lbl">14</text>
+                                        <rect x="50" y="60" width="10" height="20" /><text x="55" y="70" class="lbl">15</text>
+                                        <rect x="60" y="60" width="10" height="20" /><text x="65" y="70" class="lbl">16</text>
+                                    </g>
+
+                                    <!-- 5. BORDURES BASSES BLEU CIEL (19, 20 / 29, 28) -->
+                                    <g class="t-ciel">
+                                        <rect x="0" y="80" width="10" height="20" /><text x="5" y="90" class="lbl">19</text>
+                                        <rect x="0" y="100" width="10" height="20" /><text x="5" y="110" class="lbl">20</text>
+                                        <rect x="60" y="80" width="10" height="20" /><text x="65" y="90" class="lbl">29</text>
+                                        <rect x="60" y="100" width="10" height="20" /><text x="65" y="110" class="lbl">28</text>
+                                    </g>
+
+                                    <!-- 6. ZONE JAUNE 2 (11 à 20) -->
+                                    <g class="t-j2">
+                                        <rect x="10" y="80" width="20" height="10" /><text x="20" y="85" class="lbl">11</text>
+                                        <rect x="10" y="90" width="20" height="10" /><text x="20" y="95" class="lbl">12</text>
+                                        <rect x="30" y="80" width="10" height="20" /><text x="35" y="90" class="lbl">13</text>
+                                        <rect x="40" y="80" width="20" height="10" /><text x="50" y="85" class="lbl">14</text>
+                                        <rect x="40" y="90" width="20" height="10" /><text x="50" y="95" class="lbl">15</text>
+                                        
+                                        <rect x="10" y="100" width="10" height="20" /><text x="15" y="110" class="lbl">16</text>
+                                        <rect x="20" y="100" width="10" height="20" /><text x="25" y="110" class="lbl">17</text>
+                                        <rect x="30" y="100" width="20" height="10" /><text x="40" y="105" class="lbl">18</text>
+                                        <rect x="30" y="110" width="20" height="10" /><text x="40" y="115" class="lbl">19</text>
+                                        <rect x="50" y="100" width="10" height="20" /><text x="55" y="110" class="lbl">20</text>
+                                    </g>
+
+                                    <!-- 7. BANDE BASSE BLEU CIEL (21 à 27) -->
+                                    <g class="t-ciel">
+                                        <rect x="0" y="120" width="10" height="20" /><text x="5" y="130" class="lbl">21</text>
+                                        <rect x="10" y="120" width="10" height="20" /><text x="15" y="130" class="lbl">22</text>
+                                        <rect x="20" y="120" width="10" height="20" /><text x="25" y="130" class="lbl">23</text>
+                                        <rect x="30" y="120" width="10" height="20" /><text x="35" y="130" class="lbl">24</text>
+                                        <rect x="40" y="120" width="10" height="20" /><text x="45" y="130" class="lbl">25</text>
+                                        <rect x="50" y="120" width="10" height="20" /><text x="55" y="130" class="lbl">26</text>
+                                        <rect x="60" y="120" width="10" height="20" /><text x="65" y="130" class="lbl">27</text>
+                                    </g>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="info-card">
                         <h3 style="font-family:'Fredoka',sans-serif; margin-top:0; color:var(--rouge);">📌 Mode d'emploi</h3>
-                        <p style="font-size:0.85rem; color:var(--gris-moyen); line-height: 1.6;">
+                        <p style="font-size:0.85rem; color:var(--gris-moyen); line-height: 1.6; margin:0;">
                             • Clique sur <strong>Mode Édition</strong> pour renommer une catégorie, glisser un outil sur un autre pour réordonner ou changer de catégorie.<br>
-                            • Si un outil n'apparaît pas immédiatement, clique sur <strong>Réinitialiser les 41 Outils</strong> en haut à droite pour rafraîchir le cache local.
+                            • Si un outil n'apparaît pas immédiatement, clique sur <strong>Réinitialiser les Outils</strong> en haut à droite pour rafraîchir le cache local.
                         </p>
                     </div>
                 </div>
@@ -332,6 +666,21 @@
         renderCatalog();
     }
 
+    function updateKPIs() {
+        let totalTools = 0;
+        structureCategories.forEach(c => {
+            totalTools += (c.outils || []).length;
+        });
+
+        const kpiTools = document.getElementById('kpi-total-tools');
+        const kpiCats = document.getElementById('kpi-total-cats');
+        const btnReset = document.getElementById('btnResetTools');
+
+        if (kpiTools) kpiTools.innerText = totalTools;
+        if (kpiCats) kpiCats.innerText = structureCategories.length;
+        if (btnReset) btnReset.innerText = `🔄 Réinitialiser les ${totalTools} Outils`;
+    }
+
     function resetToDefault() {
         if (confirm("Réinitialiser le Dashboard pour afficher tous les outils par défaut ?")) {
             localStorage.removeItem('dd_catalog_structure_v7');
@@ -349,6 +698,7 @@
             const active = localStorage.getItem('dd_sidebar_active_cat') || 0;
             window.switchSidebarCat(parseInt(active));
         }
+        updateKPIs();
     }
 
     function renderCatalog() {
@@ -357,12 +707,16 @@
         container.innerHTML = '';
 
         structureCategories.forEach((cat, catIdx) => {
+            const count = (cat.outils || []).length;
             const section = document.createElement('div');
             section.className = 'catalog-section';
 
             section.innerHTML = `
                 <div class="catalog-category-header">
-                    <h3 class="catalog-category-title" contenteditable="${isEditMode}" onblur="updateCatTitle(${catIdx}, this)">${cat.titre}</h3>
+                    <div class="catalog-category-title-wrap">
+                        <h3 class="catalog-category-title" contenteditable="${isEditMode}" onblur="updateCatTitle(${catIdx}, this)">${cat.titre}</h3>
+                        <span class="category-counter-badge">${count} ${count > 1 ? 'outils' : 'outil'}</span>
+                    </div>
                     ${isEditMode ? `<button style="background:none; border:none; color:#e74c3c; cursor:pointer; font-size:0.8rem;" onclick="deleteCategory(${catIdx})">🗑️ Supprimer</button>` : ''}
                 </div>
                 <div class="catalog-list" data-cat-idx="${catIdx}" ondragover="allowDrop(event)" ondrop="dropOnContainer(event, ${catIdx})"></div>
@@ -414,6 +768,16 @@
 
             container.appendChild(section);
         });
+
+        updateKPIs();
+    }
+
+    function switchTatamiDisp(dispNum) {
+        document.getElementById('tabDisp1').classList.toggle('active', dispNum === 1);
+        document.getElementById('tabDisp2').classList.toggle('active', dispNum === 2);
+        document.getElementById('tatamiView1').style.display = (dispNum === 1) ? 'block' : 'none';
+        document.getElementById('tatamiView2').style.display = (dispNum === 2) ? 'block' : 'none';
+        document.getElementById('kpi-tatamis-count').innerText = (dispNum === 1) ? '56' : '49';
     }
 
     function toggleEditMode() {
