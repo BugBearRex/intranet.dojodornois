@@ -72,6 +72,20 @@
             background: #FFFFFF;
         }
 
+        .source-workspace {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            background: #1E293B;
+            color: #F8FAFC;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            border: none;
+            outline: none;
+            resize: none;
+        }
+
         /* STYLES EXACTS KALISPORT ARTICLE */
         .dojo-article-tpl { font-family: 'Roboto', Arial, sans-serif; color: #3D3D3D; max-width: 850px; margin: 0 auto; padding: 10px; line-height: 1.8; }
         .dojo-article-tpl .article-header { text-align: center; margin: 25px 0 30px 0; }
@@ -131,7 +145,7 @@
         <header class="bg-white border-b border-slate-200 px-6 py-3.5 flex items-center justify-between shrink-0">
             <div>
                 <h1 class="font-fredoka text-xl font-bold text-[#1A1A1A]">Générateur de Contenu Web & Boutique</h1>
-                <p class="text-xs text-slate-500">Mise en forme conforme à la charte Kalisport & copie du code source</p>
+                <p class="text-xs text-slate-500">Mise en forme conforme à la charte Kalisport & édition du code source</p>
             </div>
             
             <div class="flex items-center gap-3">
@@ -144,20 +158,27 @@
         <!-- ZONE CENTRALE SPLIT 2 COLONNES -->
         <div class="flex-1 flex overflow-hidden">
             
-            <!-- COLONNE GAUCHE : FORMULAIRES DE SAISIE -->
+            <!-- COLONNE GAUCHE : FORMULAIRES DE SAISIE & CODE SOURCE -->
             <div class="w-1/2 border-r border-slate-200 bg-white flex flex-col overflow-hidden">
                 <!-- ONGLETS -->
-                <div class="border-b border-slate-200 bg-slate-50 px-4 flex gap-2 shrink-0">
-                    <button onclick="changerMode('article')" id="tab-article" class="tab-btn px-4 py-3 font-medium text-xs text-slate-500 flex items-center gap-2 font-fredoka tab-active">
-                        <i class="fa-solid fa-newspaper"></i> 1. Nouvel Article Club
-                    </button>
-                    <button onclick="changerMode('boutique')" id="tab-boutique" class="tab-btn px-4 py-3 font-medium text-xs text-slate-500 flex items-center gap-2 font-fredoka">
-                        <i class="fa-solid fa-store"></i> 2. Fiche Produit Boutique
+                <div class="border-b border-slate-200 bg-slate-50 px-4 flex items-center justify-between shrink-0">
+                    <div class="flex gap-2">
+                        <button onclick="changerMode('article')" id="tab-article" class="tab-btn px-4 py-3 font-medium text-xs text-slate-500 flex items-center gap-2 font-fredoka tab-active">
+                            <i class="fa-solid fa-newspaper"></i> 1. Nouvel Article Club
+                        </button>
+                        <button onclick="changerMode('boutique')" id="tab-boutique" class="tab-btn px-4 py-3 font-medium text-xs text-slate-500 flex items-center gap-2 font-fredoka">
+                            <i class="fa-solid fa-store"></i> 2. Fiche Produit Boutique
+                        </button>
+                    </div>
+
+                    <!-- BASCULE VISUEL / CODE SOURCE -->
+                    <button id="btn-toggle-source" onclick="basculerModeCodeSource()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs font-bold flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-code"></i> Code source HTML
                     </button>
                 </div>
 
-                <!-- CONTENEUR SCROLLABLE FORMULAIRE -->
-                <div class="flex-1 overflow-y-auto p-5 space-y-4">
+                <!-- CONTENEUR SCROLLABLE FORMULAIRE VISUEL -->
+                <div id="conteneur-formulaire" class="flex-1 overflow-y-auto p-5 space-y-4">
                     
                     <!-- FORMULAIRE ARTICLE -->
                     <div id="form-article" class="space-y-4">
@@ -183,9 +204,12 @@
                         </div>
 
                         <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
-                            <label class="block text-xs font-bold text-slate-800">📸 Image principale</label>
-                            <input type="text" id="art-img" class="input-field" placeholder="https://dojodornois.fr/public/..." value="https://images.unsplash.com/photo-1555597673-b21d5c935865?q=80&w=800" oninput="actualiserRendu()">
-                            <input type="text" id="art-caption" class="input-field" placeholder="Légende de la photo" value="📷 Nos judokas sur le podium lors de la remise des récompenses." oninput="actualiserRendu()">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-bold text-slate-800">📸 Image principale (Optionnelle)</label>
+                                <span class="text-[10px] text-slate-400">Laissez vide si vous n'avez pas d'image</span>
+                            </div>
+                            <input type="text" id="art-img" class="input-field" placeholder="Collez l'URL de l'image (ou laissez vide)" value="" oninput="actualiserRendu()">
+                            <input type="text" id="art-caption" class="input-field" placeholder="Légende de la photo (si une image est ajoutée)" value="📷 Remise des récompenses sur le podium." oninput="actualiserRendu()">
                         </div>
 
                         <!-- GESTIONNAIRE MODULAIRE DES PARAGRAPHES -->
@@ -279,6 +303,11 @@ Coupe et taille standards européennes</textarea>
                     </div>
 
                 </div>
+
+                <!-- CONTENEUR CODE SOURCE DIRECT -->
+                <div id="conteneur-code-source" class="flex-1 hidden">
+                    <textarea id="editeur-code-source" class="source-workspace" oninput="actualiserRenduDepuisCodeSource()"></textarea>
+                </div>
             </div>
 
             <!-- COLONNE DROITE : APERÇU EN DIRECT DU RENDU -->
@@ -303,8 +332,9 @@ Coupe et taille standards européennes</textarea>
 
     <script>
         let modeActif = 'article';
+        let modeCodeSourceActif = false;
+        let codeManuelModifie = false;
 
-        // Données des sections d'article
         let sectionsArticle = [
             {
                 titre: "Un événement marquant",
@@ -316,8 +346,35 @@ Coupe et taille standards européennes</textarea>
             }
         ];
 
+        function basculerModeCodeSource() {
+            modeCodeSourceActif = !modeCodeSourceActif;
+            const conteneurForm = document.getElementById('conteneur-formulaire');
+            const conteneurSource = document.getElementById('conteneur-code-source');
+            const btnSource = document.getElementById('btn-toggle-source');
+            const textareaSource = document.getElementById('editeur-code-source');
+
+            if (modeCodeSourceActif) {
+                textareaSource.value = codeManuelModifie ? textareaSource.value : (modeActif === 'article' ? genererCodeArticle() : genererCodeBoutique());
+                conteneurForm.classList.add('hidden');
+                conteneurSource.classList.remove('hidden');
+                btnSource.classList.remove('bg-slate-200', 'text-slate-700');
+                btnSource.classList.add('bg-[#1A1A1A]', 'text-white');
+                btnSource.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Revenir au formulaire';
+            } else {
+                conteneurSource.classList.add('hidden');
+                conteneurForm.classList.remove('hidden');
+                btnSource.classList.remove('bg-[#1A1A1A]', 'text-white');
+                btnSource.classList.add('bg-slate-200', 'text-slate-700');
+                btnSource.innerHTML = '<i class="fa-solid fa-code"></i> Code source HTML';
+                actualiserRendu();
+            }
+        }
+
         function changerMode(mode) {
+            if (modeCodeSourceActif) basculerModeCodeSource();
+            codeManuelModifie = false;
             modeActif = mode;
+
             if (mode === 'article') {
                 document.getElementById('tab-article').classList.add('tab-active');
                 document.getElementById('tab-boutique').classList.remove('tab-active');
@@ -341,7 +398,6 @@ Coupe et taille standards européennes</textarea>
                 .replace(/'/g, "&#39;");
         }
 
-        // Rendu du formulaire des sections d'articles
         function rendreSectionsFormulaire() {
             const conteneur = document.getElementById('liste-sections-article');
             conteneur.innerHTML = '';
@@ -370,6 +426,7 @@ Coupe et taille standards européennes</textarea>
         function ajouterSection() {
             sectionsArticle.push({ titre: "", texte: "" });
             rendreSectionsFormulaire();
+            codeManuelModifie = false;
             actualiserRendu();
         }
 
@@ -380,11 +437,13 @@ Coupe et taille standards européennes</textarea>
                 sectionsArticle.splice(index, 1);
             }
             rendreSectionsFormulaire();
+            codeManuelModifie = false;
             actualiserRendu();
         }
 
         function modifierSection(index, champ, valeur) {
             sectionsArticle[index][champ] = valeur;
+            codeManuelModifie = false;
             actualiserRendu();
         }
 
@@ -395,6 +454,7 @@ Coupe et taille standards européennes</textarea>
                 sectionsArticle[index] = sectionsArticle[cible];
                 sectionsArticle[cible] = temp;
                 rendreSectionsFormulaire();
+                codeManuelModifie = false;
                 actualiserRendu();
             }
         }
@@ -430,7 +490,8 @@ Coupe et taille standards européennes</textarea>
 
             let imgHtml = '';
             if (img.length > 0) {
-                imgHtml = `<div class="article-image-box"><img alt="${titre}" class="article-image" src="${img}" />\n<div class="image-caption">${caption}</div>\n</div>\n`;
+                const captionHtml = caption.length > 0 ? `\n<div class="image-caption">${caption}</div>` : '';
+                imgHtml = `<div class="article-image-box"><img alt="${titre}" class="article-image" src="${img}" />${captionHtml}\n</div>\n`;
             }
 
             let focusHtml = '';
@@ -579,16 +640,26 @@ ${boutonsHtml ? `<div class="variant-buttons">${boutonsHtml}</div>` : ''}
         }
 
         function actualiserRendu() {
+            if (modeCodeSourceActif) return;
             const renduZone = document.getElementById('zone-rendu');
-            if (modeActif === 'article') {
-                renduZone.innerHTML = genererCodeArticle();
-            } else {
-                renduZone.innerHTML = genererCodeBoutique();
-            }
+            const code = modeActif === 'article' ? genererCodeArticle() : genererCodeBoutique();
+            renduZone.innerHTML = code;
+        }
+
+        function actualiserRenduDepuisCodeSource() {
+            codeManuelModifie = true;
+            const code = document.getElementById('editeur-code-source').value;
+            document.getElementById('zone-rendu').innerHTML = code;
         }
 
         function copierCodeGenere() {
-            const code = modeActif === 'article' ? genererCodeArticle() : genererCodeBoutique();
+            let code = '';
+            if (modeCodeSourceActif || codeManuelModifie) {
+                code = document.getElementById('editeur-code-source').value;
+            } else {
+                code = modeActif === 'article' ? genererCodeArticle() : genererCodeBoutique();
+            }
+
             navigator.clipboard.writeText(code).then(() => {
                 alert('Code HTML Kalisport copié dans le presse-papiers avec succès !');
             }).catch(err => {
@@ -596,7 +667,6 @@ ${boutonsHtml ? `<div class="variant-buttons">${boutonsHtml}</div>` : ''}
             });
         }
 
-        // Initialisation
         rendreSectionsFormulaire();
         actualiserRendu();
     </script>
