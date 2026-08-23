@@ -295,7 +295,7 @@
                                 <option value="encart_gris">Bloc : Encart Gris (Note / Info)</option>
                                 <option value="bouton_cta">Composant : Bouton d'action</option>
                                 <option value="separateur">Composant : Ligne de séparation</option>
-                                <option value="footer_officiel">Pied de page : Coordonnées & Code Kalisport</option>
+                                <option value="footer_newsletter">Pied de page : Coordonnées & Code Kalisport</option>
                             </select>
                         </div>
 
@@ -308,6 +308,7 @@
                                 <option value="encart_gris">Bloc : Information Grise</option>
                                 <option value="bouton_cta">Composant : Bouton d'action</option>
                                 <option value="separateur">Composant : Ligne de séparation</option>
+                                <option value="footer_mail">Pied de page : Officiel Dojo (Standard)</option>
                             </select>
                         </div>
                     </div>
@@ -361,7 +362,8 @@
         const wysiwygControls = document.getElementById('wysiwyg-controls');
         const btnToggleSource = document.getElementById('btn-toggle-source');
 
-        const BLOC_FOOTER_AVEC_CODE = `
+        // PIED DE PAGE AVEC ACCÈS KALISPORT (NEWSLETTER SEULEMENT)
+        const BLOC_FOOTER_NEWSLETTER = `
             <table border="0" cellpadding="0" cellspacing="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px; width: 100%;" width="100%">
                 <tbody>
                     <tr>
@@ -413,6 +415,31 @@
             </table>
         `;
 
+        // PIED DE PAGE STANDARD (MAILS & COURRIELS)
+        const BLOC_FOOTER_MAIL = `
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px;">
+                <tr>
+                    <td align="center" style="padding-top: 20px; padding-bottom: 12px;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="background-color: #C41E3A; width: 56px; height: 56px; border-radius: 10px; margin: 0 auto;">
+                            <tr>
+                                <td align="center" valign="middle" style="padding: 4px;">
+                                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 46px; height: 46px; display: block; border: 0;" alt="Logo Dojo">
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #6B6B6B !important; line-height: 1.5; text-align: center;">
+                        <strong style="color: #1A1A1A !important; font-size: 14px; font-family: 'Fredoka', sans-serif; text-transform: uppercase;">DOJO DORNOIS</strong><br>
+                        1 Place de la Mairie, 58390 Dornes<br>
+                        dojodornois@gmail.com | 06.07.13.91.86<br>
+                        <span style="font-size: 10px; color: #B8B8B8 !important;">SIRET 45192841000013 &bull; RNA W583001220</span>
+                    </td>
+                </tr>
+            </table>
+        `;
+
         const GABARIT_NEWSLETTER_INITIAL = `
             <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 25px; border-bottom: 2px solid #C41E3A; width: 100%;" width="100%">
                 <tbody>
@@ -461,7 +488,7 @@
                 </tbody>
             </table>
 
-            ${BLOC_FOOTER_AVEC_CODE}
+            ${BLOC_FOOTER_NEWSLETTER}
         `;
 
         const BLOC_HEADER_MAIL = `
@@ -677,7 +704,7 @@
                     break;
             }
 
-            editor.innerHTML = BLOC_HEADER_MAIL + `<div id="mail-body" style="padding: 15px 0; text-align: justify;">${corpsTexte}</div>` + BLOC_FOOTER_AVEC_CODE;
+            editor.innerHTML = BLOC_HEADER_MAIL + `<div id="mail-body" style="padding: 15px 0; text-align: justify;">${corpsTexte}</div>` + BLOC_FOOTER_MAIL;
             genererApercu();
         }
 
@@ -765,8 +792,11 @@
                         </table><br>
                     `;
                     break;
-                case 'footer_officiel':
-                    htmlBloc = BLOC_FOOTER_AVEC_CODE + `<br>`;
+                case 'footer_newsletter':
+                    htmlBloc = BLOC_FOOTER_NEWSLETTER + `<br>`;
+                    break;
+                case 'footer_mail':
+                    htmlBloc = BLOC_FOOTER_MAIL + `<br>`;
                     break;
             }
             
