@@ -295,7 +295,7 @@
                                 <option value="encart_gris">Bloc : Encart Gris (Note / Info)</option>
                                 <option value="bouton_cta">Composant : Bouton d'action</option>
                                 <option value="separateur">Composant : Ligne de séparation</option>
-                                <option value="footer_officiel">Pied de page : Coordonnées du club</option>
+                                <option value="footer_officiel">Pied de page : Coordonnées & Code Kalisport</option>
                             </select>
                         </div>
 
@@ -361,7 +361,47 @@
         const wysiwygControls = document.getElementById('wysiwyg-controls');
         const btnToggleSource = document.getElementById('btn-toggle-source');
 
-        // GABARIT DE BASE POUR LA NEWSLETTER KALISPORT
+        const BLOC_FOOTER_AVEC_CODE = `
+            <table border="0" cellpadding="0" cellspacing="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px; width: 100%;" width="100%">
+                <tbody>
+                    <tr>
+                        <td align="center" style="padding-top: 20px; padding-bottom: 12px;">
+                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #C41E3A; width: 56px; height: 56px; border-radius: 10px; margin: 0 auto;">
+                                <tbody>
+                                    <tr>
+                                        <td align="center" style="padding: 4px;" valign="middle">
+                                            <img alt="Logo Dojo" src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 46px; height: 46px; display: block; border: 0;" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="font-size: 12px; color: #6B6B6B !important; line-height: 1.6; text-align: center; font-family: 'Roboto', Arial, sans-serif; padding-bottom: 15px;">
+                            <strong style="color: #1A1A1A !important; font-size: 14px; font-family: 'Fredoka', sans-serif; letter-spacing: 0.5px;">DOJO DORNOIS</strong><br />
+                            1 Place de la Mairie, 58390 Dornes<br />
+                            dojodornois@gmail.com | 06.07.13.91.86<br />
+                            <span style="font-size: 10px; color: #B8B8B8 !important;">SIRET 45192841000013 &bull; RNA W583001220</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding-top: 5px;">
+                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #F8FAFC; border: 1px dashed #C41E3A; border-radius: 6px; margin: 0 auto; max-width: 360px;" width="100%">
+                                <tbody>
+                                    <tr>
+                                        <td align="center" style="padding: 10px 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #3D3D3D !important; line-height: 1.4;">
+                                            📱 <strong>App Kalisport :</strong> code du dojo <span style="display: inline-block; background-color: #1A1A1A; color: #FFFFFF !important; font-family: 'Consolas', monospace; font-weight: bold; font-size: 13px; padding: 2px 8px; border-radius: 4px; letter-spacing: 1px; margin-left: 4px;">U3AMYA</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+
         const GABARIT_NEWSLETTER_INITIAL = `
             <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 25px; border-bottom: 2px solid #C41E3A; width: 100%;" width="100%">
                 <tbody>
@@ -410,31 +450,7 @@
                 </tbody>
             </table>
 
-            <table border="0" cellpadding="0" cellspacing="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px; width: 100%;" width="100%">
-                <tbody>
-                    <tr>
-                        <td align="center" style="padding-top: 20px; padding-bottom: 12px;">
-                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #C41E3A; width: 56px; height: 56px; border-radius: 10px; margin: 0 auto;">
-                                <tbody>
-                                    <tr>
-                                        <td align="center" style="padding: 4px;" valign="middle">
-                                            <img alt="Logo Dojo" src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 46px; height: 46px; display: block; border: 0;" />
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center" style="font-size: 12px; color: #6B6B6B !important; line-height: 1.6; text-align: center; font-family: 'Roboto', Arial, sans-serif;">
-                            <strong style="color: #1A1A1A !important; font-size: 14px; font-family: 'Fredoka', sans-serif; letter-spacing: 0.5px;">DOJO DORNOIS</strong><br />
-                            1 Place de la Mairie, 58390 Dornes<br />
-                            dojodornois@gmail.com | 06.07.13.91.86<br />
-                            <span style="font-size: 10px; color: #B8B8B8 !important;">SIRET 45192841000013 &bull; RNA W583001220</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            ${BLOC_FOOTER_AVEC_CODE}
         `;
 
         const BLOC_HEADER_MAIL = `
@@ -456,30 +472,6 @@
                         <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #6B6B6B !important; margin: 5px 0 0 0;">
                             <span style="color: #6B6B6B !important;">Communication officielle</span>
                         </p>
-                    </td>
-                </tr>
-            </table>
-        `;
-
-        const BLOC_FOOTER_MAIL = `
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px;">
-                <tr>
-                    <td align="center" style="padding-top: 20px; padding-bottom: 12px;">
-                        <table cellpadding="0" cellspacing="0" border="0" style="background-color: #C41E3A; width: 56px; height: 56px; border-radius: 10px; margin: 0 auto;">
-                            <tr>
-                                <td align="center" valign="middle" style="padding: 4px;">
-                                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 46px; height: 46px; display: block; border: 0;" alt="Logo Dojo">
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="center" style="font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #6B6B6B !important; line-height: 1.5; text-align: center;">
-                        <strong style="color: #1A1A1A !important; font-size: 14px; font-family: 'Fredoka', sans-serif; text-transform: uppercase;">DOJO DORNOIS</strong><br>
-                        1 Place de la Mairie, 58390 Dornes<br>
-                        dojodornois@gmail.com | 06.07.13.91.86<br>
-                        <span style="font-size: 10px; color: #B8B8B8 !important;">SIRET 45192841000013 &bull; RNA W583001220</span>
                     </td>
                 </tr>
             </table>
@@ -674,7 +666,7 @@
                     break;
             }
 
-            editor.innerHTML = BLOC_HEADER_MAIL + `<div id="mail-body" style="padding: 15px 0; text-align: justify;">${corpsTexte}</div>` + BLOC_FOOTER_MAIL;
+            editor.innerHTML = BLOC_HEADER_MAIL + `<div id="mail-body" style="padding: 15px 0; text-align: justify;">${corpsTexte}</div>` + BLOC_FOOTER_AVEC_CODE;
             genererApercu();
         }
 
@@ -763,29 +755,7 @@
                     `;
                     break;
                 case 'footer_officiel':
-                    htmlBloc = `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px;">
-                            <tr>
-                                <td align="center" style="padding-top: 20px; padding-bottom: 12px;">
-                                    <table cellpadding="0" cellspacing="0" border="0" style="background-color: #C41E3A; width: 56px; height: 56px; border-radius: 10px; margin: 0 auto;">
-                                        <tr>
-                                            <td align="center" valign="middle" style="padding: 4px;">
-                                                <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 46px; height: 46px; display: block; border: 0;" alt="Logo Dojo">
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td align="center" style="font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #6B6B6B !important; line-height: 1.5; text-align: center;">
-                                    <strong style="color: #1A1A1A !important; font-size: 14px; font-family: 'Fredoka', sans-serif;">DOJO DORNOIS</strong><br>
-                                    1 Place de la Mairie, 58390 Dornes<br>
-                                    dojodornois@gmail.com | 06.07.13.91.86<br>
-                                    <span style="font-size: 10px; color: #B8B8B8 !important;">SIRET 45192841000013 &bull; RNA W583001220</span>
-                                </td>
-                            </tr>
-                        </table><br>
-                    `;
+                    htmlBloc = BLOC_FOOTER_AVEC_CODE + `<br>`;
                     break;
             }
             
