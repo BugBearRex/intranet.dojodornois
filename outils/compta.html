@@ -147,23 +147,23 @@
             <div class="dashboard-grid">
                 <div class="stat-card" style="border-left: 4px solid var(--bleu);">
                     <h3>🏦 Solde Banque</h3>
-                    <div class="value" id="dash-banque">0,00 €</div>
+                    <div class="value" id="dash-banque">0.00 €</div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid var(--violet);">
                     <h3>📈 Livret Épargne</h3>
-                    <div class="value" id="dash-livret" style="color: var(--violet);">0,00 €</div>
+                    <div class="value" id="dash-livret" style="color: var(--violet);">0.00 €</div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid var(--vert);">
                     <h3>🪙 Solde Caisse</h3>
-                    <div class="value" id="dash-caisse">0,00 €</div>
+                    <div class="value" id="dash-caisse">0.00 €</div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid #e67e22;">
                     <h3>✍️ Chèques Attente</h3>
-                    <div class="value" id="dash-cheques-attente" style="color: #e67e22;">0,00 €</div>
+                    <div class="value" id="dash-cheques-attente" style="color: #e67e22;">0.00 €</div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid var(--noir-doux);">
                     <h3>💎 TRESORERIE NETTE</h3>
-                    <div class="value" id="dash-treso-nette">0,00 €</div>
+                    <div class="value" id="dash-treso-nette">0.00 €</div>
                 </div>
             </div>
 
@@ -400,7 +400,7 @@
                             <div class="depot-item"><span>Billet de 20 €</span><input type="number" min="0" id="dp-b-20" oninput="calcLiveDepot()" value="0"></div>
                             <div class="depot-item"><span>Billet de 10 €</span><input type="number" min="0" id="dp-b-10" oninput="calcLiveDepot()" value="0"></div>
                             <div class="depot-item"><span>Billet de 5 €</span><input type="number" min="0" id="dp-b-5" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-total-sub">Total Billets : <span id="lbl-total-b">0,00</span> €</div>
+                            <div class="depot-total-sub">Total Billets : <span id="lbl-total-b">0.00</span> €</div>
                         </div>
 
                         <div class="depot-box">
@@ -413,7 +413,7 @@
                             <div class="depot-item"><span>Pièce de 0.05 €</span><input type="number" min="0" id="dp-p-0.05" oninput="calcLiveDepot()" value="0"></div>
                             <div class="depot-item"><span>Pièce de 0.02 €</span><input type="number" min="0" id="dp-p-0.02" oninput="calcLiveDepot()" value="0"></div>
                             <div class="depot-item"><span>Pièce de 0.01 €</span><input type="number" min="0" id="dp-p-0.01" oninput="calcLiveDepot()" value="0"></div>
-                            <div class="depot-total-sub">Total Pièces : <span id="lbl-total-p">0,00</span> €</div>
+                            <div class="depot-total-sub">Total Pièces : <span id="lbl-total-p">0.00</span> €</div>
                         </div>
                     </div>
 
@@ -423,7 +423,7 @@
                         <div class="form-group"><label>Responsable</label><input type="text" id="d-resp"></div>
                         <div class="form-group" style="min-width: 200px;">
                             <label style="font-weight: bold; color: var(--vert-fonce);">Grand Total à Déposer</label>
-                            <input type="text" id="d-grand-total" readonly value="0,00 €" style="font-weight: bold; color: var(--vert-fonce); background: #e8f8f0; border-color: #2ecc71;">
+                            <input type="text" id="d-grand-total" readonly value="0.00 €" style="font-weight: bold; color: var(--vert-fonce); background: #e8f8f0; border-color: #2ecc71;">
                         </div>
                         <button class="btn btn-success" style="height: 40px;" onclick="addDepotEspecesDetaille()">🏦 Valider et Ventiler le Dépôt</button>
                     </div>
@@ -490,15 +490,15 @@
                 <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr);">
                     <div class="stat-card" style="border-left-color: var(--vert);">
                         <h3>Total Recettes</h3>
-                        <div class="value" id="ana-kpi-recettes" style="color:var(--vert-fonce);">0,00 €</div>
+                        <div class="value" id="ana-kpi-recettes" style="color:var(--vert-fonce);">0.00 €</div>
                     </div>
                     <div class="stat-card" style="border-left-color: var(--rouge);">
                         <h3>Total Dépenses</h3>
-                        <div class="value" id="ana-kpi-depenses" style="color:var(--rouge);">0,00 €</div>
+                        <div class="value" id="ana-kpi-depenses" style="color:var(--rouge);">0.00 €</div>
                     </div>
                     <div class="stat-card" style="border-left-color: var(--bleu);">
                         <h3>Résultat Net (Bénéfice/Déficit)</h3>
-                        <div class="value" id="ana-kpi-resultat">0,00 €</div>
+                        <div class="value" id="ana-kpi-resultat">0.00 €</div>
                     </div>
                     <div class="stat-card" style="border-left-color: var(--violet);">
                         <h3>Taux de Rentabilité</h3>
@@ -515,7 +515,7 @@
                             <tfoot>
                                 <tr style="background:#e8f8f0; font-weight:bold;">
                                     <td>TOTAL RECETTES</td>
-                                    <td style="text-align:right; color:var(--vert-fonce);" id="ana-tot-recettes">0,00 €</td>
+                                    <td style="text-align:right; color:var(--vert-fonce);" id="ana-tot-recettes">0.00 €</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -528,7 +528,7 @@
                             <tfoot>
                                 <tr style="background:#fcebe9; font-weight:bold;">
                                     <td>TOTAL DÉPENSES</td>
-                                    <td style="text-align:right; color:var(--rouge);" id="ana-tot-depenses">0,00 €</td>
+                                    <td style="text-align:right; color:var(--rouge);" id="ana-tot-depenses">0.00 €</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -816,17 +816,6 @@
         }
     }
 
-    // --- FORMATAGE NOMBRES & DEVISES ---
-    function formatMontant(val) {
-        const num = parseFloat(val) || 0;
-        return new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num) + " €";
-    }
-
-    function formatNumberOnly(val) {
-        const num = parseFloat(val) || 0;
-        return new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
-    }
-
     // --- SAUVEGARDE & CHARGEMENT ---
     async function syncToSupabase(silent = false) {
         if (!silent) showToast("Synchronisation Supabase...");
@@ -1084,9 +1073,7 @@
                 showToast("✅ Justificatif stocké dans Google Drive !");
             } catch (err) {
                 console.error("Erreur Google Drive :", err);
-                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible (" + err.message + ").
-
-Souhaitez-vous enregistrer le document en secours dans l'application ?");
+                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible (" + err.message + ").\n\nSouhaitez-vous enregistrer le document en secours dans l'application ?");
                 if (keepLocal) {
                     driveUrl = await fileToBase64(fileObj);
                     showToast("📎 Justificatif stocké localement");
@@ -1157,8 +1144,8 @@ Souhaitez-vous enregistrer le document en secours dans l'application ?");
                     <td>${op.desig}</td>
                     <td class="hide-on-screen">${op.ref || ''}</td>
                     <td data-html-export="ignore">${docLink}</td>
-                    <td style="font-weight:bold; color:${op.type==='Crédit'?'var(--vert-fonce)':'var(--rouge)'}">${formatMontant(m)}</td>
-                    <td style="font-weight:bold;">${formatMontant(runningSolde)}</td>
+                    <td style="font-weight:bold; color:${op.type==='Crédit'?'var(--vert-fonce)':'var(--rouge)'}">${m.toFixed(2)} €</td>
+                    <td style="font-weight:bold;">${runningSolde.toFixed(2)} €</td>
                     <td style="text-align:center;" data-html-export="ignore">
                         <button class="btn btn-blue btn-xs" onclick="openModalBanque(${op.id})">✏️</button>
                         <button class="btn btn-danger btn-xs" onclick="deleteOperationBanque(${op.id})">🗑️</button>
@@ -1223,9 +1210,7 @@ Souhaitez-vous enregistrer le document en secours dans l'application ?");
                 showToast("✅ Justificatif stocké dans Google Drive !");
             } catch (err) {
                 console.error("Erreur Google Drive :", err);
-                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible (" + err.message + ").
-
-Souhaitez-vous enregistrer le document en secours ?");
+                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible (" + err.message + ").\n\nSouhaitez-vous enregistrer le document en secours ?");
                 if (keepLocal) {
                     driveUrl = await fileToBase64(fileObj);
                     showToast("📎 Justificatif stocké localement");
@@ -1273,7 +1258,7 @@ Souhaitez-vous enregistrer le document en secours ?");
                 }
             }
 
-            tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Crédit' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Crédit'?'var(--vert-fonce)':'var(--rouge)'}">${formatMontant(op.montant)}</td><td style="font-weight:bold;">${formatMontant(s)}</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalLivret(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationLivret(${op.id})">🗑️</button></td></tr>`; 
+            tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Crédit' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Crédit'?'var(--vert-fonce)':'var(--rouge)'}">${op.montant.toFixed(2)} €</td><td style="font-weight:bold;">${s.toFixed(2)} €</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalLivret(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationLivret(${op.id})">🗑️</button></td></tr>`; 
         });
     }
 
@@ -1333,9 +1318,7 @@ Souhaitez-vous enregistrer le document en secours ?");
                 showToast("✅ Justificatif stocké dans Google Drive !");
             } catch (err) {
                 console.error("Erreur Google Drive :", err);
-                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible (" + err.message + ").
-
-Souhaitez-vous enregistrer le document en secours ?");
+                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible (" + err.message + ").\n\nSouhaitez-vous enregistrer le document en secours ?");
                 if (keepLocal) {
                     driveUrl = await fileToBase64(fileObj);
                     showToast("📎 Justificatif stocké localement");
@@ -1383,7 +1366,7 @@ Souhaitez-vous enregistrer le document en secours ?");
                 }
             }
 
-            tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Recette' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td>Dojo</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Recette'?'var(--vert-fonce)':'var(--rouge)'}">${formatMontant(op.montant)}</td><td style="font-weight:bold;">${formatMontant(s)}</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalCaisse(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationCaisse(${op.id})">🗑️</button></td></tr>`; 
+            tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Recette' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td>Dojo</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Recette'?'var(--vert-fonce)':'var(--rouge)'}">${op.montant.toFixed(2)} €</td><td style="font-weight:bold;">${s.toFixed(2)} €</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalCaisse(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationCaisse(${op.id})">🗑️</button></td></tr>`; 
         });
     }
 
@@ -1410,7 +1393,7 @@ Souhaitez-vous enregistrer le document en secours ?");
                     <td><code style="font-size:0.95rem;">n° ${c.num}</code></td>
                     <td><strong>${c.titulaire}</strong> <br><span style="font-size:0.75rem; color:var(--gris-moyen);">${c.banque}</span></td>
                     <td>${c.objet}</td>
-                    <td style="font-weight:bold; color:var(--bleu-fonce);">${formatMontant(montant)}</td>
+                    <td style="font-weight:bold; color:var(--bleu-fonce);">${montant.toFixed(2)} €</td>
                     <td style="text-align:center;" data-html-export="ignore">
                         <button class="btn btn-blue btn-xs" onclick="editChequePortefeuille(${c.id})">✏️</button>
                         <button class="btn btn-danger btn-xs" onclick="deleteChequePortefeuille(${c.id})">🗑️</button>
@@ -1474,7 +1457,7 @@ Souhaitez-vous enregistrer le document en secours ?");
             idsAEncasser.push(parseInt(cb.value));
         });
 
-        if(confirm(`Confirmer l'encaissement de ${checkboxes.length} chèque(s) (${formatMontant(totalRemise)}) sur le compte courant ?`)) {
+        if(confirm(`Confirmer l'encaissement de ${checkboxes.length} chèque(s) (${totalRemise.toFixed(2)} €) sur le compte courant ?`)) {
             comptaDB.cheques = comptaDB.cheques.filter(c => !idsAEncasser.includes(c.id));
             const date = new Date().toISOString().split('T')[0];
             comptaDB.operations.push({
@@ -1512,7 +1495,7 @@ Souhaitez-vous enregistrer le document en secours ?");
                     <td><strong>Bordereau ${b.numClub}</strong></td>
                     <td><code>${b.numFed}</code></td>
                     <td>${b.count} licenciés</td>
-                    <td style="font-weight:bold; color:var(--rouge);">${formatMontant(total)}</td>
+                    <td style="font-weight:bold; color:var(--rouge);">${total.toFixed(2)} €</td>
                     <td>${b.statusReg ? '✅ Oui' : '❌ Non'}</td>
                     <td>${b.printed ? '✅ Oui' : '❌ Non'}</td>
                     <td>${b.bankPulled ? '✅ Oui' : '❌ Non'}</td>
@@ -1574,10 +1557,10 @@ Souhaitez-vous enregistrer le document en secours ?");
     // --- DEPOTS ESPECES ---
     function calcLiveDepot() {
         let tB = 0; billetDenoms.forEach(d => { tB += (parseInt(document.getElementById('dp-b-' + d).value) || 0) * d; });
-        document.getElementById('lbl-total-b').innerText = formatNumberOnly(tB);
+        document.getElementById('lbl-total-b').innerText = tB.toFixed(2);
         let tP = 0; pieceDenoms.forEach(d => { tP += (parseInt(document.getElementById('dp-p-' + d).value) || 0) * d; });
-        document.getElementById('lbl-total-p').innerText = formatNumberOnly(tP);
-        document.getElementById('d-grand-total').value = formatMontant(tB + tP);
+        document.getElementById('lbl-total-p').innerText = tP.toFixed(2);
+        document.getElementById('d-grand-total').value = (tB + tP).toFixed(2) + " €";
     }
 
     function addDepotEspecesDetaille() {
@@ -1599,7 +1582,7 @@ Souhaitez-vous enregistrer le document en secours ?");
         const grandTotal = tB + tP;
         if(grandTotal <= 0) return alert("Montant > 0 € obligatoire.");
 
-        if(confirm(`Confirmer le dépôt réel en banque de ${formatMontant(grandTotal)} ? (Ceci va impacter la caisse et la banque)`)) {
+        if(confirm(`Confirmer le dépôt réel en banque de ${grandTotal.toFixed(2)} € ? (Ceci va impacter la caisse et la banque)`)) {
             comptaDB.caisseFlux.push({ id: Date.now() + 1, date: date, type: 'Dépense', categorie: 'Virement Interne', desig: `Mise en Banque (Réf: ${ref})`, resp: resp, montant: grandTotal, justificatif: null });
             comptaDB.operations.push({ id: Date.now() + 2, date: date, type: 'Crédit', categorie: 'Virement Interne', moyen: 'Dépôt ESP', desig: `Dépôt Espèces - Réf: ${ref}`, ref: ref, resp: resp, montant: grandTotal, dojoRef: generateDojoRef(date), justificatif: null });
             comptaDB.depotsEspeces.push({
@@ -1645,7 +1628,7 @@ Souhaitez-vous enregistrer le document en secours ?");
         if(!tbody) return;
         tbody.innerHTML = '';
         if(comptaDB.depotsEspeces.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--gris-moyen);">Aucun dépôt d'espèces archivé.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--gris-moyen);">Aucun dépôt d\'espèces archivé.</td></tr>';
             return;
         }
         comptaDB.depotsEspeces.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(dp => {
@@ -1655,9 +1638,9 @@ Souhaitez-vous enregistrer le document en secours ?");
                     <td>${formatFrenchDate(dp.date)}</td>
                     <td><strong>${dp.ref}</strong></td>
                     <td><span style="font-size:0.8rem; color:var(--gris-moyen); font-family:monospace;">${dp.text}</span></td>
-                    <td>${formatMontant(totB)}</td>
-                    <td>${formatMontant(totP)}</td>
-                    <td style="font-weight:bold; color:var(--vert-fonce);">${formatMontant(totG)}</td>
+                    <td>${totB.toFixed(2)} €</td>
+                    <td>${totP.toFixed(2)} €</td>
+                    <td style="font-weight:bold; color:var(--vert-fonce);">${totG.toFixed(2)} €</td>
                     <td>${dp.resp}</td>
                     <td style="text-align:center;" data-html-export="ignore">
                         <button class="btn btn-blue btn-xs" onclick="editDepotHistorique(${dp.id})">✏️</button>
@@ -1674,11 +1657,11 @@ Souhaitez-vous enregistrer le document en secours ?");
         let c=0; comptaDB.caisseFlux.forEach(o => o.type==='Recette'? c+=o.montant : c-=o.montant);
         let chq=0; comptaDB.cheques.forEach(o => chq+=parseFloat(o.montant)||0);
         
-        document.getElementById('dash-banque').innerText = formatMontant(b);
-        document.getElementById('dash-livret').innerText = formatMontant(l);
-        document.getElementById('dash-caisse').innerText = formatMontant(c);
-        document.getElementById('dash-cheques-attente').innerText = formatMontant(chq);
-        document.getElementById('dash-treso-nette').innerText = formatMontant(b+l+c);
+        document.getElementById('dash-banque').innerText = b.toFixed(2) + " €";
+        document.getElementById('dash-livret').innerText = l.toFixed(2) + " €";
+        document.getElementById('dash-caisse').innerText = c.toFixed(2) + " €";
+        document.getElementById('dash-cheques-attente').innerText = chq.toFixed(2) + " €";
+        document.getElementById('dash-treso-nette').innerText = (b+l+c).toFixed(2) + " €";
     }
 
     function renderAnalytique() {
@@ -1716,23 +1699,23 @@ Souhaitez-vous enregistrer le document en secours ?");
 
         const tRec = document.getElementById('ana-table-recettes'); tRec.innerHTML = '';
         Object.keys(rec_data).sort().forEach(k => {
-            tRec.innerHTML += `<tr><td>${k}</td><td style="text-align:right; font-weight:500;">${formatMontant(rec_data[k])}</td></tr>`;
+            tRec.innerHTML += `<tr><td>${k}</td><td style="text-align:right; font-weight:500;">${rec_data[k].toFixed(2)} €</td></tr>`;
         });
 
         const tDep = document.getElementById('ana-table-depenses'); tDep.innerHTML = '';
         Object.keys(dep_data).sort().forEach(k => {
-            tDep.innerHTML += `<tr><td>${k}</td><td style="text-align:right; font-weight:500;">${formatMontant(dep_data[k])}</td></tr>`;
+            tDep.innerHTML += `<tr><td>${k}</td><td style="text-align:right; font-weight:500;">${dep_data[k].toFixed(2)} €</td></tr>`;
         });
 
-        document.getElementById('ana-tot-recettes').innerText = formatMontant(totR);
-        document.getElementById('ana-tot-depenses').innerText = formatMontant(totD);
+        document.getElementById('ana-tot-recettes').innerText = totR.toFixed(2) + " €";
+        document.getElementById('ana-tot-depenses').innerText = totD.toFixed(2) + " €";
 
         const resultat = totR - totD;
-        document.getElementById('ana-kpi-recettes').innerText = formatMontant(totR);
-        document.getElementById('ana-kpi-depenses').innerText = formatMontant(totD);
+        document.getElementById('ana-kpi-recettes').innerText = totR.toFixed(2) + " €";
+        document.getElementById('ana-kpi-depenses').innerText = totD.toFixed(2) + " €";
         
         const resEl = document.getElementById('ana-kpi-resultat');
-        resEl.innerText = (resultat > 0 ? "+" : "") + formatMontant(resultat);
+        resEl.innerText = (resultat > 0 ? "+" : "") + resultat.toFixed(2) + " €";
         resEl.style.color = resultat >= 0 ? "var(--vert-fonce)" : "var(--rouge)";
 
         let taux = totR > 0 ? ((resultat / totR) * 100) : 0;
@@ -1814,7 +1797,7 @@ Souhaitez-vous enregistrer le document en secours ?");
         const source = document.getElementById('ana-source').selectedOptions[0].text;
         const start = document.getElementById('ana-start').value;
         const end = document.getElementById('ana-end').value;
-        const periode = (start || end) ? `Du ${start || 'début'} au ${end || 'aujourd'hui'}` : "Exercice global (Toutes périodes)";
+        const periode = (start || end) ? `Du ${start || 'début'} au ${end || 'aujourd\'hui'}` : "Exercice global (Toutes périodes)";
 
         const recHtml = document.getElementById('ana-table-recettes').innerHTML;
         const depHtml = document.getElementById('ana-table-depenses').innerHTML;
