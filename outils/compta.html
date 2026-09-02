@@ -118,7 +118,7 @@
         .depot-box { background: #fff; border: 1px solid var(--gris-clair); padding: 15px; border-radius: 6px; }
         .depot-box h4 { margin-top: 0; font-family: 'Fredoka', sans-serif; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 5px; }
         .depot-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.85rem; }
-        .depot-item input { width: 50px; padding: 4px; text-align: center; border: 1px solid var(--gris-clair); border-radius: 4px; }
+        .depot-item input { width: 60px; padding: 4px; text-align: center; border: 1px solid var(--gris-clair); border-radius: 4px; }
         .depot-total-sub { text-align: right; font-weight: bold; margin-top: 10px; font-size: 0.95rem; color: var(--gris-fonce); border-top: 1px dashed var(--gris-clair); padding-top: 5px; }
 
         @media screen { .hide-on-screen { display: none !important; } }
@@ -258,6 +258,54 @@
                         <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('caisse', 'JOURNAL DES FLUX DE LA BOÎTE À MONNAIE', 'table-caisse-printable')">📄 Exporter A4 Paysage</button>
                     </div>
                 </div>
+
+                <!-- MODULE VENTILATION PHYSIQUE DE LA CAISSE -->
+                <div style="background: #ffffff; border: 1px solid var(--gris-clair); border-radius: 8px; padding: 18px; margin-bottom: 22px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 10px; margin-bottom: 15px; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <h3 style="margin:0; font-family:'Fredoka', sans-serif; color:var(--noir-doux); font-size:1.15rem;">💶 Inventaire & Décompte Détaillé de la Caisse</h3>
+                            <p style="margin:2px 0 0 0; font-size:0.8rem; color:var(--gris-moyen);">Indiquez le nombre exact de billets et de pièces présents dans la boîte pour vérifier l'équilibre avec le journal.</p>
+                        </div>
+                        <button class="btn btn-success btn-xs" onclick="saveInventaireCaisse()">💾 Sauvegarder la ventilation</button>
+                    </div>
+
+                    <div class="depot-grid-split" style="margin-bottom: 14px;">
+                        <div class="depot-box">
+                            <h4>💶 Billets</h4>
+                            <div class="depot-item"><span>Billet de 100 €</span><input type="number" min="0" id="inv-b-100" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-item"><span>Billet de 50 €</span><input type="number" min="0" id="inv-b-50" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-item"><span>Billet de 20 €</span><input type="number" min="0" id="inv-b-20" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-item"><span>Billet de 10 €</span><input type="number" min="0" id="inv-b-10" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-item"><span>Billet de 5 €</span><input type="number" min="0" id="inv-b-5" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-total-sub">Total Billets : <span id="lbl-inv-b">0,00</span> €</div>
+                        </div>
+
+                        <div class="depot-box">
+                            <h4>🪙 Pièces & Centimes</h4>
+                            <div class="depot-item"><span>Pièce de 2 €</span><input type="number" min="0" id="inv-p-2" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-item"><span>Pièce de 1 €</span><input type="number" min="0" id="inv-p-1" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-item"><span>Pièce de 0.50 €</span><input type="number" min="0" id="inv-p-0.5" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-item"><span>Pièce de 0.20 €</span><input type="number" min="0" id="inv-p-0.2" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-item"><span>Pièce de 0.10 €</span><input type="number" min="0" id="inv-p-0.1" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-item"><span>Pièce de 0.05 €</span><input type="number" min="0" id="inv-p-0.05" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-item"><span>Pièce de 0.02 €</span><input type="number" min="0" id="inv-p-0.02" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-item"><span>Pièce de 0.01 €</span><input type="number" min="0" id="inv-p-0.01" oninput="calcInventaireCaisseLive()" value="0"></div>
+                            <div class="depot-total-sub">Total Pièces : <span id="lbl-inv-p">0,00</span> €</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#F8F9FA; padding:12px 18px; border-radius:6px; flex-wrap:wrap; gap:10px; border:1px solid var(--gris-tres-clair);">
+                        <div style="font-size:0.95rem;">
+                            Total Physique Compté : <strong id="lbl-inv-total" style="color:var(--vert-fonce); font-size:1.2rem; font-family:'Fredoka';">0,00 €</strong>
+                            <span style="margin: 0 10px; color:var(--gris-clair);">|</span>
+                            Solde Théorique Journal : <strong id="lbl-inv-theorique" style="font-family:'Fredoka'; font-size:1.05rem;">0,00 €</strong>
+                        </div>
+                        <div id="lbl-inv-ecart" style="font-size:0.85rem; font-weight:bold; padding:5px 12px; border-radius:4px; background:#e8f8f0; color:var(--vert-fonce);">
+                            ✓ Caisse équilibrée (0,00 €)
+                        </div>
+                    </div>
+                </div>
+
                 <div class="filter-box">
                     <span>🔍 <strong>Filtrer la période :</strong></span>
                     <input type="date" id="filter-start-date-caisse" onchange="renderCaisseFlux()"> au 
@@ -854,6 +902,7 @@
         if (!comptaDB.cheques) comptaDB.cheques = [];
         if (!comptaDB.bordereaux) comptaDB.bordereaux = [];
         if (!comptaDB.depotsEspeces) comptaDB.depotsEspeces = [];
+        if (!comptaDB.monnaieCounts) comptaDB.monnaieCounts = {};
     }
 
     async function loadData() {
@@ -862,6 +911,7 @@
             const { data, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
             if (data && data.data) comptaDB = data.data;
             if (!comptaDB.categories || comptaDB.categories.length === 0) comptaDB.categories = [...defaultCategories];
+            if (!comptaDB.monnaieCounts) comptaDB.monnaieCounts = {};
         } catch(e) {}
         rebuildAll();
     }
@@ -872,6 +922,7 @@
         renderOperationsBanque();
         renderOperationsLivret();
         renderCaisseFlux();
+        loadInventaireCaisseInputs();
         renderChequesAttente();
         renderBordereaux();
         renderDepotsEspeces();
@@ -884,6 +935,7 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('pane-' + tabId).style.display = 'block';
         document.getElementById('btn-tab-' + tabId).classList.add('active');
+        if (tabId === 'caisse') calcInventaireCaisseLive();
         if (tabId === 'analytique') renderAnalytique();
     }
 
@@ -1273,7 +1325,92 @@
         });
     }
 
-    // --- CAISSE ---
+    // --- CAISSE & VENTILATION ---
+    function calcInventaireCaisseLive() {
+        let totB = 0;
+        billetDenoms.forEach(d => {
+            const el = document.getElementById('inv-b-' + d);
+            const q = el ? (parseInt(el.value) || 0) : 0;
+            totB += q * d;
+        });
+        const lblB = document.getElementById('lbl-inv-b');
+        if (lblB) lblB.innerText = formatNumberOnly(totB);
+
+        let totP = 0;
+        pieceDenoms.forEach(d => {
+            const el = document.getElementById('inv-p-' + d);
+            const q = el ? (parseInt(el.value) || 0) : 0;
+            totP += q * d;
+        });
+        const lblP = document.getElementById('lbl-inv-p');
+        if (lblP) lblP.innerText = formatNumberOnly(totP);
+
+        const totalReel = totB + totP;
+        const lblTot = document.getElementById('lbl-inv-total');
+        if (lblTot) lblTot.innerText = formatMontant(totalReel);
+
+        let soldeTheorique = 0;
+        if (comptaDB.caisseFlux) {
+            comptaDB.caisseFlux.forEach(op => {
+                soldeTheorique += op.type === 'Recette' ? op.montant : -op.montant;
+            });
+        }
+        const lblTheo = document.getElementById('lbl-inv-theorique');
+        if (lblTheo) lblTheo.innerText = formatMontant(soldeTheorique);
+
+        const diff = totalReel - soldeTheorique;
+        const badgeEcart = document.getElementById('lbl-inv-ecart');
+        if (badgeEcart) {
+            if (Math.abs(diff) < 0.009) {
+                badgeEcart.style.background = '#e8f8f0';
+                badgeEcart.style.color = 'var(--vert-fonce)';
+                badgeEcart.innerText = "✓ Caisse équilibrée (0,00 €)";
+            } else if (diff > 0) {
+                badgeEcart.style.background = '#e1f0fa';
+                badgeEcart.style.color = 'var(--bleu-fonce)';
+                badgeEcart.innerText = `Excédent constaté : +${formatMontant(diff)}`;
+            } else {
+                badgeEcart.style.background = '#fcebe9';
+                badgeEcart.style.color = 'var(--rouge)';
+                badgeEcart.innerText = `Écart constaté : ${formatMontant(diff)}`;
+            }
+        }
+        return { totB, totP, totalReel };
+    }
+
+    function saveInventaireCaisse() {
+        if (!comptaDB.monnaieCounts) comptaDB.monnaieCounts = {};
+        billetDenoms.forEach(d => {
+            const el = document.getElementById('inv-b-' + d);
+            comptaDB.monnaieCounts['b' + d] = el ? (parseInt(el.value) || 0) : 0;
+        });
+        pieceDenoms.forEach(d => {
+            const key = 'p' + d.toString().replace('.', '_');
+            const el = document.getElementById('inv-p-' + d);
+            comptaDB.monnaieCounts[key] = el ? (parseInt(el.value) || 0) : 0;
+        });
+        saveComptaData();
+        showToast("✓ Inventaire et ventilation de caisse sauvegardés !");
+    }
+
+    function loadInventaireCaisseInputs() {
+        if (!comptaDB.monnaieCounts) return;
+        billetDenoms.forEach(d => {
+            const el = document.getElementById('inv-b-' + d);
+            if (el && comptaDB.monnaieCounts['b' + d] !== undefined) {
+                el.value = comptaDB.monnaieCounts['b' + d];
+            }
+        });
+        pieceDenoms.forEach(d => {
+            const key = 'p' + d.toString().replace('.', '_');
+            const el = document.getElementById('inv-p-' + d);
+            if (el && comptaDB.monnaieCounts[key] !== undefined) {
+                el.value = comptaDB.monnaieCounts[key];
+            }
+        });
+        calcInventaireCaisseLive();
+    }
+
     function openModalCaisse(id = null) {
         editingCaisseId = id;
         flagRemoveCaisseFile = false;
@@ -1379,6 +1516,7 @@
 
             tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Recette' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td>Dojo</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Recette'?'var(--vert-fonce)':'var(--rouge)'}">${formatMontant(op.montant)}</td><td style="font-weight:bold;">${formatMontant(s)}</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalCaisse(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationCaisse(${op.id})">🗑️</button></td></tr>`; 
         });
+        calcInventaireCaisseLive();
     }
 
     // --- CHEQUES ---
