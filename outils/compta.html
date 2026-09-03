@@ -15,6 +15,7 @@
             --bleu: #3498db;
             --bleu-fonce: #2980b9;
             --violet: #8e44ad;
+            --orange: #e67e22;
             --noir-doux: #1A1A1A;
             --gris-fonce: #3D3D3D;
             --gris-moyen: #6B6B6B;
@@ -71,6 +72,9 @@
         .filter-box label { font-size: 0.85rem; font-weight: bold; color: #2c3e50; }
         .filter-box input[type="date"], .filter-box select, .filter-box input[type="text"] { padding: 6px 10px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 0.9rem; }
 
+        .season-selector-badge { display: flex; align-items: center; gap: 8px; background: #FFF3CD; border: 1px solid #FFEEBA; padding: 5px 12px; border-radius: 6px; font-weight: 500; font-size: 0.85rem; color: #856404; }
+        .season-selector-badge select { background: white; border: 1px solid #dcdcdc; border-radius: 4px; padding: 4px 8px; font-weight: bold; color: #333; }
+
         .form-grid { display: flex; flex-wrap: wrap; gap: 12px; background: #fafafa; padding: 20px; border-radius: 6px; border: 1px dashed var(--gris-clair); margin-bottom: 20px; align-items: flex-end; }
         .form-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 150px; }
         .form-group label { font-size: 0.85rem; font-weight: 500; color: var(--gris-fonce); }
@@ -86,8 +90,11 @@
         .badge-credit { background: #e8f8f0; color: var(--vert-fonce); }
         .badge-debit { background: #fcebe9; color: var(--rouge); }
         .badge-cat { background: #e1f0fa; color: var(--bleu-fonce); font-size: 0.7rem; border: 1px solid #b3d7f0; }
+        .badge-waiting { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .badge-differe { background: #f0e6fa; color: var(--violet); border: 1px solid #d9bbf2; }
+        .badge-status-closed { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .badge-status-open { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
 
-        /* Fichiers / Justificatifs */
         .file-attachment-box { background: #F8F9FA; border: 1px dashed var(--gris-clair); border-radius: 8px; padding: 16px; margin-top: 5px; }
         .file-existing-badge { display: flex; align-items: center; justify-content: space-between; background: #EBF3FA; border: 1px solid #BEE0F7; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; font-size: 0.88rem; }
 
@@ -134,11 +141,16 @@
         <div class="topbar">
             <div class="topbar-title-block">
                 <h2>Comptabilité & Trésorerie Analytique</h2>
-                <p>Gestion par catégories, Livre journal, Bilan et Compte de Résultat</p>
+                <p>Gestion par saisons sportives, Livre journal, Bilan et Compte de Résultat</p>
             </div>
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                <button class="btn btn-outline btn-xs" style="padding:8px 14px;" onclick="loadData()">🔄 Recharger Supabase</button>
-                <button class="btn btn-success btn-xs" style="padding:8px 14px;" onclick="syncToSupabase(false)">☁️ Enregistrer vers Supabase</button>
+                <div class="season-selector-badge">
+                    <span>📅 Saison :</span>
+                    <select id="global-season-select" onchange="changeActiveSeason()"></select>
+                    <button class="btn btn-outline btn-xs" onclick="openModalSeasonManager()" title="Gérer ou ajouter des saisons">⚙️</button>
+                </div>
+                <button class="btn btn-outline btn-xs" style="padding:8px 14px;" onclick="loadData()">🔄 Supabase</button>
+                <button class="btn btn-success btn-xs" style="padding:8px 14px;" onclick="syncToSupabase(false)">☁️ Enregistrer</button>
                 <a href="../index.html" class="btn btn-dark btn-xs" style="padding:8px 14px;">🏠 Bureau Central</a>
             </div>
         </div>
@@ -146,7 +158,7 @@
         <div class="app-body">
             <div class="dashboard-grid">
                 <div class="stat-card" style="border-left: 4px solid var(--bleu);">
-                    <h3>🏦 Solde Banque</h3>
+                    <h3>🏦 Solde Banque Réel</h3>
                     <div class="value" id="dash-banque">0,00 €</div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid var(--violet);">
@@ -157,12 +169,12 @@
                     <h3>🪙 Solde Caisse</h3>
                     <div class="value" id="dash-caisse">0,00 €</div>
                 </div>
-                <div class="stat-card" style="border-left: 4px solid #e67e22;">
-                    <h3>✍️ Chèques Attente</h3>
-                    <div class="value" id="dash-cheques-attente" style="color: #e67e22;">0,00 €</div>
+                <div class="stat-card" style="border-left: 4px solid var(--orange);">
+                    <h3>✍️ Chèques Portefeuille</h3>
+                    <div class="value" id="dash-cheques-attente" style="color: var(--orange);">0,00 €</div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid var(--noir-doux);">
-                    <h3>💎 TRESORERIE NETTE</h3>
+                    <h3>💎 TRÉSORERIE NETTE</h3>
                     <div class="value" id="dash-treso-nette">0,00 €</div>
                 </div>
             </div>
@@ -171,16 +183,19 @@
                 <button id="btn-tab-banque" class="tab-btn active" onclick="switchTab('banque')">🏦 1. Banque</button>
                 <button id="btn-tab-livret" class="tab-btn" onclick="switchTab('livret')">📈 2. Livret</button>
                 <button id="btn-tab-caisse" class="tab-btn" onclick="switchTab('caisse')">🪙 3. Caisse</button>
-                <button id="btn-tab-cheques" class="tab-btn" onclick="switchTab('cheques')">✍️ 4. Chèques</button>
-                <button id="btn-tab-licences" class="tab-btn" onclick="switchTab('licences')">🥋 5. Licences FFJDA</button>
-                <button id="btn-tab-depots" class="tab-btn" onclick="switchTab('depots')">💰 6. Dépôts</button>
-                <button id="btn-tab-categories" class="tab-btn tab-btn-cat" onclick="switchTab('categories')">📂 7. Catégories</button>
-                <button id="btn-tab-analytique" class="tab-btn tab-btn-ana" onclick="switchTab('analytique')">📊 8. Analytique & Bilan</button>
+                <button id="btn-tab-cheques" class="tab-btn" onclick="switchTab('cheques')">✍️ 4. Chèques & Différés</button>
+                <button id="btn-tab-depots" class="tab-btn" onclick="switchTab('depots')">💰 5. Dépôts Espèces</button>
+                <button id="btn-tab-categories" class="tab-btn tab-btn-cat" onclick="switchTab('categories')">📂 6. Catégories</button>
+                <button id="btn-tab-analytique" class="tab-btn tab-btn-ana" onclick="switchTab('analytique')">📊 7. Analytique & Bilan</button>
             </div>
 
+            <!-- ONGLET BANQUE -->
             <div id="pane-banque" class="main-card tab-pane">
                 <div class="card-header-actions">
-                    <h2>Journal Général des Opérations Bancaires</h2>
+                    <div>
+                        <h2 id="title-banque-journal">Journal Général des Opérations Bancaires</h2>
+                        <span id="badge-banque-season" style="font-size:0.8rem; color:var(--gris-moyen);">Affichage de la saison sélectionnée</span>
+                    </div>
                     <div style="display:flex; gap:10px;">
                         <button class="btn btn-dark" onclick="openModalBanque()">➕ Nouvelle Opération</button>
                         <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('banque', 'JOURNAL GÉNÉRAL DES OPÉRATIONS BANCAIRES', 'table-banque-printable')">📄 Exporter A4 Paysage</button>
@@ -193,7 +208,7 @@
                     <select id="filter-cat-banque" onchange="renderOperationsBanque()">
                         <option value="">-- Toutes les catégories --</option>
                     </select>
-                    <button class="btn btn-outline btn-xs" onclick="clearDateFilter('banque')">Réinitialiser</button>
+                    <button class="btn btn-outline btn-xs" onclick="clearDateFilter('banque')">Réinitialiser dates</button>
                 </div>
                 <div class="table-responsive">
                     <table id="table-banque-printable">
@@ -217,12 +232,16 @@
                 </div>
             </div>
 
+            <!-- ONGLET LIVRET -->
             <div id="pane-livret" class="main-card tab-pane" style="display:none;">
                 <div class="card-header-actions">
-                    <h2>Suivi du Compte Livret Épargne</h2>
+                    <div>
+                        <h2>Suivi du Compte Livret Épargne</h2>
+                        <span id="badge-livret-season" style="font-size:0.8rem; color:var(--gris-moyen);">Affichage de la saison sélectionnée</span>
+                    </div>
                     <div style="display:flex; gap:10px;">
                         <button class="btn btn-dark" style="background: var(--violet);" onclick="openModalLivret()">➕ Nouvelle Opération</button>
-                        <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('livret', 'SUIVI DU COMPTE LIVRET EPARGNE', 'table-livret-printable')">📄 Exporter A4 Paysage</button>
+                        <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('livret', 'SUIVI DU COMPTE LIVRET ÉPARGNE', 'table-livret-printable')">📄 Exporter A4 Paysage</button>
                     </div>
                 </div>
                 <div class="filter-box">
@@ -250,21 +269,24 @@
                 </div>
             </div>
 
+            <!-- ONGLET CAISSE -->
             <div id="pane-caisse" class="main-card tab-pane" style="display:none;">
                 <div class="card-header-actions">
-                    <h2>Journal des Flux de la Boîte à Monnaie (Espèces)</h2>
+                    <div>
+                        <h2>Journal des Flux de la Boîte à Monnaie (Espèces)</h2>
+                        <span id="badge-caisse-season" style="font-size:0.8rem; color:var(--gris-moyen);">Affichage de la saison sélectionnée</span>
+                    </div>
                     <div style="display:flex; gap:10px;">
                         <button class="btn btn-dark" onclick="openModalCaisse()">➕ Saisir Mouvement Caisse</button>
                         <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('caisse', 'JOURNAL DES FLUX DE LA BOÎTE À MONNAIE', 'table-caisse-printable')">📄 Exporter A4 Paysage</button>
                     </div>
                 </div>
 
-                <!-- MODULE VENTILATION PHYSIQUE DE LA CAISSE -->
                 <div style="background: #ffffff; border: 1px solid var(--gris-clair); border-radius: 8px; padding: 18px; margin-bottom: 22px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 10px; margin-bottom: 15px; flex-wrap:wrap; gap:10px;">
                         <div>
-                            <h3 style="margin:0; font-family:'Fredoka', sans-serif; color:var(--noir-doux); font-size:1.15rem;">💶 Inventaire & Décompte Détaillé de la Caisse</h3>
-                            <p style="margin:2px 0 0 0; font-size:0.8rem; color:var(--gris-moyen);">Indiquez le nombre exact de billets et de pièces présents dans la boîte pour vérifier l'équilibre avec le journal.</p>
+                            <h3 style="margin:0; font-family:'Fredoka', sans-serif; color:var(--noir-doux); font-size:1.15rem;">💶 Inventaire & Décompte Physique Actuel</h3>
+                            <p style="margin:2px 0 0 0; font-size:0.8rem; color:var(--gris-moyen);">Décompte réel des espèces en boîte pour comparer au solde théorique cumulé.</p>
                         </div>
                         <button class="btn btn-success btn-xs" onclick="saveInventaireCaisse()">💾 Sauvegarder la ventilation</button>
                     </div>
@@ -298,7 +320,7 @@
                         <div style="font-size:0.95rem;">
                             Total Physique Compté : <strong id="lbl-inv-total" style="color:var(--vert-fonce); font-size:1.2rem; font-family:'Fredoka';">0,00 €</strong>
                             <span style="margin: 0 10px; color:var(--gris-clair);">|</span>
-                            Solde Théorique Journal : <strong id="lbl-inv-theorique" style="font-family:'Fredoka'; font-size:1.05rem;">0,00 €</strong>
+                            Solde Théorique Journal Global : <strong id="lbl-inv-theorique" style="font-family:'Fredoka'; font-size:1.05rem;">0,00 €</strong>
                         </div>
                         <div id="lbl-inv-ecart" style="font-size:0.85rem; font-weight:bold; padding:5px 12px; border-radius:4px; background:#e8f8f0; color:var(--vert-fonce);">
                             ✓ Caisse équilibrée (0,00 €)
@@ -332,55 +354,98 @@
                 </div>
             </div>
 
+            <!-- ONGLET CHÈQUES & DIFFÉRÉS -->
             <div id="pane-cheques" class="main-card tab-pane" style="display:none;">
                 <div class="card-header-actions">
-                    <h2>Gestion des Chèques Reçus & Remises en Banque</h2>
-                    <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('cheques', 'LISTE DES CHÈQUES À ENCAISSER', 'table-cheques-printable')">📄 Exporter A4 Paysage</button>
+                    <h2>Gestion Portefeuille Chèques & Chèques Différés</h2>
+                    <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('cheques', 'PORTEFEUILLE DE CHÈQUES ET DIFFÉRÉS', 'table-cheques-printable')">📄 Exporter A4 Paysage</button>
                 </div>
+
+                <div class="dashboard-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+                    <div class="stat-card" style="border-left-color: var(--orange);">
+                        <h3>Total Général en Portefeuille</h3>
+                        <div class="value" id="kpi-chq-total" style="color:var(--orange);">0,00 €</div>
+                        <small id="kpi-chq-total-count" style="color:var(--gris-moyen);">0 chèque(s)</small>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--vert);">
+                        <h3>Prêts à Encaisser Immédiatement</h3>
+                        <div class="value" id="kpi-chq-dispo" style="color:var(--vert-fonce);">0,00 €</div>
+                        <small id="kpi-chq-dispo-count" style="color:var(--gris-moyen);">0 chèque(s)</small>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--violet);">
+                        <h3>Chèques Différés (À venir)</h3>
+                        <div class="value" id="kpi-chq-differe" style="color:var(--violet);">0,00 €</div>
+                        <small id="kpi-chq-differe-count" style="color:var(--gris-moyen);">0 chèque(s)</small>
+                    </div>
+                </div>
+
                 <div class="filter-box">
-                    <span>🔍 <strong>Filtrer les chèques :</strong></span>
+                    <span>🔍 <strong>Filtrer :</strong></span>
                     <input type="date" id="filter-start-date-cheques" onchange="renderChequesAttente()"> au 
                     <input type="date" id="filter-end-date-cheques" onchange="renderChequesAttente()">
+                    <select id="filter-status-cheques" onchange="renderChequesAttente()">
+                        <option value="ALL">Tous les chèques</option>
+                        <option value="ENCAISSABLE">Directement encaissables</option>
+                        <option value="DIFFERE">Chèques différés uniquement</option>
+                    </select>
                     <button class="btn btn-outline btn-xs" onclick="clearDateFilter('cheques')">Réinitialiser</button>
                 </div>
                 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:25px;">
+                <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:20px; margin-bottom:25px;">
                     <div style="background:#fafafa; padding:20px; border-radius:6px; border:1px dashed var(--gris-clair);">
-                        <h3 style="font-family:'Fredoka'; margin-top:0;">✍️ Enregistrer un Chèque Entrant</h3>
+                        <h3 style="font-family:'Fredoka'; margin-top:0;">✍️ Réceptionner un Chèque</h3>
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                            <div class="form-group"><label>Date de réception</label><input type="date" id="chq-date"></div>
-                            <div class="form-group"><label>Montant (€)</label><input type="number" step="0.01" id="chq-montant"></div>
-                            <div class="form-group"><label>N° Chèque</label><input type="text" id="chq-num"></div>
-                            <div class="form-group"><label>Titulaire Compte</label><input type="text" id="chq-titulaire"></div>
-                            <div class="form-group"><label>Banque Émettrice</label><input type="text" id="chq-banque"></div>
-                            <div class="form-group"><label>Objet / Référence</label><input type="text" id="chq-objet"></div>
+                            <div class="form-group"><label>Date de réception *</label><input type="date" id="chq-date"></div>
+                            <div class="form-group"><label>Date encaissement prévue *</label><input type="date" id="chq-date-encaissement"></div>
+                            <div class="form-group"><label>Montant (€) *</label><input type="number" step="0.01" id="chq-montant"></div>
+                            <div class="form-group"><label>N° Chèque *</label><input type="text" id="chq-num"></div>
+                            <div class="form-group"><label>Titulaire Compte *</label><input type="text" id="chq-titulaire"></div>
+                            <div class="form-group"><label>Banque Émettrice *</label><input type="text" id="chq-banque"></div>
+                            <div class="form-group" style="grid-column: 1 / -1;"><label>Objet / Référence adhérent</label><input type="text" id="chq-objet" placeholder="Ex: Cotisation Jordan 1/3"></div>
                         </div>
-                        <button class="btn btn-dark" style="margin-top:12px; width:100%; justify-content:center;" onclick="addChequeAttente()">📥 Placer en attente de remise</button>
+                        <button class="btn btn-dark" style="margin-top:12px; width:100%; justify-content:center;" onclick="addChequeAttente()">📥 Mettre en portefeuille</button>
                     </div>
 
-                    <div style="background:#f4f9f5; padding:20px; border-radius:6px; border:1px solid #cceadb;">
-                        <h3 style="font-family:'Fredoka'; margin-top:0; color:var(--vert-fonce);">🏦 Préparer une Remise de Chèques</h3>
-                        <p style="font-size:0.8rem; color:var(--gris-moyen);">Cochez les chèques ci-dessous puis donnez un numéro de bordereau pour l'injecter en banque.</p>
-                        <div style="display:flex; gap:10px; margin-top:15px; align-items:flex-end;">
-                            <div class="form-group"><label>N° Bordereau</label><input type="text" id="remise-num"></div>
-                            <div class="form-group"><label>Responsable</label><input type="text" id="remise-resp"></div>
-                            <button class="btn btn-success" onclick="processRemiseChèques()">⚙️ Valider l'encaissement</button>
+                    <div style="background:#f4f9f5; padding:20px; border-radius:6px; border:1px solid #cceadb; display:flex; flex-direction:column; justify-content:space-between;">
+                        <div>
+                            <h3 style="font-family:'Fredoka'; margin-top:0; color:var(--vert-fonce);">🏦 Remise de Chèques en Banque</h3>
+                            <p style="font-size:0.85rem; color:var(--gris-moyen); line-height:1.4;">
+                                Cochez les chèques ci-dessous à inclure dans votre bordereau. La validation créditera automatiquement le compte courant bancaire.
+                            </p>
+                            <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+                                <div class="form-group"><label>N° Réf. Bordereau Banque *</label><input type="text" id="remise-num" placeholder="Ex: BORD-2026-01"></div>
+                                <div class="form-group"><label>Responsable du dépôt *</label><input type="text" id="remise-resp" value="Jordan Loudenot"></div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px; border-top:1px dashed #b2d8c3; padding-top:10px;">
+                            <div style="font-size: 0.9rem; margin-bottom: 8px;">
+                                Sélectionnés : <strong id="lbl-remise-selected-count">0</strong> chèque(s) pour un total de <strong id="lbl-remise-selected-total" style="color:var(--vert-fonce);">0,00 €</strong>
+                            </div>
+                            <button class="btn btn-success" style="width:100%;" onclick="processRemiseChèques()">⚙️ Encaisser la sélection sur le compte courant</button>
                         </div>
                     </div>
                 </div>
 
-                <h3>📋 Liste des Chèques Détenus (En attente d'encaissement)</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h3 style="margin:0;">📋 Liste des Chèques Détenus</h3>
+                    <div>
+                        <button class="btn btn-outline btn-xs" onclick="selectAllCheques(true)">Tout cocher</button>
+                        <button class="btn btn-outline btn-xs" onclick="selectAllCheques(false)">Tout décocher</button>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table id="table-cheques-printable">
                         <thead>
                             <tr>
-                                <th data-html-export="ignore">Sélection</th>
-                                <th>Date Reçu</th>
+                                <th data-html-export="ignore" style="width: 40px; text-align:center;">Dépôt</th>
+                                <th>Statut</th>
+                                <th>Reçu le</th>
+                                <th>À encaisser le</th>
                                 <th>N° Chèque</th>
                                 <th>Titulaire / Banque</th>
                                 <th>Objet</th>
                                 <th>Montant</th>
-                                <th style="text-align:center;" data-html-export="ignore">Action</th>
+                                <th style="text-align:center;" data-html-export="ignore">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="table-cheques-attente-body"></tbody>
@@ -388,55 +453,14 @@
                 </div>
             </div>
 
-            <div id="pane-licences" class="main-card tab-pane" style="display:none;">
-                <div class="card-header-actions">
-                    <h2>Suivi des Bordereaux de Licences Extranet FFJDA</h2>
-                    <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('licences', 'SUIVI DES BORDEREAUX DE LICENCES FFJDA', 'table-licences-printable')">📄 Exporter A4 Paysage</button>
-                </div>
-                
-                <div class="filter-box">
-                    <span>🔍 <strong>Filtrer la période :</strong></span>
-                    <input type="date" id="filter-start-licences" onchange="renderBordereaux()"> au 
-                    <input type="date" id="filter-end-licences" onchange="renderBordereaux()">
-                    <button class="btn btn-outline btn-xs" onclick="clearDateFilter('licences')">Réinitialiser</button>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group"><label>Date Bordereau</label><input type="date" id="lic-date"></div>
-                    <div class="form-group"><label>N° Bordereau Club</label><input type="text" id="lic-num-club"></div>
-                    <div class="form-group"><label>N° National Fédéral</label><input type="text" id="lic-num-fed"></div>
-                    <div class="form-group"><label>Nombre Licenciés</label><input type="number" id="lic-count"></div>
-                    <div class="form-group"><label>Montant Global (€)</label><input type="number" step="0.01" id="lic-total"></div>
-                    <button class="btn btn-dark" onclick="addBordereauLicence()">💾 Enregistrer le Bordereau</button>
-                </div>
-
-                <div class="table-responsive">
-                    <table id="table-licences-printable">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>N° Dojo</th>
-                                <th>N° Fédéral</th>
-                                <th>Nb Licences</th>
-                                <th>Montant Global</th>
-                                <th>Enregistré ?</th>
-                                <th>Imprimé ?</th>
-                                <th>Prélevé Banque ?</th>
-                                <th style="text-align:center;" data-html-export="ignore">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-licences-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
+            <!-- ONGLET DÉPÔTS ESPÈCES -->
             <div id="pane-depots" class="main-card tab-pane" style="display:none;">
                 <div class="card-header-actions">
                     <h2>Mise en Banque des Espèces (Bordereau Détaillé)</h2>
-                    <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('depots', 'HISTORIQUE DES DEPOTS EN ESPECES', 'table-depots-printable')">📄 Exporter A4 Paysage</button>
+                    <button class="btn btn-blue btn-xs" onclick="exporterTableauA4('depots', 'HISTORIQUE DES DÉPÔTS EN ESPÈCES', 'table-depots-printable')">📄 Exporter A4 Paysage</button>
                 </div>
                 <p style="font-size: 0.9rem; color: var(--gris-moyen); margin-top: -5px; margin-bottom: 20px;">
-                    Saisissez les quantités exactes déposées à la banque. L'outil calculera les distinctions réglementaires pièces/billets pour les écritures comptables.
+                    Saisissez les coupures déposées à la banque. L'outil génère automatiquement la sortie en caisse et l'entrée sur le compte courant.
                 </p>
                 
                 <div style="background: #fafafa; padding: 20px; border-radius: 8px; border: 1px dashed var(--gris-clair); margin-bottom: 25px;">
@@ -467,8 +491,8 @@
 
                     <div class="form-grid" style="background:transparent; border:none; padding:0; margin:0;">
                         <div class="form-group"><label>Date du Dépôt</label><input type="date" id="d-date"></div>
-                        <div class="form-group"><label>N° Réf / Bordereau</label><input type="text" id="d-ref"></div>
-                        <div class="form-group"><label>Responsable</label><input type="text" id="d-resp"></div>
+                        <div class="form-group"><label>N° Réf / Bordereau</label><input type="text" id="d-ref" placeholder="Ex: DEP-ESP-01"></div>
+                        <div class="form-group"><label>Responsable</label><input type="text" id="d-resp" value="Jordan Loudenot"></div>
                         <div class="form-group" style="min-width: 200px;">
                             <label style="font-weight: bold; color: var(--vert-fonce);">Grand Total à Déposer</label>
                             <input type="text" id="d-grand-total" readonly value="0,00 €" style="font-weight: bold; color: var(--vert-fonce); background: #e8f8f0; border-color: #2ecc71;">
@@ -497,12 +521,13 @@
                 </div>
             </div>
 
+            <!-- ONGLET CATÉGORIES -->
             <div id="pane-categories" class="main-card tab-pane" style="display:none;">
                 <div class="card-header-actions">
                     <h2>Gestion des Catégories (Analytique)</h2>
                     <button class="btn btn-dark" onclick="openModalCategory()">➕ Nouvelle Catégorie</button>
                 </div>
-                <p style="font-size: 0.9rem; color: var(--gris-moyen);">Créez ici vos propres postes de recettes et dépenses pour personnaliser le bilan analytique.</p>
+                <p style="font-size: 0.9rem; color: var(--gris-moyen);">Créez ici vos propres postes de recettes et dépenses pour structurer vos bilans.</p>
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -517,6 +542,7 @@
                 </div>
             </div>
 
+            <!-- ONGLET ANALYTIQUE -->
             <div id="pane-analytique" class="main-card tab-pane" style="display:none;">
                 <div class="card-header-actions">
                     <h2>Tableau de Bord Analytique & Compte de Résultat</h2>
@@ -524,7 +550,7 @@
                 </div>
                 
                 <div class="filter-box" style="background:#e8f4fc; border-color:#bce0fd;">
-                    <span>🔍 <strong>Période & Compte :</strong></span>
+                    <span>🔍 <strong>Périmètre & Compte :</strong></span>
                     <input type="date" id="ana-start" onchange="renderAnalytique()"> au 
                     <input type="date" id="ana-end" onchange="renderAnalytique()">
                     <select id="ana-source" onchange="renderAnalytique()" style="font-weight:bold;">
@@ -587,6 +613,7 @@
         </div>
     </div>
 
+    <!-- MODALE BANQUE -->
     <div class="modal-overlay" id="modal-banque-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -610,7 +637,7 @@
                     <div class="form-group"><label>Réf/Facture (Optionnel)</label><input type="text" id="mb-ref"></div>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
-                    <div class="form-group"><label>Resp.</label><input type="text" id="mb-resp"></div>
+                    <div class="form-group"><label>Resp.</label><input type="text" id="mb-resp" value="Jordan Loudenot"></div>
                     <div class="form-group"><label>Moyen</label>
                         <select id="mb-moyen">
                             <option value="VIREMENT">Virement</option>
@@ -638,7 +665,6 @@
                         <small style="color:var(--gris-moyen); font-size:0.78rem;">Le document sera classé dans Google Drive avec la référence unique du dojo.</small>
                     </div>
                 </div>
-
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('modal-banque-overlay')">Annuler</button>
@@ -647,6 +673,7 @@
         </div>
     </div>
 
+    <!-- MODALE LIVRET -->
     <div class="modal-overlay" id="modal-livret-overlay">
         <div class="modal-container">
             <div class="modal-header"><h3 id="modal-livret-title">➕ Opération Livret</h3><button class="modal-close-btn" onclick="closeModal('modal-livret-overlay')">&times;</button></div>
@@ -675,12 +702,12 @@
                         <small style="color:var(--gris-moyen); font-size:0.78rem;">Le document sera classé dans Google Drive.</small>
                     </div>
                 </div>
-
             </div>
             <div class="modal-footer"><button class="btn btn-dark" onclick="saveModalLivret()">💾 Enregistrer</button></div>
         </div>
     </div>
 
+    <!-- MODALE CAISSE -->
     <div class="modal-overlay" id="modal-caisse-overlay">
         <div class="modal-container">
             <div class="modal-header"><h3 id="modal-caisse-title">➕ Mouvement Caisse</h3><button class="modal-close-btn" onclick="closeModal('modal-caisse-overlay')">&times;</button></div>
@@ -709,12 +736,80 @@
                         <small style="color:var(--gris-moyen); font-size:0.78rem;">Le document sera classé dans Google Drive.</small>
                     </div>
                 </div>
-
             </div>
             <div class="modal-footer"><button class="btn btn-dark" onclick="saveModalCaisse()">💾 Enregistrer</button></div>
         </div>
     </div>
 
+    <!-- MODALE MODIFICATION SÉCURISÉE CHÈQUE -->
+    <div class="modal-overlay" id="modal-edit-cheque-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>✏️ Modifier le Chèque en Portefeuille</h3>
+                <button class="modal-close-btn" onclick="closeModal('modal-edit-cheque-overlay')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-chq-id">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div class="form-group"><label>Date de réception *</label><input type="date" id="edit-chq-date"></div>
+                    <div class="form-group"><label>Date encaissement prévue *</label><input type="date" id="edit-chq-date-enc"></div>
+                    <div class="form-group"><label>Montant (€) *</label><input type="number" step="0.01" id="edit-chq-montant"></div>
+                    <div class="form-group"><label>N° Chèque *</label><input type="text" id="edit-chq-num"></div>
+                    <div class="form-group"><label>Titulaire Compte *</label><input type="text" id="edit-chq-titulaire"></div>
+                    <div class="form-group"><label>Banque Émettrice *</label><input type="text" id="edit-chq-banque"></div>
+                    <div class="form-group" style="grid-column:1 / -1;"><label>Objet / Référence</label><input type="text" id="edit-chq-objet"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modal-edit-cheque-overlay')">Annuler</button>
+                <button class="btn btn-dark" onclick="saveModalEditCheque()">💾 Enregistrer les modifications</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE GESTION DES SAISONS & CLÔTURES -->
+    <div class="modal-overlay" id="modal-seasons-overlay">
+        <div class="modal-container" style="max-width: 720px;">
+            <div class="modal-header">
+                <h3>📅 Gestion des Saisons & Clôtures</h3>
+                <button class="modal-close-btn" onclick="closeModal('modal-seasons-overlay')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.88rem; color:var(--gris-moyen); margin-top:0;">
+                    Une saison dont la date de fin est antérieure à aujourd'hui est automatiquement considérée comme <strong>clôturée</strong>. Vous pouvez également forcer la clôture ou créer vos futures saisons.
+                </p>
+
+                <div style="background:#f8f9fa; border:1px dashed var(--gris-clair); border-radius:6px; padding:15px; margin-bottom:15px;">
+                    <h4 style="margin:0 0 10px 0; font-family:'Fredoka';">➕ Ajouter une Nouvelle Saison</h4>
+                    <div style="display:grid; grid-template-columns:1.2fr 1fr 1fr auto; gap:10px; align-items:flex-end;">
+                        <div class="form-group"><label>Nom Saison</label><input type="text" id="new-season-id" placeholder="Ex: 2027-2028"></div>
+                        <div class="form-group"><label>Date Début</label><input type="date" id="new-season-start"></div>
+                        <div class="form-group"><label>Date Fin</label><input type="date" id="new-season-end"></div>
+                        <button class="btn btn-dark" style="height:38px;" onclick="addNewSeason()">Créer</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Saison</th>
+                                <th>Période</th>
+                                <th>Statut</th>
+                                <th style="text-align:center;">Action Clôture</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-seasons-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modal-seasons-overlay')">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE CATÉGORIE -->
     <div class="modal-overlay" id="modal-category-overlay">
         <div class="modal-container" style="max-width: 400px;">
             <div class="modal-header"><h3 id="modal-cat-title">➕ Nouvelle Catégorie</h3><button class="modal-close-btn" onclick="closeModal('modal-category-overlay')">&times;</button></div>
@@ -734,10 +829,16 @@
     </div>
 
 <script>
-    // --- VARIABLES ET INITIALISATION ---
     let comptaDB = {
-        operations: [], livretOps: [], caisseFlux: [], cheques: [], bordereaux: [], depotsEspeces: [], monnaieCounts: {}, categories: []
+        operations: [], livretOps: [], caisseFlux: [], cheques: [], depotsEspeces: [], monnaieCounts: {}, categories: [], seasons: {}
     };
+
+    const defaultSeasons = {
+        '2025-2026': { label: '2025 - 2026', start: '2025-09-01', end: '2026-08-31', manualClosed: true },
+        '2026-2027': { label: '2026 - 2027', start: '2026-09-01', end: '2027-08-31', manualClosed: false }
+    };
+
+    let activeSeasonKey = '2026-2027';
 
     const defaultCategories = [
         { id: 1, nom: "Cotisations & Inscriptions", type: "Recette" },
@@ -775,6 +876,129 @@
         setTimeout(() => toast.remove(), 4000);
     }
 
+    // --- GESTION DES SAISONS DYNAMIQUES & AUTO-CLÔTURE ---
+    function isSeasonClosed(sKey) {
+        const s = comptaDB.seasons[sKey];
+        if (!s) return false;
+        if (s.manualClosed === true) return true;
+        const todayStr = new Date().toISOString().split('T')[0];
+        return s.end < todayStr;
+    }
+
+    function populateSeasonSelect() {
+        const sel = document.getElementById('global-season-select');
+        if (!sel) return;
+        sel.innerHTML = '';
+
+        const keys = Object.keys(comptaDB.seasons).sort();
+        keys.forEach(k => {
+            const s = comptaDB.seasons[k];
+            const closed = isSeasonClosed(k);
+            const statusTxt = closed ? "Clôturée" : "En cours";
+            sel.innerHTML += `<option value="${k}">${s.label || k} (${statusTxt})</option>`;
+        });
+        sel.innerHTML += `<option value="ALL">Toutes les saisons</option>`;
+
+        if (comptaDB.seasons[activeSeasonKey] || activeSeasonKey === 'ALL') {
+            sel.value = activeSeasonKey;
+        } else if (keys.length > 0) {
+            activeSeasonKey = keys[keys.length - 1];
+            sel.value = activeSeasonKey;
+        }
+    }
+
+    function changeActiveSeason() {
+        activeSeasonKey = document.getElementById('global-season-select').value;
+        const s = comptaDB.seasons[activeSeasonKey];
+        const infoText = activeSeasonKey === 'ALL' 
+            ? "Affichage global de toutes les écritures historiques" 
+            : `Saison active : ${s.label || activeSeasonKey} (${isSeasonClosed(activeSeasonKey) ? 'Clôturée' : 'En cours'})`;
+        
+        document.getElementById('badge-banque-season').innerText = infoText;
+        document.getElementById('badge-livret-season').innerText = infoText;
+        document.getElementById('badge-caisse-season').innerText = infoText;
+
+        if (s && activeSeasonKey !== 'ALL') {
+            document.getElementById('ana-start').value = s.start;
+            document.getElementById('ana-end').value = s.end;
+        } else {
+            document.getElementById('ana-start').value = '';
+            document.getElementById('ana-end').value = '';
+        }
+
+        renderOperationsBanque();
+        renderOperationsLivret();
+        renderCaisseFlux();
+        renderAnalytique();
+    }
+
+    function openModalSeasonManager() {
+        renderSeasonsTable();
+        document.getElementById('modal-seasons-overlay').classList.add('active');
+    }
+
+    function renderSeasonsTable() {
+        const tbody = document.getElementById('table-seasons-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        Object.keys(comptaDB.seasons).sort().forEach(k => {
+            const s = comptaDB.seasons[k];
+            const closed = isSeasonClosed(k);
+            const isAuto = s.end < todayStr;
+
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${s.label || k}</strong></td>
+                    <td>Du ${formatFrenchDate(s.start)} au ${formatFrenchDate(s.end)}</td>
+                    <td>
+                        <span class="badge ${closed ? 'badge-status-closed' : 'badge-status-open'}">
+                            ${closed ? '🔒 Clôturée' : '🟢 Active'}
+                        </span>
+                        <small style="color:var(--gris-moyen); display:block; font-size:0.75rem;">
+                            ${isAuto ? '(Par date de fin)' : (s.manualClosed ? '(Manuelle)' : '(En cours)')}
+                        </small>
+                    </td>
+                    <td style="text-align:center;">
+                        <button class="btn btn-outline btn-xs" onclick="toggleSeasonClosure('${k}')">
+                            ${closed ? '🔓 Rouvrir' : '🔒 Clôturer manuellement'}
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function toggleSeasonClosure(k) {
+        if (!comptaDB.seasons[k]) return;
+        const current = isSeasonClosed(k);
+        comptaDB.seasons[k].manualClosed = !current;
+        saveComptaData();
+        populateSeasonSelect();
+        renderSeasonsTable();
+        changeActiveSeason();
+        showToast("Statut de la saison mis à jour");
+    }
+
+    function addNewSeason() {
+        const id = document.getElementById('new-season-id').value.trim();
+        const start = document.getElementById('new-season-start').value;
+        const end = document.getElementById('new-season-end').value;
+
+        if (!id || !start || !end) return alert("Veuillez renseigner le nom et les deux dates.");
+        if (start >= end) return alert("La date de début doit être antérieure à la date de fin.");
+
+        comptaDB.seasons[id] = { label: id, start, end, manualClosed: false };
+        saveComptaData();
+        populateSeasonSelect();
+        renderSeasonsTable();
+        document.getElementById('new-season-id').value = '';
+        document.getElementById('new-season-start').value = '';
+        document.getElementById('new-season-end').value = '';
+        showToast("✓ Nouvelle saison créée");
+    }
+
     // --- UPLOAD DRIVE FONCTIONS ---
     function getNewFileName(originalName, operationRef) {
         if (!operationRef) return originalName;
@@ -810,9 +1034,7 @@
 
                     const response = await fetch(SCRIPT_URL, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'text/plain;charset=utf-8'
-                        },
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify(payload)
                     });
                     
@@ -896,11 +1118,11 @@
             try { comptaDB = JSON.parse(backup); } catch(e) { comptaDB = {}; }
         }
         if (!comptaDB.categories || comptaDB.categories.length === 0) comptaDB.categories = [...defaultCategories];
+        if (!comptaDB.seasons || Object.keys(comptaDB.seasons).length === 0) comptaDB.seasons = { ...defaultSeasons };
         if (!comptaDB.operations) comptaDB.operations = [];
         if (!comptaDB.livretOps) comptaDB.livretOps = [];
         if (!comptaDB.caisseFlux) comptaDB.caisseFlux = [];
         if (!comptaDB.cheques) comptaDB.cheques = [];
-        if (!comptaDB.bordereaux) comptaDB.bordereaux = [];
         if (!comptaDB.depotsEspeces) comptaDB.depotsEspeces = [];
         if (!comptaDB.monnaieCounts) comptaDB.monnaieCounts = {};
     }
@@ -911,12 +1133,24 @@
             const { data, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
             if (data && data.data) comptaDB = data.data;
             if (!comptaDB.categories || comptaDB.categories.length === 0) comptaDB.categories = [...defaultCategories];
+            if (!comptaDB.seasons || Object.keys(comptaDB.seasons).length === 0) comptaDB.seasons = { ...defaultSeasons };
             if (!comptaDB.monnaieCounts) comptaDB.monnaieCounts = {};
         } catch(e) {}
+        
+        populateSeasonSelect();
+        const s = comptaDB.seasons[activeSeasonKey];
+        if (s) {
+            const elStart = document.getElementById('ana-start');
+            const elEnd = document.getElementById('ana-end');
+            if (elStart && !elStart.value) elStart.value = s.start;
+            if (elEnd && !elEnd.value) elEnd.value = s.end;
+        }
+
         rebuildAll();
     }
 
     function rebuildAll() {
+        populateSeasonSelect();
         updateCategorySelects();
         renderCategories();
         renderOperationsBanque();
@@ -924,7 +1158,6 @@
         renderCaisseFlux();
         loadInventaireCaisseInputs();
         renderChequesAttente();
-        renderBordereaux();
         renderDepotsEspeces();
         updateDashboardKPIs();
         renderAnalytique();
@@ -936,6 +1169,7 @@
         document.getElementById('pane-' + tabId).style.display = 'block';
         document.getElementById('btn-tab-' + tabId).classList.add('active');
         if (tabId === 'caisse') calcInventaireCaisseLive();
+        if (tabId === 'cheques') renderChequesAttente();
         if (tabId === 'analytique') renderAnalytique();
     }
 
@@ -956,11 +1190,8 @@
         } else if(tab === 'cheques') {
             document.getElementById('filter-start-date-cheques').value = '';
             document.getElementById('filter-end-date-cheques').value = '';
+            document.getElementById('filter-status-cheques').value = 'ALL';
             renderChequesAttente();
-        } else if(tab === 'licences') {
-            document.getElementById('filter-start-licences').value = '';
-            document.getElementById('filter-end-licences').value = '';
-            renderBordereaux();
         }
     }
 
@@ -1071,18 +1302,19 @@
         document.getElementById('mb-type').value = "Crédit";
         updateCategorySelects();
         document.getElementById('mb-desig').value = ""; document.getElementById('mb-ref').value = "";
-        document.getElementById('mb-resp').value = ""; document.getElementById('mb-montant').value = "";
+        document.getElementById('mb-resp').value = "Jordan Loudenot"; document.getElementById('mb-montant').value = "";
         document.getElementById('mb-file').value = "";
         
         if (id !== null) {
             const op = comptaDB.operations.find(o => o.id === id);
+            document.getElementById('modal-banque-title').innerText = "✏️ Modifier Opération Bancaire";
             document.getElementById('mb-date').value = op.date;
             document.getElementById('mb-type').value = op.type;
             updateCategorySelects();
             if(op.categorie) document.getElementById('mb-cat').value = op.categorie;
             document.getElementById('mb-desig').value = op.desig;
             document.getElementById('mb-ref').value = op.ref || "";
-            document.getElementById('mb-resp').value = op.resp || "";
+            document.getElementById('mb-resp').value = op.resp || "Jordan Loudenot";
             document.getElementById('mb-moyen').value = op.moyen || "VIREMENT";
             document.getElementById('mb-montant').value = op.montant;
 
@@ -1096,6 +1328,7 @@
                 document.getElementById('mb-file-input-box').style.display = 'block';
             }
         } else {
+            document.getElementById('modal-banque-title').innerText = "➕ Nouvelle Opération Bancaire";
             document.getElementById('mb-existing-file-box').style.display = 'none';
             document.getElementById('mb-file-input-box').style.display = 'block';
         }
@@ -1136,7 +1369,7 @@
                 showToast("✅ Justificatif stocké dans Google Drive !");
             } catch (err) {
                 console.error("Erreur Google Drive :", err);
-                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible (" + err.message + ").\n\nSouhaitez-vous enregistrer le document en secours dans l'application ?");
+                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible (" + err.message + ").\n\nConserver le fichier en local ?");
                 if (keepLocal) {
                     driveUrl = await fileToBase64(fileObj);
                     showToast("📎 Justificatif stocké localement");
@@ -1173,13 +1406,49 @@
         const start = document.getElementById('filter-start-date').value;
         const end = document.getElementById('filter-end-date').value;
 
-        [...comptaDB.operations].sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(op => {
-            const m = parseFloat(op.montant) || 0;
-            if (op.type === 'Crédit') runningSolde += m; else runningSolde -= m;
+        const season = comptaDB.seasons[activeSeasonKey];
+        let reportANouveau = 0;
 
-            if(filterCat && op.categorie !== filterCat) return;
-            if(start && op.date < start) return;
-            if(end && op.date > end) return;
+        const sorted = [...comptaDB.operations].sort((a,b) => new Date(a.date) - new Date(b.date));
+
+        if (season && activeSeasonKey !== 'ALL') {
+            sorted.forEach(op => {
+                if (op.date < season.start) {
+                    const m = parseFloat(op.montant) || 0;
+                    reportANouveau += (op.type === 'Crédit' ? m : -m);
+                }
+            });
+
+            runningSolde = reportANouveau;
+            tbody.innerHTML += `
+                <tr style="background-color: #f8f9fa; font-weight: bold; border-bottom: 2px solid var(--gris-clair);">
+                    <td>${formatFrenchDate(season.start)}</td>
+                    <td><strong>REPORT</strong></td>
+                    <td><span class="badge" style="background:#e8f4fc; color:var(--bleu-fonce);">À NOUVEAU</span></td>
+                    <td>Report Solde Antérieur</td>
+                    <td>-</td>
+                    <td>Solde au démarrage de la saison (${season.label || activeSeasonKey})</td>
+                    <td class="hide-on-screen">-</td>
+                    <td data-html-export="ignore">-</td>
+                    <td style="color:${reportANouveau>=0?'var(--vert-fonce)':'var(--rouge)'}">${formatMontant(reportANouveau)}</td>
+                    <td style="font-size:1rem;">${formatMontant(runningSolde)}</td>
+                    <td style="text-align:center;" data-html-export="ignore">🔒</td>
+                </tr>
+            `;
+        }
+
+        sorted.forEach(op => {
+            const m = parseFloat(op.montant) || 0;
+            const inSeason = !season || activeSeasonKey === 'ALL' || (op.date >= season.start && op.date <= season.end);
+            
+            if (activeSeasonKey === 'ALL' || inSeason) {
+                runningSolde += (op.type === 'Crédit' ? m : -m);
+            }
+
+            if (!inSeason) return;
+            if (filterCat && op.categorie !== filterCat) return;
+            if (start && op.date < start) return;
+            if (end && op.date > end) return;
 
             let shortMoyen = op.moyen || "VIR.";
             if (shortMoyen === 'VIREMENT') shortMoyen = 'VIR.';
@@ -1229,6 +1498,7 @@
         
         if (id !== null) {
             const op = comptaDB.livretOps.find(o => o.id === id);
+            document.getElementById('modal-livret-title').innerText = "✏️ Modifier Opération Livret";
             document.getElementById('ml-date').value = op.date;
             document.getElementById('ml-type').value = op.type;
             updateCategorySelects();
@@ -1246,6 +1516,7 @@
                 document.getElementById('ml-file-input-box').style.display = 'block';
             }
         } else {
+            document.getElementById('modal-livret-title').innerText = "➕ Nouvelle Opération Livret";
             document.getElementById('ml-existing-file-box').style.display = 'none';
             document.getElementById('ml-file-input-box').style.display = 'block';
         }
@@ -1273,7 +1544,7 @@
                 showToast("✅ Justificatif stocké dans Google Drive !");
             } catch (err) {
                 console.error("Erreur Google Drive :", err);
-                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible (" + err.message + ").\n\nSouhaitez-vous enregistrer le document en secours ?");
+                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible. Conserver en local ?");
                 if (keepLocal) {
                     driveUrl = await fileToBase64(fileObj);
                     showToast("📎 Justificatif stocké localement");
@@ -1305,10 +1576,42 @@
         const tbody = document.getElementById('table-livret-body'); tbody.innerHTML = '';
         const start = document.getElementById('filter-start-date-livret').value;
         const end = document.getElementById('filter-end-date-livret').value;
+        const season = comptaDB.seasons[activeSeasonKey];
 
-        let s=0; 
-        [...comptaDB.livretOps].sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(op => { 
-            s += op.type==='Crédit'?op.montant:-op.montant; 
+        let runningSolde = 0;
+        let reportLivret = 0;
+        const sorted = [...comptaDB.livretOps].sort((a,b) => new Date(a.date) - new Date(b.date));
+
+        if (season && activeSeasonKey !== 'ALL') {
+            sorted.forEach(op => {
+                if (op.date < season.start) {
+                    reportLivret += (op.type === 'Crédit' ? op.montant : -op.montant);
+                }
+            });
+
+            runningSolde = reportLivret;
+            tbody.innerHTML += `
+                <tr style="background-color: #f8f9fa; font-weight: bold; border-bottom: 2px solid var(--gris-clair);">
+                    <td>${formatFrenchDate(season.start)}</td>
+                    <td><span class="badge" style="background:#e8f4fc; color:var(--bleu-fonce);">REPORT</span></td>
+                    <td>Report Solde Épargne</td>
+                    <td>Solde au démarrage de la saison (${season.label || activeSeasonKey})</td>
+                    <td data-html-export="ignore">-</td>
+                    <td style="color:${reportLivret>=0?'var(--vert-fonce)':'var(--rouge)'}">${formatMontant(reportLivret)}</td>
+                    <td style="font-size:1rem;">${formatMontant(runningSolde)}</td>
+                    <td style="text-align:center;" data-html-export="ignore">🔒</td>
+                </tr>
+            `;
+        }
+
+        sorted.forEach(op => { 
+            const inSeason = !season || activeSeasonKey === 'ALL' || (op.date >= season.start && op.date <= season.end);
+            
+            if (activeSeasonKey === 'ALL' || inSeason) {
+                runningSolde += op.type === 'Crédit' ? op.montant : -op.montant; 
+            }
+
+            if (!inSeason) return;
             if(start && op.date < start) return;
             if(end && op.date > end) return;
 
@@ -1321,7 +1624,7 @@
                 }
             }
 
-            tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Crédit' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Crédit'?'var(--vert-fonce)':'var(--rouge)'}">${formatMontant(op.montant)}</td><td style="font-weight:bold;">${formatMontant(s)}</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalLivret(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationLivret(${op.id})">🗑️</button></td></tr>`; 
+            tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Crédit' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Crédit'?'var(--vert-fonce)':'var(--rouge)'}">${formatMontant(op.montant)}</td><td style="font-weight:bold;">${formatMontant(runningSolde)}</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalLivret(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationLivret(${op.id})">🗑️</button></td></tr>`; 
         });
     }
 
@@ -1422,6 +1725,7 @@
 
         if (id !== null) {
             const op = comptaDB.caisseFlux.find(o => o.id === id);
+            document.getElementById('modal-caisse-title').innerText = "✏️ Modifier Mouvement Caisse";
             document.getElementById('mc-date').value = op.date;
             document.getElementById('mc-type').value = op.type;
             updateCategorySelects();
@@ -1439,6 +1743,7 @@
                 document.getElementById('mc-file-input-box').style.display = 'block';
             }
         } else {
+            document.getElementById('modal-caisse-title').innerText = "➕ Saisir Mouvement Caisse";
             document.getElementById('mc-existing-file-box').style.display = 'none';
             document.getElementById('mc-file-input-box').style.display = 'block';
         }
@@ -1466,7 +1771,7 @@
                 showToast("✅ Justificatif stocké dans Google Drive !");
             } catch (err) {
                 console.error("Erreur Google Drive :", err);
-                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible (" + err.message + ").\n\nSouhaitez-vous enregistrer le document en secours ?");
+                const keepLocal = confirm("⚠️ Envoi direct Drive indisponible. Conserver en local ?");
                 if (keepLocal) {
                     driveUrl = await fileToBase64(fileObj);
                     showToast("📎 Justificatif stocké localement");
@@ -1498,10 +1803,43 @@
         const tbody = document.getElementById('table-caisse-body'); tbody.innerHTML = '';
         const start = document.getElementById('filter-start-date-caisse').value;
         const end = document.getElementById('filter-end-date-caisse').value;
+        const season = comptaDB.seasons[activeSeasonKey];
 
-        let s=0; 
-        [...comptaDB.caisseFlux].sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(op => { 
-            s += op.type==='Recette'?op.montant:-op.montant; 
+        let runningSolde = 0;
+        let reportCaisse = 0;
+        const sorted = [...comptaDB.caisseFlux].sort((a,b) => new Date(a.date) - new Date(b.date));
+
+        if (season && activeSeasonKey !== 'ALL') {
+            sorted.forEach(op => {
+                if (op.date < season.start) {
+                    reportCaisse += (op.type === 'Recette' ? op.montant : -op.montant);
+                }
+            });
+
+            runningSolde = reportCaisse;
+            tbody.innerHTML += `
+                <tr style="background-color: #f8f9fa; font-weight: bold; border-bottom: 2px solid var(--gris-clair);">
+                    <td>${formatFrenchDate(season.start)}</td>
+                    <td><span class="badge" style="background:#e8f4fc; color:var(--bleu-fonce);">REPORT</span></td>
+                    <td>Report Caisse</td>
+                    <td>Solde d'espèces au démarrage de la saison (${season.label || activeSeasonKey})</td>
+                    <td>Dojo</td>
+                    <td data-html-export="ignore">-</td>
+                    <td style="color:${reportCaisse>=0?'var(--vert-fonce)':'var(--rouge)'}">${formatMontant(reportCaisse)}</td>
+                    <td style="font-size:1rem;">${formatMontant(runningSolde)}</td>
+                    <td style="text-align:center;" data-html-export="ignore">🔒</td>
+                </tr>
+            `;
+        }
+
+        sorted.forEach(op => { 
+            const inSeason = !season || activeSeasonKey === 'ALL' || (op.date >= season.start && op.date <= season.end);
+            
+            if (activeSeasonKey === 'ALL' || inSeason) {
+                runningSolde += op.type === 'Recette' ? op.montant : -op.montant; 
+            }
+
+            if (!inSeason) return;
             if(start && op.date < start) return;
             if(end && op.date > end) return;
 
@@ -1514,73 +1852,162 @@
                 }
             }
 
-            tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Recette' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td>Dojo</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Recette'?'var(--vert-fonce)':'var(--rouge)'}">${formatMontant(op.montant)}</td><td style="font-weight:bold;">${formatMontant(s)}</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalCaisse(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationCaisse(${op.id})">🗑️</button></td></tr>`; 
+            tbody.innerHTML += `<tr><td>${formatFrenchDate(op.date)}</td><td><span class="badge ${op.type === 'Recette' ? 'badge-credit' : 'badge-debit'}">${op.type}</span></td><td><span class="badge badge-cat">${op.categorie || ''}</span></td><td>${op.desig}</td><td>Dojo</td><td data-html-export="ignore">${docLink}</td><td style="font-weight:bold; color:${op.type==='Recette'?'var(--vert-fonce)':'var(--rouge)'}">${formatMontant(op.montant)}</td><td style="font-weight:bold;">${formatMontant(runningSolde)}</td><td style="text-align:center;" data-html-export="ignore"><button class="btn btn-blue btn-xs" onclick="openModalCaisse(${op.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteOperationCaisse(${op.id})">🗑️</button></td></tr>`; 
         });
         calcInventaireCaisseLive();
     }
 
-    // --- CHEQUES ---
+    // --- CHÈQUES ET CHÈQUES DIFFÉRÉS ---
     function renderChequesAttente() {
         const tbody = document.getElementById('table-cheques-attente-body');
         tbody.innerHTML = '';
         const start = document.getElementById('filter-start-date-cheques').value;
         const end = document.getElementById('filter-end-date-cheques').value;
+        const statusFilter = document.getElementById('filter-status-cheques').value;
+
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        let totAll = 0; let countAll = 0;
+        let totDispo = 0; let countDispo = 0;
+        let totDiffere = 0; let countDiffere = 0;
+
+        (comptaDB.cheques || []).forEach(c => {
+            const m = parseFloat(c.montant) || 0;
+            const dateEncaissement = c.dateEncaissement || c.date;
+            const isDiffere = dateEncaissement > todayStr;
+
+            totAll += m; countAll++;
+            if (isDiffere) {
+                totDiffere += m; countDiffere++;
+            } else {
+                totDispo += m; countDispo++;
+            }
+        });
+
+        document.getElementById('kpi-chq-total').innerText = formatMontant(totAll);
+        document.getElementById('kpi-chq-total-count').innerText = `${countAll} chèque(s)`;
+        document.getElementById('kpi-chq-dispo').innerText = formatMontant(totDispo);
+        document.getElementById('kpi-chq-dispo-count').innerText = `${countDispo} chèque(s)`;
+        document.getElementById('kpi-chq-differe').innerText = formatMontant(totDiffere);
+        document.getElementById('kpi-chq-differe-count').innerText = `${countDiffere} chèque(s)`;
 
         if(!comptaDB.cheques || comptaDB.cheques.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--gris-moyen);">Aucun chèque en portefeuille.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--gris-moyen);">Aucun chèque actuellement en portefeuille.</td></tr>';
+            updateRemiseSelectionSummary();
             return;
         }
 
-        comptaDB.cheques.forEach(c => {
+        const sorted = [...comptaDB.cheques].sort((a,b) => {
+            const da = a.dateEncaissement || a.date;
+            const db = b.dateEncaissement || b.date;
+            return new Date(da) - new Date(db);
+        });
+
+        sorted.forEach(c => {
+            const dateEnc = c.dateEncaissement || c.date;
+            const isDiffere = dateEnc > todayStr;
+
             if (start && c.date < start) return;
             if (end && c.date > end) return;
+            if (statusFilter === 'ENCAISSABLE' && isDiffere) return;
+            if (statusFilter === 'DIFFERE' && !isDiffere) return;
+
             const montant = parseFloat(c.montant) || 0;
+            const badgeStatus = isDiffere 
+                ? `<span class="badge badge-differe">⏳ Différé</span>`
+                : `<span class="badge badge-waiting">🟢 À encaisser</span>`;
+
             tbody.innerHTML += `
                 <tr>
-                    <td style="text-align:center;" data-html-export="ignore"><input type="checkbox" class="chq-select-cb" value="${c.id}" data-montant="${montant}"></td>
+                    <td style="text-align:center;" data-html-export="ignore">
+                        <input type="checkbox" class="chq-select-cb" value="${c.id}" data-montant="${montant}" onchange="updateRemiseSelectionSummary()">
+                    </td>
+                    <td>${badgeStatus}</td>
                     <td>${formatFrenchDate(c.date)}</td>
+                    <td style="font-weight:${isDiffere?'bold':'normal'}; color:${isDiffere?'var(--violet)':'inherit'};">${formatFrenchDate(dateEnc)}</td>
                     <td><code style="font-size:0.95rem;">n° ${c.num}</code></td>
                     <td><strong>${c.titulaire}</strong> <br><span style="font-size:0.75rem; color:var(--gris-moyen);">${c.banque}</span></td>
-                    <td>${c.objet}</td>
+                    <td>${c.objet || ''}</td>
                     <td style="font-weight:bold; color:var(--bleu-fonce);">${formatMontant(montant)}</td>
                     <td style="text-align:center;" data-html-export="ignore">
-                        <button class="btn btn-blue btn-xs" onclick="editChequePortefeuille(${c.id})">✏️</button>
+                        <button class="btn btn-blue btn-xs" onclick="openModalEditCheque(${c.id})">✏️</button>
                         <button class="btn btn-danger btn-xs" onclick="deleteChequePortefeuille(${c.id})">🗑️</button>
                     </td>
                 </tr>`;
         });
+
+        updateRemiseSelectionSummary();
     }
 
     function addChequeAttente() {
         const date = document.getElementById('chq-date').value;
+        let dateEnc = document.getElementById('chq-date-encaissement').value;
         const num = document.getElementById('chq-num').value.trim();
         const montant = parseFloat(document.getElementById('chq-montant').value);
         const titulaire = document.getElementById('chq-titulaire').value.trim();
         const banque = document.getElementById('chq-banque').value.trim();
         const objet = document.getElementById('chq-objet').value.trim();
 
-        if(!date || !num || isNaN(montant) || !titulaire || !banque || !objet) {
-            alert("Remplissez tous les champs pour le chèque."); return;
+        if(!date || !num || isNaN(montant) || !titulaire || !banque) {
+            alert("Remplissez tous les champs obligatoires (*) pour le chèque."); return;
         }
 
-        comptaDB.cheques.push({ id: Date.now(), date, num, montant, titulaire, banque, objet });
+        if (!dateEnc) dateEnc = date;
+
+        comptaDB.cheques.push({ id: Date.now(), date, dateEncaissement: dateEnc, num, montant, titulaire, banque, objet });
         saveComptaData();
-        document.getElementById('chq-num').value = ''; document.getElementById('chq-montant').value = '';
-        document.getElementById('chq-titulaire').value = ''; document.getElementById('chq-banque').value = '';
+        
+        document.getElementById('chq-num').value = ''; 
+        document.getElementById('chq-montant').value = '';
+        document.getElementById('chq-titulaire').value = ''; 
+        document.getElementById('chq-banque').value = '';
         document.getElementById('chq-objet').value = '';
+        document.getElementById('chq-date-encaissement').value = '';
+        showToast("✓ Chèque ajouté en portefeuille");
     }
 
-    function editChequePortefeuille(id) {
+    function openModalEditCheque(id) {
+        const c = comptaDB.cheques.find(chq => chq.id === id);
+        if (!c) return;
+
+        document.getElementById('edit-chq-id').value = c.id;
+        document.getElementById('edit-chq-date').value = c.date;
+        document.getElementById('edit-chq-date-enc').value = c.dateEncaissement || c.date;
+        document.getElementById('edit-chq-montant').value = c.montant;
+        document.getElementById('edit-chq-num').value = c.num;
+        document.getElementById('edit-chq-titulaire').value = c.titulaire;
+        document.getElementById('edit-chq-banque').value = c.banque;
+        document.getElementById('edit-chq-objet').value = c.objet || '';
+
+        document.getElementById('modal-edit-cheque-overlay').classList.add('active');
+    }
+
+    function saveModalEditCheque() {
+        const id = parseInt(document.getElementById('edit-chq-id').value);
+        const date = document.getElementById('edit-chq-date').value;
+        const dateEnc = document.getElementById('edit-chq-date-enc').value || date;
+        const montant = parseFloat(document.getElementById('edit-chq-montant').value);
+        const num = document.getElementById('edit-chq-num').value.trim();
+        const titulaire = document.getElementById('edit-chq-titulaire').value.trim();
+        const banque = document.getElementById('edit-chq-banque').value.trim();
+        const objet = document.getElementById('edit-chq-objet').value.trim();
+
+        if (!date || !num || isNaN(montant) || !titulaire || !banque) {
+            return alert("Champs obligatoires manquants.");
+        }
+
         const c = comptaDB.cheques.find(chq => chq.id === id);
         if (c) {
-            document.getElementById('chq-date').value = c.date;
-            document.getElementById('chq-num').value = c.num;
-            document.getElementById('chq-montant').value = c.montant;
-            document.getElementById('chq-titulaire').value = c.titulaire;
-            document.getElementById('chq-banque').value = c.banque;
-            document.getElementById('chq-objet').value = c.objet;
-            comptaDB.cheques = comptaDB.cheques.filter(chq => chq.id !== id);
+            c.date = date;
+            c.dateEncaissement = dateEnc;
+            c.montant = montant;
+            c.num = num;
+            c.titulaire = titulaire;
+            c.banque = banque;
+            c.objet = objet;
             saveComptaData();
+            closeModal('modal-edit-cheque-overlay');
+            showToast("✓ Chèque mis à jour !");
         }
     }
 
@@ -1591,14 +2018,31 @@
         }
     }
 
+    function selectAllCheques(state) {
+        document.querySelectorAll('.chq-select-cb').forEach(cb => cb.checked = state);
+        updateRemiseSelectionSummary();
+    }
+
+    function updateRemiseSelectionSummary() {
+        const checkboxes = document.querySelectorAll('.chq-select-cb:checked');
+        let tot = 0;
+        checkboxes.forEach(cb => {
+            tot += parseFloat(cb.getAttribute('data-montant')) || 0;
+        });
+        const cntEl = document.getElementById('lbl-remise-selected-count');
+        const totEl = document.getElementById('lbl-remise-selected-total');
+        if (cntEl) cntEl.innerText = checkboxes.length;
+        if (totEl) totEl.innerText = formatMontant(tot);
+    }
+
     function processRemiseChèques() {
         const borderau = document.getElementById('remise-num').value.trim();
         const resp = document.getElementById('remise-resp').value.trim();
 
-        if(!borderau || !resp) return alert("Renseignez le N° de bordereau et le responsable.");
+        if(!borderau || !resp) return alert("Renseignez le N° de bordereau bancaire et le responsable.");
         
         const checkboxes = document.querySelectorAll('.chq-select-cb:checked');
-        if(checkboxes.length === 0) return alert("Cochez au moins un chèque.");
+        if(checkboxes.length === 0) return alert("Cochez au moins un chèque à remettre en banque.");
 
         let totalRemise = 0; let idsAEncasser = [];
         checkboxes.forEach(cb => {
@@ -1606,104 +2050,21 @@
             idsAEncasser.push(parseInt(cb.value));
         });
 
-        if(confirm(`Confirmer l'encaissement de ${checkboxes.length} chèque(s) (${formatMontant(totalRemise)}) sur le compte courant ?`)) {
+        if(confirm(`Confirmer l'encaissement bancaire de ${checkboxes.length} chèque(s) (${formatMontant(totalRemise)}) ?`)) {
             comptaDB.cheques = comptaDB.cheques.filter(c => !idsAEncasser.includes(c.id));
             const date = new Date().toISOString().split('T')[0];
             comptaDB.operations.push({
-                id: Date.now(), date: date, type: 'Crédit', moyen: 'Rem CHQ', categorie: 'Virement Interne',
+                id: Date.now(), date: date, type: 'Crédit', moyen: 'Rem CHQ', categorie: 'Cotisations & Inscriptions',
                 desig: `Remise Chèques n°${borderau} (${checkboxes.length} chq)`, ref: borderau, resp: resp, montant: totalRemise,
                 dojoRef: generateDojoRef(date), justificatif: null
             });
             saveComptaData();
             document.getElementById('remise-num').value = '';
+            showToast("✅ Remise de chèques injectée en banque avec succès !");
         }
     }
 
-    // --- BORDEREAUX FFJDA ---
-    function renderBordereaux() {
-        const tbody = document.getElementById('table-licences-body');
-        if(!tbody) return;
-        tbody.innerHTML = '';
-        
-        const start = document.getElementById('filter-start-licences').value;
-        const end = document.getElementById('filter-end-licences').value;
-
-        if(!comptaDB.bordereaux || comptaDB.bordereaux.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--gris-moyen);">Aucun bordereau enregistré.</td></tr>';
-            return;
-        }
-
-        comptaDB.bordereaux.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(b => {
-            if(start && b.date < start) return;
-            if(end && b.date > end) return;
-
-            const total = parseFloat(b.totalFed) || 0;
-            tbody.innerHTML += `
-                <tr>
-                    <td>${formatFrenchDate(b.date)}</td>
-                    <td><strong>Bordereau ${b.numClub}</strong></td>
-                    <td><code>${b.numFed}</code></td>
-                    <td>${b.count} licenciés</td>
-                    <td style="font-weight:bold; color:var(--rouge);">${formatMontant(total)}</td>
-                    <td>${b.statusReg ? '✅ Oui' : '❌ Non'}</td>
-                    <td>${b.printed ? '✅ Oui' : '❌ Non'}</td>
-                    <td>${b.bankPulled ? '✅ Oui' : '❌ Non'}</td>
-                    <td style="text-align:center;" data-html-export="ignore">
-                        <button class="btn btn-outline btn-xs" onclick="toggleLicenceStatus(${b.id})">⚙️ Statut</button>
-                        <button class="btn btn-blue btn-xs" onclick="editBordereau(${b.id})">✏️</button>
-                        <button class="btn btn-danger btn-xs" onclick="deleteBordereau(${b.id})">🗑️</button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    function addBordereauLicence() {
-        const date = document.getElementById('lic-date').value;
-        const numClub = document.getElementById('lic-num-club').value.trim();
-        const numFed = document.getElementById('lic-num-fed').value.trim();
-        const count = parseInt(document.getElementById('lic-count').value);
-        const totalFed = parseFloat(document.getElementById('lic-total').value);
-
-        if(!date || !numClub || !numFed || isNaN(count) || isNaN(totalFed)) return alert("Veuillez remplir le formulaire fédéral.");
-        comptaDB.bordereaux.push({ id: Date.now(), date, numClub, numFed, count, totalFed, statusReg: true, printed: false, bankPulled: false });
-        saveComptaData();
-        document.getElementById('lic-num-club').value = ''; document.getElementById('lic-num-fed').value = '';
-        document.getElementById('lic-count').value = ''; document.getElementById('lic-total').value = '';
-    }
-
-    function editBordereau(id) {
-        const b = comptaDB.bordereaux.find(x => x.id === id);
-        if (b) {
-            document.getElementById('lic-date').value = b.date;
-            document.getElementById('lic-num-club').value = b.numClub;
-            document.getElementById('lic-num-fed').value = b.numFed;
-            document.getElementById('lic-count').value = b.count;
-            document.getElementById('lic-total').value = b.totalFed;
-            comptaDB.bordereaux = comptaDB.bordereaux.filter(x => x.id !== id);
-            saveComptaData();
-        }
-    }
-
-    function toggleLicenceStatus(id) {
-        const b = comptaDB.bordereaux.find(x => x.id === id);
-        if(b) {
-            if(!b.printed && !b.bankPulled) { b.printed = true; }
-            else if(b.printed && !b.bankPulled) { b.bankPulled = true; }
-            else { b.printed = false; b.bankPulled = false; }
-            saveComptaData();
-            renderBordereaux();
-        }
-    }
-
-    function deleteBordereau(id) {
-        if(confirm("Supprimer ce suivi de bordereau ?")) {
-            comptaDB.bordereaux = comptaDB.bordereaux.filter(x => x.id !== id);
-            saveComptaData();
-        }
-    }
-
-    // --- DEPOTS ESPECES ---
+    // --- DÉPÔTS ESPÈCES ---
     function calcLiveDepot() {
         let tB = 0; billetDenoms.forEach(d => { tB += (parseInt(document.getElementById('dp-b-' + d).value) || 0) * d; });
         document.getElementById('lbl-total-b').innerText = formatNumberOnly(tB);
@@ -1731,7 +2092,7 @@
         const grandTotal = tB + tP;
         if(grandTotal <= 0) return alert("Montant > 0 € obligatoire.");
 
-        if(confirm(`Confirmer le dépôt réel en banque de ${formatMontant(grandTotal)} ? (Ceci va impacter la caisse et la banque)`)) {
+        if(confirm(`Confirmer le dépôt réel en banque de ${formatMontant(grandTotal)} ? (Débitera la caisse et créditera le compte bancaire)`)) {
             comptaDB.caisseFlux.push({ id: Date.now() + 1, date: date, type: 'Dépense', categorie: 'Virement Interne', desig: `Mise en Banque (Réf: ${ref})`, resp: resp, montant: grandTotal, justificatif: null });
             comptaDB.operations.push({ id: Date.now() + 2, date: date, type: 'Crédit', categorie: 'Virement Interne', moyen: 'Dépôt ESP', desig: `Dépôt Espèces - Réf: ${ref}`, ref: ref, resp: resp, montant: grandTotal, dojoRef: generateDojoRef(date), justificatif: null });
             comptaDB.depotsEspeces.push({
@@ -1762,6 +2123,7 @@
             calcLiveDepot();
             comptaDB.depotsEspeces = comptaDB.depotsEspeces.filter(x => x.id !== id);
             saveComptaData();
+            showToast("Bordereau chargé dans le formulaire pour modification");
         }
     }
 
@@ -1876,7 +2238,9 @@
         const originalTable = document.getElementById(tableId);
         if(!originalTable) return;
 
-        let pDateTexte = `Extrait le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}`;
+        const s = comptaDB.seasons[activeSeasonKey];
+        let seasonLabel = activeSeasonKey === 'ALL' ? 'Toutes saisons' : `Saison ${s ? (s.label || activeSeasonKey) : activeSeasonKey}`;
+        let pDateTexte = `Extrait le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})} • ${seasonLabel}`;
 
         const cloneTable = originalTable.cloneNode(true);
         cloneTable.removeAttribute('id');
@@ -1929,6 +2293,8 @@
                     .badge-credit { background: #E8F8F0 !important; color: #2ECC71 !important; }
                     .badge-debit { background: #FFEBEF !important; color: #C41E3A !important; }
                     .badge-cat { background: #E1F0FA !important; color: #2980B9 !important; }
+                    .badge-waiting { background: #fff3cd !important; color: #856404 !important; }
+                    .badge-differe { background: #f0e6fa !important; color: #8e44ad !important; }
                 </style>
             </head>
             <body>
