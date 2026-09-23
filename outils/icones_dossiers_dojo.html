@@ -2,8 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Générateur d'Icônes - Dojo Dornois</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=600;700&family=Roboto:wght=500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'Icônes Articles SumUp - Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -14,7 +15,7 @@
             --gris-moyen: #6B6B6B;
             --gris-clair: #B8B8B8;
             --gris-tres-clair: #E8E8E8;
-            --fond: #3D3D3D;
+            --fond: #F4F6F9;
             --blanc: #FFFFFF;
             --sidebar-width: 280px;
         }
@@ -28,12 +29,13 @@
         body {
             font-family: 'Roboto', sans-serif;
             background-color: var(--fond);
+            color: var(--gris-fonce);
             display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* --- FIX SIDEBAR DÉBORDEMENT --- */
+        /* SIDEBAR INTÉGRÉE */
         .sidebar { 
             width: var(--sidebar-width); 
             min-width: var(--sidebar-width);
@@ -46,302 +48,548 @@
             position: relative; 
             box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
             flex-shrink: 0; 
-            box-sizing: border-box;
             overflow-x: hidden;
             z-index: 100;
         }
 
-        .sidebar * {
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-
-        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
-        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
-        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
-
-        /* MAIN CONTENT SCROLLABLE */
         .main-content {
             flex: 1;
-            overflow-y: auto;
-            padding: 40px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 30px;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* PANNEAU DE CONTRÔLE DYNAMIQUE */
-        .control-panel {
-            background-color: #FFFFFF;
-            border-radius: 20px;
-            padding: 20px 30px;
+        .topbar {
+            background: var(--blanc);
+            height: 68px;
+            padding: 0 28px;
             display: flex;
             align-items: center;
-            gap: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            border: 3px solid #C41E3A;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--gris-tres-clair);
             flex-shrink: 0;
         }
 
-        .control-panel label {
+        .topbar h2 {
             font-family: 'Fredoka', sans-serif;
-            font-size: 14pt;
-            color: #1A1A1A;
+            font-size: 1.3rem;
+            color: var(--noir-doux);
         }
 
-        .control-panel input {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 14pt;
-            padding: 8px 12px;
-            width: 100px;
-            border: 2px solid #E8E8E8;
-            border-radius: 10px;
-            text-align: center;
+        .topbar h2 span {
+            color: var(--rouge);
         }
 
-        .btn-generate {
-            background-color: #1A1A1A;
-            color: #FFFFFF;
-            border: none;
-            font-family: 'Fredoka', sans-serif;
-            font-size: 14pt;
-            padding: 10px 24px;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .btn-generate:hover {
-            background-color: #C41E3A;
-        }
-
-        /* GRILLE DE CARTES */
-        .cards-container {
+        .content-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 30px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 35px;
+            gap: 30px;
+            align-items: flex-start;
             justify-content: center;
-            width: 100%;
         }
 
-        .card-wrapper {
+        /* PANNEAU DE CONTRÔLE */
+        .panel-form {
+            width: 460px;
+            background: var(--blanc);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid var(--gris-tres-clair);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
+            color: var(--rouge);
+            border-bottom: 2px solid var(--gris-tres-clair);
+            padding-bottom: 4px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gris-moyen);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid var(--gris-tres-clair);
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-family: 'Roboto', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--rouge);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* BADGES CATEGORIES */
+        .cat-badges-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .cat-btn {
+            border: 1px solid var(--gris-tres-clair);
+            background: #FAFAFA;
+            padding: 7px 10px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+            transition: all 0.15s ease;
+        }
+
+        .cat-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .cat-btn.active {
+            border-color: currentColor;
+            background: #FFFFFF;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+        }
+
+        .cat-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* PREVIEW AREA */
+        .preview-pane {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
+            position: sticky;
+            top: 10px;
         }
 
-        /* CARRE STRICT 500x500 PX */
-        .icon-card {
+        .preview-box-outer {
+            background-image: repeating-conic-gradient(#e6e6e6 0 25%, #ffffff 0 50%);
+            background-size: 16px 16px;
+            padding: 14px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid var(--gris-tres-clair);
+        }
+
+        /* VISUEL SUMUP 500x500 */
+        .sumup-icon-card {
             width: 500px;
             height: 500px;
-            background-color: #F5F5F5;
-            border-radius: 60px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            background: #FFFFFF;
+            border-radius: 36px;
+            position: relative;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 40px 30px;
+            padding: 30px;
+            box-sizing: border-box;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+        }
+
+        /* BANDES & VIGNETTES */
+        .banner-wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 140px;
+            clip-path: ellipse(70% 100% at 50% 0%);
+            z-index: 1;
+        }
+
+        .banner-diagonal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 130px;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
+            z-index: 1;
+        }
+
+        .banner-pill {
             position: relative;
-            overflow: hidden;
-        }
-
-        .icon-card.season-card {
-            background: linear-gradient(145deg, #FFFFFF 0%, #F5F5F5 100%);
-        }
-
-        .badge-header {
-            background-color: #C41E3A;
             color: #FFFFFF;
+            padding: 8px 30px;
+            border-radius: 30px;
             font-family: 'Fredoka', sans-serif;
-            font-size: 22pt;
+            font-size: 1.35rem;
             font-weight: 700;
             text-transform: uppercase;
-            padding: 10px 30px;
-            border-radius: 50px;
-            letter-spacing: 1px;
-            box-shadow: 0 6px 15px rgba(196, 30, 58, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            z-index: 2;
+            margin-top: 8px;
         }
 
-        .main-card-content {
+        .banner-side {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .banner-none {
+            display: none;
+        }
+
+        /* CONTENU CENTRAL */
+        .card-center-body {
+            position: relative;
+            z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            flex-grow: 1;
+            flex: 1;
+            width: 100%;
+            padding: 8px 16px;
+            gap: 10px;
         }
 
-        .title-season {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 52pt;
-            font-weight: 700;
-            color: #1A1A1A;
-            line-height: 1.1;
-        }
-
-        .title-season span {
-            color: #C41E3A;
-            display: block;
-        }
-
-        .title-month {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 64pt;
-            font-weight: 700;
-            color: #1A1A1A;
-            text-transform: uppercase;
-            line-height: 1.0;
-        }
-
-        .year-sub {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 32pt;
-            color: #C41E3A;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        .footer-brand {
+        .icon-visual-box {
+            width: 155px;
+            height: 155px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            border-top: 3px solid #E8E8E8;
-            padding-top: 15px;
-            width: 100%;
             justify-content: center;
+            font-size: 90px;
+            border-radius: 28px;
+            background: #F8FAFC;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
+            border: 2.5px solid var(--gris-tres-clair);
+            overflow: hidden;
         }
 
-        .brand-text {
+        .icon-visual-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-main-title {
             font-family: 'Fredoka', sans-serif;
-            font-size: 18pt;
+            font-size: 2.2rem;
             font-weight: 700;
-            color: #3D3D3D;
+            color: var(--noir-doux);
+            line-height: 1.15;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            max-width: 95%;
         }
 
-        .brand-text span {
-            color: #C41E3A;
+        .card-subtitle {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
-        .download-btn {
-            background-color: #C41E3A;
-            color: #FFFFFF;
+        .card-footer-branding {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            border-top: 1.5px solid var(--gris-tres-clair);
+            padding-top: 10px;
+            font-size: 0.85rem;
+            color: var(--gris-moyen);
+            font-weight: 600;
+        }
+
+        .brand-badge {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
+            color: var(--noir-doux);
+            text-transform: uppercase;
+        }
+
+        .brand-badge span {
+            color: var(--rouge);
+        }
+
+        .btn-download {
+            background-color: var(--rouge);
+            color: var(--blanc);
             border: none;
             font-family: 'Fredoka', sans-serif;
-            font-size: 14pt;
-            padding: 10px 24px;
+            font-size: 1.1rem;
+            padding: 12px 30px;
             border-radius: 30px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: transform 0.1s ease, background-color 0.2s;
+            box-shadow: 0 4px 15px rgba(196, 30, 58, 0.35);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .download-btn:hover {
-            background-color: #a3182e;
-            transform: scale(1.05);
-        }
-
-        @media print {
-            body { background: white; padding: 0; color: black; display: block !important; }
-            .no-print, .sidebar, .control-panel, .download-btn { display: none !important; }
-            .main-content { padding: 0 !important; overflow: visible !important; }
+        .btn-download:hover {
+            background-color: var(--rouge-hover);
+            transform: scale(1.03);
         }
     </style>
 </head>
 <body>
 
-    <!-- CONTENEUR SIDEBAR DYNAMIQUE -->
+    <!-- SIDEBAR DYNAMIQUE -->
     <div class="sidebar"></div>
 
     <div class="main-content">
-        <!-- BARRE DE COMMANDE -->
-        <div class="control-panel no-print">
-            <label for="startYear">Année Début :</label>
-            <input type="number" id="startYear" value="2026">
-            
-            <label for="endYear">Année Fin :</label>
-            <input type="number" id="endYear" value="2027">
-
-            <button class="btn-generate" onclick="generateCards()">⚡ Générer la Saison</button>
+        <div class="topbar">
+            <h2>Générateur d'Icônes & Catégories <span>SumUp</span></h2>
+            <div style="font-size:0.85rem; font-weight:600; color:var(--gris-moyen);">Format 500x500 HD conforme catalogue SumUp</div>
         </div>
 
-        <!-- CONTENEUR DES CARTES -->
-        <div class="cards-container" id="cardsContainer"></div>
+        <div class="content-scrollable">
+            
+            <div class="panel-form">
+                <div class="section-title">
+                    <span>🗂️ 1. Choisir la Catégorie SumUp</span>
+                </div>
+                <div class="cat-badges-grid">
+                    <button class="cat-btn active" onclick="selectCategory('Cotisations & Licences', '#C41E3A', '🥋', 'COTISATIONS', 'Licence & Adhésion Annuelle')">
+                        <span class="cat-indicator" style="background:#C41E3A;"></span> 🥋 Cotisations
+                    </button>
+                    <button class="cat-btn" onclick="selectCategory('Stages & Vacances', '#F39C12', '🏆', 'STAGE VACANCES', 'Tarif Journée / Multi-Activités')">
+                        <span class="cat-indicator" style="background:#F39C12;"></span> 🏆 Stages
+                    </button>
+                    <button class="cat-btn" onclick="selectCategory('Événements Club', '#9B59B6', '🎟️', 'ÉVÉNEMENT', 'Tombola, Galette & Fêtes')">
+                        <span class="cat-indicator" style="background:#9B59B6;"></span> 🎈 Événements
+                    </button>
+                    <button class="cat-btn" onclick="selectCategory('Boutique du Dojo', '#2980B9', '🥋', 'BOUTIQUE', 'Kimono, Écusson & Vêtements')">
+                        <span class="cat-indicator" style="background:#2980B9;"></span> 🛍️ Boutique
+                    </button>
+                    <button class="cat-btn" onclick="selectCategory('Buvette & Snacks', '#2ECC71', '🥤', 'BUVETTE', 'Boissons & Restauration')">
+                        <span class="cat-indicator" style="background:#2ECC71;"></span> 🥤 Buvette
+                    </button>
+                    <button class="cat-btn" onclick="selectCategory('Sophrologie & Bien-être', '#1ABC9C', '🧘', 'BIEN-ÊTRE', 'Séance Mensuelle au Dojo')">
+                        <span class="cat-indicator" style="background:#1ABC9C;"></span> 🧘 Sophrologie
+                    </button>
+                </div>
+
+                <div class="section-title">🏷️ 2. Détails de l'article</div>
+                <div class="form-group">
+                    <label>Nom de l'article :</label>
+                    <input type="text" id="itemName" class="form-control" value="COTISATION ÉVEIL JUDO" oninput="updateCard()">
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Sous-titre / Prix :</label>
+                        <input type="text" id="itemSub" class="form-control" value="156,00 € • Saison Complète" oninput="updateCard()">
+                    </div>
+                    <div class="form-group">
+                        <label>Taille Titre :</label>
+                        <input type="range" id="titleSize" min="24" max="44" value="34" oninput="updateCard()">
+                    </div>
+                </div>
+
+                <div class="section-title">📐 3. Forme & Couleurs de la Vignette</div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Forme de la bande :</label>
+                        <select id="bandStyle" class="form-control" onchange="updateCard()">
+                            <option value="wave">Vague incurvée (Haut)</option>
+                            <option value="diagonal">Biseau oblique (Haut)</option>
+                            <option value="pill" selected>Badge / Pilule supérieure</option>
+                            <option value="side">Liseré latéral discret</option>
+                            <option value="none">Aucune bande (Épuré)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Couleur SumUp :</label>
+                        <input type="color" id="primaryColor" class="form-control" value="#C41E3A" style="padding:2px; height:38px; cursor:pointer;" onchange="updateCard()">
+                    </div>
+                </div>
+
+                <div class="section-title">🖼️ 4. Symbole / Photo de l'Article</div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Émoji rapide :</label>
+                        <input type="text" id="itemEmoji" class="form-control" value="🥋" oninput="setEmoji(this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>Ou importer Image :</label>
+                        <input type="file" id="itemPhoto" class="form-control" accept="image/*" onchange="handleImageUpload(event)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Badge d'En-tête (Si style pilule) :</label>
+                    <input type="text" id="itemBadgeTag" class="form-control" value="COTISATIONS" oninput="updateCard()">
+                </div>
+            </div>
+
+            <!-- APERÇU EN DIRECT -->
+            <div class="preview-pane">
+                <div class="preview-box-outer">
+                    <div class="sumup-icon-card" id="sumupCardPreview">
+                        <div id="dynamicBand"></div>
+
+                        <div class="card-center-body">
+                            <div class="icon-visual-box" id="visualContainer">
+                                <span id="emojiDisplay">🥋</span>
+                            </div>
+                            <div class="card-main-title" id="previewTitle">COTISATION ÉVEIL JUDO</div>
+                            <div class="card-subtitle" id="previewSub">156,00 € • Saison Complète</div>
+                        </div>
+
+                        <div class="card-footer-branding">
+                            <div class="brand-badge">DOJO <span>DORNOIS</span></div>
+                            <div id="footerCategory" style="font-weight:700; text-transform:uppercase;">COTISATIONS & LICENCES</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-download" onclick="downloadSumUpImage()">
+                    📥 Télécharger l'image pour SumUp (PNG)
+                </button>
+            </div>
+
+        </div>
     </div>
 
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
     <script>
-        const monthsData = [
-            { num: '01', name: 'Septembre', code: 'SEP', yearOffset: 0 },
-            { num: '02', name: 'Octobre', code: 'OCT', yearOffset: 0 },
-            { num: '03', name: 'Novembre', code: 'NOV', yearOffset: 0 },
-            { num: '04', name: 'Décembre', code: 'DÉC', yearOffset: 0 },
-            { num: '05', name: 'Janvier', code: 'JAN', yearOffset: 1 },
-            { num: '06', name: 'Février', code: 'FÉV', yearOffset: 1 },
-            { num: '07', name: 'Mars', code: 'MARS', yearOffset: 1 },
-            { num: '08', name: 'Avril', code: 'AVR', yearOffset: 1 },
-            { num: '09', name: 'Mai', code: 'MAI', yearOffset: 1 },
-            { num: '10', name: 'Juin', code: 'JUIN', yearOffset: 1 },
-            { num: '11', name: 'Juillet', code: 'JUIL', yearOffset: 1 },
-            { num: '12', name: 'Août', code: 'AOÛT', yearOffset: 1 }
-        ];
+        let currentCategoryName = 'COTISATIONS & LICENCES';
 
-        function generateCards() {
-            const yStart = parseInt(document.getElementById('startYear').value);
-            const yEnd = parseInt(document.getElementById('endYear').value);
-            const container = document.getElementById('cardsContainer');
-            container.innerHTML = '';
+        function selectCategory(catName, color, emoji, tag, defaultSub) {
+            currentCategoryName = catName;
+            document.getElementById('primaryColor').value = color;
+            document.getElementById('itemBadgeTag').value = tag;
+            document.getElementById('itemEmoji').value = emoji;
+            setEmoji(emoji);
 
-            // 1. Carte de la Saison Globale
-            const seasonCardId = `season-${yStart}-${yEnd}`;
-            const seasonHTML = `
-                <div class="card-wrapper">
-                    <div class="icon-card season-card" id="${seasonCardId}">
-                        <div class="badge-header">Saison</div>
-                        <div class="main-card-content">
-                            <div class="title-season">${yStart}<span>${yEnd}</span></div>
-                        </div>
-                        <div class="footer-brand">
-                            <div class="brand-text">Dojo <span>Dornois</span></div>
-                        </div>
-                    </div>
-                    <button class="download-btn no-print" onclick="downloadPNG('${seasonCardId}', 'Saison-${yStart}-${yEnd}.png')">📥 Télécharger PNG</button>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', seasonHTML);
+            if (defaultSub) {
+                document.getElementById('itemSub').value = defaultSub;
+            }
 
-            // 2. Cartes des 12 Mois
-            monthsData.forEach(m => {
-                const currentYear = m.yearOffset === 0 ? yStart : yEnd;
-                const cardId = `card-${m.num}-${yStart}-${yEnd}`;
-                const filename = `${m.num}-${m.name}-${currentYear}.png`;
+            // Gérer classe active
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
 
-                const monthHTML = `
-                    <div class="card-wrapper">
-                        <div class="icon-card" id="${cardId}">
-                            <div class="badge-header">${m.num} - ${m.name}</div>
-                            <div class="main-card-content">
-                                <div class="title-month">${m.code}</div>
-                                <div class="year-sub">${currentYear}</div>
-                            </div>
-                            <div class="footer-brand">
-                                <div class="brand-text">Dojo <span>Dornois</span></div>
-                            </div>
-                        </div>
-                        <button class="download-btn no-print" onclick="downloadPNG('${cardId}', '${filename}')">📥 Télécharger PNG</button>
-                    </div>
-                `;
-                container.insertAdjacentHTML('beforeend', monthHTML);
-            });
+            updateCard();
         }
 
-        function downloadPNG(cardId, filename) {
-            const cardElement = document.getElementById(cardId);
-            html2canvas(cardElement, {
-                scale: 2,
+        function updateCard() {
+            const name = document.getElementById('itemName').value || 'ARTICLE';
+            const sub = document.getElementById('itemSub').value || '';
+            const size = document.getElementById('titleSize').value;
+            const color = document.getElementById('primaryColor').value;
+            const style = document.getElementById('bandStyle').value;
+            const badgeTag = document.getElementById('itemBadgeTag').value || 'ARTICLE';
+
+            const titleEl = document.getElementById('previewTitle');
+            titleEl.innerText = name;
+            titleEl.style.fontSize = size + 'px';
+
+            const subEl = document.getElementById('previewSub');
+            subEl.innerText = sub;
+            subEl.style.color = color;
+
+            const bandEl = document.getElementById('dynamicBand');
+            bandEl.className = '';
+            bandEl.innerHTML = '';
+            bandEl.style.backgroundColor = 'transparent';
+
+            if (style === 'wave') {
+                bandEl.className = 'banner-wave';
+                bandEl.style.backgroundColor = color;
+            } else if (style === 'diagonal') {
+                bandEl.className = 'banner-diagonal';
+                bandEl.style.backgroundColor = color;
+            } else if (style === 'pill') {
+                bandEl.className = 'banner-pill';
+                bandEl.style.backgroundColor = color;
+                bandEl.innerText = badgeTag;
+            } else if (style === 'side') {
+                bandEl.className = 'banner-side';
+                bandEl.style.backgroundColor = color;
+            }
+
+            const visualBox = document.getElementById('visualContainer');
+            visualBox.style.borderColor = color + '40';
+
+            const footerCat = document.getElementById('footerCategory');
+            footerCat.innerText = currentCategoryName;
+            footerCat.style.color = color;
+        }
+
+        function setEmoji(val) {
+            const container = document.getElementById('visualContainer');
+            container.innerHTML = `<span id="emojiDisplay" style="font-size:90px;">${val}</span>`;
+            updateCard();
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const container = document.getElementById('visualContainer');
+                    container.innerHTML = `<img src="${e.target.result}" alt="Article">`;
+                    updateCard();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function downloadSumUpImage() {
+            const card = document.getElementById('sumupCardPreview');
+            const cleanName = document.getElementById('itemName').value.trim().toLowerCase().replace(/[^a-z0-9]/gi, '_');
+            const filename = `sumup_${cleanName || 'article'}.png`;
+
+            html2canvas(card, {
+                scale: 2, // Sortie 1000x1000 nette pour l'app et l'écran TPE SumUp
                 useCORS: true,
                 backgroundColor: null
             }).then(canvas => {
@@ -352,12 +600,7 @@
             });
         }
 
-        // Génération automatique au chargement
-        window.onload = generateCards;
+        window.onload = updateCard;
     </script>
-
-    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
-    <script src="../js/sidebar.js"></script>
-
 </body>
 </html>
