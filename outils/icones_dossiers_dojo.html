@@ -4,27 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Générateur d'Icônes Articles SumUp - Dojo Dornois</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --rouge: #C41E3A;
-            --rouge-hover: #A3182E;
             --noir-doux: #1A1A1A;
             --gris-fonce: #3D3D3D;
             --gris-moyen: #6B6B6B;
-            --gris-clair: #B8B8B8;
             --gris-tres-clair: #E8E8E8;
             --fond: #F4F6F9;
             --blanc: #FFFFFF;
             --sidebar-width: 280px;
         }
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Roboto', sans-serif;
@@ -35,20 +29,13 @@
             overflow: hidden;
         }
 
-        /* SIDEBAR INTÉGRÉE */
         .sidebar { 
             width: var(--sidebar-width); 
             min-width: var(--sidebar-width);
-            max-width: var(--sidebar-width);
             background: var(--noir-doux); 
             color: var(--blanc); 
-            display: flex; 
-            flex-direction: column; 
             height: 100%; 
-            position: relative; 
-            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
             flex-shrink: 0; 
-            overflow-x: hidden;
             z-index: 100;
         }
 
@@ -76,24 +63,20 @@
             font-size: 1.3rem;
             color: var(--noir-doux);
         }
-
-        .topbar h2 span {
-            color: var(--rouge);
-        }
+        .topbar h2 span { color: var(--rouge); }
 
         .content-scrollable {
             flex: 1;
             overflow-y: auto;
             padding: 24px 30px;
             display: flex;
-            gap: 30px;
+            gap: 40px;
             align-items: flex-start;
             justify-content: center;
         }
 
-        /* PANNEAU DE CONTRÔLE */
         .panel-form {
-            width: 460px;
+            width: 440px;
             background: var(--blanc);
             border-radius: 16px;
             padding: 22px;
@@ -111,48 +94,8 @@
             color: var(--rouge);
             border-bottom: 2px solid var(--gris-tres-clair);
             padding-bottom: 4px;
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .form-group label {
-            font-size: 0.78rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--gris-moyen);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1.5px solid var(--gris-tres-clair);
-            border-radius: 8px;
-            font-size: 0.88rem;
-            font-family: 'Roboto', sans-serif;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .form-control:focus {
-            border-color: var(--rouge);
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        /* BADGES CATEGORIES */
         .cat-badges-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -162,22 +105,16 @@
         .cat-btn {
             border: 1px solid var(--gris-tres-clair);
             background: #FAFAFA;
-            padding: 7px 10px;
+            padding: 8px 10px;
             border-radius: 8px;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             font-family: 'Fredoka', sans-serif;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            text-align: left;
             transition: all 0.15s ease;
-        }
-
-        .cat-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
 
         .cat-btn.active {
@@ -193,165 +130,135 @@
             flex-shrink: 0;
         }
 
-        /* PREVIEW AREA */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--gris-moyen);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid var(--gris-tres-clair);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* ZONE D'APERÇU */
         .preview-pane {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 18px;
             position: sticky;
             top: 10px;
         }
 
-        .preview-box-outer {
-            background-image: repeating-conic-gradient(#e6e6e6 0 25%, #ffffff 0 50%);
-            background-size: 16px 16px;
-            padding: 14px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid var(--gris-tres-clair);
+        /* SIMULATION ÉCRAN SUMUP (POUR VOIR LE RENDU RÉEL RÉDUIT) */
+        .sumup-simulation-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* VISUEL SUMUP 500x500 */
-        .sumup-icon-card {
-            width: 500px;
-            height: 500px;
-            background: #FFFFFF;
-            border-radius: 36px;
+        .sumup-card-canvas {
+            width: 320px;
+            height: 320px;
+            border-radius: 20px;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             align-items: center;
-            padding: 30px;
-            box-sizing: border-box;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            background: #C41E3A;
+            transition: background 0.2s;
         }
 
-        /* BANDES & VIGNETTES */
-        .banner-wave {
+        /* MOTIF DE FOND GÉOMÉTRIQUE POUR DONNER DU RELIEF */
+        .bg-pattern {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 140px;
-            clip-path: ellipse(70% 100% at 50% 0%);
+            inset: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.15) 100%);
             z-index: 1;
         }
 
-        .banner-diagonal {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 130px;
-            clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
-            z-index: 1;
-        }
-
-        .banner-pill {
+        .big-symbol {
             position: relative;
-            color: #FFFFFF;
-            padding: 8px 30px;
-            border-radius: 30px;
-            font-family: 'Fredoka', sans-serif;
-            font-size: 1.35rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             z-index: 2;
-            margin-top: 8px;
+            font-size: 135px;
+            line-height: 1;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
         }
 
-        .banner-side {
+        .big-symbol img {
+            width: 170px;
+            height: 170px;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
+        }
+
+        .short-label {
+            position: relative;
+            z-index: 2;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2rem;
+            color: #FFFFFF;
+            text-transform: uppercase;
+            font-weight: 800;
+            text-shadow: 0 3px 8px rgba(0,0,0,0.35);
+            margin-top: 10px;
+            letter-spacing: 1px;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        /* REPRODUCTION DU VOILE NATIF SUMUP POUR TESTER LA LISIBILITÉ */
+        .sumup-overlay-mockup {
             position: absolute;
-            left: 0;
-            top: 0;
-            width: 20px;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .banner-none {
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.6) 100%);
+            z-index: 3;
+            pointer-events: none;
             display: none;
         }
 
-        /* CONTENU CENTRAL */
-        .card-center-body {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            flex: 1;
-            width: 100%;
-            padding: 8px 16px;
-            gap: 10px;
-        }
-
-        .icon-visual-box {
-            width: 155px;
-            height: 155px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 90px;
-            border-radius: 28px;
-            background: #F8FAFC;
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
-            border: 2.5px solid var(--gris-tres-clair);
-            overflow: hidden;
-        }
-
-        .icon-visual-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .card-main-title {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 2.2rem;
+        .mockup-text-top {
+            position: absolute;
+            top: 12px;
+            left: 14px;
+            right: 14px;
+            color: #FFF;
             font-weight: 700;
-            color: var(--noir-doux);
-            line-height: 1.15;
-            text-transform: uppercase;
-            max-width: 95%;
+            font-size: 0.9rem;
+            line-height: 1.2;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
 
-        .card-subtitle {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 1.45rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .card-footer-branding {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            border-top: 1.5px solid var(--gris-tres-clair);
-            padding-top: 10px;
-            font-size: 0.85rem;
-            color: var(--gris-moyen);
-            font-weight: 600;
-        }
-
-        .brand-badge {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 0.95rem;
-            color: var(--noir-doux);
-            text-transform: uppercase;
-        }
-
-        .brand-badge span {
-            color: var(--rouge);
+        .mockup-price-bottom {
+            position: absolute;
+            bottom: 12px;
+            left: 14px;
+            color: #FFF;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
 
         .btn-download {
@@ -359,248 +266,191 @@
             color: var(--blanc);
             border: none;
             font-family: 'Fredoka', sans-serif;
-            font-size: 1.1rem;
-            padding: 12px 30px;
+            font-size: 1.05rem;
+            padding: 12px 28px;
             border-radius: 30px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(196, 30, 58, 0.35);
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .btn-download:hover {
-            background-color: var(--rouge-hover);
+            background-color: #A3182E;
             transform: scale(1.03);
         }
     </style>
 </head>
 <body>
 
-    <!-- SIDEBAR DYNAMIQUE -->
     <div class="sidebar"></div>
 
     <div class="main-content">
         <div class="topbar">
-            <h2>Générateur d'Icônes & Catégories <span>SumUp</span></h2>
-            <div style="font-size:0.85rem; font-weight:600; color:var(--gris-moyen);">Format 500x500 HD conforme catalogue SumUp</div>
+            <h2>Générateur d'Icônes Simples <span>SumUp</span></h2>
+            <div style="font-size:0.85rem; font-weight:600; color:var(--gris-moyen);">Optimisé pour l'écran caisse SumUp Terminal</div>
         </div>
 
         <div class="content-scrollable">
             
             <div class="panel-form">
-                <div class="section-title">
-                    <span>🗂️ 1. Choisir la Catégorie SumUp</span>
-                </div>
+                <div class="section-title">🗂️ 1. Catégorie & Couleur SumUp</div>
                 <div class="cat-badges-grid">
-                    <button class="cat-btn active" onclick="selectCategory('Cotisations & Licences', '#C41E3A', '🥋', 'COTISATIONS', 'Licence & Adhésion Annuelle')">
+                    <button class="cat-btn active" onclick="setCategory('#C41E3A', '🥋', '')">
                         <span class="cat-indicator" style="background:#C41E3A;"></span> 🥋 Cotisations
                     </button>
-                    <button class="cat-btn" onclick="selectCategory('Stages & Vacances', '#F39C12', '🏆', 'STAGE VACANCES', 'Tarif Journée / Multi-Activités')">
+                    <button class="cat-btn" onclick="setCategory('#F39C12', '🏆', '')">
                         <span class="cat-indicator" style="background:#F39C12;"></span> 🏆 Stages
                     </button>
-                    <button class="cat-btn" onclick="selectCategory('Événements Club', '#9B59B6', '🎟️', 'ÉVÉNEMENT', 'Tombola, Galette & Fêtes')">
+                    <button class="cat-btn" onclick="setCategory('#9B59B6', '🎟️', '')">
                         <span class="cat-indicator" style="background:#9B59B6;"></span> 🎈 Événements
                     </button>
-                    <button class="cat-btn" onclick="selectCategory('Boutique du Dojo', '#2980B9', '🥋', 'BOUTIQUE', 'Kimono, Écusson & Vêtements')">
+                    <button class="cat-btn" onclick="setCategory('#2980B9', '🥋', '')">
                         <span class="cat-indicator" style="background:#2980B9;"></span> 🛍️ Boutique
                     </button>
-                    <button class="cat-btn" onclick="selectCategory('Buvette & Snacks', '#2ECC71', '🥤', 'BUVETTE', 'Boissons & Restauration')">
+                    <button class="cat-btn" onclick="setCategory('#2ECC71', '🥤', '')">
                         <span class="cat-indicator" style="background:#2ECC71;"></span> 🥤 Buvette
                     </button>
-                    <button class="cat-btn" onclick="selectCategory('Sophrologie & Bien-être', '#1ABC9C', '🧘', 'BIEN-ÊTRE', 'Séance Mensuelle au Dojo')">
-                        <span class="cat-indicator" style="background:#1ABC9C;"></span> 🧘 Sophrologie
+                    <button class="cat-btn" onclick="setCategory('#1ABC9C', '🧘', '')">
+                        <span class="cat-indicator" style="background:#1ABC9C;"></span> 🧘 Sophro
                     </button>
                 </div>
 
-                <div class="section-title">🏷️ 2. Détails de l'article</div>
+                <div class="section-title">🖼️ 2. Symbole ou Photo Centrale</div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Émoji XXL :</label>
+                        <input type="text" id="emojiInput" class="form-control" value="🥋" oninput="setEmoji(this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>Ou Charger Image :</label>
+                        <input type="file" id="fileInput" class="form-control" accept="image/*" onchange="handleImage(event)">
+                    </div>
+                </div>
+
+                <div class="section-title">✏️ 3. Mot-Clé Optionnel (Court)</div>
                 <div class="form-group">
-                    <label>Nom de l'article :</label>
-                    <input type="text" id="itemName" class="form-control" value="COTISATION ÉVEIL JUDO" oninput="updateCard()">
-                </div>
-
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Sous-titre / Prix :</label>
-                        <input type="text" id="itemSub" class="form-control" value="156,00 € • Saison Complète" oninput="updateCard()">
-                    </div>
-                    <div class="form-group">
-                        <label>Taille Titre :</label>
-                        <input type="range" id="titleSize" min="24" max="44" value="34" oninput="updateCard()">
-                    </div>
-                </div>
-
-                <div class="section-title">📐 3. Forme & Couleurs de la Vignette</div>
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Forme de la bande :</label>
-                        <select id="bandStyle" class="form-control" onchange="updateCard()">
-                            <option value="wave">Vague incurvée (Haut)</option>
-                            <option value="diagonal">Biseau oblique (Haut)</option>
-                            <option value="pill" selected>Badge / Pilule supérieure</option>
-                            <option value="side">Liseré latéral discret</option>
-                            <option value="none">Aucune bande (Épuré)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Couleur SumUp :</label>
-                        <input type="color" id="primaryColor" class="form-control" value="#C41E3A" style="padding:2px; height:38px; cursor:pointer;" onchange="updateCard()">
-                    </div>
-                </div>
-
-                <div class="section-title">🖼️ 4. Symbole / Photo de l'Article</div>
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Émoji rapide :</label>
-                        <input type="text" id="itemEmoji" class="form-control" value="🥋" oninput="setEmoji(this.value)">
-                    </div>
-                    <div class="form-group">
-                        <label>Ou importer Image :</label>
-                        <input type="file" id="itemPhoto" class="form-control" accept="image/*" onchange="handleImageUpload(event)">
-                    </div>
+                    <label>Texte sous l'icône (laisser vide si inutile) :</label>
+                    <input type="text" id="shortLabelInput" class="form-control" placeholder="Ex: 6 ANS +, SODA, REPAS..." oninput="updateView()">
                 </div>
 
                 <div class="form-group">
-                    <label>Badge d'En-tête (Si style pilule) :</label>
-                    <input type="text" id="itemBadgeTag" class="form-control" value="COTISATIONS" oninput="updateCard()">
+                    <label>Couleur personnalisée du fond :</label>
+                    <input type="color" id="bgColor" class="form-control" value="#C41E3A" style="padding:2px; height:38px; cursor:pointer;" onchange="updateView()">
+                </div>
+
+                <div style="background:#F8FAFC; border:1px solid var(--gris-tres-clair); padding:10px; border-radius:8px; margin-top:8px;">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; font-weight:600;">
+                        <input type="checkbox" id="toggleOverlay" onchange="toggleMockup(this.checked)">
+                        👁️ Simuler le texte de l'écran SumUp
+                    </label>
                 </div>
             </div>
 
-            <!-- APERÇU EN DIRECT -->
+            <!-- APERÇU -->
             <div class="preview-pane">
-                <div class="preview-box-outer">
-                    <div class="sumup-icon-card" id="sumupCardPreview">
-                        <div id="dynamicBand"></div>
+                <div class="sumup-simulation-box">
+                    <div class="sumup-card-canvas" id="sumupCard">
+                        <div class="bg-pattern"></div>
+                        
+                        <div class="big-symbol" id="symbolBox">🥋</div>
+                        <div class="short-label" id="labelBox" style="display:none;"></div>
 
-                        <div class="card-center-body">
-                            <div class="icon-visual-box" id="visualContainer">
-                                <span id="emojiDisplay">🥋</span>
-                            </div>
-                            <div class="card-main-title" id="previewTitle">COTISATION ÉVEIL JUDO</div>
-                            <div class="card-subtitle" id="previewSub">156,00 € • Saison Complète</div>
-                        </div>
-
-                        <div class="card-footer-branding">
-                            <div class="brand-badge">DOJO <span>DORNOIS</span></div>
-                            <div id="footerCategory" style="font-weight:700; text-transform:uppercase;">COTISATIONS & LICENCES</div>
+                        <!-- SIMULATEUR DU TEXTE SUMUP TERMINAL -->
+                        <div class="sumup-overlay-mockup" id="mockupLayer">
+                            <div class="mockup-text-top">Cotisation Annuelle | 6 ans et +</div>
+                            <div class="mockup-price-bottom">166,00 €</div>
                         </div>
                     </div>
+                    <span style="font-size:0.8rem; color:var(--gris-moyen);">Aperçu fidèle au boîtier SumUp</span>
                 </div>
 
-                <button class="btn-download" onclick="downloadSumUpImage()">
-                    📥 Télécharger l'image pour SumUp (PNG)
+                <button class="btn-download" onclick="downloadIcon()">
+                    📥 Télécharger l'icône (PNG net 500x500)
                 </button>
             </div>
 
         </div>
     </div>
 
-    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
     <script src="../js/sidebar.js"></script>
 
     <script>
-        let currentCategoryName = 'COTISATIONS & LICENCES';
-
-        function selectCategory(catName, color, emoji, tag, defaultSub) {
-            currentCategoryName = catName;
-            document.getElementById('primaryColor').value = color;
-            document.getElementById('itemBadgeTag').value = tag;
-            document.getElementById('itemEmoji').value = emoji;
+        function setCategory(color, emoji, shortText) {
+            document.getElementById('bgColor').value = color;
+            document.getElementById('emojiInput').value = emoji;
+            document.getElementById('shortLabelInput').value = shortText;
             setEmoji(emoji);
 
-            if (defaultSub) {
-                document.getElementById('itemSub').value = defaultSub;
-            }
-
-            // Gérer classe active
             document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
             event.currentTarget.classList.add('active');
-
-            updateCard();
-        }
-
-        function updateCard() {
-            const name = document.getElementById('itemName').value || 'ARTICLE';
-            const sub = document.getElementById('itemSub').value || '';
-            const size = document.getElementById('titleSize').value;
-            const color = document.getElementById('primaryColor').value;
-            const style = document.getElementById('bandStyle').value;
-            const badgeTag = document.getElementById('itemBadgeTag').value || 'ARTICLE';
-
-            const titleEl = document.getElementById('previewTitle');
-            titleEl.innerText = name;
-            titleEl.style.fontSize = size + 'px';
-
-            const subEl = document.getElementById('previewSub');
-            subEl.innerText = sub;
-            subEl.style.color = color;
-
-            const bandEl = document.getElementById('dynamicBand');
-            bandEl.className = '';
-            bandEl.innerHTML = '';
-            bandEl.style.backgroundColor = 'transparent';
-
-            if (style === 'wave') {
-                bandEl.className = 'banner-wave';
-                bandEl.style.backgroundColor = color;
-            } else if (style === 'diagonal') {
-                bandEl.className = 'banner-diagonal';
-                bandEl.style.backgroundColor = color;
-            } else if (style === 'pill') {
-                bandEl.className = 'banner-pill';
-                bandEl.style.backgroundColor = color;
-                bandEl.innerText = badgeTag;
-            } else if (style === 'side') {
-                bandEl.className = 'banner-side';
-                bandEl.style.backgroundColor = color;
-            }
-
-            const visualBox = document.getElementById('visualContainer');
-            visualBox.style.borderColor = color + '40';
-
-            const footerCat = document.getElementById('footerCategory');
-            footerCat.innerText = currentCategoryName;
-            footerCat.style.color = color;
+            updateView();
         }
 
         function setEmoji(val) {
-            const container = document.getElementById('visualContainer');
-            container.innerHTML = `<span id="emojiDisplay" style="font-size:90px;">${val}</span>`;
-            updateCard();
+            const box = document.getElementById('symbolBox');
+            box.innerHTML = val || '🥋';
+            updateView();
         }
 
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
+        function handleImage(e) {
+            const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    const container = document.getElementById('visualContainer');
-                    container.innerHTML = `<img src="${e.target.result}" alt="Article">`;
-                    updateCard();
-                };
+                reader.onload = function(evt) {
+                    document.getElementById('symbolBox').innerHTML = `<img src="${evt.target.result}" alt="Item">`;
+                    updateView();
+                }
                 reader.readAsDataURL(file);
             }
         }
 
-        function downloadSumUpImage() {
-            const card = document.getElementById('sumupCardPreview');
-            const cleanName = document.getElementById('itemName').value.trim().toLowerCase().replace(/[^a-z0-9]/gi, '_');
-            const filename = `sumup_${cleanName || 'article'}.png`;
+        function updateView() {
+            const color = document.getElementById('bgColor').value;
+            const text = document.getElementById('shortLabelInput').value.trim();
+            const labelBox = document.getElementById('labelBox');
+            const card = document.getElementById('sumupCard');
+
+            card.style.backgroundColor = color;
+
+            if (text) {
+                labelBox.innerText = text;
+                labelBox.style.display = 'block';
+                document.getElementById('symbolBox').style.fontSize = '105px';
+            } else {
+                labelBox.style.display = 'none';
+                document.getElementById('symbolBox').style.fontSize = '135px';
+            }
+        }
+
+        function toggleMockup(show) {
+            document.getElementById('mockupLayer').style.display = show ? 'block' : 'none';
+        }
+
+        function downloadIcon() {
+            const card = document.getElementById('sumupCard');
+            const mockup = document.getElementById('mockupLayer');
+            
+            // Masquer la simulation SumUp avant l'export
+            const wasMockupVisible = mockup.style.display;
+            mockup.style.display = 'none';
 
             html2canvas(card, {
-                scale: 2, // Sortie 1000x1000 nette pour l'app et l'écran TPE SumUp
-                useCORS: true,
+                width: 320,
+                height: 320,
+                scale: 2, // Sortie HD 640x640 parfaitement nette
                 backgroundColor: null
             }).then(canvas => {
+                mockup.style.display = wasMockupVisible;
                 const link = document.createElement('a');
-                link.download = filename;
+                link.download = 'icone_sumup.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
         }
 
-        window.onload = updateCard;
+        window.onload = updateView;
     </script>
 </body>
 </html>
