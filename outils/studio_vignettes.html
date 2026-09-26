@@ -57,7 +57,7 @@
             z-index: 100;
         }
 
-        /* ZONE PRINCIPALE DE L'APPLICATION */
+        /* ZONE PRINCIPALE */
         .main-content {
             flex: 1;
             display: flex;
@@ -67,7 +67,7 @@
             min-width: 0;
         }
 
-        /* BARRE SUPÉRIEURE & ONGLETS */
+        /* BARRE SUPÉRIEURE */
         .topbar {
             height: var(--topbar-height);
             background: #151518;
@@ -112,7 +112,7 @@
             box-shadow: 0 4px 12px rgba(196, 30, 58, 0.35);
         }
 
-        /* STRUCTURE DU WORKSPACE */
+        /* WORKSPACE */
         .workspace {
             display: flex;
             flex: 1;
@@ -185,7 +185,7 @@
             border-color: var(--rouge);
         }
 
-        /* CARTES MODÈLES ÉTIQUETTES */
+        /* CARTES MODÈLES */
         .model-card {
             background: #22222C;
             border: 1px solid #363646;
@@ -234,7 +234,7 @@
             background: #3B3B4C;
         }
 
-        /* BOUTONS D'ACTION */
+        /* BOUTONS */
         .btn-action {
             background: var(--rouge);
             color: #FFF;
@@ -254,6 +254,24 @@
         .btn-action:hover { background: var(--rouge-hover); }
         .btn-action:active { transform: scale(0.98); }
         
+        .btn-preset-load {
+            background: #3B82F6;
+            color: #FFF;
+            border: none;
+            border-radius: 6px;
+            padding: 9px 14px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-preset-load:hover { background: #2563EB; }
+
         .btn-sm-add {
             background: #10B981;
             color: white;
@@ -291,7 +309,7 @@
             line-height: 1.4;
         }
 
-        /* ZONE D'APERÇU */
+        /* APERÇU */
         .preview-area {
             flex: 1;
             background: #111116;
@@ -304,7 +322,7 @@
             gap: 20px;
         }
 
-        /* PLANCHE A4 D'ÉTIQUETTES */
+        /* PLANCHE A4 */
         .a4-sheet {
             background: #FFFFFF;
             width: 210mm;
@@ -319,7 +337,7 @@
             align-content: flex-start;
         }
 
-        /* FORMATS ACTION & AVERY */
+        /* FORMATS */
         .layout-1 {
             grid-template-columns: 210mm;
             grid-template-rows: 297mm;
@@ -336,17 +354,17 @@
             grid-template-columns: repeat(3, 70mm);
             grid-template-rows: repeat(8, 37.125mm);
         }
-        /* FORMAT AVERY J8159 : 63.5 x 33.9 mm (3 col x 8 lignes) */
+        /* FORMAT AVERY J8159 : 63.5 x 33.9 mm (3 colonnes x 8 lignes) */
         .layout-avery-j8159 {
             padding: 12.9mm 7.2mm !important;
             grid-template-columns: repeat(3, 63.5mm);
             grid-template-rows: repeat(8, 33.9mm);
             column-gap: 2.5mm;
             row-gap: 0mm;
-            background: #F4F6F8; /* Teinte légère de la grille de support Avery */
+            background: #F4F6F8;
         }
 
-        /* CARTE ÉTIQUETTE INDIVIDUELLE */
+        /* ÉTIQUETTE INDIVIDUELLE */
         .judo-label-card {
             background: #FFFFFF;
             border: 1px dashed #CBD5E1;
@@ -436,7 +454,7 @@
             font-family: 'Fredoka', sans-serif;
         }
 
-        /* ADAPTATION 24 PAR PAGE ACTION (70x37mm) */
+        /* ADAPTATION 24 ACTION (70x37mm) */
         .layout-24 .judo-label-card {
             padding: 0;
         }
@@ -464,7 +482,7 @@
             padding-top: 1px;
         }
 
-        /* ADAPTATION SPÉCIFIQUE FORMAT AVERY J8159 (63.5 x 33.9mm) */
+        /* ADAPTATION AVERY J8159 (63.5 x 33.9mm) */
         .layout-avery-j8159 .judo-label-card {
             border-radius: 1.5mm;
             border: 0.2mm solid #CBD5E1;
@@ -500,6 +518,19 @@
             padding-top: 1px;
         }
 
+        /* CARTE CAS PARTICULIER : VIGNETTE / CLASSEUR COMPTABLE */
+        .layout-avery-j8159 .judo-label-card.theme-compta .label-body {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 3px;
+        }
+        .layout-avery-j8159 .judo-label-card.theme-compta .label-size-title {
+            font-size: 0.82rem;
+            color: #C41E3A;
+            text-transform: uppercase;
+        }
+
         /* THÈMES COULEURS */
         .theme-complet .label-header { background: #C41E3A; }
         .theme-complet .label-type-pill { background: #FFEBEF; color: #C41E3A; }
@@ -515,6 +546,9 @@
 
         .theme-ceintures .label-header { background: #34495E; }
         .theme-ceintures .label-type-pill { background: #EAECEE; color: #2C3E50; }
+
+        .theme-compta .label-header { background: #1A1A1A; }
+        .theme-compta .label-type-pill { background: #FFEBEF; color: #C41E3A; }
 
         /* VIGNETTES KALISPORT */
         .color-presets-grid {
@@ -740,10 +774,8 @@
 </head>
 <body>
 
-    <!-- CONTENEUR SIDEBAR UNIFIÉE -->
     <div class="sidebar"></div>
 
-    <!-- CONTENEUR PRINCIPAL DE L'APPLICATION -->
     <div class="main-content">
 
         <header class="topbar">
@@ -786,7 +818,11 @@
 
                     <div class="section-title">
                         <span>🥋 2. Modèles d'étiquettes</span>
-                        <button class="btn-sm-add" onclick="addNewModelCard()">+ Ajouter un modèle</button>
+                        <button class="btn-sm-add" onclick="addNewModelCard()">+ Nouveau modèle</button>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:8px;">
+                        <button class="btn-preset-load" onclick="loadSavedPdfModels()">📥 Charger la planche PDF (24 étiquettes)</button>
                     </div>
 
                     <div id="modelsContainer"></div>
@@ -796,13 +832,13 @@
                     </div>
 
                     <div class="alert-info-box">
-                        💡 <b>Calibrage Avery J8159 :</b> Les dimensions tiennent compte des marges physiques de la planche (12.9 mm haut/bas, 7.2 mm côtés et le séparateur de 2.5 mm entre colonnes).
+                        💡 <b>Calibrage Avery J8159 :</b> Format 63.5 × 33.9 mm avec marges de 12.9 mm haut/bas, 7.2 mm côtés et séparation de 2.5 mm entre colonnes.
                     </div>
                 </div>
 
                 <div class="preview-area">
                     <div style="color:#94A3B8; font-size:0.85rem;" class="no-print">
-                        💡 <b>Aperçu Planche en direct</b> (Format Avery 63.5 × 33.9 mm avec séparation inter-étiquettes).
+                        💡 <b>Aperçu Planche A4 Avery J8159</b> (Les 24 étiquettes calibrées d'après ton document PDF).
                     </div>
                     <div class="a4-sheet layout-avery-j8159" id="labelSheetContainer"></div>
                 </div>
@@ -994,13 +1030,13 @@
             const data = defaultData || {
                 type: 'JUDOGI COMPLET',
                 size: '100 cm',
-                dest: 'ÉCOLE / TER',
-                l1: 'École Primaire — Nom élève : _______',
-                l2: 'Pack : Veste + Pantalon + Ceinture',
-                l3: 'Ranger propre dans la pochette',
+                dest: 'PRÊT CLUB',
+                l1: 'Dojo Dornois — Matériel de prêt',
+                l2: 'Pack complet',
+                l3: '',
                 theme: 'theme-complet',
                 font: "'Fredoka', sans-serif",
-                qty: 10
+                qty: 1
             };
 
             card.innerHTML = `
@@ -1010,11 +1046,11 @@
                 </div>
 
                 <div class="preset-bar">
-                    <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'COMPLET_ECOLE')">🥋 École</button>
                     <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'COMPLET_CLUB')">🥋 Prêt Club</button>
+                    <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'COMPLET_ECOLE')">🥋 École</button>
                     <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'VESTE_SEULE')">🧥 Veste Seule</button>
                     <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'PANTALON_SEUL')">👖 Pantalon</button>
-                    <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'LOT_CEINTURES')">🎗️ Ceintures</button>
+                    <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'COMPTA')">📁 Compta</button>
                 </div>
 
                 <div class="form-row">
@@ -1026,11 +1062,11 @@
                             <option value="PANTALON SEUL" ${data.type === 'PANTALON SEUL' ? 'selected':''}>PANTALON SEUL</option>
                             <option value="PIÈCE DÉPAREILLÉE" ${data.type === 'PIÈCE DÉPAREILLÉE' ? 'selected':''}>PIÈCE DÉPAREILLÉE</option>
                             <option value="LOT DE CEINTURES" ${data.type === 'LOT DE CEINTURES' ? 'selected':''}>LOT DE CEINTURES</option>
-                            <option value="BAC DE STOCK" ${data.type === 'BAC DE STOCK' ? 'selected':''}>BAC DE STOCK</option>
+                            <option value="VIGNETTE CLASSEUR" ${data.type === 'VIGNETTE CLASSEUR' ? 'selected':''}>VIGNETTE CLASSEUR</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Taille (cm)</label>
+                        <label>Taille / Intitulé</label>
                         <input type="text" class="m-size" value="${data.size}" oninput="renderFullSheet()">
                     </div>
                 </div>
@@ -1039,20 +1075,21 @@
                     <div class="form-group">
                         <label>Affectation</label>
                         <select class="m-dest" onchange="renderFullSheet()">
-                            <option value="ÉCOLE / TER" ${data.dest === 'ÉCOLE / TER' ? 'selected':''}>ÉCOLE / TER</option>
                             <option value="PRÊT CLUB" ${data.dest === 'PRÊT CLUB' ? 'selected':''}>PRÊT CLUB</option>
+                            <option value="ÉCOLE / TER" ${data.dest === 'ÉCOLE / TER' ? 'selected':''}>ÉCOLE / TER</option>
                             <option value="STOCK GÉNÉRAL" ${data.dest === 'STOCK GÉNÉRAL' ? 'selected':''}>STOCK GÉNÉRAL</option>
-                            <option value="SECTION ADULTE" ${data.dest === 'SECTION ADULTE' ? 'selected':''}>SECTION ADULTE</option>
+                            <option value="GESTION / ADMIN" ${data.dest === 'GESTION / ADMIN' ? 'selected':''}>GESTION / ADMIN</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Thème visuel</label>
                         <select class="m-theme" onchange="renderFullSheet()">
-                            <option value="theme-complet" ${data.theme === 'theme-complet' ? 'selected':''}>🔴 Rouge Dojo</option>
+                            <option value="theme-complet" ${data.theme === 'theme-complet' ? 'selected':''}>🔴 Rouge Dojo (Complet)</option>
                             <option value="theme-veste" ${data.theme === 'theme-veste' ? 'selected':''}>🟠 Orange (Veste)</option>
                             <option value="theme-pantalon" ${data.theme === 'theme-pantalon' ? 'selected':''}>🟢 Vert (Pantalon)</option>
                             <option value="theme-inconnu" ${data.theme === 'theme-inconnu' ? 'selected':''}>🟣 Violet (Taille ?)</option>
                             <option value="theme-ceintures" ${data.theme === 'theme-ceintures' ? 'selected':''}>🔵 Bleu Nuit</option>
+                            <option value="theme-compta" ${data.theme === 'theme-compta' ? 'selected':''}>⚫ Noir / Compta</option>
                         </select>
                     </div>
                 </div>
@@ -1110,7 +1147,15 @@
             const l2 = card.querySelector('.m-l2');
             const l3 = card.querySelector('.m-l3');
 
-            if (presetType === 'COMPLET_ECOLE') {
+            if (presetType === 'COMPLET_CLUB') {
+                type.value = 'JUDOGI COMPLET';
+                dest.value = 'PRÊT CLUB';
+                theme.value = 'theme-complet';
+                size.value = '100 cm';
+                l1.value = 'Dojo Dornois — Matériel de prêt';
+                l2.value = 'Pack complet';
+                l3.value = '';
+            } else if (presetType === 'COMPLET_ECOLE') {
                 type.value = 'JUDOGI COMPLET';
                 dest.value = 'ÉCOLE / TER';
                 theme.value = 'theme-complet';
@@ -1118,19 +1163,11 @@
                 l1.value = 'École Primaire — Nom : __________';
                 l2.value = 'Pack : Veste + Pantalon + Ceinture';
                 l3.value = 'Ranger soigneusement dans la pochette';
-            } else if (presetType === 'COMPLET_CLUB') {
-                type.value = 'JUDOGI COMPLET';
-                dest.value = 'PRÊT CLUB';
-                theme.value = 'theme-complet';
-                size.value = '120 cm';
-                l1.value = 'Dojo Dornois — Matériel de prêt';
-                l2.value = 'Pack complet avec ceinture';
-                l3.value = 'À restituer en fin de séance';
             } else if (presetType === 'VESTE_SEULE') {
                 type.value = 'VESTE SEULE';
                 dest.value = 'PRÊT CLUB';
                 theme.value = 'theme-veste';
-                size.value = '160 cm';
+                size.value = '140 cm';
                 l1.value = 'Dépannage / Oubli';
                 l2.value = 'Veste grain de riz sans pantalon';
                 l3.value = 'Caisse Pièces Dépareillées';
@@ -1138,21 +1175,52 @@
                 type.value = 'PANTALON SEUL';
                 dest.value = 'PRÊT CLUB';
                 theme.value = 'theme-pantalon';
-                size.value = '170 cm';
+                size.value = '120 cm';
                 l1.value = 'Dépannage / Toile renforcée';
                 l2.value = 'Pantalon de judo avec cordon';
                 l3.value = 'Caisse Pièces Dépareillées';
-            } else if (presetType === 'LOT_CEINTURES') {
-                type.value = 'LOT DE CEINTURES';
-                dest.value = 'STOCK GÉNÉRAL';
-                theme.value = 'theme-ceintures';
-                size.value = 'Lot x10';
-                l1.value = 'Ceintures Blanches Enfants';
-                l2.value = 'Longueur 200 - 220 cm';
-                l3.value = 'Pochette animations & stages';
+            } else if (presetType === 'COMPTA') {
+                type.value = 'VIGNETTE CLASSEUR';
+                dest.value = 'GESTION / ADMIN';
+                theme.value = 'theme-compta';
+                size.value = 'EXERCICE COMPTABLE';
+                l1.value = 'Saison 2026 - 2027';
+                l2.value = 'Dossier Comptabilité & Justificatifs';
+                l3.value = '';
             }
 
             renderFullSheet();
+        }
+
+        /* CHARGEMENT DIRECT DES 24 ÉTIQUETTES DU FICHIER PDF */
+        function loadSavedPdfModels() {
+            const container = document.getElementById('modelsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            modelCount = 0;
+
+            const pdfList = [
+                // 1. Judogis complets (Prêt Club)
+                { type: 'JUDOGI COMPLET', size: '100 cm', dest: 'PRÊT CLUB', l1: 'Dojo Dornois — Matériel de prêt', l2: 'Pack complet', l3: '', theme: 'theme-complet', font: "'Fredoka', sans-serif", qty: 4 },
+                { type: 'JUDOGI COMPLET', size: '110 cm', dest: 'PRÊT CLUB', l1: 'Dojo Dornois — Matériel de prêt', l2: 'Pack complet', l3: '', theme: 'theme-complet', font: "'Fredoka', sans-serif", qty: 2 },
+                { type: 'JUDOGI COMPLET', size: '120 cm', dest: 'PRÊT CLUB', l1: 'Dojo Dornois — Matériel de prêt', l2: 'Pack complet', l3: '', theme: 'theme-complet', font: "'Fredoka', sans-serif", qty: 1 },
+                { type: 'JUDOGI COMPLET', size: '130 cm', dest: 'PRÊT CLUB', l1: 'Dojo Dornois — Matériel de prêt', l2: 'Pack complet', l3: '', theme: 'theme-complet', font: "'Fredoka', sans-serif", qty: 3 },
+                
+                // 2. Vestes seules (Prêt Club)
+                { type: 'VESTE SEULE', size: '100 cm', dest: 'PRÊT CLUB', l1: 'Dépannage / Oubli', l2: 'Veste grain de riz sans pantalon', l3: 'Caisse Pièces Dépareillées', theme: 'theme-veste', font: "'Fredoka', sans-serif", qty: 1 },
+                { type: 'VESTE SEULE', size: '140 cm', dest: 'PRÊT CLUB', l1: 'Dépannage / Oubli', l2: 'Veste grain de riz sans pantalon', l3: 'Caisse Pièces Dépareillées', theme: 'theme-veste', font: "'Fredoka', sans-serif", qty: 3 },
+                { type: 'VESTE SEULE', size: '160 cm', dest: 'PRÊT CLUB', l1: 'Dépannage / Oubli', l2: 'Veste grain de riz sans pantalon', l3: 'Caisse Pièces Dépareillées', theme: 'theme-veste', font: "'Fredoka', sans-serif", qty: 1 },
+                { type: 'VESTE SEULE', size: '180 cm', dest: 'PRÊT CLUB', l1: 'Dépannage / Oubli', l2: 'Veste grain de riz sans pantalon', l3: 'Caisse Pièces Dépareillées', theme: 'theme-veste', font: "'Fredoka', sans-serif", qty: 1 },
+                
+                // 3. Pantalons seuls (Prêt Club)
+                { type: 'PANTALON SEUL', size: '120 cm', dest: 'PRÊT CLUB', l1: 'Dépannage / Toile renforcée', l2: 'Pantalon de judo avec cordon', l3: 'Caisse Pièces Dépareillées', theme: 'theme-pantalon', font: "'Fredoka', sans-serif", qty: 1 },
+                { type: 'PANTALON SEUL', size: '170 cm', dest: 'PRÊT CLUB', l1: 'Dépannage / Toile renforcée', l2: 'Pantalon de judo avec cordon', l3: 'Caisse Pièces Dépareillées', theme: 'theme-pantalon', font: "'Fredoka', sans-serif", qty: 1 },
+                
+                // 4. Vignette Exercice Comptable
+                { type: 'VIGNETTE CLASSEUR', size: 'EXERCICE COMPTABLE', dest: 'GESTION / ADMIN', l1: 'Saison 2026 - 2027', l2: 'Classeur Comptabilité & Factures', l3: '', theme: 'theme-compta', font: "'Fredoka', sans-serif", qty: 1 }
+            ];
+
+            pdfList.forEach(item => addNewModelCard(item));
         }
 
         function renderFullSheet() {
@@ -1188,30 +1256,52 @@
                 for (let q = 0; q < qty; q++) {
                     const labelElem = document.createElement('div');
                     labelElem.className = 'judo-label-card ' + theme;
-                    labelElem.innerHTML = `
-                        <div class="label-header">
-                            <div class="label-header-left">
-                                <span>🥋</span>
-                                <span>DOJO DORNOIS</span>
+
+                    if (type === 'VIGNETTE CLASSEUR') {
+                        labelElem.innerHTML = `
+                            <div class="label-header">
+                                <div class="label-header-left">
+                                    <span>📁</span>
+                                    <span>DOJO DORNOIS</span>
+                                </div>
+                                <span class="label-header-badge">${escapeHTML(dest)}</span>
                             </div>
-                            <span class="label-header-badge">${escapeHTML(dest)}</span>
-                        </div>
-                        <div class="label-body">
-                            <div class="label-main-info">
-                                <div class="label-size-title" style="font-family:${font}">${escapeHTML(size)}</div>
-                                <span class="label-type-pill">${escapeHTML(type)}</span>
+                            <div class="label-body">
+                                <div class="label-size-title" style="font-family:${font}; text-align:center;">${escapeHTML(size)}</div>
+                                <div style="font-family:'Fredoka',sans-serif; color:var(--rouge); font-weight:700; font-size:0.75rem; text-align:center;">${escapeHTML(l1)}</div>
+                                <div style="color:#64748B; font-size:0.6rem; text-align:center;">${escapeHTML(l2)}</div>
+                                <div class="label-footer-line">
+                                    <span>dojodornois.fr</span>
+                                    <span>2026-2027</span>
+                                </div>
                             </div>
-                            <div class="label-details">
-                                <div><b>${escapeHTML(l1)}</b></div>
-                                <div style="color:#64748B;">${escapeHTML(l2)}</div>
-                                <div style="color:#94A3B8; font-style:italic;">${escapeHTML(l3)}</div>
+                        `;
+                    } else {
+                        labelElem.innerHTML = `
+                            <div class="label-header">
+                                <div class="label-header-left">
+                                    <span>🥋</span>
+                                    <span>DOJO DORNOIS</span>
+                                </div>
+                                <span class="label-header-badge">${escapeHTML(dest)}</span>
                             </div>
-                            <div class="label-footer-line">
-                                <span>dojodornois.fr</span>
-                                <span>2026-2027</span>
+                            <div class="label-body">
+                                <div class="label-main-info">
+                                    <div class="label-size-title" style="font-family:${font}">${escapeHTML(size)}</div>
+                                    <span class="label-type-pill">${escapeHTML(type)}</span>
+                                </div>
+                                <div class="label-details">
+                                    <div><b>${escapeHTML(l1)}</b></div>
+                                    <div style="color:#64748B;">${escapeHTML(l2)}</div>
+                                    <div style="color:#94A3B8; font-style:italic;">${escapeHTML(l3)}</div>
+                                </div>
+                                <div class="label-footer-line">
+                                    <span>dojodornois.fr</span>
+                                    <span>2026-2027</span>
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    }
                     container.appendChild(labelElem);
                 }
             });
@@ -1221,7 +1311,7 @@
             return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        /* LOGIQUE KALISPORT */
+        /* KALISPORT */
         let currentImageSrc = null;
         let currentEmoji = '📊';
 
@@ -1344,35 +1434,11 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            addNewModelCard({
-                type: 'JUDOGI COMPLET',
-                size: '100 cm',
-                dest: 'ÉCOLE / TER',
-                l1: 'École Primaire — Nom élève : _______',
-                l2: 'Pack : Veste + Pantalon + Ceinture',
-                l3: 'Ranger propre dans la pochette',
-                theme: 'theme-complet',
-                font: "'Fredoka', sans-serif",
-                qty: 6
-            });
-
-            addNewModelCard({
-                type: 'VESTE SEULE',
-                size: '160 cm',
-                dest: 'PRÊT CLUB',
-                l1: 'Dépannage / Oubli',
-                l2: 'Veste grain de riz sans pantalon',
-                l3: 'Caisse Pièces Dépareillées',
-                theme: 'theme-veste',
-                font: "'Fredoka', sans-serif",
-                qty: 2
-            });
-
+            loadSavedPdfModels();
             updateDimensions();
         });
     </script>
 
-    <!-- APPEL DU SCRIPT DE LA SIDEBAR -->
     <script src="../js/sidebar.js"></script>
 </body>
 </html>
