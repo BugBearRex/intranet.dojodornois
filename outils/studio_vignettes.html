@@ -304,11 +304,13 @@
             gap: 20px;
         }
 
-        /* RENDU DES ÉTIQUETTES ACTION */
+        /* PLANCHE A4 D'ÉTIQUETTES */
         .a4-sheet {
             background: #FFFFFF;
             width: 210mm;
+            height: 297mm;
             min-height: 297mm;
+            max-height: 297mm;
             padding: 0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             display: grid;
@@ -317,22 +319,31 @@
             align-content: flex-start;
         }
 
-        /* FORMATS ACTION */
+        /* FORMATS ACTION & AVERY */
         .layout-1 {
             grid-template-columns: 210mm;
             grid-template-rows: 297mm;
         }
         .layout-2 {
             grid-template-columns: 210mm;
-            grid-template-rows: repeat(auto-fill, 148.5mm);
+            grid-template-rows: repeat(2, 148.5mm);
         }
         .layout-4 {
             grid-template-columns: repeat(2, 105mm);
-            grid-template-rows: repeat(auto-fill, 148.5mm);
+            grid-template-rows: repeat(2, 148.5mm);
         }
         .layout-24 {
             grid-template-columns: repeat(3, 70mm);
-            grid-template-rows: repeat(auto-fill, 37.125mm);
+            grid-template-rows: repeat(8, 37.125mm);
+        }
+        /* FORMAT AVERY J8159 : 63.5 x 33.9 mm (3 col x 8 lignes) */
+        .layout-avery-j8159 {
+            padding: 12.9mm 7.2mm !important;
+            grid-template-columns: repeat(3, 63.5mm);
+            grid-template-rows: repeat(8, 33.9mm);
+            column-gap: 2.5mm;
+            row-gap: 0mm;
+            background: #F4F6F8; /* Teinte légère de la grille de support Avery */
         }
 
         /* CARTE ÉTIQUETTE INDIVIDUELLE */
@@ -348,8 +359,8 @@
         }
 
         .judo-label-card.empty-slot {
-            background: transparent;
-            border: 1px dashed #E2E8F0;
+            background: transparent !important;
+            border: 1px dashed #D1D5DB !important;
         }
 
         .label-header {
@@ -425,7 +436,7 @@
             font-family: 'Fredoka', sans-serif;
         }
 
-        /* ADAPTATION 24 PAR PAGE */
+        /* ADAPTATION 24 PAR PAGE ACTION (70x37mm) */
         .layout-24 .judo-label-card {
             padding: 0;
         }
@@ -450,6 +461,42 @@
         }
         .layout-24 .label-footer-line {
             font-size: 0.52rem;
+            padding-top: 1px;
+        }
+
+        /* ADAPTATION SPÉCIFIQUE FORMAT AVERY J8159 (63.5 x 33.9mm) */
+        .layout-avery-j8159 .judo-label-card {
+            border-radius: 1.5mm;
+            border: 0.2mm solid #CBD5E1;
+            background: #FFFFFF;
+            width: 63.5mm;
+            height: 33.9mm;
+            padding: 0;
+        }
+        .layout-avery-j8159 .label-header {
+            padding: 2px 5px;
+            font-size: 0.58rem;
+        }
+        .layout-avery-j8159 .label-body {
+            padding: 2.5px 5px;
+            gap: 1px;
+        }
+        .layout-avery-j8159 .label-main-info {
+            padding-bottom: 1.5px;
+        }
+        .layout-avery-j8159 .label-size-title {
+            font-size: 0.88rem;
+        }
+        .layout-avery-j8159 .label-type-pill {
+            font-size: 0.50rem;
+            padding: 1px 3.5px;
+        }
+        .layout-avery-j8159 .label-details {
+            font-size: 0.57rem;
+            line-height: 1.1;
+        }
+        .layout-avery-j8159 .label-footer-line {
+            font-size: 0.49rem;
             padding-top: 1px;
         }
 
@@ -671,15 +718,22 @@
             }
             .a4-sheet {
                 width: 210mm !important;
+                height: 297mm !important;
                 box-shadow: none !important;
                 page-break-after: always;
+                background: transparent !important;
+            }
+            .layout-avery-j8159 {
+                padding: 12.9mm 7.2mm !important;
+                background: transparent !important;
             }
             .judo-label-card {
-                border: 0.2mm solid #E2E8F0 !important;
+                border: 0.15mm solid #E2E8F0 !important;
                 box-shadow: none !important;
             }
             .judo-label-card.empty-slot {
                 border: none !important;
+                background: transparent !important;
             }
         }
     </style>
@@ -715,9 +769,10 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Planche Action</label>
+                            <label>Format de planche</label>
                             <select id="lblLayout" onchange="renderFullSheet()">
-                                <option value="24" selected>24 / page (70 × 37 mm)</option>
+                                <option value="avery-j8159" selected>🌟 Avery J8159 (63.5 × 33.9 mm — 24/page)</option>
+                                <option value="24">Planche Action (70 × 37 mm — 24/page)</option>
                                 <option value="4">4 / page (105 × 148 mm)</option>
                                 <option value="2">2 / page (210 × 148 mm)</option>
                                 <option value="1">1 / page (210 × 297 mm)</option>
@@ -741,15 +796,15 @@
                     </div>
 
                     <div class="alert-info-box">
-                        💡 <b>Astuce Planche entamée :</b> Indiquez le nombre d'étiquettes déjà décollées dans <i>"Sauter X étiquettes"</i> pour démarrer l'impression exactement sur la case vierge suivante.
+                        💡 <b>Calibrage Avery J8159 :</b> Les dimensions tiennent compte des marges physiques de la planche (12.9 mm haut/bas, 7.2 mm côtés et le séparateur de 2.5 mm entre colonnes).
                     </div>
                 </div>
 
                 <div class="preview-area">
                     <div style="color:#94A3B8; font-size:0.85rem;" class="no-print">
-                        💡 <b>Aperçu Planche A4 en direct</b> (Les cases vides au début correspondent aux étiquettes sautées).
+                        💡 <b>Aperçu Planche en direct</b> (Format Avery 63.5 × 33.9 mm avec séparation inter-étiquettes).
                     </div>
-                    <div class="a4-sheet layout-24" id="labelSheetContainer"></div>
+                    <div class="a4-sheet layout-avery-j8159" id="labelSheetContainer"></div>
                 </div>
 
             </section>
