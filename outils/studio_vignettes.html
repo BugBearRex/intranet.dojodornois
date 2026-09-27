@@ -113,22 +113,22 @@
         }
 
         .control-panel {
-            width: 440px;
+            width: 450px;
             background: #18181F;
             border-right: 1px solid #2B2B36;
-            padding: 20px;
+            padding: 16px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
             flex-shrink: 0;
         }
         .section-title {
             font-family: 'Fredoka', sans-serif;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: #E2E8F0;
             border-bottom: 1px solid #2B2B36;
-            padding-bottom: 6px;
+            padding-bottom: 5px;
             margin: 6px 0;
             display: flex;
             align-items: center;
@@ -137,29 +137,29 @@
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            margin-bottom: 6px;
+            gap: 3px;
+            margin-bottom: 5px;
         }
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
         }
         label {
-            font-size: 0.72rem;
+            font-size: 0.70rem;
             color: #94A3B8;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
         }
         input, select {
             background: #23232C;
             border: 1px solid #3A3A4A;
             border-radius: 6px;
-            padding: 7px 10px;
+            padding: 6px 8px;
             color: #FFF;
             font-family: inherit;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             outline: none;
             width: 100%;
         }
@@ -171,12 +171,12 @@
             background: #22222C;
             border: 1px solid #363646;
             border-left: 4px solid var(--rouge);
-            padding: 12px;
+            padding: 10px 12px;
             border-radius: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
         .model-card-header {
             display: flex;
@@ -186,13 +186,14 @@
         .model-card-title {
             font-family: 'Fredoka', sans-serif;
             color: #FFF;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
         }
 
         .preset-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 4px;
+            margin-bottom: 2px;
         }
         .btn-preset-mini {
             background: #2D2D3A;
@@ -201,7 +202,7 @@
             padding: 3px 6px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.68rem;
+            font-size: 0.65rem;
         }
         .btn-preset-mini:hover {
             border-color: var(--rouge);
@@ -213,9 +214,9 @@
             color: #FFF;
             border: none;
             border-radius: 8px;
-            padding: 12px 20px;
+            padding: 10px 16px;
             font-family: 'Fredoka', sans-serif;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -230,9 +231,9 @@
             color: #FFF;
             border: none;
             border-radius: 6px;
-            padding: 9px 12px;
+            padding: 8px 10px;
             font-family: 'Fredoka', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.80rem;
             cursor: pointer;
             font-weight: 600;
         }
@@ -244,7 +245,7 @@
             border: none;
             border-radius: 6px;
             padding: 4px 8px;
-            font-size: 0.72rem;
+            font-size: 0.70rem;
             font-family: 'Fredoka', sans-serif;
             cursor: pointer;
         }
@@ -254,7 +255,7 @@
             border: 1px solid #EF4444;
             border-radius: 4px;
             padding: 2px 5px;
-            font-size: 0.68rem;
+            font-size: 0.65rem;
             cursor: pointer;
         }
 
@@ -280,7 +281,6 @@
             gap: 15px;
         }
 
-        /* PLANCHE A4 PHYSIQUE EXACTE */
         .a4-sheet {
             background: #FFFFFF;
             width: 210mm;
@@ -295,7 +295,7 @@
             margin: 0 auto;
         }
 
-        /* GABARIT STRICT AVERY J8159 (3 col × 8 rangs) */
+        /* GABARIT STRICT AVERY J8159 */
         .layout-avery-j8159 {
             padding-top: var(--calib-top, 13mm) !important;
             padding-bottom: 13mm !important;
@@ -308,7 +308,6 @@
             background: #FAFAFA;
         }
 
-        /* ÉTIQUETTE 63.5 x 33.9 mm */
         .judo-label-card {
             width: 63.5mm !important;
             height: 33.9mm !important;
@@ -412,7 +411,7 @@
             line-height: 1;
         }
 
-        /* THEMES */
+        /* THÈMES */
         .theme-complet .label-header { background: #C41E3A; }
         .theme-complet .label-type-pill { background: #FFEBEF; color: #C41E3A; }
 
@@ -422,10 +421,16 @@
         .theme-pantalon .label-header { background: #27AE60; }
         .theme-pantalon .label-type-pill { background: #E8F8F0; color: #1E8449; }
 
+        .theme-inconnu .label-header { background: #8E44AD; }
+        .theme-inconnu .label-type-pill { background: #F4ECF7; color: #712794; }
+
+        .theme-ceintures .label-header { background: #34495E; }
+        .theme-ceintures .label-type-pill { background: #EAECEE; color: #2C3E50; }
+
         .theme-compta .label-header { background: #1A1A1A; }
         .theme-compta .label-type-pill { background: #FFEBEF; color: #C41E3A; }
 
-        /* IMPRESSION PURE SANS DÉCALAGE BROWSER */
+        /* IMPRESSION DIRECTE */
         @page {
             size: A4 portrait;
             margin: 0 !important;
@@ -471,6 +476,7 @@
 </head>
 <body>
 
+    <!-- SIDEBAR OFFICIELLE INTRANET -->
     <div class="sidebar"></div>
 
     <div class="main-content">
@@ -524,15 +530,15 @@
                     </div>
 
                     <div class="alert-info-box">
-                        ⚠️ <b>Important lors de l'impression :</b> Dans la boîte de dialogue d'impression de ton navigateur (Chrome/Edge/Firefox) :
+                        ⚠️ <b>Important lors de l'impression :</b>
                         <br>1. Choisis <b>Marges : Aucune</b> (ou Minimales).
-                        <br>2. Échelle : <b>100%</b> (ou "Par défaut", <u>surtout pas</u> "Ajuster à la page").
+                        <br>2. Échelle : <b>100%</b> (pas d'ajustement automatique).
                     </div>
                 </div>
 
                 <div class="preview-area">
                     <div style="color:#94A3B8; font-size:0.85rem;" class="no-print">
-                        💡 <b>Gabarit Avery J8159 (63.5 × 33.9 mm)</b> — Alignement strict 3 colonnes × 8 lignes[cite: 2].
+                        💡 <b>Gabarit Avery J8159 (63.5 × 33.9 mm)</b> — Alignement 3 colonnes × 8 lignes.
                     </div>
                     <div class="a4-sheet layout-avery-j8159" id="labelSheetContainer"></div>
                 </div>
@@ -574,16 +580,27 @@
 
             card.innerHTML = `
                 <div class="model-card-header">
-                    <div class="model-card-title">🏷️ #${modelCount} ${escapeHTML(data.size)} - ${escapeHTML(data.type)}</div>
+                    <div class="model-card-title">🏷️ #${modelCount} <span class="card-summary">${escapeHTML(data.size)}</span></div>
                     <button class="btn-sm-del" onclick="removeModelCard('${id}')">✕</button>
                 </div>
+
+                <div class="preset-bar">
+                    <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'COMPLET_CLUB')">🥋 Prêt Club</button>
+                    <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'COMPLET_ECOLE')">🥋 École</button>
+                    <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'VESTE_SEULE')">🧥 Veste</button>
+                    <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'PANTALON_SEUL')">👖 Pantalon</button>
+                    <button type="button" class="btn-preset-mini" onclick="applyCardPreset('${id}', 'COMPTA')">📁 Compta</button>
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Type</label>
+                        <label>Type de pièce</label>
                         <select class="m-type" onchange="renderFullSheet()">
                             <option value="JUDOGI COMPLET" ${data.type === 'JUDOGI COMPLET' ? 'selected':''}>JUDOGI COMPLET</option>
                             <option value="VESTE SEULE" ${data.type === 'VESTE SEULE' ? 'selected':''}>VESTE SEULE</option>
                             <option value="PANTALON SEUL" ${data.type === 'PANTALON SEUL' ? 'selected':''}>PANTALON SEUL</option>
+                            <option value="PIÈCE DÉPAREILLÉE" ${data.type === 'PIÈCE DÉPAREILLÉE' ? 'selected':''}>PIÈCE DÉPAREILLÉE</option>
+                            <option value="LOT DE CEINTURES" ${data.type === 'LOT DE CEINTURES' ? 'selected':''}>LOT DE CEINTURES</option>
                             <option value="VIGNETTE CLASSEUR" ${data.type === 'VIGNETTE CLASSEUR' ? 'selected':''}>VIGNETTE CLASSEUR</option>
                         </select>
                     </div>
@@ -592,26 +609,57 @@
                         <input type="text" class="m-size" value="${data.size}" oninput="renderFullSheet()">
                     </div>
                 </div>
+
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Thème</label>
+                        <label>Affectation</label>
+                        <select class="m-dest" onchange="renderFullSheet()">
+                            <option value="PRÊT CLUB" ${data.dest === 'PRÊT CLUB' ? 'selected':''}>PRÊT CLUB</option>
+                            <option value="ÉCOLE / TER" ${data.dest === 'ÉCOLE / TER' ? 'selected':''}>ÉCOLE / TER</option>
+                            <option value="STOCK GÉNÉRAL" ${data.dest === 'STOCK GÉNÉRAL' ? 'selected':''}>STOCK GÉNÉRAL</option>
+                            <option value="GESTION / ADMIN" ${data.dest === 'GESTION / ADMIN' ? 'selected':''}>GESTION / ADMIN</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Thème visuel</label>
                         <select class="m-theme" onchange="renderFullSheet()">
                             <option value="theme-complet" ${data.theme === 'theme-complet' ? 'selected':''}>🔴 Rouge (Complet)</option>
                             <option value="theme-veste" ${data.theme === 'theme-veste' ? 'selected':''}>🟠 Orange (Veste)</option>
                             <option value="theme-pantalon" ${data.theme === 'theme-pantalon' ? 'selected':''}>🟢 Vert (Pantalon)</option>
-                            <option value="theme-compta" ${data.theme === 'theme-compta' ? 'selected':''}>⚫ Noir (Compta)</option>
+                            <option value="theme-inconnu" ${data.theme === 'theme-inconnu' ? 'selected':''}>🟣 Violet (Taille ?)</option>
+                            <option value="theme-ceintures" ${data.theme === 'theme-ceintures' ? 'selected':''}>🔵 Bleu Nuit</option>
+                            <option value="theme-compta" ${data.theme === 'theme-compta' ? 'selected':''}>⚫ Noir / Compta</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Ligne 1</label>
+                    <input type="text" class="m-l1" value="${data.l1}" oninput="renderFullSheet()">
+                </div>
+                <div class="form-group">
+                    <label>Ligne 2</label>
+                    <input type="text" class="m-l2" value="${data.l2}" oninput="renderFullSheet()">
+                </div>
+                <div class="form-group">
+                    <label>Ligne 3</label>
+                    <input type="text" class="m-l3" value="${data.l3}" oninput="renderFullSheet()">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Police Titre</label>
+                        <select class="m-font" onchange="renderFullSheet()">
+                            <option value="'Fredoka', sans-serif" ${data.font.includes('Fredoka') ? 'selected':''}>Fredoka</option>
+                            <option value="'Roboto', sans-serif" ${data.font.includes('Roboto') ? 'selected':''}>Roboto</option>
+                            <option value="'Montserrat', sans-serif" ${data.font.includes('Montserrat') ? 'selected':''}>Montserrat</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Quantité</label>
+                        <label>Quantité voulue</label>
                         <input type="number" class="m-qty" value="${data.qty}" min="1" max="24" oninput="renderFullSheet()">
                     </div>
                 </div>
-                <input type="hidden" class="m-dest" value="${data.dest}">
-                <input type="hidden" class="m-l1" value="${data.l1}">
-                <input type="hidden" class="m-l2" value="${data.l2}">
-                <input type="hidden" class="m-l3" value="${data.l3}">
-                <input type="hidden" class="m-font" value="${data.font}">
             `;
             container.appendChild(card);
             renderFullSheet();
@@ -620,6 +668,63 @@
         function removeModelCard(cardId) {
             const el = document.getElementById(cardId);
             if (el) { el.remove(); renderFullSheet(); }
+        }
+
+        function applyCardPreset(cardId, presetType) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+
+            const type = card.querySelector('.m-type');
+            const dest = card.querySelector('.m-dest');
+            const theme = card.querySelector('.m-theme');
+            const size = card.querySelector('.m-size');
+            const l1 = card.querySelector('.m-l1');
+            const l2 = card.querySelector('.m-l2');
+            const l3 = card.querySelector('.m-l3');
+
+            if (presetType === 'COMPLET_CLUB') {
+                type.value = 'JUDOGI COMPLET';
+                dest.value = 'PRÊT CLUB';
+                theme.value = 'theme-complet';
+                size.value = '100 cm';
+                l1.value = 'Dojo Dornois — Matériel de prêt';
+                l2.value = 'Pack complet';
+                l3.value = '';
+            } else if (presetType === 'COMPLET_ECOLE') {
+                type.value = 'JUDOGI COMPLET';
+                dest.value = 'ÉCOLE / TER';
+                theme.value = 'theme-complet';
+                size.value = '100 cm';
+                l1.value = 'École Primaire — Nom : __________';
+                l2.value = 'Pack : Veste + Pantalon + Ceinture';
+                l3.value = 'Ranger soigneusement dans la pochette';
+            } else if (presetType === 'VESTE_SEULE') {
+                type.value = 'VESTE SEULE';
+                dest.value = 'PRÊT CLUB';
+                theme.value = 'theme-veste';
+                size.value = '140 cm';
+                l1.value = 'Dépannage / Oubli';
+                l2.value = 'Veste grain de riz sans pantalon';
+                l3.value = 'Caisse Pièces Dépareillées';
+            } else if (presetType === 'PANTALON_SEUL') {
+                type.value = 'PANTALON SEUL';
+                dest.value = 'PRÊT CLUB';
+                theme.value = 'theme-pantalon';
+                size.value = '120 cm';
+                l1.value = 'Dépannage / Toile renforcée';
+                l2.value = 'Pantalon de judo avec cordon';
+                l3.value = 'Caisse Pièces Dépareillées';
+            } else if (presetType === 'COMPTA') {
+                type.value = 'VIGNETTE CLASSEUR';
+                dest.value = 'GESTION / ADMIN';
+                theme.value = 'theme-compta';
+                size.value = 'EXERCICE COMPTABLE';
+                l1.value = 'Saison 2026 - 2027';
+                l2.value = 'Classeur Comptabilité & Factures';
+                l3.value = '';
+            }
+
+            renderFullSheet();
         }
 
         function loadSavedPdfModels() {
@@ -670,6 +775,9 @@
                 const theme = card.querySelector('.m-theme').value;
                 const font = card.querySelector('.m-font').value;
                 const qty = parseInt(card.querySelector('.m-qty').value) || 1;
+
+                const summary = card.querySelector('.card-summary');
+                if (summary) summary.innerText = size;
 
                 for (let q = 0; q < qty; q++) {
                     const labelElem = document.createElement('div');
@@ -734,5 +842,8 @@
             loadSavedPdfModels();
         });
     </script>
+
+    <!-- SCRIPT DE CHARGEMENT DE LA SIDEBAR OFFICIELLE -->
+    <script src="../js/sidebar.js"></script>
 </body>
 </html>
