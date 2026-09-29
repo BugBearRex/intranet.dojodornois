@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Communications & Mails - Dojo Dornois</title>
+    <title>Communications, Mails & Commandes - Dojo Dornois</title>
     
     <!-- POLICES OFFICIELLES -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
@@ -210,6 +210,9 @@
                     <button id="tab-mail" onclick="changerOnglet('mail')" class="tab-btn rounded-md">
                         <i class="fa-solid fa-envelope-open-text"></i> Mails & Courriels
                     </button>
+                    <button id="tab-rds" onclick="changerOnglet('rds')" class="tab-btn rounded-md">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Bon de Commande RDS
+                    </button>
                 </div>
             </div>
             
@@ -286,6 +289,17 @@
                             </select>
                         </div>
 
+                        <!-- MODÈLES RDS SPORT -->
+                        <div id="group-modeles-rds" class="toolbar-group hidden">
+                            <select class="tool-select font-bold text-emerald-700 border-emerald-600" onchange="chargerGabaritRDS(this.value); this.selectedIndex=0;" title="Charger un modèle RDS">
+                                <option value="" disabled selected>📋 Modèles RDS</option>
+                                <option value="bon_commande_standard">Bon de commande officiel RDS</option>
+                                <option value="demande_cotation">Demande de cotation / Échantillons</option>
+                                <option value="reassort_express">Réassort express</option>
+                                <option value="texte_vide_rds">Gabarit vierge avec en-tête</option>
+                            </select>
+                        </div>
+
                         <!-- BLOCS NEWSLETTER -->
                         <div id="group-modules-newsletter" class="toolbar-group">
                             <select class="tool-select font-bold text-[#C41E3A] border-[#C41E3A]" onchange="insererModule(this.value); this.selectedIndex=0;" title="Insérer un bloc">
@@ -311,11 +325,24 @@
                                 <option value="footer_mail">Pied de page : Officiel Dojo (Standard)</option>
                             </select>
                         </div>
+
+                        <!-- BLOCS RDS SPORT -->
+                        <div id="group-modules-rds" class="toolbar-group hidden">
+                            <select class="tool-select font-bold text-emerald-700 border-emerald-600" onchange="insererModuleRDS(this.value); this.selectedIndex=0;" title="Insérer un bloc de commande">
+                                <option value="" disabled selected>📦 Éléments de commande</option>
+                                <option value="tableau_articles">Tableau complet d'articles</option>
+                                <option value="ligne_article">Ligne d'article simple</option>
+                                <option value="encart_recap">Encart récapitulatif & Total</option>
+                                <option value="conditions_livraison">Bloc : Modalités & Livraison</option>
+                                <option value="options_marquage">Bloc : Détails marquage / broderie</option>
+                                <option value="separateur">Composant : Ligne de séparation</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
                 <!-- ZONE VISUELLE WYSIWYG -->
-                <div id="editor" class="editor-workspace" contenteditable="true" placeholder="Rédigez votre newsletter ou votre mail ici..."></div>
+                <div id="editor" class="editor-workspace" contenteditable="true" placeholder="Rédigez votre newsletter, mail ou bon de commande ici..."></div>
 
                 <!-- ZONE CODE SOURCE HTML -->
                 <textarea id="source-editor" class="source-workspace" placeholder="Collez ou modifiez directement votre code HTML ici..."></textarea>
@@ -353,7 +380,8 @@
         let modeCodeSource = false;
         const memoireContenu = {
             newsletter: '',
-            mail: ''
+            mail: '',
+            rds: ''
         };
 
         const editor = document.getElementById('editor');
@@ -362,7 +390,7 @@
         const wysiwygControls = document.getElementById('wysiwyg-controls');
         const btnToggleSource = document.getElementById('btn-toggle-source');
 
-        // PIED DE PAGE AVEC ACCÈS KALISPORT (NEWSLETTER SEULEMENT)
+        // PIED DE PAGE AVEC ACCÈS KALISPORT (NEWSLETTER)
         const BLOC_FOOTER_NEWSLETTER = `
             <table border="0" cellpadding="0" cellspacing="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px; width: 100%;" width="100%">
                 <tbody>
@@ -415,7 +443,7 @@
             </table>
         `;
 
-        // PIED DE PAGE STANDARD (MAILS & COURRIELS)
+        // PIED DE PAGE STANDARD (MAILS & RDS)
         const BLOC_FOOTER_MAIL = `
             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px;">
                 <tr>
@@ -491,29 +519,31 @@
             ${BLOC_FOOTER_NEWSLETTER}
         `;
 
-        const BLOC_HEADER_MAIL = `
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 25px; border-bottom: 2px solid #C41E3A;">
-                <tr>
-                    <td width="80" valign="middle" style="padding-bottom: 16px;">
-                        <table cellpadding="0" cellspacing="0" border="0" style="background-color: #C41E3A; width: 68px; height: 68px; border-radius: 12px;">
-                            <tr>
-                                <td align="center" valign="middle" style="padding: 6px;">
-                                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 56px; height: 56px; display: block; border: 0;" alt="Logo Dojo">
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                    <td valign="middle" style="padding-left: 15px; padding-bottom: 16px;">
-                        <h1 style="font-family: 'Fredoka', sans-serif; font-size: 22px; color: #C41E3A !important; margin: 0; text-transform: uppercase;">
-                            <span style="color: #C41E3A !important;">DOJO DORNOIS</span>
-                        </h1>
-                        <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #6B6B6B !important; margin: 5px 0 0 0;">
-                            <span style="color: #6B6B6B !important;">Communication officielle</span>
-                        </p>
-                    </td>
-                </tr>
-            </table>
-        `;
+        function getHeaderMail(sousTitre = "Communication officielle") {
+            return `
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 25px; border-bottom: 2px solid #C41E3A;">
+                    <tr>
+                        <td width="80" valign="middle" style="padding-bottom: 16px;">
+                            <table cellpadding="0" cellspacing="0" border="0" style="background-color: #C41E3A; width: 68px; height: 68px; border-radius: 12px;">
+                                <tr>
+                                    <td align="center" valign="middle" style="padding: 6px;">
+                                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 56px; height: 56px; display: block; border: 0;" alt="Logo Dojo">
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td valign="middle" style="padding-left: 15px; padding-bottom: 16px;">
+                            <h1 style="font-family: 'Fredoka', sans-serif; font-size: 22px; color: #C41E3A !important; margin: 0; text-transform: uppercase;">
+                                <span style="color: #C41E3A !important;">DOJO DORNOIS</span>
+                            </h1>
+                            <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #6B6B6B !important; margin: 5px 0 0 0;">
+                                <span style="color: #6B6B6B !important;">${sousTitre}</span>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            `;
+        }
 
         function toggleSourceCode() {
             modeCodeSource = !modeCodeSource;
@@ -544,18 +574,32 @@
 
             const btnNews = document.getElementById('tab-newsletter');
             const btnMail = document.getElementById('tab-mail');
+            const btnRds = document.getElementById('tab-rds');
+
             const grpModelesMails = document.getElementById('group-modeles-mails');
+            const grpModelesRds = document.getElementById('group-modeles-rds');
             const grpModNews = document.getElementById('group-modules-newsletter');
             const grpModMail = document.getElementById('group-modules-mail');
+            const grpModRds = document.getElementById('group-modules-rds');
+
             const badge = document.getElementById('badge-mode');
             const subtitle = document.getElementById('header-subtitle');
 
+            // Réinitialisation des styles d'onglets
+            btnNews.classList.remove('active');
+            btnMail.classList.remove('active');
+            btnRds.classList.remove('active');
+
+            // Masquage de toutes les barres contextuelles
+            grpModelesMails.classList.add('hidden');
+            grpModelesRds.classList.add('hidden');
+            grpModNews.classList.add('hidden');
+            grpModMail.classList.add('hidden');
+            grpModRds.classList.add('hidden');
+
             if (onglet === 'newsletter') {
                 btnNews.classList.add('active');
-                btnMail.classList.remove('active');
-                grpModelesMails.classList.add('hidden');
                 grpModNews.classList.remove('hidden');
-                grpModMail.classList.add('hidden');
                 badge.className = "px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase";
                 badge.innerText = "Mode Newsletter Kalisport";
                 subtitle.innerText = "Gabarit sans doublon de logo avec protection Mode Sombre";
@@ -566,11 +610,9 @@
                 } else {
                     editor.innerHTML = memoireContenu.newsletter;
                 }
-            } else {
+            } else if (onglet === 'mail') {
                 btnMail.classList.add('active');
-                btnNews.classList.remove('active');
                 grpModelesMails.classList.remove('hidden');
-                grpModNews.classList.add('hidden');
                 grpModMail.classList.remove('hidden');
                 badge.className = "px-2 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase";
                 badge.innerText = "Mode Courriel / Gmail";
@@ -581,6 +623,20 @@
                     chargerGabarit('reponse_mairie');
                 } else {
                     editor.innerHTML = memoireContenu.mail;
+                }
+            } else if (onglet === 'rds') {
+                btnRds.classList.add('active');
+                grpModelesRds.classList.remove('hidden');
+                grpModRds.classList.remove('hidden');
+                badge.className = "px-2 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded uppercase";
+                badge.innerText = "Mode Bon de Commande RDS Sport";
+                subtitle.innerText = "Génération de commandes textiles & équipements RDS Sport avec tableau formaté";
+                editor.setAttribute('placeholder', "Générez ou complétez le bon de commande pour RDS Sport...");
+
+                if (!memoireContenu.rds) {
+                    chargerGabaritRDS('bon_commande_standard');
+                } else {
+                    editor.innerHTML = memoireContenu.rds;
                 }
             }
 
@@ -704,7 +760,158 @@
                     break;
             }
 
-            editor.innerHTML = BLOC_HEADER_MAIL + `<div id="mail-body" style="padding: 15px 0; text-align: justify;">${corpsTexte}</div>` + BLOC_FOOTER_MAIL;
+            editor.innerHTML = getHeaderMail("Communication officielle") + `<div id="mail-body" style="padding: 15px 0; text-align: justify;">${corpsTexte}</div>` + BLOC_FOOTER_MAIL;
+            genererApercu();
+        }
+
+        // CHARGEMENT DES GABARITS RDS SPORT
+        function chargerGabaritRDS(type) {
+            if (modeCodeSource) toggleSourceCode();
+            let corpsTexte = '';
+
+            switch(type) {
+                case 'bon_commande_standard':
+                    corpsTexte = `
+                        <p style="margin-bottom: 15px;">Bonjour Hélène,</p>
+                        <p style="margin-bottom: 15px;">Tu trouveras ci-dessous le récapitulatif officiel de notre nouvelle commande de réassort pour la boutique du <strong>Dojo Dornois</strong> :</p>
+
+                        <!-- EN-TÊTE RÉCAPITULATIF COMMANDE -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-left: 4px solid #C41E3A; border-radius: 6px; margin: 15px 0;">
+                            <tr>
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13.5px; color: #3D3D3D; line-height: 1.6;">
+                                    <strong>📋 Référence Commande :</strong> BDC-RDS-2026-01<br>
+                                    <strong>📅 Date d'émission :</strong> ${new Date().toLocaleDateString('fr-FR')}<br>
+                                    <strong>🥋 Club donneur d'ordre :</strong> Dojo Dornois (58390 Dornes)<br>
+                                    <strong>📍 Lieu de livraison souhaité :</strong> Dojo municipal, 1 Place de la Mairie, 58390 Dornes
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- TABLEAU BON DE COMMANDE -->
+                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 20px 0; border: 1px solid #E8E8E8;">
+                            <thead>
+                                <tr style="background-color: #1A1A1A; color: #FFFFFF; font-family: 'Fredoka', sans-serif; text-align: left;">
+                                    <th style="padding: 9px; border: 1px solid #333333;">Article & Gamme</th>
+                                    <th style="padding: 9px; border: 1px solid #333333;">Réf. Cat.</th>
+                                    <th style="padding: 9px; border: 1px solid #333333;">Taille / Coloris</th>
+                                    <th style="padding: 9px; border: 1px solid #333333;">Marquage</th>
+                                    <th style="padding: 9px; border: 1px solid #333333; text-align: center;">Qté</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background-color: #FFFFFF;">
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;"><strong>T-Shirt B&C #E190</strong><br><span style="font-size: 11px; color: #6B6B6B;">Gamme Confort (185g)</span></td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; font-family: monospace; font-weight: bold;">CGTU03T</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">L / Noir</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; color: #1D4ED8;">Marquage cœur</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">15</td>
+                                </tr>
+                                <tr style="background-color: #F8FAFC;">
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;"><strong>Sweat Zippé Kariban</strong><br><span style="font-size: 11px; color: #6B6B6B;">Capuche molletonnée (280g)</span></td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; font-family: monospace; font-weight: bold;">K479</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">M / Noir</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; color: #C41E3A;">Broderie cœur</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">10</td>
+                                </tr>
+                                <tr style="background-color: #FFFFFF;">
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;"><strong>Bonnet à revers Beechfield</strong><br><span style="font-size: 11px; color: #6B6B6B;">Heritage Beanie</span></td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; font-family: monospace; font-weight: bold;">B45</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">Taille Unique / Noir</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; color: #C41E3A;">Broderie revers</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">20</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background-color: #F1F5F9; font-weight: bold;">
+                                    <td colspan="4" style="padding: 8px 9px; border: 1px solid #E8E8E8; text-align: right;">Total Pièces :</td>
+                                    <td style="padding: 8px 9px; border: 1px solid #E8E8E8; text-align: center; color: #C41E3A; font-size: 13px;">45 ex.</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <!-- CONSIGNES LOGISTIQUES -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFEBEF; border-left: 4px solid #C41E3A; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                            <tr>
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #8B1429; line-height: 1.5;">
+                                    <strong style="color: #C41E3A; font-family: 'Fredoka', sans-serif;">DÉLAI SOUHAITÉ :</strong> Livraison idéale avant le [Date souhaitée] pour distribution lors des cours. Merci de nous confirmer la faisabilité et de nous adresser le bon à tirer (BAT) ainsi que la facture proforma.
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p style="margin-bottom: 15px;">Nous restons disponibles si un réajustement de stock est nécessaire.</p>
+                        <p style="margin-bottom: 15px;">Sportivement,<br><strong>Jordan LOUDENOT</strong><br><span style="color: #6B6B6B; font-size: 13px;">Président du Dojo Dornois</span></p>
+                    `;
+                    break;
+
+                case 'demande_cotation':
+                    corpsTexte = `
+                        <p style="margin-bottom: 15px;">Bonjour Hélène,</p>
+                        <p style="margin-bottom: 15px;">Pourriez-vous nous transmettre une cotation actualisée pour les articles ci-dessous afin de finaliser l'offre club de notre boutique ?</p>
+                        
+                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 20px 0; border: 1px solid #E8E8E8;">
+                            <thead>
+                                <tr style="background-color: #1A1A1A; color: #FFFFFF; font-family: 'Fredoka', sans-serif; text-align: left;">
+                                    <th style="padding: 9px; border: 1px solid #333333;">Modèle</th>
+                                    <th style="padding: 9px; border: 1px solid #333333;">Réf.</th>
+                                    <th style="padding: 9px; border: 1px solid #333333;">Type marquage</th>
+                                    <th style="padding: 9px; border: 1px solid #333333;">Paliers demandés</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background-color: #FFFFFF;">
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">T-Shirt B&C #E190</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; font-family: monospace;">CGTU03T</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; color: #1D4ED8;">Marquage cœur (Logo club)</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">20 / 50 / 100 ex.</td>
+                                </tr>
+                                <tr style="background-color: #F8FAFC;">
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">Hoody Kariban (280g)</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; font-family: monospace;">K476</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; color: #C41E3A;">Broderie cœur (Logo club)</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">15 / 30 / 60 ex.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p style="margin-bottom: 15px;">Merci également de préciser le coût unitaire indicatif d'une option de broderie prénom nominative.</p>
+                        <p style="margin-bottom: 15px;">Bien cordialement,</p>
+                    `;
+                    break;
+
+                case 'reassort_express':
+                    corpsTexte = `
+                        <p style="margin-bottom: 15px;">Bonjour Hélène,</p>
+                        <p style="margin-bottom: 15px;">Suite aux récentes demandes des adhérents, nous aurions besoin d'un <strong>réassort rapide</strong> sur les articles suivants :</p>
+                        
+                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 15px 0; border: 1px solid #E8E8E8;">
+                            <tr style="background-color: #1A1A1A; color: #FFFFFF; font-family: 'Fredoka', sans-serif;">
+                                <th style="padding: 8px; border: 1px solid #333;">Désignation</th>
+                                <th style="padding: 8px; border: 1px solid #333;">Taille</th>
+                                <th style="padding: 8px; border: 1px solid #333; text-align: center;">Qté</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">T-shirt B&C #E190 Noir</td>
+                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">M</td>
+                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">5</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">T-shirt B&C #E190 Noir</td>
+                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">L</td>
+                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">5</td>
+                            </tr>
+                        </table>
+
+                        <p style="margin-bottom: 15px;">Peux-tu nous confirmer la disponibilité sur stock et le délai de mise à disposition ?</p>
+                        <p style="margin-bottom: 15px;">Merci d'avance !</p>
+                    `;
+                    break;
+
+                case 'texte_vide_rds':
+                    corpsTexte = `<p style="text-align: justify;">Rédigez votre bon de commande ou demande spécifique pour RDS Sport ici...</p>`;
+                    break;
+            }
+
+            editor.innerHTML = getHeaderMail("Bon de Commande & Approvisionnement RDS Sport") + `<div id="mail-body" style="padding: 15px 0; text-align: justify;">${corpsTexte}</div>` + BLOC_FOOTER_MAIL;
             genererApercu();
         }
 
@@ -804,6 +1011,107 @@
                 format('insertHTML', htmlBloc);
             }
         }
+
+        // INSERTION DE BLOCS SPÉCIFIQUES RDS SPORT
+        function insererModuleRDS(type) {
+            if (modeCodeSource) toggleSourceCode();
+            let htmlBloc = '';
+
+            switch(type) {
+                case 'tableau_articles':
+                    htmlBloc = `
+                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 15px 0; border: 1px solid #E8E8E8;">
+                            <thead>
+                                <tr style="background-color: #1A1A1A; color: #FFFFFF; font-family: 'Fredoka', sans-serif; text-align: left;">
+                                    <th style="padding: 8px; border: 1px solid #333;">Désignation</th>
+                                    <th style="padding: 8px; border: 1px solid #333;">Réf.</th>
+                                    <th style="padding: 8px; border: 1px solid #333;">Taille / Coloris</th>
+                                    <th style="padding: 8px; border: 1px solid #333;">Marquage</th>
+                                    <th style="padding: 8px; border: 1px solid #333; text-align: center;">Qté</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background-color: #FFFFFF;">
+                                    <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">Article 1</td>
+                                    <td style="padding: 7px 8px; border: 1px solid #E8E8E8; font-family: monospace;">REF001</td>
+                                    <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">Taille / Noir</td>
+                                    <td style="padding: 7px 8px; border: 1px solid #E8E8E8; color: #1D4ED8;">Marquage cœur</td>
+                                    <td style="padding: 7px 8px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">10</td>
+                                </tr>
+                            </tbody>
+                        </table><br>
+                    `;
+                    break;
+
+                case 'ligne_article':
+                    htmlBloc = `
+                        <tr style="background-color: #FFFFFF;">
+                            <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">Nouvel Article</td>
+                            <td style="padding: 7px 8px; border: 1px solid #E8E8E8; font-family: monospace;">REF---</td>
+                            <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">Taille / Couleur</td>
+                            <td style="padding: 7px 8px; border: 1px solid #E8E8E8; color: #C41E3A;">Broderie cœur</td>
+                            <td style="padding: 7px 8px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">1</td>
+                        </tr>
+                    `;
+                    break;
+
+                case 'encart_recap':
+                    htmlBloc = `
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-radius: 6px; margin: 15px 0;">
+                            <tr>
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13.5px; color: #3D3D3D; line-height: 1.6;">
+                                    <strong style="color: #1A1A1A;">Synthèse financière prévisionnelle :</strong><br>
+                                    • Total articles : <strong>[X] pièces</strong><br>
+                                    • Montant estimé HT : <strong>---,00 €</strong><br>
+                                    • Modalité de règlement : <strong>Virement bancaire Dojo Dornois à réception</strong>
+                                </td>
+                            </tr>
+                        </table><br>
+                    `;
+                    break;
+
+                case 'conditions_livraison':
+                    htmlBloc = `
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; border-left: 4px solid #1E824C; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                            <tr>
+                                <td style="padding: 12px 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #2D3748;">
+                                    📍 <strong>Adresse de livraison :</strong> Dojo municipal, 1 Place de la Mairie, 58390 Dornes<br>
+                                    📞 <strong>Contact réception :</strong> Jordan Loudenot (06.07.13.91.86)
+                                </td>
+                            </tr>
+                        </table><br>
+                    `;
+                    break;
+
+                case 'options_marquage':
+                    htmlBloc = `
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF8F1; border-left: 4px solid #DD6B20; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                            <tr>
+                                <td style="padding: 12px 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #7B341E; line-height: 1.5;">
+                                    🧵 <strong>Spécifications de personnalisation :</strong><br>
+                                    • <strong>Logo Club :</strong> Broderie cœur ou marquage poitrine selon textile.<br>
+                                    • <strong>Fichier fourni :</strong> Vectoriel HD transparent validé lors de la précédente commande.
+                                </td>
+                            </tr>
+                        </table><br>
+                    `;
+                    break;
+
+                case 'separateur':
+                    htmlBloc = `
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 20px 0;">
+                            <tr>
+                                <td style="border-bottom: 2px solid #E8E8E8; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                            </tr>
+                        </table><br>
+                    `;
+                    break;
+            }
+
+            if (htmlBloc) {
+                format('insertHTML', htmlBloc);
+            }
+        }
         
         function getCodeFinal() {
             let contenu = modeCodeSource ? sourceEditor.value : editor.innerHTML;
@@ -814,7 +1122,9 @@
             contenu = contenu.replace(/<\/h2>/g, '</span></h2>');
             contenu = contenu.replace(/<p>/g, '<p style="margin-top: 0; margin-bottom: 15px; line-height: 1.6; color: #3D3D3D;">');
 
-            const preHeader = modeActuel === 'newsletter' ? 'Actualités du Dojo Dornois' : 'Message du Dojo Dornois';
+            let preHeader = 'Message du Dojo Dornois';
+            if (modeActuel === 'newsletter') preHeader = 'Actualités du Dojo Dornois';
+            if (modeActuel === 'rds') preHeader = 'Bon de Commande & Réassort RDS Sport - Dojo Dornois';
 
             return `
                 <div style="display:none;font-size:1px;color:#F4F6F9;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${preHeader}</div>
@@ -850,9 +1160,12 @@
         function copierCodeHTML() {
             genererApercu();
             navigator.clipboard.writeText(getCodeFinal()).then(() => {
-                const message = modeActuel === 'newsletter' 
-                    ? "✅ Code HTML copié ! Prêt à être collé dans le code source de Kalisport." 
-                    : "✅ Code HTML copié ! Prêt à être collé.";
+                let message = "✅ Code HTML copié ! Prêt à être collé.";
+                if (modeActuel === 'newsletter') {
+                    message = "✅ Code HTML copié ! Prêt à être collé dans Kalisport.";
+                } else if (modeActuel === 'rds') {
+                    message = "✅ Code du Bon de Commande copié ! Prêt pour votre envoi.";
+                }
                 alert(message);
             }).catch(err => {
                 alert("Erreur lors de la copie.");
@@ -873,7 +1186,7 @@
             
             try {
                 document.execCommand("copy");
-                alert("✅ Rendu visuel copié ! Prêt à être collé dans Gmail.");
+                alert("✅ Rendu visuel copié ! Prêt à être collé directement dans Gmail.");
             } catch (err) {
                 alert("Erreur lors de la copie.");
             }
