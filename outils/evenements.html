@@ -23,6 +23,7 @@
       --bleu: #2563EB;
       --violet: #7C3AED;
       --rose: #DB2777;
+      --sidebar-width: 270px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.15s ease; }
@@ -31,8 +32,44 @@
       font-family: 'Roboto', sans-serif;
       background-color: var(--fond);
       color: var(--gris-fonce);
-      padding: 24px;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
       line-height: 1.45;
+    }
+
+    /* CONTENEUR SIDEBAR UNIFIÉE */
+    .sidebar {
+      width: var(--sidebar-width);
+      min-width: var(--sidebar-width);
+      max-width: var(--sidebar-width);
+      background: var(--noir-doux);
+      color: var(--blanc);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+      box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    /* CONTENU PRINCIPAL */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .app-body {
+      flex: 1;
+      padding: 24px 30px;
+      overflow-y: auto;
     }
 
     .container {
@@ -182,7 +219,7 @@
       gap: 20px;
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 1100px) {
       .main-grid { grid-template-columns: 1fr; }
     }
 
@@ -400,8 +437,10 @@
     .btn-icon.del:hover { background: #FEE2E2; border-color: #FCA5A5; color: #DC2626; }
 
     @media print {
-      body { background: white !important; padding: 0 !important; }
-      .header-actions, .tab-bar, .form-container, .rule-banner, .action-btn-group { display: none !important; }
+      body { background: white !important; padding: 0 !important; display: block !important; height: auto !important; overflow: visible !important; }
+      .sidebar, .header-actions, .tab-bar, .form-container, .rule-banner, .action-btn-group { display: none !important; }
+      .main-content { display: block !important; height: auto !important; overflow: visible !important; }
+      .app-body { padding: 0 !important; overflow: visible !important; }
       .main-grid { display: block !important; }
       .card { border: none !important; box-shadow: none !important; padding: 0 !important; }
       .tab-content { display: block !important; margin-bottom: 30px; }
@@ -410,590 +449,596 @@
 </head>
 <body>
 
-<div class="container">
+  <!-- CONTENEUR SIDEBAR UNIFIÉE -->
+  <div class="sidebar"></div>
 
-  <!-- EN-TÊTE DOJO DORNOIS -->
-  <div class="header-card">
-    <div class="header-left">
-      <div class="logo-box">
-        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Dojo Dornois">
-      </div>
-      <div>
-        <div class="club-title">DOJO DORNOIS • PILOTAGE DES MANIFESTATIONS & VENTES</div>
-        <div class="subtitle">Coordination temporelle, personnalisation graphique & rentabilité — Saison 2026-2027</div>
-      </div>
-    </div>
-    <div class="header-actions">
-      <button class="btn btn-outline" onclick="window.print()">🖨️ Imprimer la vue</button>
-      <button class="btn btn-dark" onclick="resetDefaults()">🔄 Réinitialiser les données</button>
-    </div>
-  </div>
+  <!-- CONTENU PRINCIPAL DE L'APPLICATION -->
+  <div class="main-content">
+    <div class="app-body">
+      <div class="container">
 
-  <!-- ONGLET DE NAVIGATION -->
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('tab-planning')">
-      📅 1. Calendrier & Frise Synoptique
-    </button>
-    <button class="tab-btn" onclick="switchTab('tab-finances')">
-      🪙 2. Suivi Financier & Rentabilité (Coût / Recette / Bénéfice)
-    </button>
-  </div>
-
-  <!-- ONGLET 1 : CALENDRIER -->
-  <div id="tab-planning" class="tab-content active">
-
-    <div class="rule-banner">
-      <strong>Règle d'or de vigilance Dojo :</strong> Pour préserver la dynamique et ne pas saturer les familles, <strong>les enfants ne portent qu'une seule vente active à la fois</strong> (le grand Challenge Calendriers du 04/11 au 04/01). Les autres opérations (chocolats, tombola) sont gérées en direct au club ou via commandes en ligne autonomes.
-    </div>
-
-    <div class="main-grid">
-      
-      <!-- FORMULAIRE (CRÉATION OU MODIFICATION) -->
-      <div class="form-container">
-        <div class="card" id="formCard">
-          <div class="card-title">
-            <span id="formTitle">➕ Ajouter une manifestation</span>
-            <button id="cancelEditBtn" class="btn btn-outline" style="display:none; font-size:11px; padding:3px 8px;" onclick="cancelEdit()">Annuler modif</button>
+        <!-- EN-TÊTE DOJO DORNOIS -->
+        <div class="header-card">
+          <div class="header-left">
+            <div class="logo-box">
+              <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Dojo Dornois">
+            </div>
+            <div>
+              <div class="club-title">DOJO DORNOIS • PILOTAGE DES MANIFESTATIONS & VENTES</div>
+              <div class="subtitle">Coordination temporelle, personnalisation graphique & rentabilité — Saison 2026-2027</div>
+            </div>
           </div>
-          <form id="eventForm" onsubmit="handleFormSubmit(event)">
-            <input type="hidden" id="editEventId" value="">
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="window.print()">🖨️ Imprimer la vue</button>
+            <button class="btn btn-dark" onclick="resetDefaults()">🔄 Réinitialiser les données</button>
+          </div>
+        </div>
 
-            <div class="form-group">
-              <label>Nom de l'action / événement</label>
-              <input type="text" id="evName" class="form-control" placeholder="Ex: Vente Chocolats Initiatives" required>
+        <!-- ONGLET DE NAVIGATION -->
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab('tab-planning')">
+            📅 1. Calendrier & Frise Synoptique
+          </button>
+          <button class="tab-btn" onclick="switchTab('tab-finances')">
+            🪙 2. Suivi Financier & Rentabilité (Coût / Recette / Bénéfice)
+          </button>
+        </div>
+
+        <!-- ONGLET 1 : CALENDRIER -->
+        <div id="tab-planning" class="tab-content active">
+
+          <div class="rule-banner">
+            <strong>Règle d'or de vigilance Dojo :</strong> Pour préserver la dynamique et ne pas saturer les familles, <strong>les enfants ne portent qu'une seule vente active à la fois</strong> (le grand Challenge Calendriers du 04/11 au 04/01). Les autres opérations (chocolats, tombola) sont gérées en direct au club ou via commandes en ligne autonomes.
+          </div>
+
+          <div class="main-grid">
+            
+            <!-- FORMULAIRE (CRÉATION OU MODIFICATION) -->
+            <div class="form-container">
+              <div class="card" id="formCard">
+                <div class="card-title">
+                  <span id="formTitle">➕ Ajouter une manifestation</span>
+                  <button id="cancelEditBtn" class="btn btn-outline" style="display:none; font-size:11px; padding:3px 8px;" onclick="cancelEdit()">Annuler modif</button>
+                </div>
+                <form id="eventForm" onsubmit="handleFormSubmit(event)">
+                  <input type="hidden" id="editEventId" value="">
+
+                  <div class="form-group">
+                    <label>Nom de l'action / événement</label>
+                    <input type="text" id="evName" class="form-control" placeholder="Ex: Vente Chocolats Initiatives" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Typologie d'action</label>
+                    <select id="evType" class="form-control" onchange="handleTypeChange()">
+                      <option value="vente-enfants">Vente par les enfants (Challenge Ambassadeurs)</option>
+                      <option value="vente-club">Vente annexe autonome (Boutique / En ligne)</option>
+                      <option value="tombola">Tombola / Tirage ponctuel</option>
+                      <option value="evenement">Événement club / Rassemblement</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Couleur personnalisée de l'événement</label>
+                    <div class="color-picker-group">
+                      <input type="color" id="evColor" class="color-preview-box" value="#D97706">
+                      <div class="preset-colors">
+                        <div class="preset-btn" style="background: #C41E3A;" title="Rouge Dojo" onclick="setColor('#C41E3A')"></div>
+                        <div class="preset-btn" style="background: #D97706;" title="Ambre" onclick="setColor('#D97706')"></div>
+                        <div class="preset-btn" style="background: #16A34A;" title="Vert" onclick="setColor('#16A34A')"></div>
+                        <div class="preset-btn" style="background: #2563EB;" title="Bleu" onclick="setColor('#2563EB')"></div>
+                        <div class="preset-btn" style="background: #7C3AED;" title="Violet" onclick="setColor('#7C3AED')"></div>
+                        <div class="preset-btn" style="background: #DB2777;" title="Rose" onclick="setColor('#DB2777')"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Date début</label>
+                      <input type="date" id="evStart" class="form-control" value="2026-11-04" required>
+                    </div>
+                    <div class="form-group">
+                      <label>Date fin</label>
+                      <input type="date" id="evEnd" class="form-control" value="2027-01-04" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Canal & Public sollicité</label>
+                    <input type="text" id="evTarget" class="form-control" placeholder="Ex: Enfants ambassadeurs (porte-à-porte)">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Remarques / Logistique</label>
+                    <input type="text" id="evNotes" class="form-control" placeholder="Ex: Livraison mi-décembre, stand lors des cours">
+                  </div>
+
+                  <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 6px;">
+                    Enregistrer l'action
+                  </button>
+                </form>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label>Typologie d'action</label>
-              <select id="evType" class="form-control" onchange="handleTypeChange()">
-                <option value="vente-enfants">Vente par les enfants (Challenge Ambassadeurs)</option>
-                <option value="vente-club">Vente annexe autonome (Boutique / En ligne)</option>
-                <option value="tombola">Tombola / Tirage ponctuel</option>
-                <option value="evenement">Événement club / Rassemblement</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Couleur personnalisée de l'événement</label>
-              <div class="color-picker-group">
-                <input type="color" id="evColor" class="color-preview-box" value="#D97706">
-                <div class="preset-colors">
-                  <div class="preset-btn" style="background: #C41E3A;" title="Rouge Dojo" onclick="setColor('#C41E3A')"></div>
-                  <div class="preset-btn" style="background: #D97706;" title="Ambre" onclick="setColor('#D97706')"></div>
-                  <div class="preset-btn" style="background: #16A34A;" title="Vert" onclick="setColor('#16A34A')"></div>
-                  <div class="preset-btn" style="background: #2563EB;" title="Bleu" onclick="setColor('#2563EB')"></div>
-                  <div class="preset-btn" style="background: #7C3AED;" title="Violet" onclick="setColor('#7C3AED')"></div>
-                  <div class="preset-btn" style="background: #DB2777;" title="Rose" onclick="setColor('#DB2777')"></div>
+            <!-- VISUELS PLANNING & RECAP -->
+            <div>
+              
+              <!-- FRISE CHRONOLOGIQUE GANTT -->
+              <div class="card">
+                <div class="card-title">
+                  <span>📊 Frise Synoptique Interactive (Septembre à Juin)</span>
+                  <span style="font-size:11px; font-weight:normal; color:var(--gris-moyen);">Cliquer sur une barre pour la modifier</span>
+                </div>
+                <div class="timeline-view">
+                  <div class="timeline-header">
+                    <div style="text-align: left;">Action / Période</div>
+                    <div>Sep</div><div>Oct</div><div>Nov</div><div>Déc</div>
+                    <div>Jan</div><div>Fév</div><div>Mar</div><div>Avr</div><div>Mai</div><div>Juin</div>
+                  </div>
+                  <div id="timelineContainer"></div>
                 </div>
               </div>
-            </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label>Date début</label>
-                <input type="date" id="evStart" class="form-control" value="2026-11-04" required>
+              <!-- TABLEAU RECAP -->
+              <div class="card">
+                <div class="card-title">📋 Statut et Arbitrage du Calendrier</div>
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Manifestation</th>
+                      <th>Période</th>
+                      <th>Typologie</th>
+                      <th>Canal & Sollicitation</th>
+                      <th>Arbitrage</th>
+                      <th style="text-align: right;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="planningTableBody"></tbody>
+                </table>
               </div>
-              <div class="form-group">
-                <label>Date fin</label>
-                <input type="date" id="evEnd" class="form-control" value="2027-01-04" required>
-              </div>
+
             </div>
 
-            <div class="form-group">
-              <label>Canal & Public sollicité</label>
-              <input type="text" id="evTarget" class="form-control" placeholder="Ex: Enfants ambassadeurs (porte-à-porte)">
-            </div>
-
-            <div class="form-group">
-              <label>Remarques / Logistique</label>
-              <input type="text" id="evNotes" class="form-control" placeholder="Ex: Livraison mi-décembre, stand lors des cours">
-            </div>
-
-            <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 6px;">
-              Enregistrer l'action
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- VISUELS PLANNING & RECAP -->
-      <div>
-        
-        <!-- FRISE CHRONOLOGIQUE GANTT -->
-        <div class="card">
-          <div class="card-title">
-            <span>📊 Frise Synoptique Interactive (Septembre à Juin)</span>
-            <span style="font-size:11px; font-weight:normal; color:var(--gris-moyen);">Cliquer sur une barre pour la modifier</span>
           </div>
-          <div class="timeline-view">
-            <div class="timeline-header">
-              <div style="text-align: left;">Action / Période</div>
-              <div>Sep</div><div>Oct</div><div>Nov</div><div>Déc</div>
-              <div>Jan</div><div>Fév</div><div>Mar</div><div>Avr</div><div>Mai</div><div>Juin</div>
-            </div>
-            <div id="timelineContainer"></div>
-          </div>
+
         </div>
 
-        <!-- TABLEAU RECAP -->
-        <div class="card">
-          <div class="card-title">📋 Statut et Arbitrage du Calendrier</div>
-          <table class="custom-table">
-            <thead>
-              <tr>
-                <th>Manifestation</th>
-                <th>Période</th>
-                <th>Typologie</th>
-                <th>Canal & Sollicitation</th>
-                <th>Arbitrage</th>
-                <th style="text-align: right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="planningTableBody"></tbody>
-          </table>
+        <!-- ONGLET 2 : SUIVI FINANCIER & RENTABILITÉ -->
+        <div id="tab-finances" class="tab-content">
+          
+          <div class="kpi-row">
+            <div class="kpi-card" style="border-left-color: var(--rouge);">
+              <h4>Total Coûts Investis</h4>
+              <div class="value" id="kpiTotalCout" style="color: var(--rouge);">0,00 €</div>
+            </div>
+            <div class="kpi-card" style="border-left-color: var(--vert-fonce);">
+              <h4>Total Recettes Récoltées</h4>
+              <div class="value" id="kpiTotalRecette" style="color: var(--vert-fonce);">0,00 €</div>
+            </div>
+            <div class="kpi-card" id="kpiCardBenefice" style="border-left-color: var(--bleu);">
+              <h4>Bénéfice Net Dégagé</h4>
+              <div class="value" id="kpiTotalBenefice">0,00 €</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <span>🪙 Rentabilité des Manifestations & Ventes (Champs éditables en direct)</span>
+              <button class="btn btn-success" onclick="openNewFinancialRow()">➕ Ajouter une opération</button>
+            </div>
+            <p style="font-size: 13px; color: var(--gris-moyen); margin-bottom: 16px;">
+              💡 Modifiez directement le coût ou la recette d'une action ci-dessous : le bénéfice net et les indicateurs totaux s'ajustent automatiquement.
+            </p>
+
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th style="width: 38%;">Événement / Manifestation</th>
+                  <th style="width: 18%;" class="num">Coût Réalisé / Prévu (€)</th>
+                  <th style="width: 18%;" class="num">Recette Récoltée (€)</th>
+                  <th style="width: 16%;" class="num">Bénéfice Net (€)</th>
+                  <th style="width: 10%; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="financesTableBody"></tbody>
+            </table>
+          </div>
+
         </div>
 
       </div>
-
     </div>
-
   </div>
 
-  <!-- ONGLET 2 : SUIVI FINANCIER & RENTABILITÉ -->
-  <div id="tab-finances" class="tab-content">
-    
-    <div class="kpi-row">
-      <div class="kpi-card" style="border-left-color: var(--rouge);">
-        <h4>Total Coûts Investis</h4>
-        <div class="value" id="kpiTotalCout" style="color: var(--rouge);">0,00 €</div>
-      </div>
-      <div class="kpi-card" style="border-left-color: var(--vert-fonce);">
-        <h4>Total Recettes Récoltées</h4>
-        <div class="value" id="kpiTotalRecette" style="color: var(--vert-fonce);">0,00 €</div>
-      </div>
-      <div class="kpi-card" id="kpiCardBenefice" style="border-left-color: var(--bleu);">
-        <h4>Bénéfice Net Dégagé</h4>
-        <div class="value" id="kpiTotalBenefice">0,00 €</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">
-        <span>🪙 Rentabilité des Manifestations & Ventes (Champs éditables en direct)</span>
-        <button class="btn btn-success" onclick="openNewFinancialRow()">➕ Ajouter une opération</button>
-      </div>
-      <p style="font-size: 13px; color: var(--gris-moyen); margin-bottom: 16px;">
-        💡 Modifiez directement le coût ou la recette d'une action ci-dessous : le bénéfice net et les indicateurs totaux s'ajustent automatiquement.
-      </p>
-
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th style="width: 38%;">Événement / Manifestation</th>
-            <th style="width: 18%;" class="num">Coût Réalisé / Prévu (€)</th>
-            <th style="width: 18%;" class="num">Recette Récoltée (€)</th>
-            <th style="width: 16%;" class="num">Bénéfice Net (€)</th>
-            <th style="width: 10%; text-align: right;">Action</th>
-          </tr>
-        </thead>
-        <tbody id="financesTableBody"></tbody>
-      </table>
-    </div>
-
-  </div>
-
-</div>
-
-<script>
-  let defaultData = [
-    {
-      id: 1,
-      name: "Challenge Calendriers Initiatives",
-      type: "vente-enfants",
-      color: "#D97706",
-      start: "2026-11-04",
-      end: "2027-01-04",
-      target: "Enfants ambassadeurs (porte-à-porte & proches)",
-      notes: "Mobilisation exclusive des enfants. Priorité club.",
-      cout: 250.00,
-      recette: 1850.00
-    },
-    {
-      id: 2,
-      name: "Vente de Chocolats (Initiatives)",
-      type: "vente-club",
-      color: "#16A34A",
-      start: "2026-11-12",
-      end: "2026-12-04",
-      target: "Boutique en ligne & commandes au bureau",
-      notes: "Pas de livret confié aux enfants. Livraison avant Noël.",
-      cout: 50.00,
-      recette: 620.00
-    },
-    {
-      id: 3,
-      name: "Tombola de Noël du Dojo",
-      type: "tombola",
-      color: "#7C3AED",
-      start: "2026-12-14",
-      end: "2026-12-22",
-      target: "Tickets au dojo pendant les cours de décembre",
-      notes: "Tirage au sort le 22 décembre lors du goûter.",
-      cout: 80.00,
-      recette: 450.00
-    },
-    {
-      id: 4,
-      name: "Fête des Familles & Galette",
-      type: "evenement",
-      color: "#2563EB",
-      start: "2027-02-06",
-      end: "2027-02-06",
-      target: "Parents et enfants ensemble sur le tatami",
-      notes: "Journée festive et initiations partagées.",
-      cout: 150.00,
-      recette: 380.00
-    },
-    {
-      id: 5,
-      name: "Olympiades de fin de saison",
-      type: "evenement",
-      color: "#C41E3A",
-      start: "2027-06-12",
-      end: "2027-06-12",
-      target: "Tous les licenciés & clubs invités",
-      notes: "Clôture festive sportive et récompenses de fin de saison.",
-      cout: 350.00,
-      recette: 920.00
-    }
-  ];
-
-  let items = JSON.parse(localStorage.getItem('dojo_manifestations_complete_v2')) || defaultData;
-
-  const tStart = new Date("2026-09-01").getTime();
-  const tEnd = new Date("2027-06-30").getTime();
-
-  function switchTab(tabId) {
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-    if (tabId === 'tab-planning') {
-      document.querySelectorAll('.tab-btn')[0].classList.add('active');
-      document.getElementById('tab-planning').classList.add('active');
-      renderPlanning();
-    } else {
-      document.querySelectorAll('.tab-btn')[1].classList.add('active');
-      document.getElementById('tab-finances').classList.add('active');
-      renderFinances();
-    }
-  }
-
-  function fmtDate(s) {
-    if (!s) return "";
-    const p = s.split('-');
-    return `${p[2]}/${p[1]}/${p[0]}`;
-  }
-
-  function setColor(hex) {
-    document.getElementById('evColor').value = hex;
-  }
-
-  function handleTypeChange() {
-    const t = document.getElementById('evType').value;
-    const targetInput = document.getElementById('evTarget');
-    if (t === 'vente-enfants') {
-      setColor('#D97706');
-      if (!targetInput.value || targetInput.dataset.auto === "true") {
-        targetInput.value = "Enfants ambassadeurs (porte-à-porte & familles)";
-        targetInput.dataset.auto = "true";
+  <script>
+    let defaultData = [
+      {
+        id: 1,
+        name: "Challenge Calendriers Initiatives",
+        type: "vente-enfants",
+        color: "#D97706",
+        start: "2026-11-04",
+        end: "2027-01-04",
+        target: "Enfants ambassadeurs (porte-à-porte & proches)",
+        notes: "Mobilisation exclusive des enfants. Priorité club.",
+        cout: 250.00,
+        recette: 1850.00
+      },
+      {
+        id: 2,
+        name: "Vente de Chocolats (Initiatives)",
+        type: "vente-club",
+        color: "#16A34A",
+        start: "2026-11-12",
+        end: "2026-12-04",
+        target: "Boutique en ligne & commandes au bureau",
+        notes: "Pas de livret confié aux enfants. Livraison avant Noël.",
+        cout: 50.00,
+        recette: 620.00
+      },
+      {
+        id: 3,
+        name: "Tombola de Noël du Dojo",
+        type: "tombola",
+        color: "#7C3AED",
+        start: "2026-12-14",
+        end: "2026-12-22",
+        target: "Tickets au dojo pendant les cours de décembre",
+        notes: "Tirage au sort le 22 décembre lors du goûter.",
+        cout: 80.00,
+        recette: 450.00
+      },
+      {
+        id: 4,
+        name: "Fête des Familles & Galette",
+        type: "evenement",
+        color: "#2563EB",
+        start: "2027-02-06",
+        end: "2027-02-06",
+        target: "Parents et enfants ensemble sur le tatami",
+        notes: "Journée festive et initiations partagées.",
+        cout: 150.00,
+        recette: 380.00
+      },
+      {
+        id: 5,
+        name: "Olympiades de fin de saison",
+        type: "evenement",
+        color: "#C41E3A",
+        start: "2027-06-12",
+        end: "2027-06-12",
+        target: "Tous les licenciés & clubs invités",
+        notes: "Clôture festive sportive et récompenses de fin de saison.",
+        cout: 350.00,
+        recette: 920.00
       }
-    } else if (t === 'vente-club') {
-      setColor('#16A34A');
-      if (!targetInput.value || targetInput.dataset.auto === "true") {
-        targetInput.value = "Boutique en ligne & commandes au bureau";
-        targetInput.dataset.auto = "true";
-      }
-    } else if (t === 'tombola') {
-      setColor('#7C3AED');
-      if (!targetInput.value || targetInput.dataset.auto === "true") {
-        targetInput.value = "Vente de tickets au dojo lors des cours";
-        targetInput.dataset.auto = "true";
-      }
-    } else {
-      setColor('#2563EB');
-      if (!targetInput.value || targetInput.dataset.auto === "true") {
-        targetInput.value = "Tous les licenciés & familles";
-        targetInput.dataset.auto = "true";
+    ];
+
+    let items = JSON.parse(localStorage.getItem('dojo_manifestations_complete_v2')) || defaultData;
+
+    const tStart = new Date("2026-09-01").getTime();
+    const tEnd = new Date("2027-06-30").getTime();
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      if (tabId === 'tab-planning') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tab-planning').classList.add('active');
+        renderPlanning();
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tab-finances').classList.add('active');
+        renderFinances();
       }
     }
-  }
 
-  function checkConflict(item) {
-    if (item.type === 'vente-enfants') {
-      const conflict = items.filter(x => x.id !== item.id && x.type === 'vente-enfants' && (
-        new Date(x.start) <= new Date(item.end) && new Date(x.end) >= new Date(item.start)
-      ));
-      if (conflict.length > 0) return '<strong style="color:#DC2626;">⚠️ Conflit Enfants</strong>';
+    function fmtDate(s) {
+      if (!s) return "";
+      const p = s.split('-');
+      return `${p[2]}/${p[1]}/${p[0]}`;
     }
-    return '<strong style="color:#16A34A;">✅ Calage Validé</strong>';
-  }
 
-  function getBadgeHtml(type) {
-    if (type === 'vente-enfants') return '<span class="badge" style="background:#FEF3C7; color:#92400E;">Vente Enfants</span>';
-    if (type === 'vente-club') return '<span class="badge" style="background:#DCFCE7; color:#166534;">Vente Autonome</span>';
-    if (type === 'tombola') return '<span class="badge" style="background:#EDE9FE; color:#5B21B6;">Tombola</span>';
-    return '<span class="badge" style="background:#DBEAFE; color:#1E40AF;">Événement Club</span>';
-  }
+    function setColor(hex) {
+      document.getElementById('evColor').value = hex;
+    }
 
-  // --- RENDU PLANNING ---
-  function renderPlanning() {
-    const tableBody = document.getElementById('planningTableBody');
-    const timelineContainer = document.getElementById('timelineContainer');
-    tableBody.innerHTML = '';
-    timelineContainer.innerHTML = '';
+    function handleTypeChange() {
+      const t = document.getElementById('evType').value;
+      const targetInput = document.getElementById('evTarget');
+      if (t === 'vente-enfants') {
+        setColor('#D97706');
+        if (!targetInput.value || targetInput.dataset.auto === "true") {
+          targetInput.value = "Enfants ambassadeurs (porte-à-porte & familles)";
+          targetInput.dataset.auto = "true";
+        }
+      } else if (t === 'vente-club') {
+        setColor('#16A34A');
+        if (!targetInput.value || targetInput.dataset.auto === "true") {
+          targetInput.value = "Boutique en ligne & commandes au bureau";
+          targetInput.dataset.auto = "true";
+        }
+      } else if (t === 'tombola') {
+        setColor('#7C3AED');
+        if (!targetInput.value || targetInput.dataset.auto === "true") {
+          targetInput.value = "Vente de tickets au dojo lors des cours";
+          targetInput.dataset.auto = "true";
+        }
+      } else {
+        setColor('#2563EB');
+        if (!targetInput.value || targetInput.dataset.auto === "true") {
+          targetInput.value = "Tous les licenciés & familles";
+          targetInput.dataset.auto = "true";
+        }
+      }
+    }
 
-    items.sort((a,b) => new Date(a.start) - new Date(b.start));
+    function checkConflict(item) {
+      if (item.type === 'vente-enfants') {
+        const conflict = items.filter(x => x.id !== item.id && x.type === 'vente-enfants' && (
+          new Date(x.start) <= new Date(item.end) && new Date(x.end) >= new Date(item.start)
+        ));
+        if (conflict.length > 0) return '<strong style="color:#DC2626;">⚠️ Conflit Enfants</strong>';
+      }
+      return '<strong style="color:#16A34A;">✅ Calage Validé</strong>';
+    }
 
-    items.forEach(ev => {
-      // Tableau
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <div style="width:12px; height:12px; border-radius:3px; background:${ev.color || '#C41E3A'}; flex-shrink:0;"></div>
-            <strong>${ev.name}</strong>
+    function getBadgeHtml(type) {
+      if (type === 'vente-enfants') return '<span class="badge" style="background:#FEF3C7; color:#92400E;">Vente Enfants</span>';
+      if (type === 'vente-club') return '<span class="badge" style="background:#DCFCE7; color:#166534;">Vente Autonome</span>';
+      if (type === 'tombola') return '<span class="badge" style="background:#EDE9FE; color:#5B21B6;">Tombola</span>';
+      return '<span class="badge" style="background:#DBEAFE; color:#1E40AF;">Événement Club</span>';
+    }
+
+    function renderPlanning() {
+      const tableBody = document.getElementById('planningTableBody');
+      const timelineContainer = document.getElementById('timelineContainer');
+      tableBody.innerHTML = '';
+      timelineContainer.innerHTML = '';
+
+      items.sort((a,b) => new Date(a.start) - new Date(b.start));
+
+      items.forEach(ev => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:12px; height:12px; border-radius:3px; background:${ev.color || '#C41E3A'}; flex-shrink:0;"></div>
+              <strong>${ev.name}</strong>
+            </div>
+            <div style="font-size:11.5px; color:#6B6B6B; margin-left:20px;">${ev.notes || ''}</div>
+          </td>
+          <td style="white-space:nowrap;">${fmtDate(ev.start)} ➔ ${fmtDate(ev.end)}</td>
+          <td>${getBadgeHtml(ev.type)}</td>
+          <td style="font-size:12px;">${ev.target || ''}</td>
+          <td>${checkConflict(ev)}</td>
+          <td style="text-align:right;">
+            <div class="action-btn-group">
+              <button class="btn-icon" onclick="startEditEvent(${ev.id})" title="Modifier cet événement">✏️</button>
+              <button class="btn-icon del" onclick="deleteEvent(${ev.id})" title="Supprimer">🗑️</button>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+
+        const dStart = new Date(ev.start).getTime();
+        const dEnd = new Date(ev.end).getTime();
+
+        let left = ((dStart - tStart) / (tEnd - tStart)) * 100;
+        let width = ((dEnd - dStart) / (tEnd - tStart)) * 100;
+
+        if (left < 0) left = 0;
+        if (width < 3.2) width = 3.5;
+
+        const row = document.createElement('div');
+        row.className = 'timeline-row';
+        row.innerHTML = `
+          <div class="timeline-label" onclick="startEditEvent(${ev.id})" style="cursor:pointer;" title="Cliquer pour modifier">
+            <span style="display:inline-block; border-left:3px solid ${ev.color || '#C41E3A'}; padding-left:6px;">${ev.name}</span>
+            <div style="font-size:10.5px; color:#6B6B6B; padding-left:9px;">${fmtDate(ev.start)} - ${fmtDate(ev.end)}</div>
           </div>
-          <div style="font-size:11.5px; color:#6B6B6B; margin-left:20px;">${ev.notes || ''}</div>
-        </td>
-        <td style="white-space:nowrap;">${fmtDate(ev.start)} ➔ ${fmtDate(ev.end)}</td>
-        <td>${getBadgeHtml(ev.type)}</td>
-        <td style="font-size:12px;">${ev.target || ''}</td>
-        <td>${checkConflict(ev)}</td>
-        <td style="text-align:right;">
-          <div class="action-btn-group">
-            <button class="btn-icon" onclick="startEditEvent(${ev.id})" title="Modifier cet événement">✏️</button>
-            <button class="btn-icon del" onclick="deleteEvent(${ev.id})" title="Supprimer">🗑️</button>
+          <div class="timeline-track">
+            <div class="timeline-bar" style="left: ${left}%; width: ${width}%; background: ${ev.color || '#C41E3A'};" onclick="startEditEvent(${ev.id})" title="${ev.name} (${fmtDate(ev.start)} au ${fmtDate(ev.end)}) - Cliquer pour éditer">
+              ${ev.name}
+            </div>
           </div>
-        </td>
-      `;
-      tableBody.appendChild(tr);
-
-      // Frise Chronologique
-      const dStart = new Date(ev.start).getTime();
-      const dEnd = new Date(ev.end).getTime();
-
-      let left = ((dStart - tStart) / (tEnd - tStart)) * 100;
-      let width = ((dEnd - dStart) / (tEnd - tStart)) * 100;
-
-      if (left < 0) left = 0;
-      if (width < 3.2) width = 3.5;
-
-      const row = document.createElement('div');
-      row.className = 'timeline-row';
-      row.innerHTML = `
-        <div class="timeline-label" onclick="startEditEvent(${ev.id})" style="cursor:pointer;" title="Cliquer pour modifier">
-          <span style="display:inline-block; border-left:3px solid ${ev.color || '#C41E3A'}; padding-left:6px;">${ev.name}</span>
-          <div style="font-size:10.5px; color:#6B6B6B; padding-left:9px;">${fmtDate(ev.start)} - ${fmtDate(ev.end)}</div>
-        </div>
-        <div class="timeline-track">
-          <div class="timeline-bar" style="left: ${left}%; width: ${width}%; background: ${ev.color || '#C41E3A'};" onclick="startEditEvent(${ev.id})" title="${ev.name} (${fmtDate(ev.start)} au ${fmtDate(ev.end)}) - Cliquer pour éditer">
-            ${ev.name}
-          </div>
-        </div>
-      `;
-      timelineContainer.appendChild(row);
-    });
-
-    saveLocal();
-  }
-
-  // --- RENDU FINANCES ---
-  function renderFinances() {
-    const tbody = document.getElementById('financesTableBody');
-    tbody.innerHTML = '';
-
-    let totalCout = 0;
-    let totalRecette = 0;
-    let totalBenefice = 0;
-
-    items.sort((a,b) => new Date(a.start) - new Date(b.start));
-
-    items.forEach(ev => {
-      const cout = Number(ev.cout) || 0;
-      const recette = Number(ev.recette) || 0;
-      const benefice = recette - cout;
-
-      totalCout += cout;
-      totalRecette += recette;
-      totalBenefice += benefice;
-
-      let netClass = benefice > 0 ? "val-positive" : (benefice < 0 ? "val-negative" : "val-neutre");
-
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <div style="width:12px; height:12px; border-radius:3px; background:${ev.color || '#C41E3A'}; flex-shrink:0;"></div>
-            <strong>${ev.name}</strong>
-          </div>
-          <span style="font-size:11px; color:#6B6B6B; margin-left:20px;">${fmtDate(ev.start)}</span>
-        </td>
-        <td class="num">
-          <input type="number" step="0.01" min="0" class="form-control" style="width:110px; text-align:right; display:inline-block;" value="${cout.toFixed(2)}" onchange="updateFinRow(${ev.id}, 'cout', this.value)">
-        </td>
-        <td class="num">
-          <input type="number" step="0.01" min="0" class="form-control" style="width:110px; text-align:right; display:inline-block;" value="${recette.toFixed(2)}" onchange="updateFinRow(${ev.id}, 'recette', this.value)">
-        </td>
-        <td class="num ${netClass}" style="font-size:14px; font-family:'Fredoka', sans-serif;">
-          ${benefice >= 0 ? '+' : ''}${benefice.toFixed(2)} €
-        </td>
-        <td style="text-align:right;">
-          <button class="btn-icon del" onclick="deleteEvent(${ev.id})" title="Supprimer">🗑️</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    document.getElementById('kpiTotalCout').innerText = totalCout.toFixed(2).replace('.', ',') + " €";
-    document.getElementById('kpiTotalRecette').innerText = totalRecette.toFixed(2).replace('.', ',') + " €";
-    
-    const kpiBenef = document.getElementById('kpiTotalBenefice');
-    const kpiCard = document.getElementById('kpiCardBenefice');
-    kpiBenef.innerText = (totalBenefice >= 0 ? '+' : '') + totalBenefice.toFixed(2).replace('.', ',') + " €";
-
-    if (totalBenefice > 0) {
-      kpiBenef.style.color = "var(--vert-fonce)";
-      kpiCard.style.borderLeftColor = "var(--vert-fonce)";
-    } else if (totalBenefice < 0) {
-      kpiBenef.style.color = "var(--rouge)";
-      kpiCard.style.borderLeftColor = "var(--rouge)";
-    } else {
-      kpiBenef.style.color = "var(--bleu)";
-      kpiCard.style.borderLeftColor = "var(--bleu)";
-    }
-
-    saveLocal();
-  }
-
-  function updateFinRow(id, field, value) {
-    const ev = items.find(x => x.id === id);
-    if (ev) {
-      ev[field] = parseFloat(value) || 0;
-      renderFinances();
-    }
-  }
-
-  function openNewFinancialRow() {
-    switchTab('tab-planning');
-    document.getElementById('evName').focus();
-  }
-
-  // --- ACTIONS FORMULAIRE (CRÉATION / ÉDITION) ---
-  function handleFormSubmit(e) {
-    e.preventDefault();
-    const editId = document.getElementById('editEventId').value;
-    const name = document.getElementById('evName').value.trim();
-    const type = document.getElementById('evType').value;
-    const color = document.getElementById('evColor').value;
-    const start = document.getElementById('evStart').value;
-    const end = document.getElementById('evEnd').value;
-    const target = document.getElementById('evTarget').value.trim();
-    const notes = document.getElementById('evNotes').value.trim();
-
-    if (new Date(end) < new Date(start)) {
-      alert("Erreur : la date de fin ne peut pas être antérieure à la date de début.");
-      return;
-    }
-
-    if (editId) {
-      const existing = items.find(x => x.id === Number(editId));
-      if (existing) {
-        existing.name = name;
-        existing.type = type;
-        existing.color = color;
-        existing.start = start;
-        existing.end = end;
-        existing.target = target;
-        existing.notes = notes;
-      }
-    } else {
-      items.push({
-        id: Date.now(),
-        name,
-        type,
-        color,
-        start,
-        end,
-        target,
-        notes,
-        cout: 0,
-        recette: 0
+        `;
+        timelineContainer.appendChild(row);
       });
+
+      saveLocal();
     }
 
-    cancelEdit();
-    renderPlanning();
-  }
+    function renderFinances() {
+      const tbody = document.getElementById('financesTableBody');
+      tbody.innerHTML = '';
 
-  function startEditEvent(id) {
-    switchTab('tab-planning');
-    const ev = items.find(x => x.id === id);
-    if (!ev) return;
+      let totalCout = 0;
+      let totalRecette = 0;
+      let totalBenefice = 0;
 
-    document.getElementById('editEventId').value = ev.id;
-    document.getElementById('evName').value = ev.name;
-    document.getElementById('evType').value = ev.type;
-    document.getElementById('evColor').value = ev.color || '#C41E3A';
-    document.getElementById('evStart').value = ev.start;
-    document.getElementById('evEnd').value = ev.end;
-    document.getElementById('evTarget').value = ev.target || '';
-    document.getElementById('evNotes').value = ev.notes || '';
+      items.sort((a,b) => new Date(a.start) - new Date(b.start));
 
-    document.getElementById('formTitle').innerText = "✏️ Modifier l'événement";
-    document.getElementById('submitBtn').innerText = "Mettre à jour l'événement";
-    document.getElementById('submitBtn').classList.remove('btn-primary');
-    document.getElementById('submitBtn').classList.add('btn-dark');
-    document.getElementById('cancelEditBtn').style.display = 'inline-block';
-    
-    document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
-  }
+      items.forEach(ev => {
+        const cout = Number(ev.cout) || 0;
+        const recette = Number(ev.recette) || 0;
+        const benefice = recette - cout;
 
-  function cancelEdit() {
-    document.getElementById('editEventId').value = '';
-    document.getElementById('evName').value = '';
-    document.getElementById('evNotes').value = '';
-    document.getElementById('evTarget').value = '';
-    document.getElementById('formTitle').innerText = "➕ Ajouter une manifestation";
-    document.getElementById('submitBtn').innerText = "Enregistrer l'action";
-    document.getElementById('submitBtn').classList.remove('btn-dark');
-    document.getElementById('submitBtn').classList.add('btn-primary');
-    document.getElementById('cancelEditBtn').style.display = 'none';
-  }
+        totalCout += cout;
+        totalRecette += recette;
+        totalBenefice += benefice;
 
-  function deleteEvent(id) {
-    if (confirm("Voulez-vous vraiment supprimer cet événement ?")) {
-      items = items.filter(x => x.id !== id);
-      renderPlanning();
-      renderFinances();
+        let netClass = benefice > 0 ? "val-positive" : (benefice < 0 ? "val-negative" : "val-neutre");
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:12px; height:12px; border-radius:3px; background:${ev.color || '#C41E3A'}; flex-shrink:0;"></div>
+              <strong>${ev.name}</strong>
+            </div>
+            <span style="font-size:11px; color:#6B6B6B; margin-left:20px;">${fmtDate(ev.start)}</span>
+          </td>
+          <td class="num">
+            <input type="number" step="0.01" min="0" class="form-control" style="width:110px; text-align:right; display:inline-block;" value="${cout.toFixed(2)}" onchange="updateFinRow(${ev.id}, 'cout', this.value)">
+          </td>
+          <td class="num">
+            <input type="number" step="0.01" min="0" class="form-control" style="width:110px; text-align:right; display:inline-block;" value="${recette.toFixed(2)}" onchange="updateFinRow(${ev.id}, 'recette', this.value)">
+          </td>
+          <td class="num ${netClass}" style="font-size:14px; font-family:'Fredoka', sans-serif;">
+            ${benefice >= 0 ? '+' : ''}${benefice.toFixed(2)} €
+          </td>
+          <td style="text-align:right;">
+            <button class="btn-icon del" onclick="deleteEvent(${ev.id})" title="Supprimer">🗑️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('kpiTotalCout').innerText = totalCout.toFixed(2).replace('.', ',') + " €";
+      document.getElementById('kpiTotalRecette').innerText = totalRecette.toFixed(2).replace('.', ',') + " €";
+      
+      const kpiBenef = document.getElementById('kpiTotalBenefice');
+      const kpiCard = document.getElementById('kpiCardBenefice');
+      kpiBenef.innerText = (totalBenefice >= 0 ? '+' : '') + totalBenefice.toFixed(2).replace('.', ',') + " €";
+
+      if (totalBenefice > 0) {
+        kpiBenef.style.color = "var(--vert-fonce)";
+        kpiCard.style.borderLeftColor = "var(--vert-fonce)";
+      } else if (totalBenefice < 0) {
+        kpiBenef.style.color = "var(--rouge)";
+        kpiCard.style.borderLeftColor = "var(--rouge)";
+      } else {
+        kpiBenef.style.color = "var(--bleu)";
+        kpiCard.style.borderLeftColor = "var(--bleu)";
+      }
+
+      saveLocal();
     }
-  }
 
-  function saveLocal() {
-    localStorage.setItem('dojo_manifestations_complete_v2', JSON.stringify(items));
-  }
+    function updateFinRow(id, field, value) {
+      const ev = items.find(x => x.id === id);
+      if (ev) {
+        ev[field] = parseFloat(value) || 0;
+        renderFinances();
+      }
+    }
 
-  function resetDefaults() {
-    if (confirm("Réinitialiser avec les manifestations et budgets d'exemple ?")) {
-      items = JSON.parse(JSON.stringify(defaultData));
+    function openNewFinancialRow() {
+      switchTab('tab-planning');
+      document.getElementById('evName').focus();
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editEventId').value;
+      const name = document.getElementById('evName').value.trim();
+      const type = document.getElementById('evType').value;
+      const color = document.getElementById('evColor').value;
+      const start = document.getElementById('evStart').value;
+      const end = document.getElementById('evEnd').value;
+      const target = document.getElementById('evTarget').value.trim();
+      const notes = document.getElementById('evNotes').value.trim();
+
+      if (new Date(end) < new Date(start)) {
+        alert("Erreur : la date de fin ne peut pas être antérieure à la date de début.");
+        return;
+      }
+
+      if (editId) {
+        const existing = items.find(x => x.id === Number(editId));
+        if (existing) {
+          existing.name = name;
+          existing.type = type;
+          existing.color = color;
+          existing.start = start;
+          existing.end = end;
+          existing.target = target;
+          existing.notes = notes;
+        }
+      } else {
+        items.push({
+          id: Date.now(),
+          name,
+          type,
+          color,
+          start,
+          end,
+          target,
+          notes,
+          cout: 0,
+          recette: 0
+        });
+      }
+
       cancelEdit();
       renderPlanning();
-      renderFinances();
     }
-  }
 
-  renderPlanning();
-  renderFinances();
-</script>
+    function startEditEvent(id) {
+      switchTab('tab-planning');
+      const ev = items.find(x => x.id === id);
+      if (!ev) return;
+
+      document.getElementById('editEventId').value = ev.id;
+      document.getElementById('evName').value = ev.name;
+      document.getElementById('evType').value = ev.type;
+      document.getElementById('evColor').value = ev.color || '#C41E3A';
+      document.getElementById('evStart').value = ev.start;
+      document.getElementById('evEnd').value = ev.end;
+      document.getElementById('evTarget').value = ev.target || '';
+      document.getElementById('evNotes').value = ev.notes || '';
+
+      document.getElementById('formTitle').innerText = "✏️ Modifier l'événement";
+      document.getElementById('submitBtn').innerText = "Mettre à jour l'événement";
+      document.getElementById('submitBtn').classList.remove('btn-primary');
+      document.getElementById('submitBtn').classList.add('btn-dark');
+      document.getElementById('cancelEditBtn').style.display = 'inline-block';
+      
+      document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+      document.getElementById('editEventId').value = '';
+      document.getElementById('evName').value = '';
+      document.getElementById('evNotes').value = '';
+      document.getElementById('evTarget').value = '';
+      document.getElementById('formTitle').innerText = "➕ Ajouter une manifestation";
+      document.getElementById('submitBtn').innerText = "Enregistrer l'action";
+      document.getElementById('submitBtn').classList.remove('btn-dark');
+      document.getElementById('submitBtn').classList.add('btn-primary');
+      document.getElementById('cancelEditBtn').style.display = 'none';
+    }
+
+    function deleteEvent(id) {
+      if (confirm("Voulez-vous vraiment supprimer cet événement ?")) {
+        items = items.filter(x => x.id !== id);
+        renderPlanning();
+        renderFinances();
+      }
+    }
+
+    function saveLocal() {
+      localStorage.setItem('dojo_manifestations_complete_v2', JSON.stringify(items));
+    }
+
+    function resetDefaults() {
+      if (confirm("Réinitialiser avec les manifestations et budgets d'exemple ?")) {
+        items = JSON.parse(JSON.stringify(defaultData));
+        cancelEdit();
+        renderPlanning();
+        renderFinances();
+      }
+    }
+
+    renderPlanning();
+    renderFinances();
+  </script>
+
+  <!-- APPEL DU SCRIPT DE LA SIDEBAR UNIFIÉE -->
+  <script src="../js/sidebar.js"></script>
 
 </body>
 </html>
