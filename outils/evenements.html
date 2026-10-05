@@ -1,527 +1,999 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Dojo Manager — Suivi des Événements</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --rouge: #C41E3A;
-            --rouge-hover: #A3182E;
-            --rouge-clair: #FFEBEF;
-            --vert: #2ecc71;
-            --vert-fonce: #27ae60;
-            --bleu: #3498db;
-            --noir-doux: #1A1A1A;
-            --gris-fonce: #3D3D3D;
-            --gris-moyen: #6B6B6B;
-            --gris-clair: #B8B8B8;
-            --gris-tres-clair: #E8E8E8;
-            --fond: #F4F6F9;
-            --blanc: #FFFFFF;
-            --sidebar-width: 270px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coordination & Bilan Financier — Dojo Dornois</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --rouge: #C41E3A;
+      --rouge-hover: #A3182E;
+      --rouge-clair: #FFEBEF;
+      --noir-doux: #1A1A1A;
+      --gris-fonce: #3D3D3D;
+      --gris-moyen: #6B6B6B;
+      --gris-clair: #E2E8F0;
+      --gris-tres-clair: #F1F5F9;
+      --fond: #F4F6F9;
+      --blanc: #FFFFFF;
+      --vert: #16A34A;
+      --vert-fonce: #15803D;
+      --ambre: #D97706;
+      --bleu: #2563EB;
+      --violet: #7C3AED;
+      --rose: #DB2777;
+    }
 
-        * { box-sizing: border-box; transition: all 0.15s ease; }
-        body { font-family: 'Roboto', sans-serif; background-color: var(--fond); margin: 0; padding: 0; color: var(--gris-fonce); display: flex; height: 100vh; overflow: hidden; }
+    * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.15s ease; }
 
-        /* --- SIDEBAR --- */
-        .sidebar { width: var(--sidebar-width); background: var(--noir-doux); color: var(--blanc); display: flex; flex-direction: column; height: 100%; position: relative; box-shadow: 4px 0 15px rgba(0,0,0,0.1); flex-shrink: 0; }
-        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
-        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
-        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--fond);
+      color: var(--gris-fonce);
+      padding: 24px;
+      line-height: 1.45;
+    }
 
-        /* --- MAIN CONTENT --- */
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .topbar { background: var(--blanc); height: 75px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; }
-        .topbar-title-block h2 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0; font-size: 1.4rem; }
-        .topbar-title-block p { margin: 3px 0 0 0; color: var(--gris-moyen); font-size: 0.85rem; }
-        .app-body { flex: 1; padding: 30px; overflow-y: auto; }
+    .container {
+      max-width: 1380px;
+      margin: 0 auto;
+    }
 
-        /* --- CONFIG & FILTRES --- */
-        .config-banner { display: flex; gap: 20px; background: var(--blanc); padding: 15px 25px; border-radius: 8px; border: 1px solid var(--gris-tres-clair); margin-bottom: 25px; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.01); }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .form-group label { font-size: 0.85rem; font-weight: bold; color: var(--gris-fonce); }
-        select, input { padding: 8px 12px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 0.9rem; font-family: 'Roboto', sans-serif; }
-        
-        .btn { font-family: 'Roboto', sans-serif; font-weight: bold; padding: 9px 15px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
-        .btn-dark { background: var(--noir-doux); color: white; }
-        .btn-dark:hover { background: #333; }
-        .btn-success { background: var(--vert); color: white; }
-        .btn-success:hover { background: var(--vert-fonce); }
-        .btn-blue { background: var(--bleu); color: white; }
-        .btn-blue:hover { background: #2980b9; }
+    /* EN-TÊTE DOJO DORNOIS */
+    .header-card {
+      background: var(--blanc);
+      border-radius: 12px;
+      padding: 16px 24px;
+      border: 1px solid var(--gris-clair);
+      border-top: 5px solid var(--rouge);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
 
-        /* --- BLOC KPIs --- */
-        .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: white; padding: 15px; border-radius: 8px; border-left: 4px solid var(--gris-clair); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
-        .kpi-card h4 { margin: 0; font-size: 0.8rem; color: var(--gris-moyen); text-transform: uppercase; }
-        .kpi-card .value { font-family: 'Fredoka', sans-serif; font-size: 1.3rem; margin-top: 5px; font-weight: bold; }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
 
-        /* --- TABLEAU ET LIFECYCLE --- */
-        .table-container { background: var(--blanc); border-radius: 8px; border: 1px solid var(--gris-tres-clair); padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #3D3D3D; color: white; padding: 12px; text-align: left; font-family: 'Fredoka', sans-serif; font-size: 0.95rem; }
-        th:nth-child(2), th:nth-child(3), th:nth-child(4) { text-align: right; }
-        th:last-child { text-align: center; }
-        
-        td { padding: 10px 12px; border-bottom: 1px solid var(--gris-tres-clair); vertical-align: middle; }
-        .input-table { width: 100%; border: 1px solid transparent; background: transparent; padding: 6px; font-size: 0.95rem; border-radius: 4px; }
-        .input-table:focus { border-color: var(--gris-clair); background: #f9fbfd; outline: none; }
-        .input-num { text-align: right; font-weight: 500; }
-        .val-resultat { font-family: 'Fredoka', sans-serif; font-weight: bold; text-align: right; font-size: 1rem; }
-        
-        .res-positive { color: var(--vert-fonce); }
-        .res-negative { color: var(--rouge); }
-        .res-nul { color: var(--bleu); }
+    .logo-box {
+      background-color: var(--rouge);
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(196, 30, 58, 0.25);
+      flex-shrink: 0;
+    }
+    .logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
 
-        .btn-delete { background: transparent; border: none; cursor: pointer; font-size: 1rem; opacity: 0.4; }
-        .btn-delete:hover { opacity: 1; transform: scale(1.1); }
+    .club-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 21px;
+      color: var(--rouge);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
 
-        /* --- TOAST NOTIFICATIONS SYNC CLOUD --- */
-        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
-        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
-        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    .subtitle {
+      font-size: 13px;
+      color: var(--gris-moyen);
+      margin-top: 2px;
+    }
+
+    /* BARRE D'ONGLETS PRINCIPALE */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--gris-clair);
+      padding-bottom: 6px;
+    }
+
+    .tab-btn {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14.5px;
+      padding: 9px 20px;
+      border-radius: 8px 8px 0 0;
+      border: none;
+      cursor: pointer;
+      background: var(--blanc);
+      color: var(--gris-moyen);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      color: var(--rouge);
+      background: var(--rouge-clair);
+    }
+
+    .tab-btn.active {
+      background: var(--rouge);
+      color: var(--blanc);
+      box-shadow: 0 -2px 8px rgba(196, 30, 58, 0.2);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* BOUTONS */
+    .btn {
+      padding: 8px 15px;
+      border-radius: 7px;
+      font-family: 'Roboto', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-primary { background: var(--rouge); color: var(--blanc); }
+    .btn-primary:hover { background: var(--rouge-hover); }
+    .btn-outline { background: var(--blanc); color: var(--gris-fonce); border: 1px solid var(--gris-clair); }
+    .btn-outline:hover { background: var(--gris-tres-clair); }
+    .btn-dark { background: var(--noir-doux); color: var(--blanc); }
+    .btn-dark:hover { background: #333; }
+    .btn-success { background: var(--vert); color: white; }
+    .btn-success:hover { background: var(--vert-fonce); }
+
+    /* CARTES & DISPOSITION */
+    .card {
+      background: var(--blanc);
+      border-radius: 12px;
+      border: 1px solid var(--gris-clair);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 16.5px;
+      color: var(--noir-doux);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--rouge-clair);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* FORMULAIRES */
+    .form-group { margin-bottom: 12px; }
+    .form-group label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--gris-fonce);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 11px;
+      border-radius: 7px;
+      border: 1px solid var(--gris-clair);
+      font-family: 'Roboto', sans-serif;
+      font-size: 13px;
+      outline: none;
+      background: var(--blanc);
+    }
+    .form-control:focus {
+      border-color: var(--rouge);
+      box-shadow: 0 0 0 3px var(--rouge-clair);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* COULEURS PICKER */
+    .color-picker-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .color-preview-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid var(--gris-clair);
+      padding: 0;
+      cursor: pointer;
+    }
+    .preset-colors {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .preset-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 2px solid white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+
+    .rule-banner {
+      background: #FFFBEB;
+      border-left: 4px solid var(--ambre);
+      border-radius: 8px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #78350F;
+    }
+    .rule-banner strong { color: #92400E; }
+
+    /* FRISE SYNOPTIQUE */
+    .timeline-view {
+      overflow-x: auto;
+      background: var(--blanc);
+      border-radius: 10px;
+      padding: 10px 0;
+    }
+
+    .timeline-header {
+      display: grid;
+      grid-template-columns: 210px repeat(10, 1fr);
+      text-align: center;
+      border-bottom: 2px solid var(--rouge-clair);
+      padding-bottom: 8px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 12.5px;
+      color: var(--rouge);
+      font-weight: 600;
+    }
+
+    .timeline-row {
+      display: flex;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--gris-tres-clair);
+    }
+
+    .timeline-label {
+      width: 210px;
+      flex-shrink: 0;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding-right: 10px;
+    }
+
+    .timeline-track {
+      flex: 1;
+      height: 30px;
+      background: #F8FAFC;
+      border-radius: 6px;
+      position: relative;
+      border: 1px dashed var(--gris-clair);
+      display: flex;
+      align-items: center;
+    }
+
+    .timeline-bar {
+      position: absolute;
+      height: 22px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+      cursor: pointer;
+    }
+
+    /* TABLEAUX */
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .custom-table th {
+      background: #3D3D3D;
+      color: white;
+      padding: 10px 12px;
+      text-align: left;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.92rem;
+    }
+    .custom-table th.num, .custom-table td.num { text-align: right; }
+    .custom-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--gris-tres-clair);
+      vertical-align: middle;
+    }
+    .custom-table tr:hover { background: #F8FAFC; }
+
+    .badge {
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    /* BLOCS FINANCES */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .kpi-card {
+      background: white;
+      padding: 16px 20px;
+      border-radius: 10px;
+      border: 1px solid var(--gris-clair);
+      border-left: 5px solid var(--gris-clair);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+    .kpi-card h4 {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--gris-moyen);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .kpi-card .value {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.45rem;
+      margin-top: 5px;
+      font-weight: 700;
+    }
+
+    .val-positive { color: var(--vert-fonce); font-weight: bold; }
+    .val-negative { color: var(--rouge); font-weight: bold; }
+    .val-neutre { color: var(--bleu); font-weight: bold; }
+
+    .action-btn-group {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+    .btn-icon {
+      background: transparent;
+      border: 1px solid var(--gris-clair);
+      border-radius: 5px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-icon:hover { background: var(--gris-tres-clair); }
+    .btn-icon.del:hover { background: #FEE2E2; border-color: #FCA5A5; color: #DC2626; }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .header-actions, .tab-bar, .form-container, .rule-banner, .action-btn-group { display: none !important; }
+      .main-grid { display: block !important; }
+      .card { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .tab-content { display: block !important; margin-bottom: 30px; }
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Conteneur d'alertes éphémères -->
-    <div class="toast-container" id="toastContainer"></div>
+<div class="container">
 
-    <!-- CONTENEUR SIDEBAR DYNAMIQUE -->
-    <div class="sidebar"></div>
+  <!-- EN-TÊTE DOJO DORNOIS -->
+  <div class="header-card">
+    <div class="header-left">
+      <div class="logo-box">
+        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Dojo Dornois">
+      </div>
+      <div>
+        <div class="club-title">DOJO DORNOIS • PILOTAGE DES MANIFESTATIONS & VENTES</div>
+        <div class="subtitle">Coordination temporelle, personnalisation graphique & rentabilité — Saison 2026-2027</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" onclick="window.print()">🖨️ Imprimer la vue</button>
+      <button class="btn btn-dark" onclick="resetDefaults()">🔄 Réinitialiser les données</button>
+    </div>
+  </div>
 
-    <div class="main-content">
-        <div class="topbar">
-            <div class="topbar-title-block">
-                <h2>Bilan & Suivi des Événements</h2>
-                <p>Visualisation rapide de la rentabilité des manifestations et animations du club</p>
-            </div>
-            <div>
-                <button class="btn btn-blue" onclick="imprimerEvenements()">🖨️ Imprimer le Bilan (A4 Paysage)</button>
-                <a href="../index.html" class="btn btn-dark">🏠 Bureau Central</a>
-            </div>
-        </div>
+  <!-- ONGLET DE NAVIGATION -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('tab-planning')">
+      📅 1. Calendrier & Frise Synoptique
+    </button>
+    <button class="tab-btn" onclick="switchTab('tab-finances')">
+      🪙 2. Suivi Financier & Rentabilité (Coût / Recette / Bénéfice)
+    </button>
+  </div>
 
-        <div class="app-body">
-            <div class="config-banner">
-                <div class="form-group" style="min-width: 180px;">
-                    <label>Saison Sportive</label>
-                    <select id="select-saison" onchange="changerSaison()">
-                        <option value="2026-2027">Saison 2026-2027</option>
-                        <option value="2027-2028">Saison 2027-2028</option>
-                        <option value="2025-2026">Saison 2025-2026</option>
-                    </select>
-                </div>
-                <div style="flex: 1; text-align: right;">
-                    <button class="btn btn-success" onclick="ajouterEvenement()">➕ Ajouter une Manifestation / Événement</button>
-                </div>
-            </div>
+  <!-- ONGLET 1 : CALENDRIER -->
+  <div id="tab-planning" class="tab-content active">
 
-            <div class="kpi-row">
-                <div class="kpi-card" style="border-left-color: var(--rouge);">
-                    <h4>Total Investi (Coûts)</h4>
-                    <div class="value" id="kpi-total-investi" style="color: var(--rouge);">0.00 €</div>
-                </div>
-                <div class="kpi-card" style="border-left-color: var(--vert-fonce);">
-                    <h4>Total Récolté (Recettes)</h4>
-                    <div class="value" id="kpi-total-recolte" style="color: var(--vert-fonce);">0.00 €</div>
-                </div>
-                <div class="kpi-card" id="kpi-resultat-card" style="border-left-color: var(--bleu);">
-                    <h4>Bénéfice Net Total</h4>
-                    <div class="value" id="kpi-total-benefice">0.00 €</div>
-                </div>
-            </div>
-
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 45%;">Nom de l'Événement / Manifestation</th>
-                            <th style="width: 16%; text-align: right;">Montant Investi (Coût)</th>
-                            <th style="width: 16%; text-align: right;">Montant Récolté</th>
-                            <th style="width: 16%; text-align: right;">Résultat (Net)</th>
-                            <th style="width: 7%; text-align: center;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-events">
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="rule-banner">
+      <strong>Règle d'or de vigilance Dojo :</strong> Pour préserver la dynamique et ne pas saturer les familles, <strong>les enfants ne portent qu'une seule vente active à la fois</strong> (le grand Challenge Calendriers du 04/11 au 04/01). Les autres opérations (chocolats, tombola) sont gérées en direct au club ou via commandes en ligne autonomes.
     </div>
 
-    <script type="text/javascript">
-        let dataEvenements = {
-            "2025-2026": [],
-            "2026-2027": [],
-            "2027-2028": []
-        };
+    <div class="main-grid">
+      
+      <!-- FORMULAIRE (CRÉATION OU MODIFICATION) -->
+      <div class="form-container">
+        <div class="card" id="formCard">
+          <div class="card-title">
+            <span id="formTitle">➕ Ajouter une manifestation</span>
+            <button id="cancelEditBtn" class="btn btn-outline" style="display:none; font-size:11px; padding:3px 8px;" onclick="cancelEdit()">Annuler modif</button>
+          </div>
+          <form id="eventForm" onsubmit="handleFormSubmit(event)">
+            <input type="hidden" id="editEventId" value="">
 
-        // --- INTERCONNEXION CLOUD SUPABASE ---
-        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-        const SUPABASE_TABLE = 'evenements';
+            <div class="form-group">
+              <label>Nom de l'action / événement</label>
+              <input type="text" id="evName" class="form-control" placeholder="Ex: Vente Chocolats Initiatives" required>
+            </div>
 
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            if (type === 'error') {
-                toast.style.background = '#C41E3A';
-                toast.style.borderLeft = '4px solid #A3182E';
-            }
-            toast.innerText = message;
-            container.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 3500);
-        }
+            <div class="form-group">
+              <label>Typologie d'action</label>
+              <select id="evType" class="form-control" onchange="handleTypeChange()">
+                <option value="vente-enfants">Vente par les enfants (Challenge Ambassadeurs)</option>
+                <option value="vente-club">Vente annexe autonome (Boutique / En ligne)</option>
+                <option value="tombola">Tombola / Tirage ponctuel</option>
+                <option value="evenement">Événement club / Rassemblement</option>
+              </select>
+            </div>
 
-        function obtenirSaisonCourante() {
-            return document.getElementById('select-saison').value;
-        }
+            <div class="form-group">
+              <label>Couleur personnalisée de l'événement</label>
+              <div class="color-picker-group">
+                <input type="color" id="evColor" class="color-preview-box" value="#D97706">
+                <div class="preset-colors">
+                  <div class="preset-btn" style="background: #C41E3A;" title="Rouge Dojo" onclick="setColor('#C41E3A')"></div>
+                  <div class="preset-btn" style="background: #D97706;" title="Ambre" onclick="setColor('#D97706')"></div>
+                  <div class="preset-btn" style="background: #16A34A;" title="Vert" onclick="setColor('#16A34A')"></div>
+                  <div class="preset-btn" style="background: #2563EB;" title="Bleu" onclick="setColor('#2563EB')"></div>
+                  <div class="preset-btn" style="background: #7C3AED;" title="Violet" onclick="setColor('#7C3AED')"></div>
+                  <div class="preset-btn" style="background: #DB2777;" title="Rose" onclick="setColor('#DB2777')"></div>
+                </div>
+              </div>
+            </div>
 
-        async function recalculerEtSauvegarder(silent = true) {
-            if (silent !== true && silent !== false) silent = true;
+            <div class="form-row">
+              <div class="form-group">
+                <label>Date début</label>
+                <input type="date" id="evStart" class="form-control" value="2026-11-04" required>
+              </div>
+              <div class="form-group">
+                <label>Date fin</label>
+                <input type="date" id="evEnd" class="form-control" value="2027-01-04" required>
+              </div>
+            </div>
 
-            const saison = obtenirSaisonCourante();
-            const tbody = document.getElementById('tbody-events');
-            const lignes = tbody.querySelectorAll('tr');
-            
-            let listeSaison = [];
-            let totalCout = 0;
-            let totalRecette = 0;
-            let totalBenefice = 0;
+            <div class="form-group">
+              <label>Canal & Public sollicité</label>
+              <input type="text" id="evTarget" class="form-control" placeholder="Ex: Enfants ambassadeurs (porte-à-porte)">
+            </div>
 
-            lignes.forEach(tr => {
-                const nom = tr.querySelector('.event-nom').value.trim();
-                const cout = parseFloat(tr.querySelector('.event-cout').value) || 0;
-                const recette = parseFloat(tr.querySelector('.event-recette').value) || 0;
-                const net = recette - cout;
+            <div class="form-group">
+              <label>Remarques / Logistique</label>
+              <input type="text" id="evNotes" class="form-control" placeholder="Ex: Livraison mi-décembre, stand lors des cours">
+            </div>
 
-                const cellNet = tr.querySelector('.val-resultat');
-                if (cellNet) {
-                    cellNet.innerText = net.toFixed(2) + " €";
-                    cellNet.className = "val-resultat";
-                    if (net > 0) cellNet.classList.add('res-positive');
-                    else if (net < 0) cellNet.classList.add('res-negative');
-                    else cellNet.classList.add('res-nul');
-                }
+            <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 6px;">
+              Enregistrer l'action
+            </button>
+          </form>
+        </div>
+      </div>
 
-                if (nom !== "") {
-                    listeSaison.push({ nom, cout, recette });
-                    totalCout += cout;
-                    totalRecette += recette;
-                    totalBenefice += net;
-                }
-            });
+      <!-- VISUELS PLANNING & RECAP -->
+      <div>
+        
+        <!-- FRISE CHRONOLOGIQUE GANTT -->
+        <div class="card">
+          <div class="card-title">
+            <span>📊 Frise Synoptique Interactive (Septembre à Juin)</span>
+            <span style="font-size:11px; font-weight:normal; color:var(--gris-moyen);">Cliquer sur une barre pour la modifier</span>
+          </div>
+          <div class="timeline-view">
+            <div class="timeline-header">
+              <div style="text-align: left;">Action / Période</div>
+              <div>Sep</div><div>Oct</div><div>Nov</div><div>Déc</div>
+              <div>Jan</div><div>Fév</div><div>Mar</div><div>Avr</div><div>Mai</div><div>Juin</div>
+            </div>
+            <div id="timelineContainer"></div>
+          </div>
+        </div>
 
-            dataEvenements[saison] = listeSaison;
-            
-            document.getElementById('kpi-total-investi').innerText = totalCout.toFixed(2) + " €";
-            document.getElementById('kpi-total-recolte').innerText = totalRecette.toFixed(2) + " €";
-            
-            const cardBenefice = document.getElementById('kpi-total-benefice');
-            const blocCardBenefice = document.getElementById('kpi-resultat-card');
-            cardBenefice.innerText = totalBenefice.toFixed(2) + " €";
+        <!-- TABLEAU RECAP -->
+        <div class="card">
+          <div class="card-title">📋 Statut et Arbitrage du Calendrier</div>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Manifestation</th>
+                <th>Période</th>
+                <th>Typologie</th>
+                <th>Canal & Sollicitation</th>
+                <th>Arbitrage</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="planningTableBody"></tbody>
+          </table>
+        </div>
 
-            if (totalBenefice > 0) {
-                cardBenefice.style.color = "var(--vert-fonce)";
-                blocCardBenefice.style.borderLeftColor = "var(--vert-fonce)";
-            } else if (totalBenefice < 0) {
-                cardBenefice.style.color = "var(--rouge)";
-                blocCardBenefice.style.borderLeftColor = "var(--rouge)";
-            } else {
-                cardBenefice.style.color = "var(--bleu)";
-                blocCardBenefice.style.borderLeftColor = "var(--bleu)";
-            }
+      </div>
 
-            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
-            try {
-                const payload = dataEvenements;
-                localStorage.setItem('dd_events_data', JSON.stringify(payload)); 
+    </div>
 
-                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
-                if (error) throw error;
-                
-                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
-            } catch (err) {
-                console.error("Erreur Supabase:", err);
-                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
-            }
-        }
+  </div>
 
-        async function chargerEvenementsData() {
-            // 1. Sync load from localStorage for instant UI
-            const saved = localStorage.getItem('dd_events_data');
-            if (saved) {
-                try {
-                    dataEvenements = JSON.parse(saved);
-                    renderView();
-                } catch(e) {}
-            } else {
-                useFallbackLocalData();
-                renderView();
-            }
-            
-            // 2. Async fetch from Supabase
-            try {
-                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
-                if (error) throw error;
-                if (result && result.data && (result.data["2025-2026"] || result.data["2026-2027"])) {
-                    dataEvenements = result.data;
-                    localStorage.setItem('dd_events_data', JSON.stringify(dataEvenements));
-                    renderView();
-                    console.log("✓ Données Événements chargées depuis Supabase.");
-                }
-            } catch(e) {
-                console.error("Erreur chargement Supabase:", e);
-            }
-        }
+  <!-- ONGLET 2 : SUIVI FINANCIER & RENTABILITÉ -->
+  <div id="tab-finances" class="tab-content">
+    
+    <div class="kpi-row">
+      <div class="kpi-card" style="border-left-color: var(--rouge);">
+        <h4>Total Coûts Investis</h4>
+        <div class="value" id="kpiTotalCout" style="color: var(--rouge);">0,00 €</div>
+      </div>
+      <div class="kpi-card" style="border-left-color: var(--vert-fonce);">
+        <h4>Total Recettes Récoltées</h4>
+        <div class="value" id="kpiTotalRecette" style="color: var(--vert-fonce);">0,00 €</div>
+      </div>
+      <div class="kpi-card" id="kpiCardBenefice" style="border-left-color: var(--bleu);">
+        <h4>Bénéfice Net Dégagé</h4>
+        <div class="value" id="kpiTotalBenefice">0,00 €</div>
+      </div>
+    </div>
 
-        function useFallbackLocalData() {
-            const backup = localStorage.getItem('dd_events_data');
-            if (backup) {
-                dataEvenements = JSON.parse(backup);
-            } else {
-                dataEvenements = {
-                    "2025-2026": [
-                        { nom: "Première Soirée Dojo Dornois", cout: 450, recette: 1250 },
-                        { nom: "Fête des Familles", cout: 200, recette: 550 }
-                    ],
-                    "2026-2027": [
-                        { nom: "Olympiades du Dojo", cout: 350, recette: 920 },
-                        { nom: "Repas Jambon à la broche", cout: 800, recette: 2100 }
-                    ],
-                    "2027-2028": []
-                };
-            }
-        }
+    <div class="card">
+      <div class="card-title">
+        <span>🪙 Rentabilité des Manifestations & Ventes (Champs éditables en direct)</span>
+        <button class="btn btn-success" onclick="openNewFinancialRow()">➕ Ajouter une opération</button>
+      </div>
+      <p style="font-size: 13px; color: var(--gris-moyen); margin-bottom: 16px;">
+        💡 Modifiez directement le coût ou la recette d'une action ci-dessous : le bénéfice net et les indicateurs totaux s'ajustent automatiquement.
+      </p>
 
-        function renderView() {
-            const saison = obtenirSaisonCourante();
-            const tbody = document.getElementById('tbody-events');
-            tbody.innerHTML = '';
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th style="width: 38%;">Événement / Manifestation</th>
+            <th style="width: 18%;" class="num">Coût Réalisé / Prévu (€)</th>
+            <th style="width: 18%;" class="num">Recette Récoltée (€)</th>
+            <th style="width: 16%;" class="num">Bénéfice Net (€)</th>
+            <th style="width: 10%; text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="financesTableBody"></tbody>
+      </table>
+    </div>
 
-            const liste = dataEvenements[saison] || [];
-            
-            liste.forEach((ev) => {
-                creerLigneHtml(ev.nom, ev.cout, ev.recette);
-            });
+  </div>
 
-            if (liste.length === 0) {
-                creerLigneHtml("", 0, 0);
-            }
+</div>
 
-            // On met à jour les totaux globaux sans renvoyer un doublon vers le réseau
-            calcularTotauxSimples();
-        }
+<script>
+  let defaultData = [
+    {
+      id: 1,
+      name: "Challenge Calendriers Initiatives",
+      type: "vente-enfants",
+      color: "#D97706",
+      start: "2026-11-04",
+      end: "2027-01-04",
+      target: "Enfants ambassadeurs (porte-à-porte & proches)",
+      notes: "Mobilisation exclusive des enfants. Priorité club.",
+      cout: 250.00,
+      recette: 1850.00
+    },
+    {
+      id: 2,
+      name: "Vente de Chocolats (Initiatives)",
+      type: "vente-club",
+      color: "#16A34A",
+      start: "2026-11-12",
+      end: "2026-12-04",
+      target: "Boutique en ligne & commandes au bureau",
+      notes: "Pas de livret confié aux enfants. Livraison avant Noël.",
+      cout: 50.00,
+      recette: 620.00
+    },
+    {
+      id: 3,
+      name: "Tombola de Noël du Dojo",
+      type: "tombola",
+      color: "#7C3AED",
+      start: "2026-12-14",
+      end: "2026-12-22",
+      target: "Tickets au dojo pendant les cours de décembre",
+      notes: "Tirage au sort le 22 décembre lors du goûter.",
+      cout: 80.00,
+      recette: 450.00
+    },
+    {
+      id: 4,
+      name: "Fête des Familles & Galette",
+      type: "evenement",
+      color: "#2563EB",
+      start: "2027-02-06",
+      end: "2027-02-06",
+      target: "Parents et enfants ensemble sur le tatami",
+      notes: "Journée festive et initiations partagées.",
+      cout: 150.00,
+      recette: 380.00
+    },
+    {
+      id: 5,
+      name: "Olympiades de fin de saison",
+      type: "evenement",
+      color: "#C41E3A",
+      start: "2027-06-12",
+      end: "2027-06-12",
+      target: "Tous les licenciés & clubs invités",
+      notes: "Clôture festive sportive et récompenses de fin de saison.",
+      cout: 350.00,
+      recette: 920.00
+    }
+  ];
 
-        function calcularTotauxSimples() {
-            const saison = obtenirSaisonCourante();
-            const liste = dataEvenements[saison] || [];
-            let totalCout = 0; let totalRecette = 0; let totalBenefice = 0;
+  let items = JSON.parse(localStorage.getItem('dojo_manifestations_complete_v2')) || defaultData;
 
-            const tbody = document.getElementById('tbody-events');
-            const lignes = tbody.querySelectorAll('tr');
-            
-            lignes.forEach(tr => {
-                const cout = parseFloat(tr.querySelector('.event-cout').value) || 0;
-                const recette = parseFloat(tr.querySelector('.event-recette').value) || 0;
-                const net = recette - cout;
+  const tStart = new Date("2026-09-01").getTime();
+  const tEnd = new Date("2027-06-30").getTime();
 
-                const cellNet = tr.querySelector('.val-resultat');
-                if(cellNet) {
-                    cellNet.innerText = net.toFixed(2) + " €";
-                    cellNet.className = "val-resultat";
-                    if (net > 0) cellNet.classList.add('res-positive');
-                    else if (net < 0) cellNet.classList.add('res-negative');
-                    else cellNet.classList.add('res-nul');
-                }
-                totalCout += cout;
-                totalRecette += recette;
-                totalBenefice += net;
-            });
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-            document.getElementById('kpi-total-investi').innerText = totalCout.toFixed(2) + " €";
-            document.getElementById('kpi-total-recolte').innerText = totalRecette.toFixed(2) + " €";
-            
-            const cardBenefice = document.getElementById('kpi-total-benefice');
-            const blocCardBenefice = document.getElementById('kpi-resultat-card');
-            cardBenefice.innerText = totalBenefice.toFixed(2) + " €";
+    if (tabId === 'tab-planning') {
+      document.querySelectorAll('.tab-btn')[0].classList.add('active');
+      document.getElementById('tab-planning').classList.add('active');
+      renderPlanning();
+    } else {
+      document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      document.getElementById('tab-finances').classList.add('active');
+      renderFinances();
+    }
+  }
 
-            if (totalBenefice > 0) {
-                cardBenefice.style.color = "var(--vert-fonce)";
-                blocCardBenefice.style.borderLeftColor = "var(--vert-fonce)";
-            } else if (totalBenefice < 0) {
-                cardBenefice.style.color = "var(--rouge)";
-                blocCardBenefice.style.borderLeftColor = "var(--rouge)";
-            } else {
-                cardBenefice.style.color = "var(--bleu)";
-                blocCardBenefice.style.borderLeftColor = "var(--bleu)";
-            }
-        }
+  function fmtDate(s) {
+    if (!s) return "";
+    const p = s.split('-');
+    return `${p[2]}/${p[1]}/${p[0]}`;
+  }
 
-        function creerLigneHtml(nom, cout, recette) {
-            const tbody = document.getElementById('tbody-events');
-            const tr = document.createElement('tr');
+  function setColor(hex) {
+    document.getElementById('evColor').value = hex;
+  }
 
-            tr.innerHTML = `
-                <td><input type="text" class="input-table event-nom" value="${nom}" placeholder="Nom de l'activité (ex: Loto, Arbre de Noël...)" /></td>
-                <td><input type="number" class="input-table input-num event-cout" value="${cout}" min="0" step="0.01" /></td>
-                <td><input type="number" class="input-table input-num event-recette" value="${recette}" min="0" step="0.01" /></td>
-                <td class="val-resultat">0.00 €</td>
-                <td style="text-align:center;"><button class="btn-delete" title="Supprimer">❌</button></td>
-            `;
+  function handleTypeChange() {
+    const t = document.getElementById('evType').value;
+    const targetInput = document.getElementById('evTarget');
+    if (t === 'vente-enfants') {
+      setColor('#D97706');
+      if (!targetInput.value || targetInput.dataset.auto === "true") {
+        targetInput.value = "Enfants ambassadeurs (porte-à-porte & familles)";
+        targetInput.dataset.auto = "true";
+      }
+    } else if (t === 'vente-club') {
+      setColor('#16A34A');
+      if (!targetInput.value || targetInput.dataset.auto === "true") {
+        targetInput.value = "Boutique en ligne & commandes au bureau";
+        targetInput.dataset.auto = "true";
+      }
+    } else if (t === 'tombola') {
+      setColor('#7C3AED');
+      if (!targetInput.value || targetInput.dataset.auto === "true") {
+        targetInput.value = "Vente de tickets au dojo lors des cours";
+        targetInput.dataset.auto = "true";
+      }
+    } else {
+      setColor('#2563EB');
+      if (!targetInput.value || targetInput.dataset.auto === "true") {
+        targetInput.value = "Tous les licenciés & familles";
+        targetInput.dataset.auto = "true";
+      }
+    }
+  }
 
-            tr.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', recalculerEtSauvegarder);
-            });
+  function checkConflict(item) {
+    if (item.type === 'vente-enfants') {
+      const conflict = items.filter(x => x.id !== item.id && x.type === 'vente-enfants' && (
+        new Date(x.start) <= new Date(item.end) && new Date(x.end) >= new Date(item.start)
+      ));
+      if (conflict.length > 0) return '<strong style="color:#DC2626;">⚠️ Conflit Enfants</strong>';
+    }
+    return '<strong style="color:#16A34A;">✅ Calage Validé</strong>';
+  }
 
-            tr.querySelector('.btn-delete').addEventListener('click', () => {
-                tr.remove();
-                recalculerEtSauvegarder();
-                if (tbody.querySelectorAll('tr').length === 0) {
-                    creerLigneHtml("", 0, 0);
-                    recalculerEtSauvegarder();
-                }
-            });
+  function getBadgeHtml(type) {
+    if (type === 'vente-enfants') return '<span class="badge" style="background:#FEF3C7; color:#92400E;">Vente Enfants</span>';
+    if (type === 'vente-club') return '<span class="badge" style="background:#DCFCE7; color:#166534;">Vente Autonome</span>';
+    if (type === 'tombola') return '<span class="badge" style="background:#EDE9FE; color:#5B21B6;">Tombola</span>';
+    return '<span class="badge" style="background:#DBEAFE; color:#1E40AF;">Événement Club</span>';
+  }
 
-            tbody.appendChild(tr);
-        }
+  // --- RENDU PLANNING ---
+  function renderPlanning() {
+    const tableBody = document.getElementById('planningTableBody');
+    const timelineContainer = document.getElementById('timelineContainer');
+    tableBody.innerHTML = '';
+    timelineContainer.innerHTML = '';
 
-        function ajouterEvenement() {
-            creerLigneHtml("", 0, 0);
-            recalculerEtSauvegarder();
-            const lignes = document.getElementById('tbody-events').querySelectorAll('tr');
-            if(lignes.length > 0) {
-                lignes[lignes.length - 1].querySelector('.event-nom').focus();
-            }
-        }
+    items.sort((a,b) => new Date(a.start) - new Date(b.start));
 
-        function changerSaison() {
-            renderView();
-        }
+    items.forEach(ev => {
+      // Tableau
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:12px; height:12px; border-radius:3px; background:${ev.color || '#C41E3A'}; flex-shrink:0;"></div>
+            <strong>${ev.name}</strong>
+          </div>
+          <div style="font-size:11.5px; color:#6B6B6B; margin-left:20px;">${ev.notes || ''}</div>
+        </td>
+        <td style="white-space:nowrap;">${fmtDate(ev.start)} ➔ ${fmtDate(ev.end)}</td>
+        <td>${getBadgeHtml(ev.type)}</td>
+        <td style="font-size:12px;">${ev.target || ''}</td>
+        <td>${checkConflict(ev)}</td>
+        <td style="text-align:right;">
+          <div class="action-btn-group">
+            <button class="btn-icon" onclick="startEditEvent(${ev.id})" title="Modifier cet événement">✏️</button>
+            <button class="btn-icon del" onclick="deleteEvent(${ev.id})" title="Supprimer">🗑️</button>
+          </div>
+        </td>
+      `;
+      tableBody.appendChild(tr);
 
-        function imprimerEvenements() {
-            const saison = obtenirSaisonCourante();
-            const liste = dataEvenements[saison] || [];
-            
-            let lignesHtml = '';
-            let totalCout = 0;
-            let totalRecette = 0;
+      // Frise Chronologique
+      const dStart = new Date(ev.start).getTime();
+      const dEnd = new Date(ev.end).getTime();
 
-            liste.forEach(ev => {
-                const net = ev.recette - ev.cout;
-                totalCout += ev.cout;
-                totalRecette += ev.recette;
-                
-                lignesHtml += `
-                    <tr>
-                        <td style="padding: 10px; border-bottom: 1px solid #E8E8E8; font-weight: 500;">${ev.nom}</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #E8E8E8; text-align: right; font-weight: 500;">${ev.cout.toFixed(2)} €</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #E8E8E8; text-align: right; font-weight: 500;">${ev.recette.toFixed(2)} €</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #E8E8E8; text-align: right; font-weight: bold; color: ${net >= 0 ? '#27ae60' : '#C41E3A'};">
-                            ${net >= 0 ? '+' : ''}${net.toFixed(2)} €
-                        </td>
-                    </tr>`;
-            });
+      let left = ((dStart - tStart) / (tEnd - tStart)) * 100;
+      let width = ((dEnd - dStart) / (tEnd - tStart)) * 100;
 
-            const netTotal = totalRecette - totalCout;
-            const pDateTexte = "Document généré le " + new Date().toLocaleDateString('fr-FR');
-            
-            const win = window.open('', '_blank');
-            win.document.write(`
-                <!DOCTYPE html>
-                <html lang="fr">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Bilan Manifestations — ${saison}</title>
-                    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
-                    <style>
-                        @page { size: A4 landscape; margin: 15mm; }
-                        body { font-family: 'Roboto', sans-serif; color: #3D3D3D; margin: 0; padding: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                        .print-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E8E8E8; padding-bottom: 15px; margin-bottom: 20px; }
-                        .print-logo { height: 65px; width: 65px; object-fit: contain; background: #C41E3A; padding: 5px; border-radius: 6px; }
-                        .print-club-info { text-align: right; font-size: 0.8rem; color: #6B6B6B; line-height: 1.4; }
-                        .print-club-info strong { color: #1A1A1A; font-size: 0.95rem; font-family: 'Fredoka', sans-serif; }
-                        .title-container { position: relative; margin-bottom: 15px; }
-                        .title-stripe { width: 100%; height: 4px; background: #C41E3A; border-radius: 2px; margin-bottom: 8px; }
-                        .doc-title { font-family: 'Fredoka', sans-serif; color: #1A1A1A; font-size: 1.6rem; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
-                        .doc-meta { font-size: 0.85rem; color: #6B6B6B; margin-bottom: 25px; font-weight: 500; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-                        th { background: #3D3D3D; color: white; padding: 12px 10px; text-align: left; font-family: 'Fredoka', sans-serif; font-size: 0.95rem; font-weight: 500; }
-                        th:nth-child(2), th:nth-child(3), th:nth-child(4) { text-align: right; }
-                        .total-row td { background: #F4F6F9; font-weight: bold; font-family: 'Fredoka', sans-serif; font-size: 1.05rem; padding: 14px 10px; border-top: 2px solid #3D3D3D; border-bottom: 2px solid #3D3D3D; }
-                        .print-footer { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; font-size: 0.75rem; color: #B8B8B8; border-top: 1px solid #E8E8E8; padding-top: 10px; font-weight: 500; }
-                    </style>
-                </head>
-                <body>
-                    <div class="print-header">
-                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
-                        <div class="print-club-info">
-                            <strong>DOJO DORNOIS</strong><br>
-                            1 PL. DE LA MAIRIE, 58390 DORNES | contact@dojodornois.fr<br>
-                            FFJDA N° CE 08.58.067.0 | SIRET 451 928 410 00013 | RNA W583001220
-                        </div>
-                    </div>
-                    <div class="title-container">
-                        <div class="title-stripe"></div>
-                        <h1 class="doc-title">Bilan Récapitulatif des Manifestations</h1>
-                    </div>
-                    <div class="doc-meta">Saison Sportive : ${saison} &bull; ${pDateTexte}</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 45%;">Nom de l'Événement / Manifestation</th>
-                                <th style="width: 18%; text-align: right;">Montant Investi (Coût)</th>
-                                <th style="width: 18%; text-align: right;">Montant Récolté</th>
-                                <th style="width: 19%; text-align: right;">Résultat Net</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${lignesHtml}
-                            <tr class="total-row">
-                                <td>TOTAL GÉNÉRAL NET</td>
-                                <td style="text-align: right;">${totalCout.toFixed(2)} €</td>
-                                <td style="text-align: right;">${totalRecette.toFixed(2)} €</td>
-                                <td style="text-align: right; color: ${netTotal >= 0 ? '#27ae60':'#C41E3A'};">
-                                    ${netTotal >= 0 ? '+' : ''}${netTotal.toFixed(2)} €
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="print-footer">
-                        Dojo Dornois &bull; Judo & Disciplines Associées &bull; RNA : W583001220 &bull; Extrait officiel certifié conforme à Dornes
-                    </div>
-                    <script>
-                        window.onload = function() {
-                            setTimeout(function() {
-                                window.print();
-                                window.close();
-                            }, 300);
-                        };
-                    <\/script>
-                </body>
-                </html>
-            `);
-            win.document.close();
-        }
+      if (left < 0) left = 0;
+      if (width < 3.2) width = 3.5;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            chargerEvenementsData();
-        });
+      const row = document.createElement('div');
+      row.className = 'timeline-row';
+      row.innerHTML = `
+        <div class="timeline-label" onclick="startEditEvent(${ev.id})" style="cursor:pointer;" title="Cliquer pour modifier">
+          <span style="display:inline-block; border-left:3px solid ${ev.color || '#C41E3A'}; padding-left:6px;">${ev.name}</span>
+          <div style="font-size:10.5px; color:#6B6B6B; padding-left:9px;">${fmtDate(ev.start)} - ${fmtDate(ev.end)}</div>
+        </div>
+        <div class="timeline-track">
+          <div class="timeline-bar" style="left: ${left}%; width: ${width}%; background: ${ev.color || '#C41E3A'};" onclick="startEditEvent(${ev.id})" title="${ev.name} (${fmtDate(ev.start)} au ${fmtDate(ev.end)}) - Cliquer pour éditer">
+            ${ev.name}
+          </div>
+        </div>
+      `;
+      timelineContainer.appendChild(row);
+    });
 
-        window.ajouterEvenement = ajouterEvenement;
-        window.changerSaison = changerSaison;
-        window.imprimerEvenements = imprimerEvenements;
-    </script>
+    saveLocal();
+  }
 
-    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
-    <script src="../js/sidebar.js"></script>
+  // --- RENDU FINANCES ---
+  function renderFinances() {
+    const tbody = document.getElementById('financesTableBody');
+    tbody.innerHTML = '';
+
+    let totalCout = 0;
+    let totalRecette = 0;
+    let totalBenefice = 0;
+
+    items.sort((a,b) => new Date(a.start) - new Date(b.start));
+
+    items.forEach(ev => {
+      const cout = Number(ev.cout) || 0;
+      const recette = Number(ev.recette) || 0;
+      const benefice = recette - cout;
+
+      totalCout += cout;
+      totalRecette += recette;
+      totalBenefice += benefice;
+
+      let netClass = benefice > 0 ? "val-positive" : (benefice < 0 ? "val-negative" : "val-neutre");
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:12px; height:12px; border-radius:3px; background:${ev.color || '#C41E3A'}; flex-shrink:0;"></div>
+            <strong>${ev.name}</strong>
+          </div>
+          <span style="font-size:11px; color:#6B6B6B; margin-left:20px;">${fmtDate(ev.start)}</span>
+        </td>
+        <td class="num">
+          <input type="number" step="0.01" min="0" class="form-control" style="width:110px; text-align:right; display:inline-block;" value="${cout.toFixed(2)}" onchange="updateFinRow(${ev.id}, 'cout', this.value)">
+        </td>
+        <td class="num">
+          <input type="number" step="0.01" min="0" class="form-control" style="width:110px; text-align:right; display:inline-block;" value="${recette.toFixed(2)}" onchange="updateFinRow(${ev.id}, 'recette', this.value)">
+        </td>
+        <td class="num ${netClass}" style="font-size:14px; font-family:'Fredoka', sans-serif;">
+          ${benefice >= 0 ? '+' : ''}${benefice.toFixed(2)} €
+        </td>
+        <td style="text-align:right;">
+          <button class="btn-icon del" onclick="deleteEvent(${ev.id})" title="Supprimer">🗑️</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('kpiTotalCout').innerText = totalCout.toFixed(2).replace('.', ',') + " €";
+    document.getElementById('kpiTotalRecette').innerText = totalRecette.toFixed(2).replace('.', ',') + " €";
+    
+    const kpiBenef = document.getElementById('kpiTotalBenefice');
+    const kpiCard = document.getElementById('kpiCardBenefice');
+    kpiBenef.innerText = (totalBenefice >= 0 ? '+' : '') + totalBenefice.toFixed(2).replace('.', ',') + " €";
+
+    if (totalBenefice > 0) {
+      kpiBenef.style.color = "var(--vert-fonce)";
+      kpiCard.style.borderLeftColor = "var(--vert-fonce)";
+    } else if (totalBenefice < 0) {
+      kpiBenef.style.color = "var(--rouge)";
+      kpiCard.style.borderLeftColor = "var(--rouge)";
+    } else {
+      kpiBenef.style.color = "var(--bleu)";
+      kpiCard.style.borderLeftColor = "var(--bleu)";
+    }
+
+    saveLocal();
+  }
+
+  function updateFinRow(id, field, value) {
+    const ev = items.find(x => x.id === id);
+    if (ev) {
+      ev[field] = parseFloat(value) || 0;
+      renderFinances();
+    }
+  }
+
+  function openNewFinancialRow() {
+    switchTab('tab-planning');
+    document.getElementById('evName').focus();
+  }
+
+  // --- ACTIONS FORMULAIRE (CRÉATION / ÉDITION) ---
+  function handleFormSubmit(e) {
+    e.preventDefault();
+    const editId = document.getElementById('editEventId').value;
+    const name = document.getElementById('evName').value.trim();
+    const type = document.getElementById('evType').value;
+    const color = document.getElementById('evColor').value;
+    const start = document.getElementById('evStart').value;
+    const end = document.getElementById('evEnd').value;
+    const target = document.getElementById('evTarget').value.trim();
+    const notes = document.getElementById('evNotes').value.trim();
+
+    if (new Date(end) < new Date(start)) {
+      alert("Erreur : la date de fin ne peut pas être antérieure à la date de début.");
+      return;
+    }
+
+    if (editId) {
+      const existing = items.find(x => x.id === Number(editId));
+      if (existing) {
+        existing.name = name;
+        existing.type = type;
+        existing.color = color;
+        existing.start = start;
+        existing.end = end;
+        existing.target = target;
+        existing.notes = notes;
+      }
+    } else {
+      items.push({
+        id: Date.now(),
+        name,
+        type,
+        color,
+        start,
+        end,
+        target,
+        notes,
+        cout: 0,
+        recette: 0
+      });
+    }
+
+    cancelEdit();
+    renderPlanning();
+  }
+
+  function startEditEvent(id) {
+    switchTab('tab-planning');
+    const ev = items.find(x => x.id === id);
+    if (!ev) return;
+
+    document.getElementById('editEventId').value = ev.id;
+    document.getElementById('evName').value = ev.name;
+    document.getElementById('evType').value = ev.type;
+    document.getElementById('evColor').value = ev.color || '#C41E3A';
+    document.getElementById('evStart').value = ev.start;
+    document.getElementById('evEnd').value = ev.end;
+    document.getElementById('evTarget').value = ev.target || '';
+    document.getElementById('evNotes').value = ev.notes || '';
+
+    document.getElementById('formTitle').innerText = "✏️ Modifier l'événement";
+    document.getElementById('submitBtn').innerText = "Mettre à jour l'événement";
+    document.getElementById('submitBtn').classList.remove('btn-primary');
+    document.getElementById('submitBtn').classList.add('btn-dark');
+    document.getElementById('cancelEditBtn').style.display = 'inline-block';
+    
+    document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function cancelEdit() {
+    document.getElementById('editEventId').value = '';
+    document.getElementById('evName').value = '';
+    document.getElementById('evNotes').value = '';
+    document.getElementById('evTarget').value = '';
+    document.getElementById('formTitle').innerText = "➕ Ajouter une manifestation";
+    document.getElementById('submitBtn').innerText = "Enregistrer l'action";
+    document.getElementById('submitBtn').classList.remove('btn-dark');
+    document.getElementById('submitBtn').classList.add('btn-primary');
+    document.getElementById('cancelEditBtn').style.display = 'none';
+  }
+
+  function deleteEvent(id) {
+    if (confirm("Voulez-vous vraiment supprimer cet événement ?")) {
+      items = items.filter(x => x.id !== id);
+      renderPlanning();
+      renderFinances();
+    }
+  }
+
+  function saveLocal() {
+    localStorage.setItem('dojo_manifestations_complete_v2', JSON.stringify(items));
+  }
+
+  function resetDefaults() {
+    if (confirm("Réinitialiser avec les manifestations et budgets d'exemple ?")) {
+      items = JSON.parse(JSON.stringify(defaultData));
+      cancelEdit();
+      renderPlanning();
+      renderFinances();
+    }
+  }
+
+  renderPlanning();
+  renderFinances();
+</script>
 
 </body>
 </html>
