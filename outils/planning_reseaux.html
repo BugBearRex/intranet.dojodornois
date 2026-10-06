@@ -3,25 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planning Réseaux Sociaux - Dojo Dornois</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Centre de Planification & Publications - Dojo Dornois</title>
     
+    <!-- Polices officielles Dojo Dornois -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --dojo-red: #C41E3A;
             --dojo-dark-red: #8B1429;
-            --dojo-bg: #F8F9FA;
+            --dojo-bg: #F4F6F9;
             --dojo-card-bg: #FFFFFF;
             --text-color: #1A1A1A;
+            --text-muted: #64748B;
             --border-color: #E2E8F0;
-            
-            /* Couleurs Réseaux */
+
+            /* Réseaux et Canaux */
             --fb-color: #1877F2;
             --fb-bg: #E7F1FF;
             --ig-color: #E4405F;
             --ig-bg: #FDE8EC;
             --wa-color: #25D366;
             --wa-bg: #E8F8EF;
+            --gmail-color: #EA4335;
+            --gmail-bg: #FCE8E6;
+            --kali-color: #0284C7;
+            --kali-bg: #E0F2FE;
         }
 
         * {
@@ -39,238 +48,114 @@
             min-height: 100vh;
         }
 
-        /* Conteneur principal */
         .main-content {
             flex: 1;
-            padding: 25px;
-            max-width: 1400px;
+            padding: 24px;
+            max-width: 1440px;
             margin: 0 auto;
         }
 
         /* En-tête */
         .page-header {
             background: var(--dojo-card-bg);
-            padding: 20px 25px;
+            padding: 20px 24px;
             border-radius: 12px;
             border-left: 6px solid var(--dojo-red);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 16px;
         }
 
         .page-header h1 {
             font-family: 'Fredoka', sans-serif;
-            font-size: 1.8rem;
+            font-size: 1.7rem;
             color: var(--text-color);
         }
 
         .page-header p {
-            color: #64748B;
-            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
         .header-actions {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         /* Boutons */
         .btn {
             font-family: 'Fredoka', sans-serif;
-            padding: 10px 18px;
+            padding: 9px 16px;
             border-radius: 8px;
             border: none;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             transition: all 0.2s ease;
+            text-decoration: none;
         }
 
-        .btn-primary {
-            background-color: var(--dojo-red);
-            color: white;
-        }
+        .btn-primary { background-color: var(--dojo-red); color: white; }
+        .btn-primary:hover { background-color: var(--dojo-dark-red); }
+        .btn-success { background-color: #10B981; color: white; }
+        .btn-success:hover { background-color: #059669; }
+        .btn-secondary { background-color: #E2E8F0; color: #334155; }
+        .btn-secondary:hover { background-color: #CBD5E1; }
+        .btn-outline { background: white; border: 1px solid var(--border-color); color: #334155; }
+        .btn-outline:hover { background: #F8FAFC; border-color: #CBD5E1; }
 
-        .btn-primary:hover {
-            background-color: var(--dojo-dark-red);
-        }
-
-        .btn-success {
-            background-color: #10B981;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #059669;
-        }
-
-        .btn-secondary {
-            background-color: #E2E8F0;
-            color: #334155;
-        }
-
-        .btn-secondary:hover {
-            background-color: #CBD5E1;
-        }
-
-        /* Formulaire de saisie */
-        .form-card {
+        /* Barre de filtres */
+        .filter-bar {
             background: var(--dojo-card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            margin-bottom: 25px;
-            transition: border-color 0.3s ease;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1px solid var(--border-color);
         }
 
-        .form-card.edit-mode {
-            border: 2px solid #3B82F6;
-            background: #F0F6FF;
-        }
-
-        .form-card h2 {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--dojo-red);
+        .filter-group {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1.5fr;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        @media (max-width: 900px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .form-group label {
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: #475569;
-        }
-
-        .form-control {
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-family: 'Roboto', sans-serif;
-            font-size: 0.95rem;
-            background: white;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--dojo-red);
-            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        /* Encadrés Réseaux */
-        .network-checkboxes {
-            display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
-        .network-pill {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
+        .filter-btn {
+            padding: 6px 12px;
             border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: white;
+            font-size: 0.82rem;
             cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            user-select: none;
-            border: 2px solid transparent;
-            transition: all 0.2s ease;
+            font-family: 'Fredoka', sans-serif;
+            transition: all 0.15s ease;
         }
 
-        .network-pill input {
-            display: none;
-        }
-
-        .pill-fb {
-            background-color: var(--fb-bg);
-            color: var(--fb-color);
-            border-color: rgba(24, 119, 242, 0.2);
-        }
-
-        .network-pill input:checked + .pill-fb-label {
-            background-color: var(--fb-color);
+        .filter-btn.active {
+            background: var(--dojo-red);
             color: white;
-            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
+            border-color: var(--dojo-red);
         }
 
-        .pill-ig {
-            background-color: var(--ig-bg);
-            color: var(--ig-color);
-            border-color: rgba(228, 64, 95, 0.2);
-        }
-
-        .network-pill input:checked + .pill-ig-label {
-            background-color: var(--ig-color);
-            color: white;
-            box-shadow: 0 2px 8px rgba(228, 64, 95, 0.3);
-        }
-
-        .pill-wa {
-            background-color: var(--wa-bg);
-            color: var(--wa-color);
-            border-color: rgba(37, 211, 102, 0.2);
-        }
-
-        .network-pill input:checked + .pill-wa-label {
-            background-color: var(--wa-color);
-            color: white;
-            box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
-        }
-
-        /* Style étiquettes */
-        .badge-net {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.78rem;
-            font-weight: 700;
-            margin-right: 4px;
-            margin-bottom: 3px;
-        }
-
-        .badge-fb { background: var(--fb-bg); color: var(--fb-color); }
-        .badge-ig { background: var(--ig-bg); color: var(--ig-color); }
-        .badge-wa { background: var(--wa-bg); color: var(--wa-color); }
-
-        /* Tableau des publications */
+        /* Tableau */
         .table-card {
             background: var(--dojo-card-bg);
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
             overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
         .table-responsive {
@@ -284,12 +169,12 @@
         }
 
         th {
-            background-color: #F1F5F9;
+            background-color: #F8FAFC;
             color: #475569;
             font-family: 'Fredoka', sans-serif;
             font-weight: 600;
             padding: 14px 16px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             border-bottom: 2px solid var(--border-color);
         }
 
@@ -297,21 +182,42 @@
             padding: 12px 16px;
             border-bottom: 1px solid var(--border-color);
             vertical-align: middle;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
         }
 
         tr:hover {
-            background-color: #F8FAFC;
+            background-color: #FAFAFA;
         }
+
+        /* Badges Canaux */
+        .badge-net {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            margin-right: 4px;
+            margin-bottom: 3px;
+            white-space: nowrap;
+        }
+
+        .badge-fb { background: var(--fb-bg); color: var(--fb-color); }
+        .badge-ig { background: var(--ig-bg); color: var(--ig-color); }
+        .badge-wa { background: var(--wa-bg); color: var(--wa-color); }
+        .badge-gmail { background: var(--gmail-bg); color: var(--gmail-color); }
+        .badge-kali { background: var(--kali-bg); color: var(--kali-color); }
 
         /* Statuts */
         .status-select {
             padding: 6px 10px;
             border-radius: 20px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            border: none;
+            border: 1px solid transparent;
             cursor: pointer;
+            outline: none;
             width: 100%;
         }
 
@@ -320,10 +226,26 @@
         .status-ready { background: #E0E7FF; color: #3730A3; }
         .status-published { background: #D1FAE5; color: #065F46; }
 
+        /* Miniature visuelle */
+        .media-preview-mini {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .media-preview-mini:hover {
+            transform: scale(1.1);
+        }
+
         /* Actions de ligne */
         .row-actions {
             display: flex;
-            gap: 4px;
+            gap: 5px;
+            align-items: center;
             justify-content: center;
         }
 
@@ -334,25 +256,174 @@
             height: 32px;
             border-radius: 6px;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            color: #475569;
+            transition: all 0.15s ease;
+        }
+
+        .btn-icon:hover { background: #E2E8F0; color: #0F172A; }
+        .btn-copy:hover { background: #FEF3C7; color: #B45309; }
+        .btn-download:hover { background: #E0F2FE; color: #0284C7; }
+        .btn-edit:hover { background: #DBEAFE; color: #2563EB; }
+        .btn-delete:hover { background: #FEE2E2; color: #DC2626; }
+
+        /* Modale */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 760px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3rem;
+            color: var(--dojo-red);
+        }
+
+        .modal-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .form-control {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.92rem;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--dojo-red);
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        /* Sélecteurs de canaux en pastilles */
+        .channel-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .channel-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            user-select: none;
+            border: 1px solid transparent;
             transition: all 0.2s ease;
         }
 
-        .btn-icon:hover {
-            background: #E2E8F0;
+        .channel-pill input { display: none; }
+
+        .pill-fb { background: var(--fb-bg); color: var(--fb-color); border-color: rgba(24,119,242,0.2); }
+        .channel-pill input:checked + .pill-label-fb { background: var(--fb-color); color: white; border-radius: 16px; padding: 4px 10px; }
+
+        .pill-ig { background: var(--ig-bg); color: var(--ig-color); border-color: rgba(228,64,95,0.2); }
+        .channel-pill input:checked + .pill-label-ig { background: var(--ig-color); color: white; border-radius: 16px; padding: 4px 10px; }
+
+        .pill-wa { background: var(--wa-bg); color: var(--wa-color); border-color: rgba(37,211,102,0.2); }
+        .channel-pill input:checked + .pill-label-wa { background: var(--wa-color); color: white; border-radius: 16px; padding: 4px 10px; }
+
+        .pill-gmail { background: var(--gmail-bg); color: var(--gmail-color); border-color: rgba(234,67,53,0.2); }
+        .channel-pill input:checked + .pill-label-gmail { background: var(--gmail-color); color: white; border-radius: 16px; padding: 4px 10px; }
+
+        .pill-kali { background: var(--kali-bg); color: var(--kali-color); border-color: rgba(2,132,199,0.2); }
+        .channel-pill input:checked + .pill-label-kali { background: var(--kali-color); color: white; border-radius: 16px; padding: 4px 10px; }
+
+        /* Zone d'import de visuel */
+        .image-drop-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+            background: #F8FAFC;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
 
-        .btn-edit:hover {
-            background: #DBEAFE;
-            color: #2563EB;
-        }
+        .image-drop-area:hover { border-color: var(--dojo-red); }
 
-        .btn-delete:hover {
-            background: #FEE2E2;
-            color: #DC2626;
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: #F8FAFC;
+            border-bottom-left-radius: 14px;
+            border-bottom-right-radius: 14px;
         }
 
         /* Notif Toast */
@@ -366,11 +437,11 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             display: none;
-            z-index: 1000;
+            z-index: 2000;
             font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -379,77 +450,127 @@
     <div class="main-content">
         <div class="page-header">
             <div>
-                <h1>📅 Planning de Publications Réseaux Sociaux</h1>
-                <p>Préparez, ordonnez et planifiez les contenus du Dojo Dornois sur Facebook, Instagram et WhatsApp.</p>
+                <h1>📅 Hub de Planification & Publications</h1>
+                <p>Centralisation complète : Facebook, Instagram, WhatsApp, Mails Gmail & Newsletters Kalisport.</p>
             </div>
             <div class="header-actions">
-                <button class="btn btn-secondary" onclick="exportJSON()">💾 Exporter JSON</button>
-                <button class="btn btn-success" onclick="syncToSupabase(false)">☁️ Synchroniser Supabase</button>
+                <button class="btn btn-outline" onclick="exportJSON()"><i class="fa-solid fa-download"></i> Sauvegarde JSON</button>
+                <button class="btn btn-success" onclick="syncToSupabase(false)"><i class="fa-solid fa-cloud-arrow-up"></i> Synchroniser</button>
+                <button class="btn btn-primary" onclick="openCreateModal()"><i class="fa-solid fa-plus"></i> Nouvelle Publication</button>
             </div>
         </div>
 
-        <div class="form-card" id="formCard">
-            <h2 id="formTitle">➕ Ajouter une nouvelle publication</h2>
-            <form id="pubForm" onsubmit="savePublication(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="pubTitle">Titre de la publication / Sujet *</label>
-                        <input type="text" id="pubTitle" class="form-control" placeholder="ex: Reprise du Taïso Senior & Inscriptions" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="pubDate">Date / Période *</label>
-                        <input type="text" id="pubDate" class="form-control" placeholder="ex: Lundi 24 Août ou S36" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Réseaux cibles *</label>
-                        <div class="network-checkboxes">
-                            <label class="network-pill pill-fb">
-                                <input type="checkbox" id="netFB" value="Facebook">
-                                <span class="pill-fb-label">📘 Facebook</span>
-                            </label>
-                            <label class="network-pill pill-ig">
-                                <input type="checkbox" id="netIG" value="Instagram">
-                                <span class="pill-ig-label">📸 Instagram</span>
-                            </label>
-                            <label class="network-pill pill-wa">
-                                <input type="checkbox" id="netWA" value="WhatsApp">
-                                <span class="pill-wa-label">💬 WhatsApp</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="pubDesc">Descriptif / Brouillon / Éléments de rédaction</label>
-                    <textarea id="pubDesc" class="form-control" placeholder="Détails du texte, rappels d'horaires, emojis, photo/visuel à joindre..."></textarea>
-                </div>
-
-                <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                    <button type="button" class="btn btn-secondary" id="btnCancelEdit" style="display: none;" onclick="cancelEdit()">❌ Annuler</button>
-                    <button type="submit" class="btn btn-primary" id="btnSubmit">➕ Ajouter au planning</button>
-                </div>
-            </form>
+        <!-- Filtres par réseau -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <span style="font-weight:600; font-size:0.85rem; color:#64748B;">Filtrer par canal :</span>
+                <button class="filter-btn active" onclick="setFilter('ALL')">Tous</button>
+                <button class="filter-btn" onclick="setFilter('Facebook')">📘 Facebook</button>
+                <button class="filter-btn" onclick="setFilter('Instagram')">📸 Instagram</button>
+                <button class="filter-btn" onclick="setFilter('WhatsApp')">💬 WhatsApp</button>
+                <button class="filter-btn" onclick="setFilter('Gmail')">✉️ Gmail</button>
+                <button class="filter-btn" onclick="setFilter('Kalisport')">📰 Kalisport</button>
+            </div>
+            <div style="font-size:0.85rem; color:#64748B;">
+                Total : <strong id="totalCount" style="color:var(--text-color);">0</strong> entrée(s)
+            </div>
         </div>
 
+        <!-- Tableau des contenus -->
         <div class="table-card">
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
                             <th style="width: 70px; text-align: center;">Ordre</th>
-                            <th style="width: 140px;">Date / Période</th>
-                            <th style="width: 220px;">Titre</th>
-                            <th style="width: 170px;">Réseaux</th>
-                            <th>Descriptif / Contenu</th>
+                            <th style="width: 140px;">Date & Heure</th>
+                            <th style="width: 220px;">Titre / Sujet</th>
+                            <th style="width: 160px;">Canaux cibles</th>
+                            <th style="width: 80px; text-align: center;">Visuel</th>
+                            <th>Contenu & Rédaction</th>
                             <th style="width: 160px;">Statut</th>
-                            <th style="width: 110px; text-align: center;">Actions</th>
+                            <th style="width: 130px; text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="pubTableBody"></tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <!-- MODALE CRÉATION / ÉDITION -->
+    <div class="modal-overlay" id="pubModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="modalTitle">➕ Planifier une publication ou un envoi</h2>
+                <button class="btn-icon" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="pubModalForm" onsubmit="savePublication(event)">
+                <div class="modal-body">
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="pubTitle">Titre du sujet / Thème interne *</label>
+                            <input type="text" id="pubTitle" class="form-control" placeholder="ex: Séance Sophrologie N°3 ou Stage Toussaint" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pubDate">Date / Période cible *</label>
+                            <input type="text" id="pubDate" class="form-control" placeholder="ex: Samedi 24 Octobre 14h00" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Canaux de diffusion concernés *</label>
+                        <div class="channel-selector">
+                            <label class="channel-pill pill-fb">
+                                <input type="checkbox" id="netFB" value="Facebook">
+                                <span class="pill-label-fb">📘 Facebook</span>
+                            </label>
+                            <label class="channel-pill pill-ig">
+                                <input type="checkbox" id="netIG" value="Instagram">
+                                <span class="pill-label-ig">📸 Instagram</span>
+                            </label>
+                            <label class="channel-pill pill-wa">
+                                <input type="checkbox" id="netWA" value="WhatsApp">
+                                <span class="pill-label-wa">💬 WhatsApp</span>
+                            </label>
+                            <label class="channel-pill pill-gmail">
+                                <input type="checkbox" id="netGmail" value="Gmail">
+                                <span class="pill-label-gmail">✉️ Gmail</span>
+                            </label>
+                            <label class="channel-pill pill-kali">
+                                <input type="checkbox" id="netKali" value="Kalisport">
+                                <span class="pill-label-kali">📰 Kalisport</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pubDesc">Texte rédigé / Légende complète / Corps du message (prêt à copier) *</label>
+                        <textarea id="pubDesc" class="form-control" style="min-height: 140px;" placeholder="Écris ici ton texte exact avec émojis, dates, détails... prêt à être copié dans Meta Business Suite, Gmail ou Kalisport." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Visuel / Affiche attachée (facultatif)</label>
+                        <div class="image-drop-area" onclick="document.getElementById('fileInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400"></i>
+                            <div style="text-align: left;">
+                                <div style="font-weight: 600; font-size: 0.85rem;" id="fileNameDisplay">Choisir une image depuis l'ordinateur</div>
+                                <div style="font-size: 0.75rem; color: #64748B;">PNG, JPG ou WEBP (stocké directement dans la fiche)</div>
+                            </div>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+                        <div id="imagePreviewContainer" style="display: none; align-items: center; gap: 10px; margin-top: 8px;">
+                            <img id="previewImg" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color);">
+                            <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem; color: #DC2626;" onclick="removeImage()">Retirer le visuel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmitModal">💾 Enregistrer</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -465,13 +586,15 @@
 
         let editingIndex = null;
         let publications = [];
+        let currentFilter = 'ALL';
+        let currentImageData = '';
 
         document.addEventListener('DOMContentLoaded', () => {
             loadInitialData();
         });
 
         async function loadInitialData() {
-            // 1. Sync load from localStorage for instant UI
+            // LocalStorage en premier pour affichage immédiat
             const saved = localStorage.getItem('dojo_pub_planning');
             if (saved) {
                 try {
@@ -482,8 +605,8 @@
                     }
                 } catch(e) {}
             }
-            
-            // 2. Async fetch from Supabase
+
+            // Synchro Supabase
             try {
                 const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
                 if (error && error.code !== 'PGRST116') throw error;
@@ -492,23 +615,25 @@
                     localStorage.setItem('dojo_pub_planning', JSON.stringify(publications));
                     renderTable();
                 } else if (publications.length === 0) {
-                    // Données par défaut si base vide
+                    // Exemples types
                     publications = [
                         {
                             id: 1,
-                            date: "Lundi 24 Août",
-                            title: "Rentrée du Judo & Inscriptions",
-                            networks: ["Facebook", "Instagram", "WhatsApp"],
-                            desc: "Rappel des 3 séances d'essai gratuites, visuel de reprise et lien vers le livret d'accueil.",
-                            status: "À rédiger"
+                            date: "Samedi 24 Octobre 14h00",
+                            title: "Séance Sophrologie Adhérents",
+                            networks: ["Facebook", "Instagram"],
+                            desc: "🧘‍♀️ Nouvelle séance de sophrologie au Dojo Dornois ! Prenez un temps pour vous et votre respiration. Inscription préalable requise.",
+                            image: "",
+                            status: "Brouillon"
                         },
                         {
                             id: 2,
-                            date: "Mercredi 26 Août",
-                            title: "Focus Stage Multi-Activités",
-                            networks: ["Facebook", "Instagram"],
-                            desc: "Programme complet du stage été avec horaires et rappel du repas à prévoir.",
-                            status: "Brouillon"
+                            date: "Jeudi 15 Octobre 09h00",
+                            title: "Convocation AG Mixte - Mairie & Partenaires",
+                            networks: ["Gmail"],
+                            desc: "Courriel officiel d'invitation avec envoi du PDF de convocation en pièce jointe.",
+                            image: "",
+                            status: "Prêt / Programmé"
                         }
                     ];
                     renderTable();
@@ -520,54 +645,184 @@
             }
         }
 
+        function setFilter(channel) {
+            currentFilter = channel;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderTable();
+        }
+
         function renderTable() {
             const tbody = document.getElementById('pubTableBody');
             tbody.innerHTML = '';
 
-            if (publications.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px; color: #94A3B8;">Aucune publication planifiée pour le moment.</td></tr>`;
+            const filtered = publications.filter(p => {
+                if (currentFilter === 'ALL') return true;
+                return p.networks && p.networks.includes(currentFilter);
+            });
+
+            document.getElementById('totalCount').innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 35px; color: #94A3B8;">Aucune entrée pour ce canal. Cliquez sur "+ Nouvelle Publication" pour en ajouter une.</td></tr>`;
                 return;
             }
 
-            publications.forEach((pub, index) => {
-                const tr = document.createElement('tr');
-                
-                let netBadges = '';
-                if (pub.networks && pub.networks.includes('Facebook')) netBadges += `<span class="badge-net badge-fb">📘 Facebook</span>`;
-                if (pub.networks && pub.networks.includes('Instagram')) netBadges += `<span class="badge-net badge-ig">📸 Instagram</span>`;
-                if (pub.networks && pub.networks.includes('WhatsApp')) netBadges += `<span class="badge-net badge-wa">💬 WhatsApp</span>`;
+            filtered.forEach((pub, index) => {
+                // Trouver le véritable index dans le tableau publications
+                const realIndex = publications.findIndex(p => p.id === pub.id);
 
+                const tr = document.createElement('tr');
+
+                // Badges
+                let netBadges = '';
+                if (pub.networks) {
+                    if (pub.networks.includes('Facebook')) netBadges += `<span class="badge-net badge-fb"><i class="fa-brands fa-facebook"></i> Facebook</span>`;
+                    if (pub.networks.includes('Instagram')) netBadges += `<span class="badge-net badge-ig"><i class="fa-brands fa-instagram"></i> Instagram</span>`;
+                    if (pub.networks.includes('WhatsApp')) netBadges += `<span class="badge-net badge-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</span>`;
+                    if (pub.networks.includes('Gmail')) netBadges += `<span class="badge-net badge-gmail"><i class="fa-solid fa-envelope"></i> Gmail</span>`;
+                    if (pub.networks.includes('Kalisport')) netBadges += `<span class="badge-net badge-kali"><i class="fa-solid fa-newspaper"></i> Kalisport</span>`;
+                }
+
+                // Statut
                 let statusClass = 'status-todo';
                 if (pub.status === 'Brouillon') statusClass = 'status-draft';
                 if (pub.status === 'Prêt / Programmé') statusClass = 'status-ready';
                 if (pub.status === 'Publié') statusClass = 'status-published';
 
+                // Image thumbnail & bouton DL direct
+                let mediaCell = '<span style="color:#CBD5E1; font-size:0.8rem;">Aucun</span>';
+                if (pub.image) {
+                    mediaCell = `
+                        <img src="${pub.image}" class="media-preview-mini" title="Cliquer pour télécharger" onclick="downloadImageDirect('${pub.image}', 'visuel_${pub.id}')">
+                    `;
+                }
+
                 tr.innerHTML = `
                     <td style="text-align: center;">
-                        <button class="btn-icon" onclick="moveRow(${index}, -1)" ${index === 0 ? 'disabled style="opacity:0.3;"' : ''}>⬆️</button>
-                        <button class="btn-icon" onclick="moveRow(${index}, 1)" ${index === publications.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>⬇️</button>
+                        <button class="btn-icon" onclick="moveRow(${realIndex}, -1)" ${realIndex === 0 ? 'disabled style="opacity:0.3;"' : ''}>⬆️</button>
+                        <button class="btn-icon" onclick="moveRow(${realIndex}, 1)" ${realIndex === publications.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>⬇️</button>
                     </td>
                     <td><strong>${escapeHtml(pub.date)}</strong></td>
                     <td style="font-weight: 600; color: var(--dojo-red);">${escapeHtml(pub.title)}</td>
                     <td>${netBadges || '<span style="color:#94A3B8;">Aucun</span>'}</td>
-                    <td style="color: #475569; white-space: pre-wrap;">${escapeHtml(pub.desc)}</td>
+                    <td style="text-align: center;">${mediaCell}</td>
+                    <td style="color: #334155; white-space: pre-wrap; font-size: 0.85rem; max-width: 380px;">${escapeHtml(pub.desc)}</td>
                     <td>
-                        <select class="status-select ${statusClass}" onchange="updateStatus(${index}, this.value)">
+                        <select class="status-select ${statusClass}" onchange="updateStatus(${realIndex}, this.value)">
                             <option value="À rédiger" ${pub.status === 'À rédiger' ? 'selected' : ''}>⏳ À rédiger</option>
-                            <option value="Brouillon" ${pub.status === 'Brouillon' ? 'selected' : ''}>📝 Brouillon</option>
+                            <option value="Brouillon" ${pub.status === 'Brouillon' ? 'selected' : ''}>📝 Brouillon (Prêt)</option>
                             <option value="Prêt / Programmé" ${pub.status === 'Prêt / Programmé' ? 'selected' : ''}>📌 Programmé</option>
-                            <option value="Publié" ${pub.status === 'Publié' ? 'selected' : ''}>✅ Publié</option>
+                            <option value="Publié" ${pub.status === 'Publié' ? 'selected' : ''}>✅ Publié / Envoyé</option>
                         </select>
                     </td>
                     <td style="text-align: center;">
                         <div class="row-actions">
-                            <button class="btn-icon btn-edit" onclick="editRow(${index})" title="Modifier">✏️</button>
-                            <button class="btn-icon btn-delete" onclick="deleteRow(${index})" title="Supprimer">🗑️</button>
+                            <button class="btn-icon btn-copy" onclick="copyContent(${realIndex})" title="Copier le texte"><i class="fa-solid fa-copy"></i></button>
+                            ${pub.image ? `<button class="btn-icon btn-download" onclick="downloadImageDirect('${pub.image}', 'visuel_${pub.id}')" title="Télécharger l'image"><i class="fa-solid fa-download"></i></button>` : ''}
+                            <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn-icon btn-delete" onclick="deleteRow(${realIndex})" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        // Modale d'ajout
+        function openCreateModal() {
+            editingIndex = null;
+            currentImageData = '';
+            document.getElementById('pubModalForm').reset();
+            document.getElementById('modalTitle').innerText = "➕ Planifier une publication ou un envoi";
+            document.getElementById('btnSubmitModal').innerText = "Ajouter au planning";
+            removeImage();
+            document.getElementById('pubModal').classList.add('active');
+        }
+
+        // Modale d'édition
+        function openEditModal(index) {
+            editingIndex = index;
+            const pub = publications[index];
+
+            document.getElementById('pubTitle').value = pub.title;
+            document.getElementById('pubDate').value = pub.date;
+            document.getElementById('pubDesc').value = pub.desc;
+
+            document.getElementById('netFB').checked = pub.networks && pub.networks.includes('Facebook');
+            document.getElementById('netIG').checked = pub.networks && pub.networks.includes('Instagram');
+            document.getElementById('netWA').checked = pub.networks && pub.networks.includes('WhatsApp');
+            document.getElementById('netGmail').checked = pub.networks && pub.networks.includes('Gmail');
+            document.getElementById('netKali').checked = pub.networks && pub.networks.includes('Kalisport');
+
+            if (pub.image) {
+                currentImageData = pub.image;
+                document.getElementById('previewImg').src = pub.image;
+                document.getElementById('imagePreviewContainer').style.display = 'flex';
+                document.getElementById('fileNameDisplay').innerText = "Visuel chargé ✓";
+            } else {
+                removeImage();
+            }
+
+            document.getElementById('modalTitle').innerText = "✏️ Modifier : " + pub.title;
+            document.getElementById('btnSubmitModal').innerText = "Enregistrer les modifications";
+            document.getElementById('pubModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('pubModal').classList.remove('active');
+        }
+
+        // Gestion de l'image (Base64)
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                currentImageData = evt.target.result;
+                document.getElementById('previewImg').src = currentImageData;
+                document.getElementById('imagePreviewContainer').style.display = 'flex';
+                document.getElementById('fileNameDisplay').innerText = file.name;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage() {
+            currentImageData = '';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('previewImg').src = '';
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('fileNameDisplay').innerText = "Choisir une image depuis l'ordinateur";
+        }
+
+        // Télécharger directement le visuel
+        function downloadImageDirect(dataUrl, name) {
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `${name}.png`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            showToast("📥 Visuel téléchargé !");
+        }
+
+        // Copier le texte
+        function copyContent(index) {
+            const pub = publications[index];
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(pub.desc).then(() => {
+                    showToast("📋 Texte copié ! Prêt à coller.");
+                });
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = pub.desc;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast("📋 Texte copié !");
+            }
         }
 
         async function savePublication(e) {
@@ -581,9 +836,11 @@
             if (document.getElementById('netFB').checked) networks.push('Facebook');
             if (document.getElementById('netIG').checked) networks.push('Instagram');
             if (document.getElementById('netWA').checked) networks.push('WhatsApp');
+            if (document.getElementById('netGmail').checked) networks.push('Gmail');
+            if (document.getElementById('netKali').checked) networks.push('Kalisport');
 
             if (networks.length === 0) {
-                alert('Veuillez sélectionner au moins un réseau social.');
+                alert('Veuillez cocher au moins un canal de diffusion.');
                 return;
             }
 
@@ -592,7 +849,8 @@
                 publications[editingIndex].date = date;
                 publications[editingIndex].networks = networks;
                 publications[editingIndex].desc = desc;
-                showToast('Publication modifiée avec succès !');
+                publications[editingIndex].image = currentImageData;
+                showToast('Élément mis à jour !');
             } else {
                 const newPub = {
                     id: Date.now(),
@@ -600,45 +858,17 @@
                     date,
                     networks,
                     desc,
-                    status: 'À rédiger'
+                    image: currentImageData,
+                    status: 'Brouillon'
                 };
                 publications.push(newPub);
-                showToast('Publication ajoutée au planning !');
+                showToast('Ajouté avec succès !');
             }
 
-            cancelEdit();
+            closeModal();
             saveLocal();
             renderTable();
             await syncToSupabase(true);
-        }
-
-        function editRow(index) {
-            editingIndex = index;
-            const pub = publications[index];
-
-            document.getElementById('pubTitle').value = pub.title;
-            document.getElementById('pubDate').value = pub.date;
-            document.getElementById('pubDesc').value = pub.desc;
-
-            document.getElementById('netFB').checked = pub.networks && pub.networks.includes('Facebook');
-            document.getElementById('netIG').checked = pub.networks && pub.networks.includes('Instagram');
-            document.getElementById('netWA').checked = pub.networks && pub.networks.includes('WhatsApp');
-
-            document.getElementById('formCard').classList.add('edit-mode');
-            document.getElementById('formTitle').innerHTML = `✏️ Modifier la publication : <span style="color:var(--text-color);">${escapeHtml(pub.title)}</span>`;
-            document.getElementById('btnSubmit').innerHTML = '💾 Enregistrer la modification';
-            document.getElementById('btnCancelEdit').style.display = 'inline-flex';
-
-            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function cancelEdit() {
-            editingIndex = null;
-            document.getElementById('pubForm').reset();
-            document.getElementById('formCard').classList.remove('edit-mode');
-            document.getElementById('formTitle').innerText = '➕ Ajouter une nouvelle publication';
-            document.getElementById('btnSubmit').innerHTML = '➕ Ajouter au planning';
-            document.getElementById('btnCancelEdit').style.display = 'none';
         }
 
         async function moveRow(index, direction) {
@@ -663,14 +893,11 @@
         }
 
         async function deleteRow(index) {
-            if (confirm('Voulez-vous vraiment supprimer cette publication du planning ?')) {
-                if (editingIndex === index) {
-                    cancelEdit();
-                }
+            if (confirm('Voulez-vous vraiment supprimer cet élément ?')) {
                 publications.splice(index, 1);
                 saveLocal();
                 renderTable();
-                showToast('Publication supprimée.');
+                showToast('Élément supprimé.');
                 await syncToSupabase(true);
             }
         }
@@ -680,31 +907,29 @@
         }
 
         async function syncToSupabase(silent = false) {
-            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            if (!silent) showToast("Synchronisation Supabase...");
             try {
-                const payload = publications;
-                localStorage.setItem('dojo_pub_planning', JSON.stringify(payload)); 
-                
+                localStorage.setItem('dojo_pub_planning', JSON.stringify(publications));
                 const { error } = await sbClient
                     .from(SUPABASE_TABLE)
-                    .upsert({ id: 1, data: payload });
+                    .upsert({ id: 1, data: publications });
 
                 if (error) throw error;
-                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+                if (!silent) showToast("✓ Données synchronisées sur Supabase !");
             } catch (err) {
                 console.error("Erreur Supabase:", err);
-                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+                if (!silent) showToast("⚠️️ Sauvegardé en local (erreur Supabase)");
             }
         }
 
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(publications, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `planning_reseaux_dojo_${new Date().toISOString().slice(0,10)}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
+            const a = document.createElement('a');
+            a.href = dataStr;
+            a.download = `planning_communications_dojo_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
         }
 
         function escapeHtml(str) {
@@ -720,7 +945,7 @@
             const toast = document.getElementById('toast');
             toast.innerText = msg;
             toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 2500);
+            setTimeout(() => { toast.style.display = 'none'; }, 2400);
         }
     </script>
 </body>
