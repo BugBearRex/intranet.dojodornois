@@ -62,7 +62,7 @@
             border-radius: 12px;
             border-left: 6px solid var(--dojo-red);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -85,6 +85,39 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+        }
+
+        /* Onglets d'affichage principaux */
+        .view-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #E2E8F0;
+            padding: 4px;
+            border-radius: 10px;
+            width: fit-content;
+        }
+
+        .view-tab-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .view-tab-btn.active {
+            background: white;
+            color: var(--dojo-red);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         }
 
         /* Boutons */
@@ -269,6 +302,221 @@
         .btn-download:hover { background: #E0F2FE; color: #0284C7; }
         .btn-edit:hover { background: #DBEAFE; color: #2563EB; }
         .btn-delete:hover { background: #FEE2E2; color: #DC2626; }
+
+        /* ================= VUE CALENDRIER ================= */
+        .calendar-card {
+            background: var(--dojo-card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            display: none;
+        }
+
+        .cal-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .cal-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.35rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cal-nav-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .cal-sub-tabs {
+            display: flex;
+            background: #F1F5F9;
+            padding: 3px;
+            border-radius: 8px;
+        }
+
+        .cal-sub-tab {
+            padding: 6px 14px;
+            border: none;
+            background: transparent;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #64748B;
+        }
+
+        .cal-sub-tab.active {
+            background: white;
+            color: var(--dojo-red);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Grille Mois */
+        .cal-grid-month {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .cal-day-header {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748B;
+            text-align: center;
+            padding: 8px 0;
+            background: #F8FAFC;
+            border-radius: 6px;
+        }
+
+        .cal-day-cell {
+            min-height: 120px;
+            background: #FAFAFA;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: background 0.15s;
+        }
+
+        .cal-day-cell:hover {
+            background: #FFFFFF;
+        }
+
+        .cal-day-cell.other-month {
+            background: #F1F5F9;
+            opacity: 0.55;
+        }
+
+        .cal-day-cell.today {
+            border-color: var(--dojo-red);
+            background: #FFF9FA;
+        }
+
+        .cal-day-num {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #475569;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cal-day-cell.today .cal-day-num {
+            color: var(--dojo-red);
+        }
+
+        /* Grille Semaine */
+        .cal-grid-week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .cal-week-col {
+            background: #FAFAFA;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cal-week-col.today {
+            border-color: var(--dojo-red);
+            background: #FFF9FA;
+        }
+
+        .cal-week-header {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            background: #F8FAFC;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .cal-week-header-day {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .cal-week-header-date {
+            font-size: 0.8rem;
+            color: #64748B;
+        }
+
+        .cal-week-items {
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        /* Éléments / Cartes de publication dans le calendrier */
+        .cal-item {
+            background: white;
+            border-radius: 6px;
+            padding: 6px 8px;
+            border-left: 4px solid var(--dojo-red);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .cal-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .cal-item-title {
+            font-weight: 700;
+            color: #1E293B;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cal-item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            color: #64748B;
+        }
+
+        .cal-item-badges {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+
+        .cal-mini-badge {
+            font-size: 0.68rem;
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
 
         /* Modale */
         .modal-overlay {
@@ -460,6 +708,16 @@
             </div>
         </div>
 
+        <!-- BASCULE DES VUES (TABLEAU VS CALENDRIER) -->
+        <div class="view-tabs">
+            <button class="view-tab-btn active" id="tabViewTable" onclick="switchView('table')">
+                <i class="fa-solid fa-table-list"></i> Vue Tableau / Liste
+            </button>
+            <button class="view-tab-btn" id="tabViewCalendar" onclick="switchView('calendar')">
+                <i class="fa-solid fa-calendar-days"></i> Vue Calendrier
+            </button>
+        </div>
+
         <!-- Filtres par réseau -->
         <div class="filter-bar">
             <div class="filter-group">
@@ -476,8 +734,8 @@
             </div>
         </div>
 
-        <!-- Tableau des contenus -->
-        <div class="table-card">
+        <!-- 1. VUE TABLEAU DES CONTENUS -->
+        <div class="table-card" id="viewTableContainer">
             <div class="table-responsive">
                 <table>
                     <thead>
@@ -495,6 +753,26 @@
                     <tbody id="pubTableBody"></tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- 2. VUE CALENDRIER (MOIS / SEMAINE) -->
+        <div class="calendar-card" id="viewCalendarContainer">
+            <div class="cal-header-bar">
+                <div class="cal-title" id="calCurrentLabel">Mois Année</div>
+                <div class="cal-nav-group">
+                    <button class="btn btn-outline" style="padding: 6px 12px;" onclick="navigateCalendar(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="btn btn-outline" style="padding: 6px 12px;" onclick="goToToday()">Aujourd'hui</button>
+                    <button class="btn btn-outline" style="padding: 6px 12px;" onclick="navigateCalendar(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                    
+                    <div class="cal-sub-tabs" style="margin-left: 10px;">
+                        <button class="cal-sub-tab active" id="subTabMonth" onclick="setCalendarMode('month')">Mois</button>
+                        <button class="cal-sub-tab" id="subTabWeek" onclick="setCalendarMode('week')">Semaine</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conteneur rendu dynamique calendrier -->
+            <div id="calendarRenderContainer"></div>
         </div>
     </div>
 
@@ -514,7 +792,7 @@
                         </div>
                         <div class="form-group">
                             <label for="pubDate">Date / Période cible *</label>
-                            <input type="text" id="pubDate" class="form-control" placeholder="ex: Samedi 24 Octobre 14h00" required>
+                            <input type="text" id="pubDate" class="form-control" placeholder="ex: 2026-10-24 ou Samedi 24 Octobre 14h00" required>
                         </div>
                     </div>
 
@@ -588,6 +866,9 @@
         let publications = [];
         let currentFilter = 'ALL';
         let currentImageData = '';
+        let currentView = 'table'; // 'table' ou 'calendar'
+        let calendarMode = 'month'; // 'month' ou 'week'
+        let calendarRefDate = new Date();
 
         document.addEventListener('DOMContentLoaded', () => {
             loadInitialData();
@@ -600,7 +881,7 @@
                     const data = JSON.parse(saved);
                     if (Array.isArray(data) && data.length > 0) {
                         publications = data;
-                        renderTable();
+                        refreshDisplay();
                     }
                 } catch(e) {
                     console.error("Erreur lecture LocalStorage", e);
@@ -613,7 +894,7 @@
                 if (result && result.data && Array.isArray(result.data) && result.data.length > 0) {
                     publications = result.data;
                     saveLocal();
-                    renderTable();
+                    refreshDisplay();
                 } else if (publications.length === 0) {
                     publications = [
                         {
@@ -635,12 +916,61 @@
                             status: "Prêt / Programmé"
                         }
                     ];
-                    renderTable();
+                    refreshDisplay();
                     await syncToSupabase(true);
                 }
             } catch(e) {
                 console.error("Erreur chargement Supabase:", e);
-                if (publications.length === 0) renderTable();
+                if (publications.length === 0) refreshDisplay();
+            }
+        }
+
+        function switchView(view) {
+            currentView = view;
+            if (view === 'table') {
+                document.getElementById('tabViewTable').classList.add('active');
+                document.getElementById('tabViewCalendar').classList.remove('active');
+                document.getElementById('viewTableContainer').style.display = 'block';
+                document.getElementById('viewCalendarContainer').style.display = 'none';
+            } else {
+                document.getElementById('tabViewTable').classList.remove('active');
+                document.getElementById('tabViewCalendar').classList.add('active');
+                document.getElementById('viewTableContainer').style.display = 'none';
+                document.getElementById('viewCalendarContainer').style.display = 'block';
+                renderCalendar();
+            }
+        }
+
+        function setCalendarMode(mode) {
+            calendarMode = mode;
+            if (mode === 'month') {
+                document.getElementById('subTabMonth').classList.add('active');
+                document.getElementById('subTabWeek').classList.remove('active');
+            } else {
+                document.getElementById('subTabMonth').classList.remove('active');
+                document.getElementById('subTabWeek').classList.add('active');
+            }
+            renderCalendar();
+        }
+
+        function navigateCalendar(direction) {
+            if (calendarMode === 'month') {
+                calendarRefDate.setMonth(calendarRefDate.getMonth() + direction);
+            } else {
+                calendarRefDate.setDate(calendarRefDate.getDate() + (direction * 7));
+            }
+            renderCalendar();
+        }
+
+        function goToToday() {
+            calendarRefDate = new Date();
+            renderCalendar();
+        }
+
+        function refreshDisplay() {
+            renderTable();
+            if (currentView === 'calendar') {
+                renderCalendar();
             }
         }
 
@@ -652,18 +982,21 @@
             } else if (window.event && window.event.target) {
                 window.event.target.classList.add('active');
             }
-            renderTable();
+            refreshDisplay();
+        }
+
+        function getFilteredPublications() {
+            return publications.filter(p => {
+                if (currentFilter === 'ALL') return true;
+                return Array.isArray(p.networks) && p.networks.includes(currentFilter);
+            });
         }
 
         function renderTable() {
             const tbody = document.getElementById('pubTableBody');
             tbody.innerHTML = '';
 
-            const filtered = publications.filter(p => {
-                if (currentFilter === 'ALL') return true;
-                return Array.isArray(p.networks) && p.networks.includes(currentFilter);
-            });
-
+            const filtered = getFilteredPublications();
             document.getElementById('totalCount').innerText = filtered.length;
 
             if (filtered.length === 0) {
@@ -673,7 +1006,6 @@
 
             filtered.forEach((pub) => {
                 const realIndex = publications.findIndex(p => p.id === pub.id);
-
                 const tr = document.createElement('tr');
 
                 let netBadges = '';
@@ -726,6 +1058,213 @@
             });
         }
 
+        /* ================= LOGIQUE DU CALENDRIER ================= */
+        // Convertisseur intelligent de date textuelle libre vers objet Date
+        function parsePublicationDate(dateStr) {
+            if (!dateStr) return null;
+            const str = dateStr.trim().toLowerCase();
+
+            // 1. Format ISO YYYY-MM-DD
+            const isoMatch = str.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+            if (isoMatch) {
+                return new Date(parseInt(isoMatch[1]), parseInt(isoMatch[2]) - 1, parseInt(isoMatch[3]));
+            }
+
+            // 2. Format DD/MM/YYYY ou DD/MM
+            const slashMatch = str.match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
+            if (slashMatch) {
+                const day = parseInt(slashMatch[1]);
+                const month = parseInt(slashMatch[2]) - 1;
+                const year = slashMatch[3] ? (slashMatch[3].length === 2 ? 2000 + parseInt(slashMatch[3]) : parseInt(slashMatch[3])) : calendarRefDate.getFullYear();
+                return new Date(year, month, day);
+            }
+
+            // 3. Détection de mois en français : "24 Octobre" ou "Samedi 24 Octobre 14h"
+            const monthsFr = ['janvier', 'février', 'fevrier', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'aout', 'septembre', 'octobre', 'novembre', 'décembre', 'decembre'];
+            for (let m = 0; m < monthsFr.length; m++) {
+                const mName = monthsFr[m];
+                if (str.includes(mName)) {
+                    const normalizedMonth = (m === 2) ? 1 : (m === 7) ? 6 : (m === 12) ? 11 : m;
+                    const dayMatch = str.match(/(\d{1,2})/);
+                    const day = dayMatch ? parseInt(dayMatch[1]) : 1;
+                    const yearMatch = str.match(/\b(20\d{2})\b/);
+                    const year = yearMatch ? parseInt(yearMatch[1]) : calendarRefDate.getFullYear();
+                    return new Date(year, normalizedMonth, day);
+                }
+            }
+
+            return null;
+        }
+
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                   d1.getMonth() === d2.getMonth() &&
+                   d1.getDate() === d2.getDate();
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('calendarRenderContainer');
+            const filtered = getFilteredPublications();
+            const monthsNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            const today = new Date();
+
+            if (calendarMode === 'month') {
+                const year = calendarRefDate.getFullYear();
+                const month = calendarRefDate.getMonth();
+                document.getElementById('calCurrentLabel').innerText = `${monthsNames[month]} ${year}`;
+
+                // Premier jour du mois
+                const firstDay = new Date(year, month, 1);
+                // Décalage lundi = 0 (Dimanche = 6)
+                let startOffset = firstDay.getDay() - 1;
+                if (startOffset === -1) startOffset = 6;
+
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+                let html = `
+                    <div class="cal-grid-month">
+                        <div class="cal-day-header">Lun</div>
+                        <div class="cal-day-header">Mar</div>
+                        <div class="cal-day-header">Mer</div>
+                        <div class="cal-day-header">Jeu</div>
+                        <div class="cal-day-header">Ven</div>
+                        <div class="cal-day-header">Sam</div>
+                        <div class="cal-day-header">Dim</div>
+                `;
+
+                // Jours du mois précédent
+                for (let i = startOffset - 1; i >= 0; i--) {
+                    const prevDayNum = daysInPrevMonth - i;
+                    html += `
+                        <div class="cal-day-cell other-month">
+                            <div class="cal-day-num">${prevDayNum}</div>
+                        </div>
+                    `;
+                }
+
+                // Jours du mois en cours
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const currentCellDate = new Date(year, month, d);
+                    const isToday = isSameDay(currentCellDate, today);
+
+                    // Trouver les publications pour ce jour
+                    const dayPubs = filtered.filter(p => {
+                        const parsed = parsePublicationDate(p.date);
+                        return parsed && isSameDay(parsed, currentCellDate);
+                    });
+
+                    let itemsHtml = '';
+                    dayPubs.forEach(pub => {
+                        const realIndex = publications.findIndex(p => p.id === pub.id);
+                        let badgeIcon = '📘';
+                        if (pub.networks && pub.networks.includes('Instagram')) badgeIcon = '📸';
+                        if (pub.networks && pub.networks.includes('Gmail')) badgeIcon = '✉️';
+                        if (pub.networks && pub.networks.includes('Kalisport')) badgeIcon = '📰';
+
+                        itemsHtml += `
+                            <div class="cal-item" onclick="openEditModal(${realIndex})" title="${escapeHtml(pub.desc)}">
+                                <div class="cal-item-title">${badgeIcon} ${escapeHtml(pub.title)}</div>
+                                <div class="cal-item-meta">
+                                    <span>${escapeHtml(pub.status)}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                        <div class="cal-day-cell ${isToday ? 'today' : ''}">
+                            <div class="cal-day-num">
+                                <span>${d}</span>
+                                ${isToday ? '<span style="font-size:0.7rem; color:var(--dojo-red);">Auj.</span>' : ''}
+                            </div>
+                            ${itemsHtml}
+                        </div>
+                    `;
+                }
+
+                // Compléter la dernière semaine
+                const totalCells = startOffset + daysInMonth;
+                const nextDaysCount = (7 - (totalCells % 7)) % 7;
+                for (let n = 1; n <= nextDaysCount; n++) {
+                    html += `
+                        <div class="cal-day-cell other-month">
+                            <div class="cal-day-num">${n}</div>
+                        </div>
+                    `;
+                }
+
+                html += `</div>`;
+                container.innerHTML = html;
+
+            } else {
+                // MODE SEMAINE
+                const startOfWeek = new Date(calendarRefDate);
+                let dayOfWeek = startOfWeek.getDay() - 1;
+                if (dayOfWeek === -1) dayOfWeek = 6;
+                startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek);
+
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+                document.getElementById('calCurrentLabel').innerText = `Semaine du ${startOfWeek.getDate()} ${monthsNames[startOfWeek.getMonth()]} au ${endOfWeek.getDate()} ${monthsNames[endOfWeek.getMonth()]} ${endOfWeek.getFullYear()}`;
+
+                const weekDaysLabels = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+                let html = `<div class="cal-grid-week">`;
+
+                for (let i = 0; i < 7; i++) {
+                    const dayDate = new Date(startOfWeek);
+                    dayDate.setDate(dayDate.getDate() + i);
+                    const isToday = isSameDay(dayDate, today);
+
+                    const dayPubs = filtered.filter(p => {
+                        const parsed = parsePublicationDate(p.date);
+                        return parsed && isSameDay(parsed, dayDate);
+                    });
+
+                    let itemsHtml = '';
+                    dayPubs.forEach(pub => {
+                        const realIndex = publications.findIndex(p => p.id === pub.id);
+                        let badgeTags = '';
+                        if (pub.networks) {
+                            if (pub.networks.includes('Facebook')) badgeTags += `<span class="badge-net badge-fb" style="font-size:0.65rem; padding:1px 5px;">FB</span>`;
+                            if (pub.networks.includes('Instagram')) badgeTags += `<span class="badge-net badge-ig" style="font-size:0.65rem; padding:1px 5px;">IG</span>`;
+                            if (pub.networks.includes('WhatsApp')) badgeTags += `<span class="badge-net badge-wa" style="font-size:0.65rem; padding:1px 5px;">WA</span>`;
+                            if (pub.networks.includes('Gmail')) badgeTags += `<span class="badge-net badge-gmail" style="font-size:0.65rem; padding:1px 5px;">Mail</span>`;
+                            if (pub.networks.includes('Kalisport')) badgeTags += `<span class="badge-net badge-kali" style="font-size:0.65rem; padding:1px 5px;">Kali</span>`;
+                        }
+
+                        itemsHtml += `
+                            <div class="cal-item" onclick="openEditModal(${realIndex})">
+                                <div class="cal-item-title">${escapeHtml(pub.title)}</div>
+                                <div style="font-size:0.75rem; color:#475569; margin: 2px 0;">${escapeHtml(pub.desc).slice(0, 60)}...</div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                                    <div class="cal-item-badges">${badgeTags}</div>
+                                    <span style="font-size:0.7rem; font-weight:700; color:#334155;">${escapeHtml(pub.status)}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                        <div class="cal-week-col ${isToday ? 'today' : ''}">
+                            <div class="cal-week-header">
+                                <div class="cal-week-header-day">${weekDaysLabels[i]}</div>
+                                <div class="cal-week-header-date">${dayDate.getDate()} ${monthsNames[dayDate.getMonth()]}</div>
+                            </div>
+                            <div class="cal-week-items">
+                                ${itemsHtml || '<span style="color:#CBD5E1; font-size:0.75rem; text-align:center; margin-top:10px;">Rien de prévu</span>'}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                html += `</div>`;
+                container.innerHTML = html;
+            }
+        }
+
+        /* ================= GESTION DES MODALES ================= */
         function openCreateModal() {
             editingIndex = null;
             currentImageData = '';
@@ -881,7 +1420,7 @@
 
             closeModal();
             saveLocal();
-            renderTable();
+            refreshDisplay();
             await syncToSupabase(true);
         }
 
@@ -894,14 +1433,14 @@
             publications[newIndex] = temp;
 
             saveLocal();
-            renderTable();
+            refreshDisplay();
             await syncToSupabase(true);
         }
 
         async function updateStatus(index, newStatus) {
             publications[index].status = newStatus;
             saveLocal();
-            renderTable();
+            refreshDisplay();
             showToast('Statut mis à jour !');
             await syncToSupabase(true);
         }
@@ -910,7 +1449,7 @@
             if (confirm('Voulez-vous vraiment supprimer cet élément ?')) {
                 publications.splice(index, 1);
                 saveLocal();
-                renderTable();
+                refreshDisplay();
                 showToast('Élément supprimé.');
                 await syncToSupabase(true);
             }
