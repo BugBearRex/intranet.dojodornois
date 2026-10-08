@@ -199,7 +199,7 @@
             <div class="flex items-center gap-6">
                 <div>
                     <h1 class="font-fredoka text-xl font-bold text-[#1A1A1A]">Studio de Communication</h1>
-                    <p class="text-xs text-slate-500" id="header-subtitle">Création visuelle d'emails et newsletters sécurisée Mode Sombre</p>
+                    <p class="text-xs text-slate-500" id="header-subtitle">Création visuelle d'emails et newsletters avec centrage automatique</p>
                 </div>
 
                 <!-- NAVIGATION ONGLETS -->
@@ -393,7 +393,7 @@
         const wysiwygControls = document.getElementById('wysiwyg-controls');
         const btnToggleSource = document.getElementById('btn-toggle-source');
 
-        // PIED DE PAGE AVEC ACCÈS KALISPORT (NEWSLETTER) - PROTÉGÉ
+        // PIED DE PAGE AVEC ACCÈS KALISPORT (NEWSLETTER SEULEMENT)
         const BLOC_FOOTER_NEWSLETTER = `
             <table border="0" cellpadding="0" cellspacing="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px; width: 100%; background-color: #FFFFFF !important;" width="100%">
                 <tbody>
@@ -941,7 +941,6 @@
                     `;
                     break;
 
-                // NOUVEAU BLOC : PROGRAMME & HORAIRES SÉCURISÉ (SOLUTION AU BUG CAPTURE 1)
                 case 'programme_horaires':
                     htmlBloc = `
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 18px 0; border: 1px solid #CBD5E0; border-left: 5px solid #EA580C; border-radius: 6px; background-color: #FFFFFF !important; width: 100%;">
@@ -992,7 +991,6 @@
                     `;
                     break;
 
-                // NOUVEAU BLOC : TABLEAU PLANNING CONTRASTÉ SÉCURISÉ (SOLUTION AU BUG CAPTURE 2)
                 case 'planning_tableau':
                     htmlBloc = `
                         <table border="0" cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 20px 0; border: 2px solid #CBD5E0 !important; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; background-color: #FFFFFF !important;">
@@ -1234,6 +1232,7 @@
             }
         }
         
+        // CORRECTION CENTRAGE ABSOLU GMAIL & GESTION CODE SOURCE
         function getCodeFinal() {
             let contenu = modeCodeSource ? sourceEditor.value : editor.innerHTML;
             
@@ -1249,25 +1248,27 @@
 
             return `
                 <div style="display:none;font-size:1px;color:#F4F6F9;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${preHeader}</div>
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F4F6F9; padding: 20px 0; width: 100%;">
-                    <tr>
-                        <td align="center">
-                            <!--[if mso]>
-                            <table width="650" cellpadding="0" cellspacing="0" border="0"><tr><td>
-                            <![endif]-->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFFFFF !important; max-width: 650px; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px; margin: auto;">
-                                <tr>
-                                    <td style="padding: 30px; font-family: 'Roboto', Arial, sans-serif; font-size: 15px; color: #2D3748 !important; line-height: 1.6; background-color: #FFFFFF !important;">
-                                        ${contenu}
-                                    </td>
-                                </tr>
-                            </table>
-                            <!--[if mso]>
-                            </td></tr></table>
-                            <![endif]-->
-                        </td>
-                    </tr>
-                </table>
+                <center style="width: 100%; background-color: #F4F6F9;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="background-color: #F4F6F9; padding: 20px 0; width: 100%; margin: 0 auto; text-align: center;">
+                        <tr>
+                            <td align="center" valign="top" style="padding: 0; margin: 0; text-align: center;">
+                                <!--[if mso]>
+                                <table width="650" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td align="center">
+                                <![endif]-->
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="background-color: #FFFFFF !important; max-width: 650px; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px; margin: 0 auto; text-align: left;">
+                                    <tr>
+                                        <td style="padding: 30px; font-family: 'Roboto', Arial, sans-serif; font-size: 15px; color: #2D3748 !important; line-height: 1.6; background-color: #FFFFFF !important; text-align: left;">
+                                            ${contenu}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!--[if mso]>
+                                </td></tr></table>
+                                <![endif]-->
+                            </td>
+                        </tr>
+                    </table>
+                </center>
             `;
         }
 
