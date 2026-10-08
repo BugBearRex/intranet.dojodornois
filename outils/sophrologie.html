@@ -39,7 +39,6 @@
             overflow: hidden;
         }
 
-        /* --- SIDEBAR CONTAINER --- */
         .sidebar { 
             width: var(--sidebar-width); 
             min-width: var(--sidebar-width);
@@ -57,7 +56,6 @@
             z-index: 100;
         }
 
-        /* ===== CONTENU PRINCIPAL ===== */
         .main-content {
             flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
         }
@@ -77,7 +75,6 @@
             flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
         }
 
-        /* ===== BOUTONS ET COMPOSANTS ===== */
         .btn { font-family: 'Roboto', sans-serif; font-weight: 500; padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
         .btn-violet { background: var(--violet); color: white; }
         .btn-violet:hover { background: var(--violet-fonce); }
@@ -100,7 +97,6 @@
 
         .main-card { background: var(--blanc); padding: 22px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid var(--gris-tres-clair); }
 
-        /* ===== SEASONS & SEANCES EN GRILLE ===== */
         .season-section {
             background: #FAF9FC; border: 1px solid var(--violet-clair); border-radius: 10px; padding: 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 14px;
         }
@@ -133,38 +129,31 @@
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 5px;
         }
 
-        /* ===== PASTILLES COLORÉES DE STATUT ===== */
         .pastille {
             display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; flex-shrink: 0;
         }
         .pastille-green { background-color: var(--vert); box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.25); }
-        .pastille-orange { background-color: var(--orange); box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.25); }
         .pastille-violet { background-color: var(--violet); box-shadow: 0 0 0 2px rgba(122, 92, 155, 0.25); }
 
         .badge {
             padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; transition: all 0.15s; white-space: nowrap;
         }
         .badge:hover { transform: scale(1.02); }
-        .badge-licencie { background: #e8f8f0; color: #1e824c; border: 1.5px solid #2ecc71; }
-        .badge-nonlicencie { background: #fdf2e9; color: #d35400; border: 1.5px solid #e67e22; }
+        .badge-standard { background: #e8f8f0; color: #1e824c; border: 1.5px solid #2ecc71; }
         .badge-premiere { background: var(--violet-clair); color: var(--violet-fonce); border: 1.5px solid var(--violet); }
 
-        /* KPI CARDS */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
         .kpi-card { background: var(--blanc); padding: 18px; border-radius: 10px; border-left: 4px solid var(--violet); border: 1px solid var(--gris-tres-clair); }
         .kpi-card.green { border-left-color: var(--vert-fonce); }
-        .kpi-card.orange { border-left-color: var(--orange); }
         .kpi-card.purple { border-left-color: var(--violet); }
         .kpi-card h4 { margin: 0 0 6px 0; font-size: 0.75rem; color: var(--gris-moyen); text-transform: uppercase; letter-spacing: 0.5px; }
         .kpi-card .value { font-family: 'Fredoka', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--noir-doux); margin: 0; }
         .kpi-card .subtext { font-size: 0.75rem; color: var(--gris-moyen); margin-top: 4px; }
 
-        /* Formulaires */
         .form-inline { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px dashed var(--gris-clair); }
         .form-inline input, .form-inline select { padding: 8px 12px; border: 1px solid var(--gris-clair); border-radius: 6px; font-size: 0.88rem; outline: none; }
         .form-inline input[type="text"] { flex-grow: 1; min-width: 200px; }
 
-        /* Tableaux */
         .table-responsive { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
         th, td { padding: 11px 13px; border-bottom: 1px solid var(--gris-tres-clair); vertical-align: middle; }
@@ -173,7 +162,6 @@
 
         .check-box { width: 18px; height: 18px; cursor: pointer; accent-color: var(--violet); }
 
-        /* Totaux à droite */
         .summary-box { background: linear-gradient(135deg, var(--violet), var(--violet-fonce)); color: var(--blanc); padding: 20px; border-radius: 10px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 4px 16px rgba(122, 92, 155, 0.2); }
         .summary-box h3 { margin: 0; font-size: 0.85rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; color: white; }
         .summary-stat { font-size: 1.8rem; font-weight: bold; font-family: 'Fredoka', sans-serif; margin-top: 4px; }
@@ -182,7 +170,6 @@
         .tab-btn { padding: 9px 18px; border-radius: 6px; border: 1px solid var(--gris-clair); background: white; cursor: pointer; font-family: 'Fredoka', sans-serif; font-size: 0.9rem; }
         .tab-btn.active { background: var(--violet); color: white; border-color: var(--violet); }
 
-        /* MODALE CONFIGURATION IMPRESSION */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
         }
@@ -190,7 +177,6 @@
             background: white; border-radius: 10px; width: 100%; max-width: 850px; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 18px;
         }
 
-        /* TOAST SYSTEM */
         .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
         .toast { color: white; padding: 12px 18px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
         .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
@@ -208,7 +194,7 @@
         <div class="topbar">
             <div class="page-title-area">
                 <h2>🧘‍♂️ Gestion des Ateliers de Sophrologie</h2>
-                <p>Suivi des présences, encaissements, fiches d'émargement et analyse d'impact</p>
+                <p>Suivi des présences, encaissements (5 € / 1ère offerte), fiches d'émargement</p>
             </div>
             <div class="topbar-actions">
                 <button class="btn btn-success" onclick="saveData(false)">☁️ Synchroniser Supabase</button>
@@ -220,7 +206,7 @@
             <div class="tabs">
                 <button id="btn-tab-session" class="tab-btn active" onclick="switchTab('session')">📅 Pointage Séance Active</button>
                 <button id="btn-tab-global" class="tab-btn" onclick="switchTab('global')">🌐 Vue Globale / Grille de Présences</button>
-                <button id="btn-tab-analytics" class="tab-btn" onclick="switchTab('analytics')">📈 Analyse &amp; Impact Sophrologie</button>
+                <button id="btn-tab-analytics" class="tab-btn" onclick="switchTab('analytics')">📈 Analyse &amp; Assiduité</button>
             </div>
 
             <div id="tab-session" class="layout">
@@ -235,8 +221,7 @@
 
                         <div>
                             <div style="font-size:0.8rem; font-weight:600; color:var(--gris-moyen); margin-bottom:8px;">Séances programmées pour cette saison :</div>
-                            <div class="sessions-grid" id="sessions-grid-container">
-                                </div>
+                            <div class="sessions-grid" id="sessions-grid-container"></div>
                         </div>
 
                         <div class="session-actions-bar">
@@ -251,11 +236,10 @@
                     <div class="form-inline">
                         <input type="text" id="new-name" placeholder="NOM Prénom (Ex: MARTIN Jean)">
                         <select id="new-status">
-                            <option value="licencie">Licencié (2 €)</option>
-                            <option value="nonlicencie">Extérieur (5 €)</option>
-                            <option value="premiere">1ère séance (Offert !)</option>
+                            <option value="standard">Séance Standard (5 €)</option>
+                            <option value="premiere">1ère séance (Offerte !)</option>
                         </select>
-                        <button class="btn btn-violet" onclick="addCustomPerson()">➕ Ajouter au Répertoire Club</button>
+                        <button class="btn btn-violet" onclick="addCustomPerson()">➕ Ajouter au Répertoire</button>
                     </div>
 
                     <div class="table-responsive">
@@ -263,14 +247,13 @@
                             <thead>
                                 <tr>
                                     <th>Participant</th>
-                                    <th>Statut Club (Clic pour modifier)</th>
+                                    <th>Formule / Tarif (Clic pour basculer)</th>
                                     <th style="text-align: center;">Présence Séance Active</th>
                                     <th style="text-align: right;">Dû (€)</th>
                                     <th style="text-align: center;">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="session-table-body">
-                                </tbody>
+                            <tbody id="session-table-body"></tbody>
                         </table>
                     </div>
                 </div>
@@ -283,30 +266,28 @@
                         </div>
                         <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 0;">
                         <div>
-                            <h3>💰 Caisse estimée</h3>
+                            <h3>💰 Caisse estimée (5 €/séance)</h3>
                             <div class="summary-stat" style="color: #2ecc71;" id="day-cash-count">0 €</div>
                         </div>
                     </div>
                     
                     <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--gris-tres-clair); font-size: 0.82rem; color: var(--gris-moyen); line-height: 1.5;">
-                        💡 <strong>Suivi &amp; Présences :</strong><br>
-                        • <strong>Filtrage par Saison :</strong> Les séances sont strictement séparées par saison sportive.<br>
-                        • <strong>Modifications :</strong> Cliquez sur la pastille colorée pour ajuster le tarif d'un participant.<br>
-                        • <strong>Imprimer en Paysage :</strong> Utilisez le bouton en haut à droite pour imprimer le bilan complet de la saison ou l'analyse d'impact.
+                        💡 <strong>Tarif &amp; Présences :</strong><br>
+                        • <strong>Tarif Unique :</strong> 5 € par personne (licencié ou extérieur), 1ère séance d'essai gratuite.<br>
+                        • <strong>Impression :</strong> Le bouton en haut à droite génère le registre d'émargement officiel avec la grille prête à remplir.<br>
+                        • <strong>Horaires :</strong> 19h00 — 20h30 au Dojo.
                     </div>
                 </div>
             </div>
 
             <div id="tab-global" class="main-card" style="display: none;">
-                <h2>🌐 Matrice Générale des Présences de la Saison Active</h2>
-                <p style="color: var(--gris-moyen); font-size: 0.82rem; margin-top: -5px;">Vue synoptique avec codes couleurs des statuts. Chaque colonne représente une date planifiée pour la saison active.</p>
+                <h2>🌐 Matrice Générale des Présences</h2>
+                <p style="color: var(--gris-moyen); font-size: 0.82rem; margin-top: -5px;">Vue synoptique de toutes les séances planifiées.</p>
                 
                 <div class="table-responsive">
                     <table style="font-size: 0.82rem;">
-                        <thead id="global-table-head">
-                            </thead>
-                        <tbody id="global-table-body">
-                            </tbody>
+                        <thead id="global-table-head"></thead>
+                        <tbody id="global-table-body"></tbody>
                     </table>
                 </div>
             </div>
@@ -319,14 +300,9 @@
                         <div class="subtext">participants uniques enregistrés</div>
                     </div>
                     <div class="kpi-card green">
-                        <h4>Licenciés Dojo</h4>
-                        <div class="value" id="kpi-licencies-count">0</div>
-                        <div class="subtext" id="kpi-licencies-pct">0% du public total</div>
-                    </div>
-                    <div class="kpi-card orange">
-                        <h4>Participants Extérieurs</h4>
-                        <div class="value" id="kpi-exterieurs-count">0</div>
-                        <div class="subtext" id="kpi-exterieurs-pct">0% du public total</div>
+                        <h4>Séances Découverte (Offertes)</h4>
+                        <div class="value" id="kpi-premieres-count">0</div>
+                        <div class="subtext" id="kpi-premieres-pct">0% du public total</div>
                     </div>
                     <div class="kpi-card purple">
                         <h4>Taux de Récurrence / Fidélité</h4>
@@ -338,8 +314,8 @@
                 <div class="main-card">
                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gris-tres-clair); padding-bottom:12px; margin-bottom:15px;">
                         <div>
-                            <h3 style="font-family:'Fredoka',sans-serif; margin:0; font-size:1.15rem; color:var(--noir-doux);">📊 Analyse d'Assiduité &amp; Impact par Adhérent</h3>
-                            <p style="margin:2px 0 0 0; font-size:0.78rem; color:var(--gris-moyen);">Mesure de la régularité et de la fidélisation du public sur la saison active</p>
+                            <h3 style="font-family:'Fredoka',sans-serif; margin:0; font-size:1.15rem; color:var(--noir-doux);">📊 Analyse d'Assiduité par Participant</h3>
+                            <p style="margin:2px 0 0 0; font-size:0.78rem; color:var(--gris-moyen);">Mesure de la régularité sur la saison active</p>
                         </div>
                         <button class="btn btn-violet" onclick="imprimerBilanAnalytiqueA4()">🖨️ Imprimer ce Bilan Analytique A4</button>
                     </div>
@@ -349,14 +325,13 @@
                             <thead>
                                 <tr>
                                     <th>Participant</th>
-                                    <th>Statut Club</th>
+                                    <th>Formule</th>
                                     <th style="text-align: center;">Séances Suivies</th>
                                     <th style="text-align: center;">Taux de Présence</th>
                                     <th style="text-align: center;">Niveau d'Assiduité</th>
                                 </tr>
                             </thead>
-                            <tbody id="analytics-table-body">
-                                </tbody>
+                            <tbody id="analytics-table-body"></tbody>
                         </table>
                     </div>
                 </div>
@@ -376,9 +351,9 @@
                 <div>
                     <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 6px;">Type de document à imprimer :</label>
                     <select id="print-type-select" style="width: 100%; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px;">
-                        <option value="session">📄 Émargement Séance Active (avec grille à émarger)</option>
+                        <option value="session">📄 Émargement Séance Active (Grille complète à remplir)</option>
                         <option value="season">📊 Bilan Synoptique Complet de la Saison (Toutes les dates)</option>
-                        <option value="analytics">📈 Rapport d'Analyse Analytique &amp; Impact Sophrologie</option>
+                        <option value="analytics">📈 Rapport d'Analyse Analytique &amp; Assiduité</option>
                     </select>
                 </div>
 
@@ -388,7 +363,7 @@
                         <input type="text" id="print-season-input" style="width: 100%; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px;" readonly>
                     </div>
                     <div style="flex: 1; min-width: 180px;">
-                        <label style="font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 5px;">Horaires / Remarques :</label>
+                        <label style="font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 5px;">Horaires :</label>
                         <input type="text" id="print-time-input" style="width: 100%; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px;" value="19h00 — 20h30">
                     </div>
                 </div>
@@ -436,16 +411,30 @@
             if (p.name) fullName = p.name.trim();
             else if (p.nom || p.prenom) fullName = `${p.nom || ''} ${p.prenom || ''}`.trim();
 
-            let status = "licencie";
+            let status = "standard";
             const rawStatut = (p.status || p.statut || "").toLowerCase();
-            if (rawStatut.includes("non") || rawStatut.includes("extér") || rawStatut.includes("exter")) status = "nonlicencie";
-            else if (rawStatut.includes("1ère") || rawStatut.includes("premiere") || rawStatut.includes("offert")) status = "premiere";
+            if (rawStatut.includes("1ère") || rawStatut.includes("premiere") || rawStatut.includes("offert") || rawStatut.includes("decouverte")) {
+                status = "premiere";
+            }
 
             return { name: fullName.toUpperCase(), status: status };
         }
 
+        function ensureSaison2026Dates() {
+            if (!state.seasons.includes("2026/2027")) {
+                state.seasons.push("2026/2027");
+            }
+            if (!state.seasonDates["2026/2027"] || state.seasonDates["2026/2027"].length < defaultDatesBySeason["2026/2027"].length) {
+                state.seasonDates["2026/2027"] = [...defaultDatesBySeason["2026/2027"]];
+            }
+            if (state.activeSeason === "2026/2027" && (!state.activeDate || !state.seasonDates["2026/2027"].includes(state.activeDate))) {
+                state.activeDate = state.seasonDates["2026/2027"][0] || "16/10";
+            }
+        }
+
         async function loadData() {
             useFallbackLocalData();
+            ensureSaison2026Dates();
             finalizeInitialization();
 
             try {
@@ -462,19 +451,16 @@
                     if (serverState.participants && Array.isArray(serverState.participants)) {
                         state.participants = serverState.participants.map(normalizeParticipant);
                     }
-                    if (serverState.seasons) state.seasons = serverState.seasons;
+                    if (serverState.seasons && Array.isArray(serverState.seasons)) {
+                        state.seasons = Array.from(new Set([...serverState.seasons, "2025/2026", "2026/2027"]));
+                    }
                     if (serverState.activeSeason) state.activeSeason = serverState.activeSeason;
                     
                     if (serverState.seasonDates) {
                         state.seasonDates = serverState.seasonDates;
-                    } else if (serverState.dates) {
-                        state.seasonDates[state.activeSeason] = serverState.dates;
                     }
 
-                    // S'assurer que les dates 2026/2027 sont bien initialisées si manquantes
-                    if (!state.seasonDates["2026/2027"] || state.seasonDates["2026/2027"].length === 0) {
-                        state.seasonDates["2026/2027"] = [...defaultDatesBySeason["2026/2027"]];
-                    }
+                    ensureSaison2026Dates();
 
                     if (serverState.activeDate) state.activeDate = serverState.activeDate;
                     if (serverState.presences) state.presences = serverState.presences;
@@ -501,9 +487,7 @@
                 } catch(e) {}
             }
             if (!state.seasons.length) state.seasons = [...defaultSeasons];
-            if (!state.seasonDates["2026/2027"] || state.seasonDates["2026/2027"].length === 0) {
-                state.seasonDates["2026/2027"] = [...defaultDatesBySeason["2026/2027"]];
-            }
+            ensureSaison2026Dates();
             if (!state.activeSeason) state.activeSeason = "2026/2027";
             if (!state.seasonDates[state.activeSeason]) state.seasonDates[state.activeSeason] = [...defaultDatesBySeason[state.activeSeason]];
             if (!state.activeDate) state.activeDate = state.seasonDates[state.activeSeason][0] || "16/10";
@@ -563,8 +547,12 @@
 
         async function selectSeason(s) {
             state.activeSeason = s;
-            if (!state.seasonDates[s]) {
-                state.seasonDates[s] = [];
+            if (!state.seasonDates[s] || state.seasonDates[s].length === 0) {
+                if (defaultDatesBySeason[s]) {
+                    state.seasonDates[s] = [...defaultDatesBySeason[s]];
+                } else {
+                    state.seasonDates[s] = [];
+                }
             }
             if (state.seasonDates[s].length > 0) {
                 state.activeDate = state.seasonDates[s][0];
@@ -582,9 +570,9 @@
             if(val && !state.seasons.includes(val.trim())) {
                 const seasonName = val.trim();
                 state.seasons.push(seasonName);
-                state.seasonDates[seasonName] = [];
+                state.seasonDates[seasonName] = defaultDatesBySeason[seasonName] ? [...defaultDatesBySeason[seasonName]] : [];
                 state.activeSeason = seasonName;
-                state.activeDate = "";
+                state.activeDate = state.seasonDates[seasonName][0] || "";
                 await saveData(true);
                 renderSeasons();
                 renderSessionsGrid();
@@ -712,9 +700,7 @@
         async function toggleStatus(name) {
             const person = state.participants.find(p => p.name === name);
             if (person) {
-                if (person.status === 'licencie') person.status = 'nonlicencie';
-                else if (person.status === 'nonlicencie') person.status = 'premiere';
-                else person.status = 'licencie';
+                person.status = (person.status === 'premiere') ? 'standard' : 'premiere';
                 await saveData(true);
                 renderSession();
             }
@@ -745,21 +731,16 @@
             state.participants.forEach(p => {
                 const isPresent = (state.activeDate && state.presences[state.activeDate] && state.presences[state.activeDate].includes(p.name));
                 
-                let price = 0;
-                let badgeClass = 'badge-premiere';
-                let pastilleClass = 'pastille-violet';
-                let badgeLabel = '1ère fois (Offert !)';
+                let price = 5;
+                let badgeClass = 'badge-standard';
+                let pastilleClass = 'pastille-green';
+                let badgeLabel = 'Séance (5 €)';
 
-                if (p.status === 'licencie') {
-                    price = 2;
-                    badgeClass = 'badge-licencie';
-                    pastilleClass = 'pastille-green';
-                    badgeLabel = 'Licencié (2 €)';
-                } else if (p.status === 'nonlicencie') {
-                    price = 5;
-                    badgeClass = 'badge-nonlicencie';
-                    pastilleClass = 'pastille-orange';
-                    badgeLabel = 'Extérieur (5 €)';
+                if (p.status === 'premiere') {
+                    price = 0;
+                    badgeClass = 'badge-premiere';
+                    pastilleClass = 'pastille-violet';
+                    badgeLabel = '1ère fois (Offert !)';
                 }
 
                 if (isPresent) {
@@ -792,14 +773,13 @@
             document.getElementById('day-cash-count').innerText = `${totalCash} €`;
         }
 
-        /* --- RENDU MATRICE GLOBALE AVEC BADGES COLORÉS --- */
         function renderGlobalMatrix() {
             const thead = document.getElementById('global-table-head');
             const tbody = document.getElementById('global-table-body');
             
             const currentDates = state.seasonDates[state.activeSeason] || [];
 
-            let headHtml = `<tr><th>Participant</th><th>Statut Club</th>`;
+            let headHtml = `<tr><th>Participant</th><th>Formule</th>`;
             currentDates.forEach(d => {
                 headHtml += `<th style="text-align: center;">${d}</th>`;
             });
@@ -810,19 +790,9 @@
             state.participants.sort((a, b) => a.name.localeCompare(b.name));
 
             state.participants.forEach(p => {
-                let badgeClass = 'badge-premiere';
-                let pastilleClass = 'pastille-violet';
-                let badgeLabel = '1ère fois';
-
-                if (p.status === 'licencie') {
-                    badgeClass = 'badge-licencie';
-                    pastilleClass = 'pastille-green';
-                    badgeLabel = 'Licencié';
-                } else if (p.status === 'nonlicencie') {
-                    badgeClass = 'badge-nonlicencie';
-                    pastilleClass = 'pastille-orange';
-                    badgeLabel = 'Extérieur';
-                }
+                let badgeClass = (p.status === 'premiere') ? 'badge-premiere' : 'badge-standard';
+                let pastilleClass = (p.status === 'premiere') ? 'pastille-violet' : 'pastille-green';
+                let badgeLabel = (p.status === 'premiere') ? '1ère offerte' : 'Tarif 5 €';
 
                 let rowHtml = `<tr>
                     <td style="font-weight: 500;">${p.name}</td>
@@ -842,14 +812,12 @@
             });
         }
 
-        /* --- CALCULS ANALYTIQUES ET MESURE D'IMPACT --- */
         function renderAnalytics() {
             const currentDates = state.seasonDates[state.activeSeason] || [];
             const totalDates = currentDates.length;
 
             const totalPeople = state.participants.length;
-            let licenciesCount = 0;
-            let exterieursCount = 0;
+            let premieresCount = 0;
             let loyalCount = 0;
 
             const tbody = document.getElementById('analytics-table-body');
@@ -858,8 +826,7 @@
             state.participants.sort((a, b) => a.name.localeCompare(b.name));
 
             state.participants.forEach(p => {
-                if (p.status === 'licencie') licenciesCount++;
-                else exterieursCount++;
+                if (p.status === 'premiere') premieresCount++;
 
                 let attendedCount = 0;
                 currentDates.forEach(d => {
@@ -872,15 +839,9 @@
 
                 const attendanceRate = totalDates > 0 ? Math.round((attendedCount / totalDates) * 100) : 0;
 
-                let badgeClass = 'badge-premiere';
-                let pastilleClass = 'pastille-violet';
-                let badgeLabel = '1ère fois';
-
-                if (p.status === 'licencie') {
-                    badgeClass = 'badge-licencie'; pastilleClass = 'pastille-green'; badgeLabel = 'Licencié';
-                } else if (p.status === 'nonlicencie') {
-                    badgeClass = 'badge-nonlicencie'; pastilleClass = 'pastille-orange'; badgeLabel = 'Extérieur';
-                }
+                let badgeClass = (p.status === 'premiere') ? 'badge-premiere' : 'badge-standard';
+                let pastilleClass = (p.status === 'premiere') ? 'pastille-violet' : 'pastille-green';
+                let badgeLabel = (p.status === 'premiere') ? '1ère offerte' : 'Tarif 5 €';
 
                 let assiduiteLabel = 'Occasionnel (1 séance)';
                 let assiduiteBadgeStyle = 'background:#FAF9FC; color:#666; border:1px solid #ccc;';
@@ -915,11 +876,8 @@
             });
 
             document.getElementById('kpi-total-people').innerText = totalPeople;
-            document.getElementById('kpi-licencies-count').innerText = licenciesCount;
-            document.getElementById('kpi-licencies-pct').innerText = totalPeople > 0 ? `${Math.round((licenciesCount / totalPeople) * 100)}% du public` : '0%';
-            
-            document.getElementById('kpi-exterieurs-count').innerText = exterieursCount;
-            document.getElementById('kpi-exterieurs-pct').innerText = totalPeople > 0 ? `${Math.round((exterieursCount / totalPeople) * 100)}% du public` : '0%';
+            document.getElementById('kpi-premieres-count').innerText = premieresCount;
+            document.getElementById('kpi-premieres-pct').innerText = totalPeople > 0 ? `${Math.round((premieresCount / totalPeople) * 100)}% du public` : '0%';
 
             const loyaltyRate = totalPeople > 0 ? Math.round((loyalCount / totalPeople) * 100) : 0;
             document.getElementById('kpi-loyalty-pct').innerText = `${loyaltyRate} %`;
@@ -952,7 +910,6 @@
             }
         }
 
-        /* --- MODALE ET IMPRESSION OPTIMISÉE PAYSAGE --- */
         function openPrintModal() {
             document.getElementById('print-season-input').value = state.activeSeason;
             document.getElementById('print-time-input').value = "19h00 — 20h30";
@@ -988,20 +945,17 @@
                             <tr>
                                 <th style="width: 5%;">#</th>
                                 <th style="width: 32%;">NOM et Prénom</th>
-                                <th style="width: 23%;">Statut Club / Formule</th>
+                                <th style="width: 23%;">Formule / Tarif</th>
                                 <th style="width: 15%; text-align: center;">Présence</th>
-                                <th style="width: 25%;">Émargement / Règlement</th>
+                                <th style="width: 25%;">Émargement / Règlement (5 €)</th>
                             </tr>
                         </thead>
                         <tbody>`;
                 
                 let lineIndex = 1;
-                // Participants existants
                 state.participants.forEach((p) => {
                     const isPresent = (state.activeDate && state.presences[state.activeDate] && state.presences[state.activeDate].includes(p.name));
-                    let statusTxt = "Licencié (2 €)";
-                    if (p.status === 'nonlicencie') statusTxt = "Extérieur (5 €)";
-                    if (p.status === 'premiere') statusTxt = "1ère séance (Offert)";
+                    let statusTxt = (p.status === 'premiere') ? "1ère séance (Offerte)" : "Séance (5 €)";
 
                     tableHtml += `
                         <tr style="height: 28px;">
@@ -1015,7 +969,6 @@
                     lineIndex++;
                 });
 
-                // Génération de lignes vierges à remplir (au minimum 14 lignes au total)
                 const minLines = 14;
                 const blankRowsNeeded = Math.max(minLines - state.participants.length, 6);
 
@@ -1024,7 +977,7 @@
                         <tr style="height: 30px;">
                             <td style="text-align:center; color:#999;">${lineIndex}</td>
                             <td style="color:#ccc; font-style:italic; font-size:7.5pt;">.......................................................................</td>
-                            <td style="color:#888; font-size:7.5pt;">[ ] Licencié (2€) &nbsp; [ ] Ext. (5€) &nbsp; [ ] 1ère</td>
+                            <td style="color:#888; font-size:7.5pt;">[ ] Séance (5 €) &nbsp; [ ] 1ère offerte</td>
                             <td style="text-align:center; color:#ccc;">[ &nbsp; ]</td>
                             <td></td>
                         </tr>
@@ -1050,9 +1003,7 @@
                     tableHtml += `<tr><td colspan="${currentDates.length + 2}" style="text-align:center; padding:18px; color:#888; font-style:italic;">Aucun participant enregistré pour cette saison sportive.</td></tr>`;
                 } else {
                     state.participants.forEach(p => {
-                        let statusTxt = `<span style="color:#27ae60; font-weight:bold;">🥋 Licencié</span>`;
-                        if (p.status === 'nonlicencie') statusTxt = `<span style="color:#e67e22; font-weight:bold;">👤 Extérieur</span>`;
-                        if (p.status === 'premiere') statusTxt = `<span style="color:#7A5C9B; font-weight:bold;">🟣 1ère fois</span>`;
+                        let statusTxt = (p.status === 'premiere') ? `<span style="color:#7A5C9B; font-weight:bold;">🟣 1ère offerte</span>` : `<span style="color:#27ae60; font-weight:bold;">🟢 Tarif 5 €</span>`;
 
                         tableHtml += `<tr>
                             <td><strong>${p.name}</strong></td>
@@ -1070,15 +1021,13 @@
             launchPrintWindow(titleText, seasonVal, timeVal, tableHtml);
         }
 
-        /* --- IMPRESSION DÉDIÉE RAPPORT ANALYTIQUE --- */
         function imprimerBilanAnalytiqueA4() {
             const seasonVal = state.activeSeason;
             const currentDates = state.seasonDates[seasonVal] || [];
             const totalDates = currentDates.length;
             const totalPeople = state.participants.length;
 
-            let licenciesCount = 0;
-            let exterieursCount = 0;
+            let premieresCount = 0;
             let loyalCount = 0;
 
             let rowsHtml = '';
@@ -1086,8 +1035,7 @@
                 rowsHtml = `<tr><td colspan="5" style="text-align:center; padding:18px; color:#888; font-style:italic;">Aucun participant enregistré pour cette saison sportive.</td></tr>`;
             } else {
                 state.participants.sort((a, b) => a.name.localeCompare(b.name)).forEach(p => {
-                    if (p.status === 'licencie') licenciesCount++;
-                    else exterieursCount++;
+                    if (p.status === 'premiere') premieresCount++;
 
                     let attendedCount = 0;
                     currentDates.forEach(d => {
@@ -1097,10 +1045,7 @@
                     if (attendedCount >= 2) loyalCount++;
 
                     const attendanceRate = totalDates > 0 ? Math.round((attendedCount / totalDates) * 100) : 0;
-                    
-                    let statusLabel = "Licencié Dojo";
-                    if (p.status === 'nonlicencie') statusLabel = "Extérieur";
-                    if (p.status === 'premiere') statusLabel = "1ère séance";
+                    let statusLabel = (p.status === 'premiere') ? "1ère séance" : "Tarif 5 €";
 
                     let assiduiteLabel = "Occasionnel";
                     if (attendedCount >= 4) assiduiteLabel = "🥇 Très Assidu (Fidèle)";
@@ -1121,22 +1066,18 @@
             const loyaltyRate = totalPeople > 0 ? Math.round((loyalCount / totalPeople) * 100) : 0;
 
             const summaryHtml = `
-                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:20px; background:#F4F6F9; padding:12px; border-radius:6px; border:1px solid #ccc;">
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:20px; background:#F4F6F9; padding:12px; border-radius:6px; border:1px solid #ccc;">
                     <div style="text-align:center;">
                         <div style="font-size:7.5pt; color:#666; text-transform:uppercase;">Public Total</div>
                         <div style="font-size:14pt; font-weight:bold; color:#1A1A1A;">${totalPeople} pers.</div>
                     </div>
                     <div style="text-align:center;">
-                        <div style="font-size:7.5pt; color:#666; text-transform:uppercase;">Licenciés Dojo</div>
-                        <div style="font-size:14pt; font-weight:bold; color:#27ae60;">${licenciesCount} (${totalPeople > 0 ? Math.round((licenciesCount/totalPeople)*100) : 0}%)</div>
-                    </div>
-                    <div style="text-align:center;">
-                        <div style="font-size:7.5pt; color:#666; text-transform:uppercase;">Extérieurs Captés</div>
-                        <div style="font-size:14pt; font-weight:bold; color:#e67e22;">${exterieursCount} (${totalPeople > 0 ? Math.round((exterieursCount/totalPeople)*100) : 0}%)</div>
+                        <div style="font-size:7.5pt; color:#666; text-transform:uppercase;">Séances d'Essai Offertes</div>
+                        <div style="font-size:14pt; font-weight:bold; color:#7A5C9B;">${premieresCount} (${totalPeople > 0 ? Math.round((premieresCount/totalPeople)*100) : 0}%)</div>
                     </div>
                     <div style="text-align:center;">
                         <div style="font-size:7.5pt; color:#666; text-transform:uppercase;">Fidélisation (≥2 séances)</div>
-                        <div style="font-size:14pt; font-weight:bold; color:#7A5C9B;">${loyaltyRate} % (${loyalCount} pers.)</div>
+                        <div style="font-size:14pt; font-weight:bold; color:#27ae60;">${loyaltyRate} % (${loyalCount} pers.)</div>
                     </div>
                 </div>
 
@@ -1144,7 +1085,7 @@
                     <thead>
                         <tr>
                             <th>Participant</th>
-                            <th>Statut Club</th>
+                            <th>Formule</th>
                             <th style="text-align:center;">Séances Suivies</th>
                             <th style="text-align:center;">Taux de Présence</th>
                             <th style="text-align:center;">Qualificatif d'Assiduité</th>
@@ -1156,7 +1097,7 @@
                 </table>
             `;
 
-            launchPrintWindow(`Rapport d'Analyse & Impact Sophrologie — Saison ${seasonVal}`, seasonVal, "19h00 — 20h30", summaryHtml);
+            launchPrintWindow(`Rapport d'Assiduité Sophrologie — Saison ${seasonVal}`, seasonVal, "19h00 — 20h30", summaryHtml);
         }
 
         function launchPrintWindow(titleText, seasonVal, timeVal, contentHtml) {
@@ -1198,7 +1139,7 @@
 
                     <div class="sheet-title-box">
                         <h1>${titleText}</h1>
-                        <p>Saison sportive ${seasonVal} &bull; Horaires : <strong>${timeVal}</strong></p>
+                        <p>Saison sportive ${seasonVal} &bull; Horaires : <strong>${timeVal}</strong> &bull; Tarif unique : <strong>5 € la séance</strong> (1ère découverte offerte)</p>
                     </div>
 
                     ${contentHtml}
