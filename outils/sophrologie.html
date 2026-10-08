@@ -149,7 +149,7 @@
         .badge-nonlicencie { background: #fdf2e9; color: #d35400; border: 1.5px solid #e67e22; }
         .badge-premiere { background: var(--violet-clair); color: var(--violet-fonce); border: 1.5px solid var(--violet); }
 
-        /* KPI CARDS (ONGLET ANALYTIQUE) */
+        /* KPI CARDS */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
         .kpi-card { background: var(--blanc); padding: 18px; border-radius: 10px; border-left: 4px solid var(--violet); border: 1px solid var(--gris-tres-clair); }
         .kpi-card.green { border-left-color: var(--vert-fonce); }
@@ -241,7 +241,7 @@
 
                         <div class="session-actions-bar">
                             <div style="display: flex; gap: 6px; align-items: center;">
-                                <input type="text" id="new-session-date" placeholder="Ex: 15/10, 12/11..." style="padding: 6px 10px; border: 1px solid var(--gris-clair); border-radius: 6px; font-size: 0.85rem; width: 130px;">
+                                <input type="text" id="new-session-date" placeholder="Ex: 16/10, 13/11..." style="padding: 6px 10px; border: 1px solid var(--gris-clair); border-radius: 6px; font-size: 0.85rem; width: 130px;">
                                 <button class="btn btn-violet" style="padding: 6px 12px; font-size: 0.82rem;" onclick="addNewSessionDate()">📅 Planifier une séance</button>
                             </div>
                             <button class="btn btn-danger" style="padding: 6px 10px; font-size: 0.82rem;" onclick="deleteActiveSessionDate()">🗑️ Supprimer la séance active</button>
@@ -376,7 +376,7 @@
                 <div>
                     <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 6px;">Type de document à imprimer :</label>
                     <select id="print-type-select" style="width: 100%; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px;">
-                        <option value="session">📄 Émargement Séance Active uniquement</option>
+                        <option value="session">📄 Émargement Séance Active (avec grille à émarger)</option>
                         <option value="season">📊 Bilan Synoptique Complet de la Saison (Toutes les dates)</option>
                         <option value="analytics">📈 Rapport d'Analyse Analytique &amp; Impact Sophrologie</option>
                     </select>
@@ -389,7 +389,7 @@
                     </div>
                     <div style="flex: 1; min-width: 180px;">
                         <label style="font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 5px;">Horaires / Remarques :</label>
-                        <input type="text" id="print-time-input" style="width: 100%; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px;" value="19h00 — 20h00">
+                        <input type="text" id="print-time-input" style="width: 100%; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px;" value="19h00 — 20h30">
                     </div>
                 </div>
             </div>
@@ -410,14 +410,14 @@
         const defaultSeasons = ["2025/2026", "2026/2027"];
         const defaultDatesBySeason = {
             "2025/2026": ["19/06", "12/09", "10/10", "14/11", "12/12", "20/01", "20/02", "20/03", "03/04", "24/04"],
-            "2026/2027": ["15/10", "12/11", "10/12", "14/01", "11/02", "18/03", "15/04", "13/05", "10/06"]
+            "2026/2027": ["16/10", "13/11", "18/12", "15/01", "12/02", "12/03", "16/04", "14/05", "11/06"]
         };
 
         let state = {
             seasons: [...defaultSeasons],
-            activeSeason: "2025/2026",
+            activeSeason: "2026/2027",
             seasonDates: JSON.parse(JSON.stringify(defaultDatesBySeason)),
-            activeDate: "19/06",
+            activeDate: "16/10",
             participants: [],
             presences: {}
         };
@@ -445,11 +445,9 @@
         }
 
         async function loadData() {
-            // 1. Chargement préalable du cache local pour réactivité immédiate
             useFallbackLocalData();
             finalizeInitialization();
 
-            // 2. Synchronisation prioritaire depuis Supabase
             try {
                 const { data, error } = await sbClient
                     .from(SUPABASE_TABLE)
@@ -471,6 +469,11 @@
                         state.seasonDates = serverState.seasonDates;
                     } else if (serverState.dates) {
                         state.seasonDates[state.activeSeason] = serverState.dates;
+                    }
+
+                    // S'assurer que les dates 2026/2027 sont bien initialisées si manquantes
+                    if (!state.seasonDates["2026/2027"] || state.seasonDates["2026/2027"].length === 0) {
+                        state.seasonDates["2026/2027"] = [...defaultDatesBySeason["2026/2027"]];
                     }
 
                     if (serverState.activeDate) state.activeDate = serverState.activeDate;
@@ -498,9 +501,12 @@
                 } catch(e) {}
             }
             if (!state.seasons.length) state.seasons = [...defaultSeasons];
-            if (!state.activeSeason) state.activeSeason = state.seasons[0];
-            if (!state.seasonDates[state.activeSeason]) state.seasonDates[state.activeSeason] = [...defaultDatesBySeason["2025/2026"]];
-            if (!state.activeDate) state.activeDate = state.seasonDates[state.activeSeason][0] || "";
+            if (!state.seasonDates["2026/2027"] || state.seasonDates["2026/2027"].length === 0) {
+                state.seasonDates["2026/2027"] = [...defaultDatesBySeason["2026/2027"]];
+            }
+            if (!state.activeSeason) state.activeSeason = "2026/2027";
+            if (!state.seasonDates[state.activeSeason]) state.seasonDates[state.activeSeason] = [...defaultDatesBySeason[state.activeSeason]];
+            if (!state.activeDate) state.activeDate = state.seasonDates[state.activeSeason][0] || "16/10";
             if (!state.presences) state.presences = {};
         }
 
@@ -949,6 +955,7 @@
         /* --- MODALE ET IMPRESSION OPTIMISÉE PAYSAGE --- */
         function openPrintModal() {
             document.getElementById('print-season-input').value = state.activeSeason;
+            document.getElementById('print-time-input').value = "19h00 — 20h30";
             document.getElementById('print-modal').style.display = 'flex';
         }
 
@@ -965,7 +972,7 @@
             }
 
             const seasonVal = state.activeSeason;
-            const timeVal = document.getElementById('print-time-input').value;
+            const timeVal = document.getElementById('print-time-input').value || "19h00 — 20h30";
             const currentDates = state.seasonDates[seasonVal] || [];
 
             closePrintModal();
@@ -980,30 +987,51 @@
                         <thead>
                             <tr>
                                 <th style="width: 5%;">#</th>
-                                <th style="width: 35%;">NOM et Prénom</th>
-                                <th style="width: 25%;">Statut Club</th>
-                                <th style="width: 15%;">Présence</th>
-                                <th style="width: 20%;">Émargement / Règlement</th>
+                                <th style="width: 32%;">NOM et Prénom</th>
+                                <th style="width: 23%;">Statut Club / Formule</th>
+                                <th style="width: 15%; text-align: center;">Présence</th>
+                                <th style="width: 25%;">Émargement / Règlement</th>
                             </tr>
                         </thead>
                         <tbody>`;
                 
-                state.participants.forEach((p, idx) => {
+                let lineIndex = 1;
+                // Participants existants
+                state.participants.forEach((p) => {
                     const isPresent = (state.activeDate && state.presences[state.activeDate] && state.presences[state.activeDate].includes(p.name));
                     let statusTxt = "Licencié (2 €)";
                     if (p.status === 'nonlicencie') statusTxt = "Extérieur (5 €)";
                     if (p.status === 'premiere') statusTxt = "1ère séance (Offert)";
 
                     tableHtml += `
-                        <tr>
-                            <td style="text-align:center;">${idx + 1}</td>
+                        <tr style="height: 28px;">
+                            <td style="text-align:center; font-weight:bold; color:#7A5C9B;">${lineIndex}</td>
                             <td><strong>${p.name}</strong></td>
                             <td>${statusTxt}</td>
-                            <td style="text-align:center;">${isPresent ? '<b>PRÉSENT</b>' : '—'}</td>
+                            <td style="text-align:center;">${isPresent ? '<b style="color:#27ae60;">✔ PRÉSENT</b>' : '<span style="color:#bbb;">[ &nbsp; ]</span>'}</td>
                             <td></td>
                         </tr>
                     `;
+                    lineIndex++;
                 });
+
+                // Génération de lignes vierges à remplir (au minimum 14 lignes au total)
+                const minLines = 14;
+                const blankRowsNeeded = Math.max(minLines - state.participants.length, 6);
+
+                for (let i = 0; i < blankRowsNeeded; i++) {
+                    tableHtml += `
+                        <tr style="height: 30px;">
+                            <td style="text-align:center; color:#999;">${lineIndex}</td>
+                            <td style="color:#ccc; font-style:italic; font-size:7.5pt;">.......................................................................</td>
+                            <td style="color:#888; font-size:7.5pt;">[ ] Licencié (2€) &nbsp; [ ] Ext. (5€) &nbsp; [ ] 1ère</td>
+                            <td style="text-align:center; color:#ccc;">[ &nbsp; ]</td>
+                            <td></td>
+                        </tr>
+                    `;
+                    lineIndex++;
+                }
+
                 tableHtml += `</tbody></table>`;
             } else {
                 titleText = `Bilan Synoptique Annuel de Sophrologie — Saison ${seasonVal}`;
@@ -1018,20 +1046,24 @@
                 });
                 tableHtml += `</tr></thead><tbody>`;
 
-                state.participants.forEach(p => {
-                    let statusTxt = `<span style="color:#27ae60; font-weight:bold;">🥋 Licencié</span>`;
-                    if (p.status === 'nonlicencie') statusTxt = `<span style="color:#e67e22; font-weight:bold;">👤 Extérieur</span>`;
-                    if (p.status === 'premiere') statusTxt = `<span style="color:#7A5C9B; font-weight:bold;">🟣 1ère fois</span>`;
+                if (state.participants.length === 0) {
+                    tableHtml += `<tr><td colspan="${currentDates.length + 2}" style="text-align:center; padding:18px; color:#888; font-style:italic;">Aucun participant enregistré pour cette saison sportive.</td></tr>`;
+                } else {
+                    state.participants.forEach(p => {
+                        let statusTxt = `<span style="color:#27ae60; font-weight:bold;">🥋 Licencié</span>`;
+                        if (p.status === 'nonlicencie') statusTxt = `<span style="color:#e67e22; font-weight:bold;">👤 Extérieur</span>`;
+                        if (p.status === 'premiere') statusTxt = `<span style="color:#7A5C9B; font-weight:bold;">🟣 1ère fois</span>`;
 
-                    tableHtml += `<tr>
-                        <td><strong>${p.name}</strong></td>
-                        <td>${statusTxt}</td>`;
-                    currentDates.forEach(d => {
-                        const checked = (state.presences[d] && state.presences[d].includes(p.name)) ? '✅' : '—';
-                        tableHtml += `<td style="text-align:center;">${checked}</td>`;
+                        tableHtml += `<tr>
+                            <td><strong>${p.name}</strong></td>
+                            <td>${statusTxt}</td>`;
+                        currentDates.forEach(d => {
+                            const checked = (state.presences[d] && state.presences[d].includes(p.name)) ? '✅' : '—';
+                            tableHtml += `<td style="text-align:center;">${checked}</td>`;
+                        });
+                        tableHtml += `</tr>`;
                     });
-                    tableHtml += `</tr>`;
-                });
+                }
                 tableHtml += `</tbody></table>`;
             }
 
@@ -1050,37 +1082,41 @@
             let loyalCount = 0;
 
             let rowsHtml = '';
-            state.participants.sort((a, b) => a.name.localeCompare(b.name)).forEach(p => {
-                if (p.status === 'licencie') licenciesCount++;
-                else exterieursCount++;
+            if (state.participants.length === 0) {
+                rowsHtml = `<tr><td colspan="5" style="text-align:center; padding:18px; color:#888; font-style:italic;">Aucun participant enregistré pour cette saison sportive.</td></tr>`;
+            } else {
+                state.participants.sort((a, b) => a.name.localeCompare(b.name)).forEach(p => {
+                    if (p.status === 'licencie') licenciesCount++;
+                    else exterieursCount++;
 
-                let attendedCount = 0;
-                currentDates.forEach(d => {
-                    if (state.presences[d] && state.presences[d].includes(p.name)) attendedCount++;
+                    let attendedCount = 0;
+                    currentDates.forEach(d => {
+                        if (state.presences[d] && state.presences[d].includes(p.name)) attendedCount++;
+                    });
+
+                    if (attendedCount >= 2) loyalCount++;
+
+                    const attendanceRate = totalDates > 0 ? Math.round((attendedCount / totalDates) * 100) : 0;
+                    
+                    let statusLabel = "Licencié Dojo";
+                    if (p.status === 'nonlicencie') statusLabel = "Extérieur";
+                    if (p.status === 'premiere') statusLabel = "1ère séance";
+
+                    let assiduiteLabel = "Occasionnel";
+                    if (attendedCount >= 4) assiduiteLabel = "🥇 Très Assidu (Fidèle)";
+                    else if (attendedCount >= 2) assiduiteLabel = "🥈 Régulier";
+
+                    rowsHtml += `
+                        <tr>
+                            <td><strong>${p.name}</strong></td>
+                            <td>${statusLabel}</td>
+                            <td style="text-align:center; font-weight:bold;">${attendedCount} / ${totalDates}</td>
+                            <td style="text-align:center; font-weight:bold; color:#5A3E78;">${attendanceRate} %</td>
+                            <td style="text-align:center;">${assiduiteLabel}</td>
+                        </tr>
+                    `;
                 });
-
-                if (attendedCount >= 2) loyalCount++;
-
-                const attendanceRate = totalDates > 0 ? Math.round((attendedCount / totalDates) * 100) : 0;
-                
-                let statusLabel = "Licencié Dojo";
-                if (p.status === 'nonlicencie') statusLabel = "Extérieur";
-                if (p.status === 'premiere') statusLabel = "1ère séance";
-
-                let assiduiteLabel = "Occasionnel";
-                if (attendedCount >= 4) assiduiteLabel = "🥇 Très Assidu (Fidèle)";
-                else if (attendedCount >= 2) assiduiteLabel = "🥈 Régulier";
-
-                rowsHtml += `
-                    <tr>
-                        <td><strong>${p.name}</strong></td>
-                        <td>${statusLabel}</td>
-                        <td style="text-align:center; font-weight:bold;">${attendedCount} / ${totalDates}</td>
-                        <td style="text-align:center; font-weight:bold; color:#5A3E78;">${attendanceRate} %</td>
-                        <td style="text-align:center;">${assiduiteLabel}</td>
-                    </tr>
-                `;
-            });
+            }
 
             const loyaltyRate = totalPeople > 0 ? Math.round((loyalCount / totalPeople) * 100) : 0;
 
@@ -1120,7 +1156,7 @@
                 </table>
             `;
 
-            launchPrintWindow(`Rapport d'Analyse & Impact Sophrologie — Saison ${seasonVal}`, seasonVal, "Bilan Global", summaryHtml);
+            launchPrintWindow(`Rapport d'Analyse & Impact Sophrologie — Saison ${seasonVal}`, seasonVal, "19h00 — 20h30", summaryHtml);
         }
 
         function launchPrintWindow(titleText, seasonVal, timeVal, contentHtml) {
@@ -1133,20 +1169,20 @@
                     <title>${titleText}</title>
                     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
                     <style>
-                        @page { size: A4 landscape; margin: 10mm; }
+                        @page { size: A4 landscape; margin: 8mm 10mm; }
                         body { font-family: 'Roboto', sans-serif; color: #1a1a1a; background: #fff; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                        .sheet-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #C41E3A; padding-bottom: 10px; margin-bottom: 15px; }
-                        .sheet-logo-left { height: 50px; width: 50px; object-fit: contain; background: #C41E3A; padding: 4px; border-radius: 6px; }
-                        .sheet-logo-right { height: 50px; object-fit: contain; }
+                        .sheet-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #C41E3A; padding-bottom: 8px; margin-bottom: 12px; }
+                        .sheet-logo-left { height: 50px; width: 50px; object-fit: contain; background: #C41E3A; padding: 4px; border-radius: 8px; }
+                        .sheet-logo-right { height: 48px; object-fit: contain; }
                         .sheet-club-details { text-align: center; font-size: 8pt; color: #3D3D3D; line-height: 1.3; }
-                        .sheet-club-details strong { font-family: 'Fredoka', sans-serif; color: #C41E3A; font-size: 11pt; display: block; }
-                        .sheet-title-box { text-align: center; margin-bottom: 15px; }
-                        .sheet-title-box h1 { font-family: 'Fredoka', sans-serif; color: #5A3E78; font-size: 16pt; margin: 0 0 4px 0; text-transform: uppercase; }
-                        .sheet-title-box p { margin: 0; font-size: 9.5pt; color: #6B6B6B; font-weight: 500; }
-                        .sheet-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 8.5pt; }
+                        .sheet-club-details strong { font-family: 'Fredoka', sans-serif; color: #C41E3A; font-size: 11.5pt; display: block; }
+                        .sheet-title-box { text-align: center; margin-bottom: 12px; }
+                        .sheet-title-box h1 { font-family: 'Fredoka', sans-serif; color: #5A3E78; font-size: 15pt; margin: 0 0 3px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+                        .sheet-title-box p { margin: 0; font-size: 9pt; color: #6B6B6B; font-weight: 500; }
+                        .sheet-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 8.5pt; }
                         .sheet-table th { background: #F0EBF5; color: #5A3E78; font-family: 'Fredoka', sans-serif; padding: 7px 8px; border: 1px solid #B8B8B8; }
-                        .sheet-table td { border: 1px solid #B8B8B8; padding: 6px 8px; }
-                        .sheet-footer { position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid #B8B8B8; padding-top: 6px; text-align: center; font-size: 7.5pt; color: #6B6B6B; line-height: 1.3; }
+                        .sheet-table td { border: 1px solid #B8B8B8; padding: 5px 8px; }
+                        .sheet-footer { position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid #B8B8B8; padding-top: 5px; text-align: center; font-size: 7.5pt; color: #6B6B6B; line-height: 1.3; }
                     </style>
                 </head>
                 <body>
@@ -1155,14 +1191,14 @@
                         <div class="sheet-club-details">
                             <strong>DOJO DORNOIS</strong>
                             Judo, Jujitsu &amp; Atelier Sophrologie<br>
-                            1 Pl. de la Mairie, 58390 Dornes &bull; contact@dojodornois.fr
+                            1 Pl. de la Mairie, 58390 Dornes &bull; contact@dojodornois.fr &bull; 06.07.13.91.86
                         </div>
                         <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/9856dd4fcd6147ccad3af20da7f043b21906e5b6.png" class="sheet-logo-right">
                     </div>
 
                     <div class="sheet-title-box">
                         <h1>${titleText}</h1>
-                        <p>Saison sportive ${seasonVal} &bull; ${timeVal}</p>
+                        <p>Saison sportive ${seasonVal} &bull; Horaires : <strong>${timeVal}</strong></p>
                     </div>
 
                     ${contentHtml}
