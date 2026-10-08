@@ -199,7 +199,7 @@
             <div class="flex items-center gap-6">
                 <div>
                     <h1 class="font-fredoka text-xl font-bold text-[#1A1A1A]">Studio de Communication</h1>
-                    <p class="text-xs text-slate-500" id="header-subtitle">Création visuelle d'emails et newsletters</p>
+                    <p class="text-xs text-slate-500" id="header-subtitle">Création visuelle d'emails et newsletters sécurisée Mode Sombre</p>
                 </div>
 
                 <!-- NAVIGATION ONGLETS -->
@@ -305,7 +305,10 @@
                             <select class="tool-select font-bold text-[#C41E3A] border-[#C41E3A]" onchange="insererModule(this.value); this.selectedIndex=0;" title="Insérer un bloc">
                                 <option value="" disabled selected>🧩 Insérer un bloc</option>
                                 <option value="titre_newsletter">En-tête : Titre & Sous-titre</option>
+                                <option value="programme_horaires">Bloc : Programme & Horaires (Haute visibilité)</option>
+                                <option value="planning_tableau">Bloc : Tableau Planning & Créneaux</option>
                                 <option value="alerte_rouge">Bloc : Annonce Importante (Fond Rose/Rouge)</option>
+                                <option value="alerte_jaune">Bloc : Organisation / Vigilance (Fond Jaune)</option>
                                 <option value="encart_gris">Bloc : Encart Gris (Note / Info)</option>
                                 <option value="bouton_cta">Composant : Bouton d'action</option>
                                 <option value="separateur">Composant : Ligne de séparation</option>
@@ -358,7 +361,7 @@
                 
                 <div class="preview-box">
                     <div class="preview-header">
-                        <span class="text-xs font-medium text-slate-300">Boîte de réception - Rendu visuel</span>
+                        <span class="text-xs font-medium text-slate-300">Boîte de réception - Rendu visuel sécurisé</span>
                         <div class="flex gap-2">
                             <div class="w-3 h-3 rounded-full bg-slate-600"></div>
                             <div class="w-3 h-3 rounded-full bg-slate-600"></div>
@@ -390,13 +393,13 @@
         const wysiwygControls = document.getElementById('wysiwyg-controls');
         const btnToggleSource = document.getElementById('btn-toggle-source');
 
-        // PIED DE PAGE AVEC ACCÈS KALISPORT (NEWSLETTER)
+        // PIED DE PAGE AVEC ACCÈS KALISPORT (NEWSLETTER) - PROTÉGÉ
         const BLOC_FOOTER_NEWSLETTER = `
-            <table border="0" cellpadding="0" cellspacing="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px; width: 100%;" width="100%">
+            <table border="0" cellpadding="0" cellspacing="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px; width: 100%; background-color: #FFFFFF !important;" width="100%">
                 <tbody>
                     <tr>
-                        <td align="center" style="padding-top: 20px; padding-bottom: 12px;">
-                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #C41E3A; width: 56px; height: 56px; border-radius: 10px; margin: 0 auto;">
+                        <td align="center" style="padding-top: 20px; padding-bottom: 12px; background-color: #FFFFFF !important;">
+                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #C41E3A !important; width: 56px; height: 56px; border-radius: 10px; margin: 0 auto;">
                                 <tbody>
                                     <tr>
                                         <td align="center" style="padding: 4px;" valign="middle">
@@ -408,27 +411,27 @@
                         </td>
                     </tr>
                     <tr>
-                        <td align="center" style="font-size: 12px; color: #6B6B6B !important; line-height: 1.6; text-align: center; font-family: 'Roboto', Arial, sans-serif; padding-bottom: 15px;">
+                        <td align="center" style="font-size: 12px; color: #4A5568 !important; line-height: 1.6; text-align: center; font-family: 'Roboto', Arial, sans-serif; padding-bottom: 15px; background-color: #FFFFFF !important;">
                             <strong style="color: #1A1A1A !important; font-size: 14px; font-family: 'Fredoka', sans-serif; letter-spacing: 0.5px;">DOJO DORNOIS</strong><br />
-                            1 Place de la Mairie, 58390 Dornes<br />
-                            contact@dojodornois.fr | 06.07.13.91.86<br />
-                            <span style="font-size: 10px; color: #B8B8B8 !important;">SIRET 45192841000013 &bull; RNA W583001220</span>
+                            <span style="color: #4A5568 !important;">1 Place de la Mairie, 58390 Dornes</span><br />
+                            <span style="color: #4A5568 !important;">contact@dojodornois.fr | 06.07.13.91.86</span><br />
+                            <span style="font-size: 10px; color: #718096 !important;">SIRET 45192841000013 &bull; RNA W583001220</span>
                         </td>
                     </tr>
                     <tr>
-                        <td align="center" style="padding-top: 5px;">
-                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #F8FAFC; border: 1px dashed #C41E3A; border-radius: 6px; margin: 0 auto; max-width: 440px;" width="100%">
+                        <td align="center" style="padding-top: 5px; background-color: #FFFFFF !important;">
+                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #F8FAFC !important; border: 1px dashed #C41E3A !important; border-radius: 6px; margin: 0 auto; max-width: 440px;" width="100%">
                                 <tbody>
                                     <tr>
-                                        <td align="center" style="padding: 10px 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #3D3D3D !important; line-height: 1.4;">
+                                        <td align="center" style="padding: 10px 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #1A202C !important; line-height: 1.4; background-color: #F8FAFC !important;">
                                             <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                                                 <tbody>
                                                     <tr>
                                                         <td valign="middle" style="padding-right: 8px;">
                                                             <img alt="Kalisport" src="https://dojodornois.fr/assets/img/app/icon.svg" style="width: 18px; height: 18px; display: block; border: 0;" />
                                                         </td>
-                                                        <td valign="middle" style="font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #3D3D3D !important;">
-                                                            <strong>App Kalisport :</strong> Code d'accès pour le Dojo Dornois <span style="display: inline-block; background-color: #1A1A1A; color: #FFFFFF !important; font-family: 'Consolas', monospace; font-weight: bold; font-size: 13px; padding: 2px 8px; border-radius: 4px; letter-spacing: 1px; margin-left: 4px;">U3AMYA</span>
+                                                        <td valign="middle" style="font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #1A202C !important;">
+                                                            <strong style="color: #1A202C !important;">App Kalisport :</strong> Code d'accès pour le Dojo Dornois <span style="display: inline-block; background-color: #1A1A1A !important; color: #FFFFFF !important; font-family: 'Consolas', monospace; font-weight: bold; font-size: 13px; padding: 2px 8px; border-radius: 4px; letter-spacing: 1px; margin-left: 4px;">U3AMYA</span>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -445,10 +448,10 @@
 
         // PIED DE PAGE STANDARD (MAILS & RDS)
         const BLOC_FOOTER_MAIL = `
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px; background-color: #FFFFFF !important;">
                 <tr>
-                    <td align="center" style="padding-top: 20px; padding-bottom: 12px;">
-                        <table cellpadding="0" cellspacing="0" border="0" style="background-color: #C41E3A; width: 56px; height: 56px; border-radius: 10px; margin: 0 auto;">
+                    <td align="center" style="padding-top: 20px; padding-bottom: 12px; background-color: #FFFFFF !important;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="background-color: #C41E3A !important; width: 56px; height: 56px; border-radius: 10px; margin: 0 auto;">
                             <tr>
                                 <td align="center" valign="middle" style="padding: 4px;">
                                     <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 46px; height: 46px; display: block; border: 0;" alt="Logo Dojo">
@@ -458,11 +461,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <td align="center" style="font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #6B6B6B !important; line-height: 1.5; text-align: center;">
+                    <td align="center" style="font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #4A5568 !important; line-height: 1.5; text-align: center; background-color: #FFFFFF !important;">
                         <strong style="color: #1A1A1A !important; font-size: 14px; font-family: 'Fredoka', sans-serif; text-transform: uppercase;">DOJO DORNOIS</strong><br>
-                        1 Place de la Mairie, 58390 Dornes<br>
-                        contact@dojodornois.fr | 06.07.13.91.86<br>
-                        <span style="font-size: 10px; color: #B8B8B8 !important;">SIRET 45192841000013 &bull; RNA W583001220</span>
+                        <span style="color: #4A5568 !important;">1 Place de la Mairie, 58390 Dornes</span><br>
+                        <span style="color: #4A5568 !important;">contact@dojodornois.fr | 06.07.13.91.86</span><br>
+                        <span style="font-size: 10px; color: #718096 !important;">SIRET 45192841000013 &bull; RNA W583001220</span>
                     </td>
                 </tr>
             </table>
@@ -476,18 +479,22 @@
                             <h1 style="font-family: 'Fredoka', 'Roboto', Arial, sans-serif; font-size: 24px; font-weight: bold; color: #C41E3A !important; margin: 0; text-transform: uppercase; line-height: 1.2;">
                                 <span style="color: #C41E3A !important;">TITRE DE LA NEWSLETTER</span>
                             </h1>
-                            <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #6B6B6B !important; margin: 6px 0 0 0;">
-                                <span style="color: #6B6B6B !important;">Date ou sous-titre de l'actualité</span>
+                            <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #4A5568 !important; margin: 6px 0 0 0;">
+                                <span style="color: #4A5568 !important;">Date ou sous-titre de l'actualité</span>
                             </p>
                         </td>
                     </tr>
                 </tbody>
             </table>
 
-            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #FFEBEF; border-left: 4px solid #C41E3A; margin: 15px 0; width: 100%; border-radius: 0 6px 6px 0;" width="100%">
+            <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 15px; color: #2D3748 !important; line-height: 1.6; margin-bottom: 16px;">
+                Bonjour à tous ! Retrouvez ci-dessous toutes les actualités et informations importantes du club.
+            </p>
+
+            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; margin: 15px 0; width: 100%; border-radius: 0 6px 6px 0;" width="100%">
                 <tbody>
                     <tr>
-                        <td style="padding: 15px; font-size: 14px; color: #8B1429 !important; font-family: 'Roboto', Arial, sans-serif; line-height: 1.5;">
+                        <td style="padding: 15px; font-size: 14px; color: #742A2A !important; font-family: 'Roboto', Arial, sans-serif; line-height: 1.5; background-color: #FFF5F5 !important;">
                             <strong style="color: #C41E3A !important; font-family: 'Fredoka', sans-serif;">IMPORTANT :</strong> Rédigez ici votre message ou votre annonce principale.
                         </td>
                     </tr>
@@ -498,7 +505,7 @@
                 <tbody>
                     <tr>
                         <td align="center">
-                            <a href="#" style="background-color: #C41E3A; color: #FFFFFF !important; padding: 12px 28px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 6px; display: inline-block; box-shadow: 0 2px 4px rgba(196,30,58,0.2);">
+                            <a href="#" style="background-color: #C41E3A !important; color: #FFFFFF !important; padding: 12px 28px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 6px; display: inline-block; box-shadow: 0 2px 4px rgba(196,30,58,0.2);">
                                 <span style="color: #FFFFFF !important;">CLIQUEZ ICI</span>
                             </a>
                         </td>
@@ -506,10 +513,10 @@
                 </tbody>
             </table>
 
-            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-radius: 6px; margin: 15px 0; width: 100%;" width="100%">
+            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0; width: 100%;" width="100%">
                 <tbody>
                     <tr>
-                        <td style="padding: 20px; font-size: 14px; text-align: center; color: #3D3D3D !important; font-family: 'Roboto', Arial, sans-serif; line-height: 1.6;">
+                        <td style="padding: 20px; font-size: 14px; text-align: center; color: #2D3748 !important; font-family: 'Roboto', Arial, sans-serif; line-height: 1.6; background-color: #F8FAFC !important;">
                             Ajoutez ici les informations complémentaires, les détails pratiques ou les consignes du club.
                         </td>
                     </tr>
@@ -536,8 +543,8 @@
                             <h1 style="font-family: 'Fredoka', sans-serif; font-size: 22px; color: #C41E3A !important; margin: 0; text-transform: uppercase;">
                                 <span style="color: #C41E3A !important;">DOJO DORNOIS</span>
                             </h1>
-                            <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #6B6B6B !important; margin: 5px 0 0 0;">
-                                <span style="color: #6B6B6B !important;">${sousTitre}</span>
+                            <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #4A5568 !important; margin: 5px 0 0 0;">
+                                <span style="color: #4A5568 !important;">${sousTitre}</span>
                             </p>
                         </td>
                     </tr>
@@ -585,12 +592,10 @@
             const badge = document.getElementById('badge-mode');
             const subtitle = document.getElementById('header-subtitle');
 
-            // Réinitialisation des styles d'onglets
             btnNews.classList.remove('active');
             btnMail.classList.remove('active');
             btnRds.classList.remove('active');
 
-            // Masquage de toutes les barres contextuelles
             grpModelesMails.classList.add('hidden');
             grpModelesRds.classList.add('hidden');
             grpModNews.classList.add('hidden');
@@ -602,7 +607,7 @@
                 grpModNews.classList.remove('hidden');
                 badge.className = "px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase";
                 badge.innerText = "Mode Newsletter Kalisport";
-                subtitle.innerText = "Gabarit sans doublon de logo avec protection Mode Sombre";
+                subtitle.innerText = "Gabarit contrasté haute visibilité avec protection Mode Sombre";
                 editor.setAttribute('placeholder', "Rédigez ou éditez le code source de la newsletter...");
                 
                 if (!memoireContenu.newsletter) {
@@ -677,12 +682,12 @@
             switch(type) {
                 case 'reponse_mairie':
                     corpsTexte = `
-                        <p style="text-align: justify; margin-bottom: 15px;">Bonjour Nicole,</p>
-                        <p style="text-align: justify; margin-bottom: 15px;">Faisant suite à ton mail du 20 août concernant la préparation de la rentrée associative et la réunion du 20 octobre, tu trouveras ci-joint les éléments administratifs relatifs au Dojo Dornois (Dossier Zip nommé : <strong>DojoDornois_PiecesAdministratives_Saison2026-2027.zip</strong>) :</p>
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-radius: 6px; margin: 15px 0;">
+                        <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Bonjour Nicole,</p>
+                        <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Faisant suite à ton mail du 20 août concernant la préparation de la rentrée associative et la réunion du 20 octobre, tu trouveras ci-joint les éléments administratifs relatifs au Dojo Dornois (Dossier Zip nommé : <strong>DojoDornois_PiecesAdministratives_Saison2026-2027.zip</strong>) :</p>
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
                             <tr>
-                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #3D3D3D; text-align: justify; line-height: 1.6;">
-                                    <strong>Récapitulatif :</strong><br>
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #2D3748 !important; text-align: justify; line-height: 1.6;">
+                                    <strong style="color: #1A1A1A !important;">Récapitulatif :</strong><br>
                                     • <strong>Compte de résultat et Compte rendu d'AG :</strong> transmis le 14/12/2025<br>
                                     • <strong>Statuts de l'association :</strong> transmis le 14/12/2025<br>
                                     • <strong>Attestations d'assurance 2026 :</strong> transmises le 12/11/2025<br>
@@ -692,71 +697,71 @@
                                 </td>
                             </tr>
                         </table>
-                        <p style="text-align: justify; margin-bottom: 15px;">Je reste à ta disposition et serai présent lors de la réunion du 20 octobre prochain.</p>
-                        <p style="text-align: justify; margin-bottom: 15px;">Bien cordialement,</p>
+                        <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Je reste à ta disposition et serai présent lors de la réunion du 20 octobre prochain.</p>
+                        <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Bien cordialement,</p>
                     `;
                     break;
 
                 case 'reponse_officielle':
                     corpsTexte = `
-                        <p style="text-align: justify;">Bonjour [Nom / Prénom],</p>
-                        <p style="text-align: justify;">Je fais suite à votre demande concernant [Sujet de la demande].</p>
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-radius: 6px; margin: 15px 0;">
+                        <p style="text-align: justify; color: #2D3748 !important;">Bonjour [Nom / Prénom],</p>
+                        <p style="text-align: justify; color: #2D3748 !important;">Je fais suite à votre demande concernant [Sujet de la demande].</p>
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
                             <tr>
-                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #3D3D3D; text-align: justify;">
-                                    <strong>Récapitulatif :</strong><br>
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #2D3748 !important; text-align: justify;">
+                                    <strong style="color: #1A1A1A !important;">Récapitulatif :</strong><br>
                                     • Éléments reçus : [Dossier complet / Pièces à fournir]<br>
                                     • Statut actuel : [En cours de traitement]<br>
                                     • Prochaine étape : [Prochaine action]
                                 </td>
                             </tr>
                         </table>
-                        <p style="text-align: justify;">N'hésitez pas si vous avez des questions complémentaires.</p>
-                        <p style="text-align: justify;">Bien cordialement,</p>
+                        <p style="text-align: justify; color: #2D3748 !important;">N'hésitez pas si vous avez des questions complémentaires.</p>
+                        <p style="text-align: justify; color: #2D3748 !important;">Bien cordialement,</p>
                     `;
                     break;
 
                 case 'relance_adhesion':
                     corpsTexte = `
-                        <p style="text-align: justify;">Bonjour [Prénom],</p>
-                        <p style="text-align: justify;">Sauf erreur de notre part, nous n'avons pas encore reçu [la pièce manquante / le règlement] pour finaliser l'inscription au Dojo Dornois.</p>
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFEBEF; border-left: 4px solid #C41E3A; margin: 15px 0;">
+                        <p style="text-align: justify; color: #2D3748 !important;">Bonjour [Prénom],</p>
+                        <p style="text-align: justify; color: #2D3748 !important;">Sauf erreur de notre part, nous n'avons pas encore reçu [la pièce manquante / le règlement] pour finaliser l'inscription au Dojo Dornois.</p>
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF5F5 !important; border-left: 4px solid #C41E3A !important; margin: 15px 0;">
                             <tr>
-                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #8B1429; text-align: justify;">
-                                    <strong style="color: #C41E3A; font-family: 'Fredoka', sans-serif;">RAPPEL :</strong> Pour des raisons d'assurance sur les tatamis, nous devons clôturer le dossier avant le [Date limite].
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #742A2A !important; text-align: justify;">
+                                    <strong style="color: #C41E3A !important; font-family: 'Fredoka', sans-serif;">RAPPEL :</strong> Pour des raisons d'assurance sur les tatamis, nous devons clôturer le dossier avant le [Date limite].
                                 </td>
                             </tr>
                         </table>
-                        <p style="text-align: justify;">Merci pour votre réactivité et à très vite au dojo !</p>
+                        <p style="text-align: justify; color: #2D3748 !important;">Merci pour votre réactivité et à très vite au dojo !</p>
                     `;
                     break;
 
                 case 'convocation_reunion':
                     corpsTexte = `
-                        <h2 style="color: #1A1A1A;">CONVOCATION À LA RÉUNION</h2>
-                        <p style="text-align: justify;">Bonjour à toutes et à tous,</p>
-                        <p style="text-align: justify;">Vous êtes conviés à la prochaine réunion du club :</p>
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-radius: 6px; margin: 15px 0;">
+                        <h2 style="color: #1A1A1A !important;">CONVOCATION À LA RÉUNION</h2>
+                        <p style="text-align: justify; color: #2D3748 !important;">Bonjour à toutes et à tous,</p>
+                        <p style="text-align: justify; color: #2D3748 !important;">Vous êtes conviés à la prochaine réunion du club :</p>
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
                             <tr>
-                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #3D3D3D; text-align: justify;">
-                                    📅 <strong>Date :</strong> [Date de la réunion]<br>
-                                    ⏰ <strong>Heure :</strong> [Heure de début] - [Heure de fin]<br>
-                                    📍 <strong>Lieu :</strong> [Lieu de rendez-vous]
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #2D3748 !important; text-align: justify;">
+                                    📅 <strong style="color: #1A1A1A !important;">Date :</strong> [Date de la réunion]<br>
+                                    ⏰ <strong style="color: #1A1A1A !important;">Heure :</strong> [Heure de début] - [Heure de fin]<br>
+                                    📍 <strong style="color: #1A1A1A !important;">Lieu :</strong> [Lieu de rendez-vous]
                                 </td>
                             </tr>
                         </table>
-                        <h2>Ordre du jour :</h2>
-                        <ul style="text-align: justify;">
+                        <h2 style="color: #1A1A1A !important;">Ordre du jour :</h2>
+                        <ul style="text-align: justify; color: #2D3748 !important;">
                             <li>Point 1 : Point financier et administratif</li>
                             <li>Point 2 : Prochains événements</li>
                             <li>Point 3 : Questions diverses</li>
                         </ul>
-                        <p style="text-align: justify;">Merci de nous confirmer votre présence.</p>
+                        <p style="text-align: justify; color: #2D3748 !important;">Merci de nous confirmer votre présence.</p>
                     `;
                     break;
 
                 case 'texte_vide':
-                    corpsTexte = `<p style="text-align: justify;">Rédigez votre message ici...</p>`;
+                    corpsTexte = `<p style="text-align: justify; color: #2D3748 !important;">Rédigez votre message ici...</p>`;
                     break;
             }
 
@@ -772,142 +777,139 @@
             switch(type) {
                 case 'bon_commande_standard':
                     corpsTexte = `
-                        <p style="margin-bottom: 15px;">Bonjour Hélène,</p>
-                        <p style="margin-bottom: 15px;">Tu trouveras ci-dessous le récapitulatif officiel de notre nouvelle commande de réassort pour la boutique du <strong>Dojo Dornois</strong> :</p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Bonjour Hélène,</p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Tu trouveras ci-dessous le récapitulatif officiel de notre nouvelle commande de réassort pour la boutique du <strong>Dojo Dornois</strong> :</p>
 
-                        <!-- EN-TÊTE RÉCAPITULATIF COMMANDE -->
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-left: 4px solid #C41E3A; border-radius: 6px; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-left: 4px solid #C41E3A !important; border-radius: 6px; margin: 15px 0;">
                             <tr>
-                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13.5px; color: #3D3D3D; line-height: 1.6;">
-                                    <strong>📋 Référence Commande :</strong> BDC-RDS-2026-01<br>
-                                    <strong>📅 Date d'émission :</strong> ${new Date().toLocaleDateString('fr-FR')}<br>
-                                    <strong>🥋 Club donneur d'ordre :</strong> Dojo Dornois (58390 Dornes)<br>
-                                    <strong>📍 Lieu de livraison souhaité :</strong> Dojo municipal, 1 Place de la Mairie, 58390 Dornes
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13.5px; color: #2D3748 !important; line-height: 1.6;">
+                                    <strong style="color: #1A1A1A !important;">📋 Référence Commande :</strong> BDC-RDS-2026-01<br>
+                                    <strong style="color: #1A1A1A !important;">📅 Date d'émission :</strong> ${new Date().toLocaleDateString('fr-FR')}<br>
+                                    <strong style="color: #1A1A1A !important;">🥋 Club donneur d'ordre :</strong> Dojo Dornois (58390 Dornes)<br>
+                                    <strong style="color: #1A1A1A !important;">📍 Lieu de livraison souhaité :</strong> Dojo municipal, 1 Place de la Mairie, 58390 Dornes
                                 </td>
                             </tr>
                         </table>
 
-                        <!-- TABLEAU BON DE COMMANDE -->
-                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 20px 0; border: 1px solid #E8E8E8;">
+                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 20px 0; border: 1px solid #CBD5E0 !important;">
                             <thead>
-                                <tr style="background-color: #1A1A1A; color: #FFFFFF; font-family: 'Fredoka', sans-serif; text-align: left;">
-                                    <th style="padding: 9px; border: 1px solid #333333;">Article & Gamme</th>
-                                    <th style="padding: 9px; border: 1px solid #333333;">Réf. Cat.</th>
-                                    <th style="padding: 9px; border: 1px solid #333333;">Taille / Coloris</th>
-                                    <th style="padding: 9px; border: 1px solid #333333;">Marquage</th>
-                                    <th style="padding: 9px; border: 1px solid #333333; text-align: center;">Qté</th>
+                                <tr style="background-color: #1A1A1A !important; color: #FFFFFF !important; font-family: 'Fredoka', sans-serif; text-align: left;">
+                                    <th style="padding: 9px; border: 1px solid #333333; color: #FFFFFF !important;">Article & Gamme</th>
+                                    <th style="padding: 9px; border: 1px solid #333333; color: #FFFFFF !important;">Réf. Cat.</th>
+                                    <th style="padding: 9px; border: 1px solid #333333; color: #FFFFFF !important;">Taille / Coloris</th>
+                                    <th style="padding: 9px; border: 1px solid #333333; color: #FFFFFF !important;">Marquage</th>
+                                    <th style="padding: 9px; border: 1px solid #333333; text-align: center; color: #FFFFFF !important;">Qté</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr style="background-color: #FFFFFF;">
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;"><strong>T-Shirt B&C #E190</strong><br><span style="font-size: 11px; color: #6B6B6B;">Gamme Confort (185g)</span></td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; font-family: monospace; font-weight: bold;">CGTU03T</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">L / Noir</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; color: #1D4ED8;">Marquage cœur</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">15</td>
+                                <tr style="background-color: #FFFFFF !important;">
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #2D3748 !important;"><strong style="color: #1A1A1A !important;">T-Shirt B&C #E190</strong><br><span style="font-size: 11px; color: #718096 !important;">Gamme Confort (185g)</span></td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; font-family: monospace; font-weight: bold; color: #1A1A1A !important;">CGTU03T</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #2D3748 !important;">L / Noir</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #1D4ED8 !important; font-weight: bold;">Marquage cœur</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #1A1A1A !important;">15</td>
                                 </tr>
-                                <tr style="background-color: #F8FAFC;">
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;"><strong>Sweat Zippé Kariban</strong><br><span style="font-size: 11px; color: #6B6B6B;">Capuche molletonnée (280g)</span></td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; font-family: monospace; font-weight: bold;">K479</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">M / Noir</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; color: #C41E3A;">Broderie cœur</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">10</td>
+                                <tr style="background-color: #F8FAFC !important;">
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #2D3748 !important;"><strong style="color: #1A1A1A !important;">Sweat Zippé Kariban</strong><br><span style="font-size: 11px; color: #718096 !important;">Capuche molletonnée (280g)</span></td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; font-family: monospace; font-weight: bold; color: #1A1A1A !important;">K479</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #2D3748 !important;">M / Noir</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #C41E3A !important; font-weight: bold;">Broderie cœur</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #1A1A1A !important;">10</td>
                                 </tr>
-                                <tr style="background-color: #FFFFFF;">
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;"><strong>Bonnet à revers Beechfield</strong><br><span style="font-size: 11px; color: #6B6B6B;">Heritage Beanie</span></td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; font-family: monospace; font-weight: bold;">B45</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">Taille Unique / Noir</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; color: #C41E3A;">Broderie revers</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">20</td>
+                                <tr style="background-color: #FFFFFF !important;">
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #2D3748 !important;"><strong style="color: #1A1A1A !important;">Bonnet à revers Beechfield</strong><br><span style="font-size: 11px; color: #718096 !important;">Heritage Beanie</span></td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; font-family: monospace; font-weight: bold; color: #1A1A1A !important;">B45</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #2D3748 !important;">Taille Unique / Noir</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #C41E3A !important; font-weight: bold;">Broderie revers</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #1A1A1A !important;">20</td>
                                 </tr>
                             </tbody>
                             <tfoot>
-                                <tr style="background-color: #F1F5F9; font-weight: bold;">
-                                    <td colspan="4" style="padding: 8px 9px; border: 1px solid #E8E8E8; text-align: right;">Total Pièces :</td>
-                                    <td style="padding: 8px 9px; border: 1px solid #E8E8E8; text-align: center; color: #C41E3A; font-size: 13px;">45 ex.</td>
+                                <tr style="background-color: #EDF2F7 !important; font-weight: bold;">
+                                    <td colspan="4" style="padding: 8px 9px; border: 1px solid #CBD5E0; text-align: right; color: #1A1A1A !important;">Total Pièces :</td>
+                                    <td style="padding: 8px 9px; border: 1px solid #CBD5E0; text-align: center; color: #C41E3A !important; font-size: 13px;">45 ex.</td>
                                 </tr>
                             </tfoot>
                         </table>
 
-                        <!-- CONSIGNES LOGISTIQUES -->
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFEBEF; border-left: 4px solid #C41E3A; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF5F5 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
                             <tr>
-                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #8B1429; line-height: 1.5;">
-                                    <strong style="color: #C41E3A; font-family: 'Fredoka', sans-serif;">DÉLAI SOUHAITÉ :</strong> Livraison idéale avant le [Date souhaitée] pour distribution lors des cours. Merci de nous confirmer la faisabilité et de nous adresser le bon à tirer (BAT) ainsi que la facture proforma.
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #742A2A !important; line-height: 1.5; background-color: #FFF5F5 !important;">
+                                    <strong style="color: #C41E3A !important; font-family: 'Fredoka', sans-serif;">DÉLAI SOUHAITÉ :</strong> Livraison idéale avant le [Date souhaitée] pour distribution lors des cours. Merci de nous confirmer la faisabilité et de nous adresser le bon à tirer (BAT) ainsi que la facture proforma.
                                 </td>
                             </tr>
                         </table>
 
-                        <p style="margin-bottom: 15px;">Nous restons disponibles si un réajustement de stock est nécessaire.</p>
-                        <p style="margin-bottom: 15px;">Sportivement,<br><strong>Jordan LOUDENOT</strong><br><span style="color: #6B6B6B; font-size: 13px;">Président du Dojo Dornois</span></p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Nous restons disponibles si un réajustement de stock est nécessaire.</p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Sportivement,<br><strong style="color: #1A1A1A !important;">Jordan LOUDENOT</strong><br><span style="color: #718096 !important; font-size: 13px;">Président du Dojo Dornois</span></p>
                     `;
                     break;
 
                 case 'demande_cotation':
                     corpsTexte = `
-                        <p style="margin-bottom: 15px;">Bonjour Hélène,</p>
-                        <p style="margin-bottom: 15px;">Pourriez-vous nous transmettre une cotation actualisée pour les articles ci-dessous afin de finaliser l'offre club de notre boutique ?</p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Bonjour Hélène,</p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Pourriez-vous nous transmettre une cotation actualisée pour les articles ci-dessous afin de finaliser l'offre club de notre boutique ?</p>
                         
-                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 20px 0; border: 1px solid #E8E8E8;">
+                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 20px 0; border: 1px solid #CBD5E0 !important;">
                             <thead>
-                                <tr style="background-color: #1A1A1A; color: #FFFFFF; font-family: 'Fredoka', sans-serif; text-align: left;">
-                                    <th style="padding: 9px; border: 1px solid #333333;">Modèle</th>
-                                    <th style="padding: 9px; border: 1px solid #333333;">Réf.</th>
-                                    <th style="padding: 9px; border: 1px solid #333333;">Type marquage</th>
-                                    <th style="padding: 9px; border: 1px solid #333333;">Paliers demandés</th>
+                                <tr style="background-color: #1A1A1A !important; color: #FFFFFF !important; font-family: 'Fredoka', sans-serif; text-align: left;">
+                                    <th style="padding: 9px; border: 1px solid #333333; color: #FFFFFF !important;">Modèle</th>
+                                    <th style="padding: 9px; border: 1px solid #333333; color: #FFFFFF !important;">Réf.</th>
+                                    <th style="padding: 9px; border: 1px solid #333333; color: #FFFFFF !important;">Type marquage</th>
+                                    <th style="padding: 9px; border: 1px solid #333333; color: #FFFFFF !important;">Paliers demandés</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr style="background-color: #FFFFFF;">
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">T-Shirt B&C #E190</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; font-family: monospace;">CGTU03T</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; color: #1D4ED8;">Marquage cœur (Logo club)</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">20 / 50 / 100 ex.</td>
+                                <tr style="background-color: #FFFFFF !important;">
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #2D3748 !important;">T-Shirt B&C #E190</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; font-family: monospace; color: #1A1A1A !important; font-weight: bold;">CGTU03T</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #1D4ED8 !important; font-weight: bold;">Marquage cœur (Logo club)</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #2D3748 !important;">20 / 50 / 100 ex.</td>
                                 </tr>
-                                <tr style="background-color: #F8FAFC;">
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">Hoody Kariban (280g)</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; font-family: monospace;">K476</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8; color: #C41E3A;">Broderie cœur (Logo club)</td>
-                                    <td style="padding: 7px 9px; border: 1px solid #E8E8E8;">15 / 30 / 60 ex.</td>
+                                <tr style="background-color: #F8FAFC !important;">
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #2D3748 !important;">Hoody Kariban (280g)</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; font-family: monospace; color: #1A1A1A !important; font-weight: bold;">K476</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #C41E3A !important; font-weight: bold;">Broderie cœur (Logo club)</td>
+                                    <td style="padding: 7px 9px; border: 1px solid #E2E8F0; color: #2D3748 !important;">15 / 30 / 60 ex.</td>
                                 </tr>
                             </tbody>
                         </table>
 
-                        <p style="margin-bottom: 15px;">Merci également de préciser le coût unitaire indicatif d'une option de broderie prénom nominative.</p>
-                        <p style="margin-bottom: 15px;">Bien cordialement,</p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Merci également de préciser le coût unitaire indicatif d'une option de broderie prénom nominative.</p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Bien cordialement,</p>
                     `;
                     break;
 
                 case 'reassort_express':
                     corpsTexte = `
-                        <p style="margin-bottom: 15px;">Bonjour Hélène,</p>
-                        <p style="margin-bottom: 15px;">Suite aux récentes demandes des adhérents, nous aurions besoin d'un <strong>réassort rapide</strong> sur les articles suivants :</p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Bonjour Hélène,</p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Suite aux récentes demandes des adhérents, nous aurions besoin d'un <strong>réassort rapide</strong> sur les articles suivants :</p>
                         
-                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 15px 0; border: 1px solid #E8E8E8;">
-                            <tr style="background-color: #1A1A1A; color: #FFFFFF; font-family: 'Fredoka', sans-serif;">
-                                <th style="padding: 8px; border: 1px solid #333;">Désignation</th>
-                                <th style="padding: 8px; border: 1px solid #333;">Taille</th>
-                                <th style="padding: 8px; border: 1px solid #333; text-align: center;">Qté</th>
+                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 15px 0; border: 1px solid #CBD5E0 !important;">
+                            <tr style="background-color: #1A1A1A !important; color: #FFFFFF !important; font-family: 'Fredoka', sans-serif;">
+                                <th style="padding: 8px; border: 1px solid #333; color: #FFFFFF !important;">Désignation</th>
+                                <th style="padding: 8px; border: 1px solid #333; color: #FFFFFF !important;">Taille</th>
+                                <th style="padding: 8px; border: 1px solid #333; text-align: center; color: #FFFFFF !important;">Qté</th>
                             </tr>
-                            <tr>
-                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">T-shirt B&C #E190 Noir</td>
-                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">M</td>
-                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">5</td>
+                            <tr style="background-color: #FFFFFF !important;">
+                                <td style="padding: 7px 8px; border: 1px solid #E2E8F0; color: #2D3748 !important;">T-shirt B&C #E190 Noir</td>
+                                <td style="padding: 7px 8px; border: 1px solid #E2E8F0; color: #2D3748 !important;">M</td>
+                                <td style="padding: 7px 8px; border: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #1A1A1A !important;">5</td>
                             </tr>
-                            <tr>
-                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">T-shirt B&C #E190 Noir</td>
-                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">L</td>
-                                <td style="padding: 7px 8px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">5</td>
+                            <tr style="background-color: #F8FAFC !important;">
+                                <td style="padding: 7px 8px; border: 1px solid #E2E8F0; color: #2D3748 !important;">T-shirt B&C #E190 Noir</td>
+                                <td style="padding: 7px 8px; border: 1px solid #E2E8F0; color: #2D3748 !important;">L</td>
+                                <td style="padding: 7px 8px; border: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #1A1A1A !important;">5</td>
                             </tr>
                         </table>
 
-                        <p style="margin-bottom: 15px;">Peux-tu nous confirmer la disponibilité sur stock et le délai de mise à disposition ?</p>
-                        <p style="margin-bottom: 15px;">Merci d'avance !</p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Peux-tu nous confirmer la disponibilité sur stock et le délai de mise à disposition ?</p>
+                        <p style="margin-bottom: 15px; color: #2D3748 !important;">Merci d'avance !</p>
                     `;
                     break;
 
                 case 'texte_vide_rds':
-                    corpsTexte = `<p style="text-align: justify;">Rédigez votre bon de commande ou demande spécifique pour RDS Sport ici...</p>`;
+                    corpsTexte = `<p style="text-align: justify; color: #2D3748 !important;">Rédigez votre bon de commande ou demande spécifique pour RDS Sport ici...</p>`;
                     break;
             }
 
@@ -929,8 +931,8 @@
                                         <h1 style="font-family: 'Fredoka', 'Roboto', Arial, sans-serif; font-size: 24px; font-weight: bold; color: #C41E3A !important; margin: 0; text-transform: uppercase; line-height: 1.2;">
                                             <span style="color: #C41E3A !important;">TITRE DE LA NEWSLETTER</span>
                                         </h1>
-                                        <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #6B6B6B !important; margin: 6px 0 0 0;">
-                                            <span style="color: #6B6B6B !important;">Date ou texte d'accroche</span>
+                                        <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #4A5568 !important; margin: 6px 0 0 0;">
+                                            <span style="color: #4A5568 !important;">Date ou texte d'accroche</span>
                                         </p>
                                     </td>
                                 </tr>
@@ -938,51 +940,167 @@
                         </table><br>
                     `;
                     break;
-                case 'layout_2col':
+
+                // NOUVEAU BLOC : PROGRAMME & HORAIRES SÉCURISÉ (SOLUTION AU BUG CAPTURE 1)
+                case 'programme_horaires':
                     htmlBloc = `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 15px 0;">
-                            <tr>
-                                <td width="48%" valign="top" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-radius: 6px; padding: 12px; text-align: justify;">
-                                    <strong style="color: #1A1A1A;">Partie Gauche</strong><br>
-                                    <span style="font-size: 13px; color: #6B6B6B;">Description ou détails du premier élément.</span>
-                                </td>
-                                <td width="4%">&nbsp;</td>
-                                <td width="48%" valign="top" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-radius: 6px; padding: 12px; text-align: justify;">
-                                    <strong style="color: #1A1A1A;">Partie Droite</strong><br>
-                                    <span style="font-size: 13px; color: #6B6B6B;">Description ou détails du second élément.</span>
-                                </td>
-                            </tr>
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 18px 0; border: 1px solid #CBD5E0; border-left: 5px solid #EA580C; border-radius: 6px; background-color: #FFFFFF !important; width: 100%;">
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 18px; font-family: 'Roboto', Arial, sans-serif; background-color: #FFFFFF !important;">
+                                        <div style="font-family: 'Fredoka', sans-serif; font-size: 17px; font-weight: bold; color: #C2410C !important; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            ⏰ PROGRAMME DE LA JOURNÉE
+                                        </div>
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px; line-height: 1.7; color: #2D3748 !important; background-color: #FFFFFF !important;">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="padding: 5px 0; vertical-align: top; color: #2D3748 !important;">
+                                                        • <strong style="color: #C2410C !important; font-family: 'Consolas', monospace; font-size: 14px;">10h00 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Accueil des participants</span> au Dojo Henri Pierrehumbert
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; vertical-align: top; color: #2D3748 !important;">
+                                                        • <strong style="color: #C2410C !important; font-family: 'Consolas', monospace; font-size: 14px;">10h30 - 12h00 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Session Judo</span> sur les tatamis
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; vertical-align: top; color: #2D3748 !important;">
+                                                        • <strong style="color: #C2410C !important; font-family: 'Consolas', monospace; font-size: 14px;">12h00 - 13h30 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Pause repas</span> (Repas tiré du sac &bull; Boissons offertes par le club)
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; vertical-align: top; color: #2D3748 !important;">
+                                                        • <strong style="color: #C2410C !important; font-family: 'Consolas', monospace; font-size: 14px;">13h30 - 14h30 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Temps calme &amp; détente</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; vertical-align: top; color: #2D3748 !important;">
+                                                        • <strong style="color: #C2410C !important; font-family: 'Consolas', monospace; font-size: 14px;">14h30 - 16h30 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Multi-activités &amp; jeux</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; vertical-align: top; color: #2D3748 !important;">
+                                                        • <strong style="color: #C2410C !important; font-family: 'Consolas', monospace; font-size: 14px;">16h30 - 17h00 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Goûter offert</span> par le Dojo &amp; fin de la journée
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
                         </table><br>
                     `;
                     break;
+
+                // NOUVEAU BLOC : TABLEAU PLANNING CONTRASTÉ SÉCURISÉ (SOLUTION AU BUG CAPTURE 2)
+                case 'planning_tableau':
+                    htmlBloc = `
+                        <table border="0" cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 20px 0; border: 2px solid #CBD5E0 !important; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; background-color: #FFFFFF !important;">
+                            <thead>
+                                <tr style="background-color: #1A1A1A !important; color: #FFFFFF !important;">
+                                    <th style="padding: 10px; border: 1px solid #4A5568 !important; color: #FFFFFF !important; font-family: 'Fredoka', sans-serif; text-align: left; width: 25%;">Date &amp; Moment</th>
+                                    <th style="padding: 10px; border: 1px solid #4A5568 !important; color: #FFFFFF !important; font-family: 'Fredoka', sans-serif; text-align: left; width: 45%;">Événement / Cours</th>
+                                    <th style="padding: 10px; border: 1px solid #4A5568 !important; color: #FFFFFF !important; font-family: 'Fredoka', sans-serif; text-align: left; width: 30%;">Lieu &amp; Modalités</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background-color: #FFFFFF !important;">
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #1A1A1A !important; font-weight: bold; background-color: #FFFFFF !important;">
+                                        Dimanche 18/10<br><span style="font-weight: normal; color: #4A5568 !important; font-size: 12px;">Journée</span>
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #1A202C !important; background-color: #FFFFFF !important;">
+                                        <strong style="color: #C41E3A !important;">Tournoi départemental</strong><br>
+                                        <span style="color: #4A5568 !important; font-size: 12px;">Déplacement judokas engagés</span>
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #2D3748 !important; background-color: #FFFFFF !important;">
+                                        Sens (Déplacement)
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #F8FAFC !important;">
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #1A1A1A !important; font-weight: bold; background-color: #F8FAFC !important;">
+                                        Mardi 20/10<br><span style="font-weight: normal; color: #4A5568 !important; font-size: 12px;">Fin de journée</span>
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #1A202C !important; background-color: #F8FAFC !important;">
+                                        • <strong>Taïso Seniors :</strong> 17h-18h<br>
+                                        • <strong>Taïso :</strong> 18h-18h45<br>
+                                        • <strong>Jujitsu Ne-Waza :</strong> 18h45-20h15
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #2D3748 !important; background-color: #F8FAFC !important;">
+                                        Dojo Dornois
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #FFFDF5 !important;">
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #92400E !important; font-weight: bold; background-color: #FFFDF5 !important;">
+                                        Mercredi 21/10<br><span style="font-weight: normal; color: #B45309 !important; font-size: 12px;">10h00 à 17h00</span>
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #78350F !important; background-color: #FFFDF5 !important;">
+                                        <strong style="color: #B45309 !important;">Stage Pré-Poussins &amp; Poussins</strong><br>
+                                        <span style="color: #92400E !important; font-size: 12px;">Entraînement, jeux &amp; cohésion</span>
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #78350F !important; background-color: #FFFDF5 !important;">
+                                        <strong>Repas tiré du sac</strong><br>(Dojo Dornois)
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #F8FAFC !important;">
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #1A1A1A !important; font-weight: bold; background-color: #F8FAFC !important;">
+                                        Jeudi 22/10<br><span style="font-weight: normal; color: #4A5568 !important; font-size: 12px;">Fin de journée</span>
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #1A202C !important; background-color: #F8FAFC !important;">
+                                        • <strong>Taïso Seniors :</strong> 17h-18h<br>
+                                        • <strong>Taïso :</strong> 18h-18h45<br>
+                                        • <strong>Jujitsu Contact :</strong> 18h45-20h15
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #2D3748 !important; background-color: #F8FAFC !important;">
+                                        Dojo Dornois
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table><br>
+                    `;
+                    break;
+
                 case 'alerte_rouge':
                     htmlBloc = `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFEBEF; border-left: 4px solid #C41E3A; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
                             <tr>
-                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #8B1429 !important;">
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #742A2A !important; background-color: #FFF5F5 !important;">
                                     <strong style="color: #C41E3A !important; font-family: 'Fredoka', sans-serif;">IMPORTANT :</strong> Rédigez ici votre annonce capitale.
                                 </td>
                             </tr>
                         </table><br>
                     `;
                     break;
+
+                case 'alerte_jaune':
+                    htmlBloc = `
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFFBEB !important; border: 1px solid #FDE68A !important; border-left: 4px solid #D97706 !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                            <tr>
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #78350F !important; line-height: 1.5; background-color: #FFFBEB !important;">
+                                    ⚠️ <strong style="color: #B45309 !important; font-family: 'Fredoka', sans-serif;">Organisation &amp; Repas :</strong> Merci de bien vouloir valider votre présence ou absence via l'application Kalisport.
+                                </td>
+                            </tr>
+                        </table><br>
+                    `;
+                    break;
+
                 case 'encart_gris':
                     htmlBloc = `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-radius: 6px; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
                             <tr>
-                                <td style="padding: 20px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #3D3D3D !important; text-align: center;">
+                                <td style="padding: 20px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #2D3748 !important; text-align: center; background-color: #F8FAFC !important;">
                                     Ajoutez ici une information complémentaire, une date clé ou une note pratique.
                                 </td>
                             </tr>
                         </table><br>
                     `;
                     break;
+
                 case 'bouton_cta':
                     htmlBloc = `
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 25px 0;">
                             <tr>
                                 <td align="center">
-                                    <a href="#" style="background-color: #C41E3A; color: #FFFFFF !important; padding: 12px 28px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 6px; display: inline-block;">
+                                    <a href="#" style="background-color: #C41E3A !important; color: #FFFFFF !important; padding: 12px 28px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 6px; display: inline-block;">
                                         <span style="color: #FFFFFF !important;">CLIQUEZ ICI</span>
                                     </a>
                                 </td>
@@ -990,6 +1108,7 @@
                         </table><br>
                     `;
                     break;
+
                 case 'separateur':
                     htmlBloc = `
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 20px 0;">
@@ -999,9 +1118,11 @@
                         </table><br>
                     `;
                     break;
+
                 case 'footer_newsletter':
                     htmlBloc = BLOC_FOOTER_NEWSLETTER + `<br>`;
                     break;
+
                 case 'footer_mail':
                     htmlBloc = BLOC_FOOTER_MAIL + `<br>`;
                     break;
@@ -1020,23 +1141,23 @@
             switch(type) {
                 case 'tableau_articles':
                     htmlBloc = `
-                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 15px 0; border: 1px solid #E8E8E8;">
+                        <table width="100%" cellpadding="7" cellspacing="0" border="0" style="border-collapse: collapse; font-size: 12.5px; margin: 15px 0; border: 1px solid #CBD5E0 !important;">
                             <thead>
-                                <tr style="background-color: #1A1A1A; color: #FFFFFF; font-family: 'Fredoka', sans-serif; text-align: left;">
-                                    <th style="padding: 8px; border: 1px solid #333;">Désignation</th>
-                                    <th style="padding: 8px; border: 1px solid #333;">Réf.</th>
-                                    <th style="padding: 8px; border: 1px solid #333;">Taille / Coloris</th>
-                                    <th style="padding: 8px; border: 1px solid #333;">Marquage</th>
-                                    <th style="padding: 8px; border: 1px solid #333; text-align: center;">Qté</th>
+                                <tr style="background-color: #1A1A1A !important; color: #FFFFFF !important; font-family: 'Fredoka', sans-serif; text-align: left;">
+                                    <th style="padding: 8px; border: 1px solid #333; color: #FFFFFF !important;">Désignation</th>
+                                    <th style="padding: 8px; border: 1px solid #333; color: #FFFFFF !important;">Réf.</th>
+                                    <th style="padding: 8px; border: 1px solid #333; color: #FFFFFF !important;">Taille / Coloris</th>
+                                    <th style="padding: 8px; border: 1px solid #333; color: #FFFFFF !important;">Marquage</th>
+                                    <th style="padding: 8px; border: 1px solid #333; text-align: center; color: #FFFFFF !important;">Qté</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr style="background-color: #FFFFFF;">
-                                    <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">Article 1</td>
-                                    <td style="padding: 7px 8px; border: 1px solid #E8E8E8; font-family: monospace;">REF001</td>
-                                    <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">Taille / Noir</td>
-                                    <td style="padding: 7px 8px; border: 1px solid #E8E8E8; color: #1D4ED8;">Marquage cœur</td>
-                                    <td style="padding: 7px 8px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">10</td>
+                                <tr style="background-color: #FFFFFF !important;">
+                                    <td style="padding: 7px 8px; border: 1px solid #E2E8F0; color: #2D3748 !important;">Article 1</td>
+                                    <td style="padding: 7px 8px; border: 1px solid #E2E8F0; font-family: monospace; color: #1A1A1A !important; font-weight: bold;">REF001</td>
+                                    <td style="padding: 7px 8px; border: 1px solid #E2E8F0; color: #2D3748 !important;">Taille / Noir</td>
+                                    <td style="padding: 7px 8px; border: 1px solid #E2E8F0; color: #1D4ED8 !important; font-weight: bold;">Marquage cœur</td>
+                                    <td style="padding: 7px 8px; border: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #1A1A1A !important;">10</td>
                                 </tr>
                             </tbody>
                         </table><br>
@@ -1045,22 +1166,22 @@
 
                 case 'ligne_article':
                     htmlBloc = `
-                        <tr style="background-color: #FFFFFF;">
-                            <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">Nouvel Article</td>
-                            <td style="padding: 7px 8px; border: 1px solid #E8E8E8; font-family: monospace;">REF---</td>
-                            <td style="padding: 7px 8px; border: 1px solid #E8E8E8;">Taille / Couleur</td>
-                            <td style="padding: 7px 8px; border: 1px solid #E8E8E8; color: #C41E3A;">Broderie cœur</td>
-                            <td style="padding: 7px 8px; border: 1px solid #E8E8E8; text-align: center; font-weight: bold;">1</td>
+                        <tr style="background-color: #FFFFFF !important;">
+                            <td style="padding: 7px 8px; border: 1px solid #E2E8F0; color: #2D3748 !important;">Nouvel Article</td>
+                            <td style="padding: 7px 8px; border: 1px solid #E2E8F0; font-family: monospace; color: #1A1A1A !important; font-weight: bold;">REF---</td>
+                            <td style="padding: 7px 8px; border: 1px solid #E2E8F0; color: #2D3748 !important;">Taille / Couleur</td>
+                            <td style="padding: 7px 8px; border: 1px solid #E2E8F0; color: #C41E3A !important; font-weight: bold;">Broderie cœur</td>
+                            <td style="padding: 7px 8px; border: 1px solid #E2E8F0; text-align: center; font-weight: bold; color: #1A1A1A !important;">1</td>
                         </tr>
                     `;
                     break;
 
                 case 'encart_recap':
                     htmlBloc = `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-radius: 6px; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
                             <tr>
-                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13.5px; color: #3D3D3D; line-height: 1.6;">
-                                    <strong style="color: #1A1A1A;">Synthèse financière prévisionnelle :</strong><br>
+                                <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13.5px; color: #2D3748 !important; line-height: 1.6;">
+                                    <strong style="color: #1A1A1A !important;">Synthèse financière prévisionnelle :</strong><br>
                                     • Total articles : <strong>[X] pièces</strong><br>
                                     • Montant estimé HT : <strong>---,00 €</strong><br>
                                     • Modalité de règlement : <strong>Virement bancaire Dojo Dornois à réception</strong>
@@ -1072,11 +1193,11 @@
 
                 case 'conditions_livraison':
                     htmlBloc = `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; border-left: 4px solid #1E824C; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F0FDF4 !important; border-left: 4px solid #16A34A !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
                             <tr>
-                                <td style="padding: 12px 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #2D3748;">
-                                    📍 <strong>Adresse de livraison :</strong> Dojo municipal, 1 Place de la Mairie, 58390 Dornes<br>
-                                    📞 <strong>Contact réception :</strong> Jordan Loudenot (06.07.13.91.86)
+                                <td style="padding: 12px 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #14532D !important; line-height: 1.5; background-color: #F0FDF4 !important;">
+                                    📍 <strong style="color: #15803D !important;">Adresse de livraison :</strong> Dojo municipal, 1 Place de la Mairie, 58390 Dornes<br>
+                                    📞 <strong style="color: #15803D !important;">Contact réception :</strong> Jordan Loudenot (06.07.13.91.86)
                                 </td>
                             </tr>
                         </table><br>
@@ -1085,10 +1206,10 @@
 
                 case 'options_marquage':
                     htmlBloc = `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF8F1; border-left: 4px solid #DD6B20; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFFBEB !important; border-left: 4px solid #D97706 !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
                             <tr>
-                                <td style="padding: 12px 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #7B341E; line-height: 1.5;">
-                                    🧵 <strong>Spécifications de personnalisation :</strong><br>
+                                <td style="padding: 12px 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #78350F !important; line-height: 1.5; background-color: #FFFBEB !important;">
+                                    🧵 <strong style="color: #B45309 !important;">Spécifications de personnalisation :</strong><br>
                                     • <strong>Logo Club :</strong> Broderie cœur ou marquage poitrine selon textile.<br>
                                     • <strong>Fichier fourni :</strong> Vectoriel HD transparent validé lors de la précédente commande.
                                 </td>
@@ -1120,7 +1241,7 @@
             contenu = contenu.replace(/<\/h1>/g, '</span></h1>');
             contenu = contenu.replace(/<h2>/g, '<h2 style="font-family: \'Fredoka\', sans-serif; font-size: 20px; color: #1A1A1A !important; margin-top: 0; margin-bottom: 12px; text-align: left;"><span style="color: #1A1A1A !important;">');
             contenu = contenu.replace(/<\/h2>/g, '</span></h2>');
-            contenu = contenu.replace(/<p>/g, '<p style="margin-top: 0; margin-bottom: 15px; line-height: 1.6; color: #3D3D3D;">');
+            contenu = contenu.replace(/<p>/g, '<p style="margin-top: 0; margin-bottom: 15px; line-height: 1.6; color: #2D3748 !important;">');
 
             let preHeader = 'Message du Dojo Dornois';
             if (modeActuel === 'newsletter') preHeader = 'Actualités du Dojo Dornois';
@@ -1128,18 +1249,15 @@
 
             return `
                 <div style="display:none;font-size:1px;color:#F4F6F9;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${preHeader}</div>
-                <style type="text/css">
-                    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:wght@400;500&display=swap');
-                </style>
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F4F6F9; padding: 20px 0;">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F4F6F9; padding: 20px 0; width: 100%;">
                     <tr>
                         <td align="center">
                             <!--[if mso]>
                             <table width="650" cellpadding="0" cellspacing="0" border="0"><tr><td>
                             <![endif]-->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFFFFF; max-width: 650px; width: 100%; border: 1px solid #E8E8E8; border-radius: 8px; margin: auto;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFFFFF !important; max-width: 650px; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px; margin: auto;">
                                 <tr>
-                                    <td style="padding: 30px; font-family: 'Roboto', Arial, sans-serif; font-size: 15px; color: #3D3D3D; line-height: 1.6;">
+                                    <td style="padding: 30px; font-family: 'Roboto', Arial, sans-serif; font-size: 15px; color: #2D3748 !important; line-height: 1.6; background-color: #FFFFFF !important;">
                                         ${contenu}
                                     </td>
                                 </tr>
