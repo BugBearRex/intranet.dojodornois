@@ -23,9 +23,13 @@
             --gris-clair: #B8B8B8;
             --gris-tres-clair: #E8E8E8;
             --fond: #F4F6F9;
+            --blanc: #FFFFFF;
             --vert-succes: #2ECC71;
             --vert-fond: #E8F8F0;
+            --sidebar-width: 270px;
         }
+
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
             font-family: 'Roboto', sans-serif;
@@ -36,6 +40,24 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            font-size: 13px;
+        }
+
+        /* SIDEBAR UNIFIÉE */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux); 
+            color: var(--blanc); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            overflow-x: hidden;
+            z-index: 100;
         }
 
         h1, h2, h3, h4, .font-fredoka {
@@ -48,22 +70,18 @@
             font-weight: 700;
         }
 
-        /* CARTE COURS SOBRE EN ATTENTE */
+        /* CARTES DE SÉANCES */
         .course-card-item {
             transition: all 0.15s ease-in-out;
-            cursor: pointer;
-            user-select: none;
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-left: 5px solid #CBD5E1;
             color: #475569;
         }
         .course-card-item:hover {
-            transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
 
-        /* ÉTAT VALIDÉ : BARRE VERTE */
         .course-card-item.status-done {
             background-color: #FFFFFF;
             border-color: #A7F3D0;
@@ -71,7 +89,6 @@
             color: #065F46;
         }
 
-        /* ÉTAT ANNULÉ : BARRE ROUGE */
         .course-card-item.status-cancelled {
             background-color: #FFFFFF;
             border-color: #FECDD3;
@@ -79,69 +96,20 @@
             color: #881337;
         }
 
+        /* MODALE */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: white; border-radius: 12px; padding: 22px; max-width: 480px; width: 95%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        }
+
         .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
         .toast { color: white; padding: 12px 18px; border-radius: 8px; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
         .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
-
-        /* ZONE D'IMPRESSION A4 PORTRAIT MASQUÉE SUR ÉCRAN */
-        #printable-releve-a4 {
-            display: none;
-        }
-
-        /* GESTION CSS PRINT OFFICIELLE */
-        @media print {
-            @page {
-                size: A4 portrait;
-                margin: 10mm;
-                @bottom-left {
-                    content: "Dojo Dornois (RNA : W583001220 - SIRET : 451 928 410 00013) — Relevé de Prestations";
-                    font-family: 'Roboto', sans-serif;
-                    font-size: 7.5pt;
-                    color: #64748b;
-                    border-top: 1px solid #e2e8f0;
-                    padding-top: 4px;
-                }
-                @bottom-right {
-                    content: "Page " counter(page) " / " counter(pages);
-                    font-family: 'Fredoka', sans-serif;
-                    font-weight: bold;
-                    font-size: 8.5pt;
-                    color: #C41E3A;
-                    border-top: 1px solid #e2e8f0;
-                    padding-top: 4px;
-                }
-            }
-
-            .no-print, .sidebar, .main-content > header, .main-content > main {
-                display: none !important;
-            }
-
-            body, .main-content {
-                background: white !important;
-                height: auto !important;
-                overflow: visible !important;
-                display: block !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-
-            #printable-releve-a4 {
-                display: block !important;
-                width: 100% !important;
-                background: white !important;
-                color: #1e293b !important;
-                font-size: 9pt !important;
-            }
-
-            #printable-releve-a4 * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            tr {
-                page-break-inside: avoid !important;
-            }
-        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -163,14 +131,20 @@
                 </div>
                 <div>
                     <h1 class="font-fredoka text-xl font-bold text-[#1A1A1A]">Suivi & Pointage des Heures — Romain</h1>
-                    <p class="text-xs text-slate-500">Gestionnaire d'activité, pointage hebdomadaire visuel & relevés mensuels</p>
+                    <p class="text-xs text-slate-500">Gestion d'activité, séances régulières, stages de vacances et relevés mensuels</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-2">
-                <button onclick="syncToSupabase()" class="px-4 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> ☁️ Enregistrer vers Supabase
+                <button onclick="ouvrirModalAjoutSeance()" class="px-3.5 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-plus text-rose-400"></i> Séance ponctuelle / Stage
                 </button>
+                <button onclick="syncToSupabase()" class="px-3.5 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> ☁️ Enregistrer Supabase
+                </button>
+                <a href="../index.html" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition">
+                    🏠 Central
+                </a>
             </div>
         </header>
 
@@ -181,10 +155,10 @@
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
                 <div class="border-b border-slate-200 bg-slate-50 px-4 flex gap-4">
                     <button onclick="switchTab('pointage')" id="tab-btn-pointage" class="tab-btn active py-3.5 font-fredoka font-semibold text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-check"></i> 1. Pointage Visuel Hebdo
+                        <i class="fa-solid fa-calendar-check"></i> 1. Pointage Visuel Hebdomadaire
                     </button>
                     <button onclick="switchTab('ajustements')" id="tab-btn-ajustements" class="tab-btn py-3.5 font-fredoka font-semibold text-sm text-slate-500 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders"></i> 2. Heures Sup. & Déductions
+                        <i class="fa-solid fa-sliders"></i> 2. Heures Sup. & Déductions Ponctuelles
                     </button>
                 </div>
 
@@ -195,8 +169,8 @@
                         <div class="flex items-center gap-3">
                             <label class="text-xs font-bold font-fredoka text-slate-600 uppercase">Sélecteur de Mois :</label>
                             <select id="select-month" onchange="renderPointage()" class="px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-bold font-fredoka focus:ring-2 focus:ring-[#C41E3A] focus:outline-none">
-                                <option value="2026-09" selected>Septembre 2026</option>
-                                <option value="2026-10">Octobre 2026</option>
+                                <option value="2026-09">Septembre 2026</option>
+                                <option value="2026-10" selected>Octobre 2026</option>
                                 <option value="2026-11">Novembre 2026</option>
                                 <option value="2026-12">Décembre 2026</option>
                                 <option value="2027-01">Janvier 2027</option>
@@ -210,8 +184,8 @@
                         </div>
                         
                         <div class="flex items-center gap-2">
-                            <button onclick="imprimerReleveMensuel()" class="px-3.5 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-sm">
-                                <i class="fa-solid fa-print"></i> Imprimer Relevé Mensuel (A4)
+                            <button onclick="imprimerReleveOfficielA4()" class="px-3.5 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-print"></i> Imprimer Relevé Officiel A4
                             </button>
                             <button onclick="validateAllMonth('done')" class="px-3 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-xs font-bold transition">
                                 <i class="fa-solid fa-check-double"></i> Tout cocher (Fait)
@@ -222,31 +196,31 @@
                         </div>
                     </div>
 
-                    <!-- BLOC RECAPITULATIF -->
+                    <!-- BLOC RÉCAPITULATIF SYNTHÈSE -->
                     <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-5 rounded-2xl border border-slate-700 shadow-md">
                         <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-4">
                             <h3 class="font-fredoka text-base font-bold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-chart-simple text-[#C41E3A]"></i> Synthèse du Mois — <span id="block-month-title">Septembre 2026</span>
+                                <i class="fa-solid fa-chart-simple text-[#C41E3A]"></i> Synthèse du Mois — <span id="block-month-title">Octobre 2026</span>
                             </h3>
-                            <span class="text-[11px] text-slate-400">Calcul en temps réel</span>
+                            <span class="text-[11px] text-slate-400">Calcul dynamique instantané</span>
                         </div>
                         
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                             <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase font-fredoka block">1. Volume Prévu</span>
-                                <span class="text-xl font-bold font-fredoka text-slate-200" id="block-planned">0.00 h</span>
+                                <span class="text-xl font-bold font-fredoka text-slate-200" id="block-planned">0,00 h</span>
                             </div>
                             <div class="bg-emerald-950/40 p-3 rounded-xl border border-emerald-800/60">
                                 <span class="text-[10px] font-bold text-emerald-400 uppercase font-fredoka block">2. Réel Fait (Coché Vert)</span>
-                                <span class="text-xl font-bold font-fredoka text-emerald-400" id="block-done">0.00 h</span>
+                                <span class="text-xl font-bold font-fredoka text-emerald-400" id="block-done">0,00 h</span>
                             </div>
                             <div class="bg-rose-950/40 p-3 rounded-xl border border-rose-800/60">
                                 <span class="text-[10px] font-bold text-rose-400 uppercase font-fredoka block">3. Annulé / Non Fait (Rouge)</span>
-                                <span class="text-xl font-bold font-fredoka text-rose-400" id="block-cancelled">0.00 h</span>
+                                <span class="text-xl font-bold font-fredoka text-rose-400" id="block-cancelled">0,00 h</span>
                             </div>
                             <div class="bg-indigo-950/40 p-3 rounded-xl border border-indigo-800/60">
-                                <span class="text-[10px] font-bold text-indigo-300 uppercase font-fredoka block">4. Total à Payer (Avec +/-)</span>
-                                <span class="text-xl font-bold font-fredoka text-indigo-300" id="block-total">0.00 h</span>
+                                <span class="text-[10px] font-bold text-indigo-300 uppercase font-fredoka block">4. Total Dû (Avec +/-)</span>
+                                <span class="text-xl font-bold font-fredoka text-indigo-300" id="block-total">0,00 h</span>
                             </div>
                         </div>
                     </div>
@@ -258,13 +232,13 @@
                 <!-- ONGLET 2 : AJUSTEMENTS -->
                 <div id="pane-ajustements" class="p-6 hidden space-y-6">
                     <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
-                        <h3 class="font-fredoka text-base font-bold text-slate-800">Saisir un ajustement ponctuel d'heures</h3>
+                        <h3 class="font-fredoka text-base font-bold text-slate-800">Saisir un ajustement global ponctuel</h3>
                         <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Mois Concerné</label>
                                 <select id="adj-month" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold">
                                     <option value="2026-09">Septembre 2026</option>
-                                    <option value="2026-10">Octobre 2026</option>
+                                    <option value="2026-10" selected>Octobre 2026</option>
                                     <option value="2026-11">Novembre 2026</option>
                                     <option value="2026-12">Décembre 2026</option>
                                     <option value="2027-01">Janvier 2027</option>
@@ -278,17 +252,17 @@
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Type d'Ajustement</label>
                                 <select id="adj-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold">
-                                    <option value="plus">➕ Heures Supplémentaires (+)</option>
-                                    <option value="minus">➖ Déduction / Heures en moins (-)</option>
+                                    <option value="plus">➕ Heures Complémentaires (+)</option>
+                                    <option value="minus">➖ Déduction d'heures (-)</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Durée (Heures)</label>
-                                <input type="number" step="0.25" id="adj-hours" placeholder="Ex: 1.5" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold">
+                                <input type="number" step="0.25" id="adj-hours" placeholder="Ex: 2.0" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Motif / Contexte</label>
-                                <input type="text" id="adj-reason" placeholder="Ex: Stage compétition ou Absence cours" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs">
+                                <input type="text" id="adj-reason" placeholder="Ex: Déplacement compétition ou séance décalée" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs">
                             </div>
                         </div>
                         <button onclick="addAdjustment()" class="px-4 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition">
@@ -317,85 +291,74 @@
         </main>
     </div>
 
-    <!-- ZONE A4 PORTRAIT IMPRIMABLE -->
-    <div id="printable-releve-a4">
-        <table style="width:100%; border-collapse:collapse;">
-            <thead>
-                <tr>
-                    <td style="padding-bottom:12px; border-bottom:2px solid #C41E3A;">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div style="display:flex; gap:12px; align-items:center;">
-                                <div style="background:#C41E3A; width:52px; height:50px; border-radius:8px; padding:3px; display:flex; align-items:center; justify-content:center;">
-                                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width:100%; height:100%; object-fit:contain;">
-                                </div>
-                                <div>
-                                    <h1 style="margin:0; font-size:13pt; color:#C41E3A; font-family:'Fredoka', sans-serif; font-weight:bold;">DOJO DORNOIS</h1>
-                                    <div style="font-size:7pt; color:#64748b; line-height:1.2;">
-                                        1 Place de la Mairie - 58390 DORNES<br>
-                                        FFJDA n° CE 08.58.067.0 • Agrément J&S n° 58.S.471<br>
-                                        SIRET n° 451 928 410 00013 • RNA W583001220
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="text-align:right;">
-                                <strong style="font-size:9pt; text-transform:uppercase; font-family:'Fredoka', sans-serif; display:block;">Relevé de Prestations</strong>
-                                <div style="color:#C41E3A; font-size:12pt; font-family:'Fredoka', sans-serif; font-weight:bold;" id="print-month-title">Septembre 2026</div>
-                                <div style="font-size:7.5pt; color:#64748b;">Intervenant : Romain Flammang</div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="padding-top:12px;">
-                        
-                        <!-- BLOC SYNTHÈSE A4 -->
-                        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; background:#f8fafc; padding:10px; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:15px; text-align:center;">
-                            <div><span style="display:block; font-size:6.5pt; color:#64748b; text-transform:uppercase; font-weight:bold;">Volume Prévu</span><strong id="p-stat-planned" style="font-size:10.5pt;">0.00 h</strong></div>
-                            <div><span style="display:block; font-size:6.5pt; color:#64748b; text-transform:uppercase; font-weight:bold;">Réel Fait</span><strong id="p-stat-done" style="font-size:10.5pt; color:#047857;">0.00 h</strong></div>
-                            <div><span style="display:block; font-size:6.5pt; color:#64748b; text-transform:uppercase; font-weight:bold;">Ajustements (+/-)</span><strong id="p-stat-adjust" style="font-size:10.5pt; color:#0284c7;">0.00 h</strong></div>
-                            <div><span style="display:block; font-size:6.5pt; color:#64748b; text-transform:uppercase; font-weight:bold;">Total Dû</span><strong id="p-stat-total" style="font-size:10.5pt; color:#4338ca;">0.00 h</strong></div>
-                        </div>
-
-                        <h3 style="font-size:8.5pt; text-transform:uppercase; margin-bottom:6px; font-family:'Fredoka', sans-serif; color:#1e293b;">Détail chronologique des séances du mois :</h3>
-                        
-                        <table style="width:100%; border-collapse:collapse; font-size:8.5pt; margin-bottom:15px;">
-                            <thead>
-                                <tr style="background:#1e293b; color:white; font-family:'Fredoka', sans-serif;">
-                                    <th style="padding:6px; text-align:left; font-size:7pt; text-transform:uppercase;">Date & Jour</th>
-                                    <th style="padding:6px; text-align:left; font-size:7pt; text-transform:uppercase;">Séance / Cours</th>
-                                    <th style="padding:6px; text-align:left; font-size:7pt; text-transform:uppercase;">Horaire</th>
-                                    <th style="padding:6px; text-align:center; font-size:7pt; text-transform:uppercase;">Durée</th>
-                                    <th style="padding:6px; text-align:right; font-size:7pt; text-transform:uppercase;">Statut Effectué</th>
-                                </tr>
-                            </thead>
-                            <tbody id="print-rows-tbody" style="border-bottom:1px solid #e2e8f0;"></tbody>
-                        </table>
-
-                        <div id="print-adjustments-block" style="background:#f0f9ff; border:1px solid #bae6fd; padding:8px; border-radius:6px; margin-bottom:15px; font-size:8pt;" class="hidden">
-                            <strong style="color:#0369a1; display:block; margin-bottom:3px; font-family:'Fredoka', sans-serif; text-transform:uppercase; font-size:7.5pt;">Ajustements / Heures complémentaires :</strong>
-                            <div id="print-adjustments-list" style="color:#0c4a6e;"></div>
-                        </div>
-
-                        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:25px; border-top:1px solid #e2e8f0; padding-top:8px;">
-                            <div style="font-size:6.8pt; color:#64748b; font-style:italic;">
-                                Document extrait de l'intranet officiel du Dojo Dornois le <span id="print-export-date">--/--/----</span>.<br>
-                                Certifié conforme pour le suivi de facturation du professeur.
-                            </div>
-                            <div style="text-align:center; width:170px; border:1px solid #cbd5e1; padding:5px; border-radius:4px; background:#f8fafc;">
-                                <span style="display:block; font-size:6.5pt; font-weight:bold; text-transform:uppercase; color:#334155;">Le Président du Club</span>
-                                <span style="display:block; font-size:8pt; font-family:'Fredoka', sans-serif; color:#C41E3A; font-weight:bold; margin-top:1px;">Jordan LOUDENOT</span>
-                            </div>
-                        </div>
-
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- MODALE : AJOUTER UNE SÉANCE PONCTUELLE (VACANCES / STAGE) -->
+    <div class="modal-overlay" id="modalAjoutSeance">
+        <div class="modal-box">
+            <h3 class="font-fredoka text-lg font-bold text-[#1A1A1A] border-b pb-2 mb-3">
+                ➕ Ajouter une séance ponctuelle / Stage
+            </h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Date exacte de la séance :</label>
+                    <input type="date" id="m-add-date" class="w-full px-3 py-2 border rounded-lg text-sm font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Intitulé du cours ou stage :</label>
+                    <input type="text" id="m-add-name" placeholder="Ex: Stage Toussaint Multi-Activités" class="w-full px-3 py-2 border rounded-lg text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Horaires :</label>
+                        <input type="text" id="m-add-time" placeholder="Ex: 10h00-16h00 ou 17h-18h" class="w-full px-3 py-2 border rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Durée (heures) :</label>
+                        <input type="number" step="0.25" id="m-add-duration" value="1.5" class="w-full px-3 py-2 border rounded-lg text-sm font-bold">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-4 pt-3 border-t">
+                <button onclick="fermerModalAjoutSeance()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg text-xs font-bold">Annuler</button>
+                <button onclick="validerAjoutSeance()" class="px-4 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold">Enregistrer la séance</button>
+            </div>
+        </div>
     </div>
 
-    <!-- SCRIPT SIDEBAR UNIFIÉE -->
+    <!-- MODALE : MODIFIER UNE SÉANCE EXISTANTE -->
+    <div class="modal-overlay" id="modalEditSeance">
+        <div class="modal-box">
+            <h3 class="font-fredoka text-lg font-bold text-[#1A1A1A] border-b pb-2 mb-3">
+                ✏️ Modifier la séance
+            </h3>
+            <input type="hidden" id="m-edit-key">
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Intitulé :</label>
+                    <input type="text" id="m-edit-name" class="w-full px-3 py-2 border rounded-lg text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Horaires :</label>
+                        <input type="text" id="m-edit-time" class="w-full px-3 py-2 border rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Durée (heures) :</label>
+                        <input type="number" step="0.25" id="m-edit-duration" class="w-full px-3 py-2 border rounded-lg text-sm font-bold">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-between items-center mt-4 pt-3 border-t">
+                <button onclick="supprimerSeanceActive()" class="px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-lg text-xs font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-trash"></i> Supprimer de ce jour
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="fermerModalEditSeance()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg text-xs font-bold">Annuler</button>
+                    <button onclick="validerEditSeance()" class="px-4 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/sidebar.js"></script>
 
     <script>
@@ -404,21 +367,21 @@
         const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
         const SUPABASE_TABLE = 'heures_romain';
 
-        // MATRICE DU PLANNING HEBDOMADAIRE OFFICIELLE (CONFORME 2026-2027)
-        const scheduleWeekly = [
-            // MARDI (Total : 4.5h)
+        // PLANNING HEBDOMADAIRE OFFICIEL TYPE
+        const defaultScheduleWeekly = [
+            // MARDI (4.5h)
             { id: "mar_taiso_seniors", day: 2, name: "Taïso Adapté (Seniors/PSH)", category: "Taïso", duration: 1.0, time: "15h00-16h00" },
             { id: "mar_enfants", day: 2, name: "Pré-Poussins, Poussins & Benjamins 1", category: "Judo Enfants", duration: 1.25, time: "17h30-18h45" },
             { id: "mar_taiso_1", day: 2, name: "Taïso Soir", category: "Taïso", duration: 0.75, time: "18h45-19h30" },
             { id: "mar_jujitsu", day: 2, name: "Jujitsu Ne-Waza", category: "Jujitsu", duration: 1.5, time: "19h30-21h00" },
             
-            // JEUDI (Total : 4.5h)
+            // JEUDI (4.5h)
             { id: "jeu_taiso_seniors", day: 4, name: "Taïso Adapté (Seniors/PSH)", category: "Taïso", duration: 1.0, time: "15h00-16h00" },
             { id: "jeu_jeunes", day: 4, name: "Benjamins 2 & Cadets", category: "Judo Jeunes", duration: 1.25, time: "17h30-18h45" },
             { id: "jeu_taiso_2", day: 4, name: "Taïso Soir", category: "Taïso", duration: 0.75, time: "18h45-19h30" },
             { id: "jeu_jujitsu_contact", day: 4, name: "Jujitsu Contact", category: "Jujitsu", duration: 1.5, time: "19h30-21h00" },
             
-            // SAMEDI (Total : 5.5h)
+            // SAMEDI (5.5h)
             { id: "sam_baby", day: 6, name: "Baby Motricité", category: "Baby", duration: 0.75, time: "08h30-09h15" },
             { id: "sam_eveil", day: 6, name: "Éveil Judo", category: "Éveil", duration: 1.0, time: "09h15-10h15" },
             { id: "sam_enfants", day: 6, name: "Pré-Poussins & Poussins", category: "Judo Enfants", duration: 1.25, time: "10h15-11h30" },
@@ -426,17 +389,20 @@
             { id: "sam_adultes", day: 6, name: "Benjamins à Adultes", category: "Judo Adultes", duration: 1.75, time: "13h30-15h15" }
         ];
 
+        // VACANCES ZONE A (2026 - 2027)
         const vacationRanges = [
-            { start: "2026-10-17", end: "2026-11-02" }, 
-            { start: "2026-12-19", end: "2027-01-04" }, 
-            { start: "2027-02-06", end: "2027-02-22" }, 
-            { start: "2027-04-10", end: "2027-04-26" }, 
-            { start: "2027-07-03", end: "2027-09-01" }  
+            { start: "2026-10-17", end: "2026-11-02", name: "Vacances de la Toussaint" }, 
+            { start: "2026-12-19", end: "2027-01-04", name: "Vacances de Noël" }, 
+            { start: "2027-02-06", end: "2027-02-22", name: "Vacances d'Hiver" }, 
+            { start: "2027-04-10", end: "2027-04-26", name: "Vacances de Printemps" }, 
+            { start: "2027-07-03", end: "2027-09-01", name: "Vacances d'Été" }  
         ];
 
         let romainData = {
             checkState: {}, 
-            adjustments: []
+            adjustments: [],
+            customSessions: [], // [{ id, date, name, time, duration, status }]
+            sessionOverrides: {} // { [date_courseId]: { name, time, duration, deleted: bool } }
         };
 
         function isVacationDate(dateStr) {
@@ -448,7 +414,7 @@
         }
 
         function autoSaveLocal() {
-            localStorage.setItem('romain_hours_data_v5', JSON.stringify(romainData));
+            localStorage.setItem('romain_hours_data_v6', JSON.stringify(romainData));
             syncToSupabase(true);
         }
 
@@ -460,6 +426,50 @@
             document.getElementById('tab-btn-' + tabId).classList.add('active');
         }
 
+        function formatDuree(h) {
+            return Number(h).toFixed(2).replace('.', ',') + " h";
+        }
+
+        // --- GESTION DES SÉANCES EFFECTIVES POUR UN JOUR DONNÉ ---
+        function getCoursesForDay(dateStr) {
+            const dateObj = new Date(dateStr + "T00:00:00");
+            const dayOfWeek = dateObj.getDay();
+            let courses = [];
+
+            // 1. Cours récurrents du jour
+            const defaultCourses = defaultScheduleWeekly.filter(c => c.day === dayOfWeek);
+            defaultCourses.forEach(c => {
+                const key = `${dateStr}_${c.id}`;
+                const override = romainData.sessionOverrides[key];
+                
+                if (override && override.deleted) return; // séance supprimée pour ce jour
+
+                courses.push({
+                    id: c.id,
+                    isCustom: false,
+                    key: key,
+                    name: override ? override.name : c.name,
+                    time: override ? override.time : c.time,
+                    duration: override ? parseFloat(override.duration) : c.duration
+                });
+            });
+
+            // 2. Séances ponctuelles ajoutées manuellement pour ce jour
+            (romainData.customSessions || []).filter(cs => cs.date === dateStr).forEach(cs => {
+                courses.push({
+                    id: cs.id,
+                    isCustom: true,
+                    key: `custom_${cs.id}`,
+                    name: cs.name,
+                    time: cs.time,
+                    duration: parseFloat(cs.duration)
+                });
+            });
+
+            return courses;
+        }
+
+        // --- RENDU DU POINTAGE HEBDOMADAIRE ---
         function renderPointage() {
             const selectedMonth = document.getElementById('select-month').value;
             const [year, month] = selectedMonth.split('-').map(Number);
@@ -476,19 +486,19 @@
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateObj = new Date(year, month - 1, d);
                 const dateStr = getLocalDateStr(year, month, d);
-                const dayOfWeek = dateObj.getDay();
+                const courses = getCoursesForDay(dateStr);
 
-                const matchingCourses = scheduleWeekly.filter(c => c.day === dayOfWeek);
-
-                if (matchingCourses.length > 0) {
+                if (courses.length > 0) {
                     const weekNum = getWeekNumber(dateObj);
                     if (!weeksMap[weekNum]) weeksMap[weekNum] = {};
-                    if (!weeksMap[weekNum][dateStr]) weeksMap[weekNum][dateStr] = { dateObj, courses: [] };
-                    
-                    matchingCourses.forEach(course => {
-                        weeksMap[weekNum][dateStr].courses.push(course);
-                    });
+                    weeksMap[weekNum][dateStr] = { dateObj, courses };
                 }
+            }
+
+            if (Object.keys(weeksMap).length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center p-8 bg-white rounded-2xl border border-slate-200 text-slate-400">Aucune séance planifiée pour ce mois. Vous pouvez en ajouter une via le bouton en haut à droite.</div>`;
+                updateKPIs();
+                return;
             }
 
             Object.keys(weeksMap).forEach((weekNum) => {
@@ -507,7 +517,7 @@
                     let courseBadges = '';
 
                     courses.forEach(course => {
-                        const checkKey = `${dateStr}_${course.id}`;
+                        const checkKey = course.key;
                         
                         if (romainData.checkState[checkKey] === undefined) {
                             romainData.checkState[checkKey] = 'pending';
@@ -517,25 +527,30 @@
                         const isDone = (status === 'done');
                         const isCancelled = (status === 'cancelled');
 
-                        if (isDone && !isVac) weekDoneHours += course.duration;
+                        if (isDone) weekDoneHours += course.duration;
 
                         courseBadges += `
-                            <div onclick="${isVac ? '' : `toggleCheckCycle('${checkKey}')`}" 
-                                 class="course-card-item p-2.5 rounded-xl font-medium text-xs flex items-center justify-between gap-2 ${isVac ? 'bg-amber-50/70 border-amber-200 text-amber-700 opacity-60 cursor-not-allowed border-l-4 border-l-amber-400' : (isDone ? 'status-done' : (isCancelled ? 'status-cancelled' : ''))}">
-                                <div class="truncate">
-                                    <strong class="font-fredoka block text-[11px] leading-tight">${course.name}</strong>
+                            <div class="course-card-item p-2.5 rounded-xl font-medium text-xs flex items-center justify-between gap-2 ${isDone ? 'status-done' : (isCancelled ? 'status-cancelled' : '')}">
+                                <div onclick="toggleCheckCycle('${checkKey}')" class="truncate flex-1 cursor-pointer">
+                                    <strong class="font-fredoka block text-[11px] leading-tight flex items-center gap-1.5">
+                                        ${course.name}
+                                        ${course.isCustom ? '<span class="px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded text-[9px]">Stage</span>' : ''}
+                                    </strong>
                                     <span class="text-[10px] opacity-75 block">${course.time}</span>
                                 </div>
-                                <div class="flex items-center gap-1.5 shrink-0">
+                                <div class="flex items-center gap-2 shrink-0">
                                     <span class="font-fredoka font-bold text-[11px]">${course.duration}h</span>
-                                    ${isVac 
-                                        ? '<i class="fa-solid fa-umbrella-beach text-[10px]"></i>' 
-                                        : (isDone 
+                                    <div onclick="toggleCheckCycle('${checkKey}')" class="cursor-pointer">
+                                        ${isDone 
                                             ? '<i class="fa-solid fa-circle-check text-emerald-500 text-sm"></i>' 
                                             : (isCancelled 
                                                 ? '<i class="fa-solid fa-circle-xmark text-rose-600 text-sm"></i>' 
-                                                : '<i class="fa-regular fa-circle text-slate-300 text-sm"></i>'))
-                                    }
+                                                : '<i class="fa-regular fa-circle text-slate-300 text-sm"></i>')
+                                        }
+                                    </div>
+                                    <button onclick="ouvrirModalEditSeance('${checkKey}', '${course.name.replace(/'/g, "\\'")}', '${course.time}', ${course.duration}, ${course.isCustom})" title="Modifier cette séance" class="text-slate-400 hover:text-slate-700 px-1">
+                                        <i class="fa-solid fa-pen text-[10px]"></i>
+                                    </button>
                                 </div>
                             </div>
                         `;
@@ -543,9 +558,14 @@
 
                     daysBadgesHtml += `
                         <div class="space-y-1.5 bg-slate-50/80 p-3 rounded-xl border border-slate-200/70">
-                            <div class="text-[11px] font-bold font-fredoka text-slate-500 uppercase border-b border-slate-200 pb-1 mb-2 flex justify-between">
+                            <div class="text-[11px] font-bold font-fredoka text-slate-500 uppercase border-b border-slate-200 pb-1 mb-2 flex justify-between items-center">
                                 <span>${formattedDay}</span>
-                                ${isVac ? '<span class="text-amber-600 font-bold">Vacances</span>' : ''}
+                                <div class="flex items-center gap-1.5">
+                                    ${isVac ? '<span class="text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded text-[9.5px]">Vacances</span>' : ''}
+                                    <button onclick="ouvrirModalAjoutSeance('${dateStr}')" title="Ajouter une séance ce jour" class="text-slate-400 hover:text-rose-600">
+                                        <i class="fa-solid fa-plus-circle text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="space-y-1.5">
                                 ${courseBadges}
@@ -561,7 +581,7 @@
                             <h3 class="font-fredoka text-sm font-bold text-slate-800">Semaine N° ${weekNum}</h3>
                         </div>
                         <span class="text-xs font-bold font-fredoka text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-                            Volume Réel Fait : ${weekDoneHours.toFixed(2)} h
+                            Volume Réalisé : ${formatDuree(weekDoneHours)}
                         </span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -595,12 +615,9 @@
 
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateStr = getLocalDateStr(year, month, d);
-                if (isVacationDate(dateStr)) continue;
-                const dayOfWeek = new Date(year, month - 1, d).getDay();
-                
-                const matchingCourses = scheduleWeekly.filter(c => c.day === dayOfWeek);
-                matchingCourses.forEach(c => {
-                    romainData.checkState[`${dateStr}_${c.id}`] = targetStatus;
+                const courses = getCoursesForDay(dateStr);
+                courses.forEach(c => {
+                    romainData.checkState[c.key] = targetStatus;
                 });
             }
             autoSaveLocal();
@@ -618,37 +635,131 @@
 
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateStr = getLocalDateStr(year, month, d);
-                if (isVacationDate(dateStr)) continue;
+                const courses = getCoursesForDay(dateStr);
 
-                const dayOfWeek = new Date(year, month - 1, d).getDay();
-                const matchingCourses = scheduleWeekly.filter(c => c.day === dayOfWeek);
-
-                matchingCourses.forEach(course => {
-                    plannedHours += course.duration;
-                    const checkKey = `${dateStr}_${course.id}`;
-                    const status = romainData.checkState[checkKey];
+                courses.forEach(c => {
+                    plannedHours += c.duration;
+                    const status = romainData.checkState[c.key];
 
                     if (status === 'done' || status === true) {
-                        doneHours += course.duration;
+                        doneHours += c.duration;
                     } else if (status === 'cancelled') {
-                        cancelledHours += course.duration;
+                        cancelledHours += c.duration;
                     }
                 });
             }
 
             let adjustHours = 0;
-            romainData.adjustments.filter(a => a.month === selectedMonth).forEach(a => {
+            (romainData.adjustments || []).filter(a => a.month === selectedMonth).forEach(a => {
                 adjustHours += (a.type === 'plus' ? a.hours : -a.hours);
             });
 
             const totalPayable = doneHours + adjustHours;
 
-            document.getElementById('block-planned').textContent = `${plannedHours.toFixed(2)} h`;
-            document.getElementById('block-done').textContent = `${doneHours.toFixed(2)} h`;
-            document.getElementById('block-cancelled').textContent = `${cancelledHours.toFixed(2)} h`;
-            document.getElementById('block-total').textContent = `${totalPayable.toFixed(2)} h`;
+            document.getElementById('block-planned').textContent = formatDuree(plannedHours);
+            document.getElementById('block-done').textContent = formatDuree(doneHours);
+            document.getElementById('block-cancelled').textContent = formatDuree(cancelledHours);
+            document.getElementById('block-total').textContent = formatDuree(totalPayable);
         }
 
+        // --- GESTION DES MODALES D'AJOUT & ÉDITION DE SÉANCE ---
+        function ouvrirModalAjoutSeance(datePreselect = null) {
+            const curMonth = document.getElementById('select-month').value;
+            document.getElementById('m-add-date').value = datePreselect || (curMonth + "-20");
+            document.getElementById('m-add-name').value = "Stage Vacances / Intervention";
+            document.getElementById('m-add-time').value = "10h00-12h00";
+            document.getElementById('m-add-duration').value = "2.0";
+            document.getElementById('modalAjoutSeance').classList.add('open');
+        }
+
+        function fermerModalAjoutSeance() {
+            document.getElementById('modalAjoutSeance').classList.remove('open');
+        }
+
+        function validerAjoutSeance() {
+            const date = document.getElementById('m-add-date').value;
+            const name = document.getElementById('m-add-name').value.trim();
+            const time = document.getElementById('m-add-time').value.trim();
+            const duration = parseFloat(document.getElementById('m-add-duration').value);
+
+            if (!date || !name || isNaN(duration) || duration <= 0) {
+                alert("Veuillez renseigner correctement la date, le nom et la durée.");
+                return;
+            }
+
+            if (!romainData.customSessions) romainData.customSessions = [];
+            const newId = Date.now();
+            romainData.customSessions.push({ id: newId, date, name, time: time || "Horaire convenu", duration });
+            romainData.checkState[`custom_${newId}`] = 'done'; // Séance ponctuelle considérée effectuée par défaut
+
+            autoSaveLocal();
+            fermerModalAjoutSeance();
+            renderPointage();
+            showToast("✓ Séance ajoutée avec succès !");
+        }
+
+        function ouvrirModalEditSeance(key, name, time, duration, isCustom) {
+            document.getElementById('m-edit-key').value = key;
+            document.getElementById('m-edit-key').setAttribute('data-iscustom', isCustom ? 'true' : 'false');
+            document.getElementById('m-edit-name').value = name;
+            document.getElementById('m-edit-time').value = time;
+            document.getElementById('m-edit-duration').value = duration;
+            document.getElementById('modalEditSeance').classList.add('open');
+        }
+
+        function fermerModalEditSeance() {
+            document.getElementById('modalEditSeance').classList.remove('open');
+        }
+
+        function validerEditSeance() {
+            const key = document.getElementById('m-edit-key').value;
+            const isCustom = document.getElementById('m-edit-key').getAttribute('data-iscustom') === 'true';
+            const name = document.getElementById('m-edit-name').value.trim();
+            const time = document.getElementById('m-edit-time').value.trim();
+            const duration = parseFloat(document.getElementById('m-edit-duration').value);
+
+            if (!name || isNaN(duration) || duration <= 0) {
+                alert("Veuillez renseigner correctement l'intitulé et la durée.");
+                return;
+            }
+
+            if (isCustom) {
+                const customId = parseInt(key.replace('custom_', ''), 10);
+                const cs = (romainData.customSessions || []).find(x => x.id === customId);
+                if (cs) { cs.name = name; cs.time = time; cs.duration = duration; }
+            } else {
+                if (!romainData.sessionOverrides) romainData.sessionOverrides = {};
+                romainData.sessionOverrides[key] = { name, time, duration, deleted: false };
+            }
+
+            autoSaveLocal();
+            fermerModalEditSeance();
+            renderPointage();
+            showToast("✓ Séance modifiée !");
+        }
+
+        function supprimerSeanceActive() {
+            const key = document.getElementById('m-edit-key').value;
+            const isCustom = document.getElementById('m-edit-key').getAttribute('data-iscustom') === 'true';
+
+            if (!confirm("Voulez-vous supprimer cette séance pour ce jour ?")) return;
+
+            if (isCustom) {
+                const customId = parseInt(key.replace('custom_', ''), 10);
+                romainData.customSessions = (romainData.customSessions || []).filter(x => x.id !== customId);
+            } else {
+                if (!romainData.sessionOverrides) romainData.sessionOverrides = {};
+                romainData.sessionOverrides[key] = { deleted: true };
+            }
+
+            delete romainData.checkState[key];
+            autoSaveLocal();
+            fermerModalEditSeance();
+            renderPointage();
+            showToast("✓ Séance retirée !");
+        }
+
+        // --- AJUSTEMENTS GLOBAUX ---
         function addAdjustment() {
             const month = document.getElementById('adj-month').value;
             const type = document.getElementById('adj-type').value;
@@ -656,10 +767,11 @@
             const reason = document.getElementById('adj-reason').value.trim();
 
             if (isNaN(hours) || hours <= 0 || !reason) {
-                alert("Veuillez remplir correctement la durée et le motif de l'ajustement.");
+                alert("Veuillez remplir correctement la durée et le motif.");
                 return;
             }
 
+            if (!romainData.adjustments) romainData.adjustments = [];
             romainData.adjustments.push({ id: Date.now(), month, type, hours, reason });
             document.getElementById('adj-hours').value = '';
             document.getElementById('adj-reason').value = '';
@@ -667,13 +779,13 @@
             autoSaveLocal(); 
             renderAdjustmentsTable();
             updateKPIs();
-            showToast("Ajustement ajouté !");
+            showToast("✓ Ajustement enregistré !");
         }
 
         function renderAdjustmentsTable() {
             const tbody = document.getElementById('adjustments-table-body');
             tbody.innerHTML = '';
-            if (romainData.adjustments.length === 0) {
+            if (!romainData.adjustments || romainData.adjustments.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Aucun ajustement enregistré.</td></tr>`;
                 return;
             }
@@ -683,11 +795,11 @@
                         <td class="p-3 font-bold font-fredoka">${adj.month}</td>
                         <td class="p-3">
                             <span class="px-2 py-0.5 rounded font-bold text-[10px] ${adj.type === 'plus' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                                ${adj.type === 'plus' ? '+ Heures Sup' : '- Déduction'}
+                                ${adj.type === 'plus' ? '+ Heures Complémentaires' : '- Déduction'}
                             </span>
                         </td>
                         <td class="p-3 font-bold font-fredoka ${adj.type === 'plus' ? 'text-emerald-600' : 'text-rose-600'}">
-                            ${adj.type === 'plus' ? '+' : '-'}${adj.hours.toFixed(2)} h
+                            ${adj.type === 'plus' ? '+' : '-'}${formatDuree(adj.hours)}
                         </td>
                         <td class="p-3 text-slate-600">${adj.reason}</td>
                         <td class="p-3 text-center">
@@ -705,124 +817,307 @@
             updateKPIs();
         }
 
-        function imprimerReleveMensuel() {
+        // --- IMPRESSION CONFORME CHARTE MASTER DU DOJO DORNOIS ---
+        function imprimerReleveOfficielA4() {
             const selectedMonth = document.getElementById('select-month').value;
             const [year, month] = selectedMonth.split('-').map(Number);
             const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-            
-            document.getElementById('print-month-title').textContent = `${monthNames[month - 1]} ${year}`;
-            document.getElementById('print-export-date').textContent = new Date().toLocaleDateString('fr-FR');
+            const monthTitle = `${monthNames[month - 1]} ${year}`;
 
             const daysInMonth = new Date(year, month, 0).getDate();
-            const tbody = document.getElementById('print-rows-tbody');
-            tbody.innerHTML = '';
-
             let pPlanned = 0, pDone = 0, pCancelled = 0;
+            let rowsHtml = '';
 
             for (let d = 1; d <= daysInMonth; d++) {
-                const dateObj = new Date(year, month - 1, d);
                 const dateStr = getLocalDateStr(year, month, d);
-                if (isVacationDate(dateStr)) continue;
+                const dateObj = new Date(year, month - 1, d);
+                const courses = getCoursesForDay(dateStr);
 
-                const dayOfWeek = dateObj.getDay();
-                const matchingCourses = scheduleWeekly.filter(c => c.day === dayOfWeek);
+                courses.forEach(c => {
+                    pPlanned += c.duration;
+                    const status = romainData.checkState[c.key] || 'pending';
 
-                matchingCourses.forEach(course => {
-                    pPlanned += course.duration;
-                    const checkKey = `${dateStr}_${course.id}`;
-                    const status = romainData.checkState[checkKey] || 'pending';
-
-                    let statusLabel = '<span style="color:#94a3b8; font-weight:bold;">Non pointé</span>';
+                    let statusLabel = '<span style="color:#64748b;">En attente</span>';
                     if (status === 'done' || status === true) {
-                        pDone += course.duration;
-                        statusLabel = '<span style="color:#047857; font-weight:bold;">✓ Effectué</span>';
+                        pDone += c.duration;
+                        statusLabel = '<strong style="color:#047857;">✓ Réalisé</strong>';
                     } else if (status === 'cancelled') {
-                        pCancelled += course.duration;
-                        statusLabel = '<span style="color:#b91c1c; font-weight:bold;">✕ Non dispensé</span>';
+                        pCancelled += c.duration;
+                        statusLabel = '<strong style="color:#C41E3A;">✕ Non dispensé</strong>';
                     }
 
                     const formattedDate = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
 
-                    tbody.innerHTML += `
-                        <tr style="border-bottom: 1px solid #e2e8f0;">
-                            <td style="padding: 6px; font-weight: bold; text-transform: capitalize;">${formattedDate}</td>
-                            <td style="padding: 6px; font-weight: bold;">${course.name}</td>
-                            <td style="padding: 6px;">${course.time}</td>
-                            <td style="padding: 6px; text-align: center; font-weight: bold;">${course.duration} h</td>
-                            <td style="padding: 6px; text-align: right;">${statusLabel}</td>
+                    rowsHtml += `
+                        <tr style="border-bottom: 1px solid #E8E8E8; page-break-inside: avoid;">
+                            <td style="padding: 6px 8px; text-transform: capitalize; font-weight: 500;">${formattedDate}</td>
+                            <td style="padding: 6px 8px; font-weight: bold; color: #1A1A1A;">
+                                ${c.name} ${c.isCustom ? '<span style="font-size:7pt; color:#2563eb; background:#eff6ff; padding:1px 4px; border-radius:3px;">Stage</span>' : ''}
+                            </td>
+                            <td style="padding: 6px 8px; color: #64748b;">${c.time}</td>
+                            <td style="padding: 6px 8px; text-align: center; font-weight: bold;">${formatDuree(c.duration)}</td>
+                            <td style="padding: 6px 8px; text-align: right;">${statusLabel}</td>
                         </tr>
                     `;
                 });
             }
 
             let adjustHours = 0;
-            const monthAdjusts = romainData.adjustments.filter(a => a.month === selectedMonth);
-            const adjBlock = document.getElementById('print-adjustments-block');
-            const adjList = document.getElementById('print-adjustments-list');
-            adjList.innerHTML = '';
+            const monthAdjusts = (romainData.adjustments || []).filter(a => a.month === selectedMonth);
+            let adjustsHtml = '';
 
             if (monthAdjusts.length > 0) {
-                adjBlock.classList.remove('hidden');
                 monthAdjusts.forEach(a => {
-                    const hVal = a.type === 'plus' ? a.hours : -a.hours;
-                    adjustHours += hVal;
-                    adjList.innerHTML += `<div>• <strong>${a.type === 'plus' ? '+' : '-'}${a.hours} h</strong> : ${a.reason}</div>`;
+                    const val = a.type === 'plus' ? a.hours : -a.hours;
+                    adjustHours += val;
+                    adjustsHtml += `<div>• <strong>${a.type === 'plus' ? '+' : '-'}${formatDuree(a.hours)}</strong> : ${a.reason}</div>`;
                 });
-            } else {
-                adjBlock.classList.add('hidden');
             }
 
-            document.getElementById('p-stat-planned').textContent = `${pPlanned.toFixed(2)} h`;
-            document.getElementById('p-stat-done').textContent = `${pDone.toFixed(2)} h`;
-            document.getElementById('p-stat-adjust').textContent = `${adjustHours > 0 ? '+' : ''}${adjustHours.toFixed(2)} h`;
-            document.getElementById('p-stat-total').textContent = `${(pDone + adjustHours).toFixed(2)} h`;
+            const totalPayable = pDone + adjustHours;
+            const dateEdition = new Date().toLocaleDateString('fr-FR');
+            const sigPres = localStorage.getItem('club_signature') || '';
 
-            window.print();
+            const printWin = window.open('', '_blank');
+            printWin.document.write(`
+                <!DOCTYPE html>
+                <html lang="fr">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Relevé de Prestations - Romain Flammang - ${monthTitle}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                    <style>
+                        @page {
+                            size: A4 portrait;
+                            margin: 10mm 12mm 14mm 12mm;
+                            @bottom-left {
+                                content: "Dojo Dornois • Association Loi 1901 • RNA : W583001220 • SIRET : 451 928 410 00013 • « Non assujetti à la TVA art. 293-B du CGI »";
+                                font-family: 'Roboto', sans-serif;
+                                font-size: 7.5pt;
+                                color: #6B6B6B;
+                                border-top: 1px solid #E8E8E8;
+                                padding-top: 5px;
+                            }
+                            @bottom-right {
+                                content: "Page " counter(page) " / " counter(pages);
+                                font-family: 'Fredoka', sans-serif;
+                                font-weight: 600;
+                                font-size: 8.5pt;
+                                color: #C41E3A;
+                                border-top: 1px solid #E8E8E8;
+                                padding-top: 5px;
+                            }
+                        }
+                        body {
+                            font-family: 'Roboto', sans-serif;
+                            color: #1A1A1A;
+                            background: #FFFFFF;
+                            margin: 0;
+                            padding: 0;
+                            font-size: 8.8pt;
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+                        .header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                            border-bottom: 2px solid #C41E3A;
+                            padding-bottom: 10px;
+                            margin-bottom: 12px;
+                        }
+                        .brand { display: flex; gap: 12px; align-items: center; }
+                        .logo-box {
+                            background-color: #C41E3A;
+                            width: 60px;
+                            height: 60px;
+                            border-radius: 12px;
+                            padding: 5px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.25);
+                            flex-shrink: 0;
+                        }
+                        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+                        .info { font-size: 8pt; line-height: 1.35; color: #3D3D3D; }
+                        .name { font-family: 'Fredoka', sans-serif; font-size: 13pt; color: #C41E3A; font-weight: 700; margin-bottom: 2px; }
+                        
+                        .meta-badge {
+                            background: #F8FAFC;
+                            border: 1px solid #CBD5E1;
+                            border-radius: 6px;
+                            padding: 6px 12px;
+                            text-align: right;
+                        }
+                        .title-bar {
+                            text-align: center;
+                            border-top: 2px solid #C41E3A;
+                            border-bottom: 2px solid #C41E3A;
+                            padding: 5px 0;
+                            margin: 10px 0 14px 0;
+                        }
+                        .title-bar h1 {
+                            font-family: 'Fredoka', sans-serif;
+                            font-size: 13pt;
+                            color: #C41E3A;
+                            margin: 0;
+                            text-transform: uppercase;
+                        }
+                        .kpi-grid {
+                            display: grid;
+                            grid-template-columns: repeat(4, 1fr);
+                            gap: 10px;
+                            background: #F8FAFC;
+                            border: 1px solid #E2E8F0;
+                            border-radius: 6px;
+                            padding: 8px 10px;
+                            text-align: center;
+                            margin-bottom: 14px;
+                        }
+                        .kpi-grid div span { display: block; font-size: 7pt; color: #64748b; text-transform: uppercase; font-weight: bold; }
+                        .kpi-grid div strong { font-family: 'Fredoka', sans-serif; font-size: 11pt; }
+
+                        table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-top: 8px; }
+                        th { background-color: #1A1A1A; color: white; padding: 7px 8px; font-weight: 600; text-align: left; font-size: 8pt; }
+                        td { padding: 6px 8px; }
+
+                        .adjust-box {
+                            background: #F0F9FF;
+                            border: 1px solid #BAE6FD;
+                            padding: 8px 12px;
+                            border-radius: 6px;
+                            margin-top: 12px;
+                            font-size: 8pt;
+                            color: #0369A1;
+                        }
+
+                        .sigs { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 25px; page-break-inside: avoid; }
+                        .sig-box { border: 1px dashed #B8B8B8; padding: 10px; border-radius: 6px; min-height: 100px; font-size: 8.5pt; background: #FAFAFA; text-align: center; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="brand">
+                            <div class="logo-box">
+                                <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
+                            </div>
+                            <div class="info">
+                                <div class="name">DOJO DORNOIS</div>
+                                1 Place de la Mairie - 58390 DORNES<br>
+                                FFJDA n° CE 08.58.067.0 • Agrément J&S n° 58.S.471<br>
+                                SIRET 451 928 410 00013 • RNA W583001220<br>
+                                contact@dojodornois.fr • 06.07.13.91.86
+                            </div>
+                        </div>
+                        <div class="meta-badge">
+                            <span style="font-size:7pt; color:#64748b; text-transform:uppercase; display:block;">Intervenant Sportif</span>
+                            <strong style="font-family:'Fredoka',sans-serif; color:#C41E3A; font-size:10pt;">Romain FLAMMANG</strong>
+                            <div style="font-size:7.5pt; color:#64748b;">Édité le ${dateEdition}</div>
+                        </div>
+                    </div>
+
+                    <div class="title-bar">
+                        <h1>RELEVÉ D'ACTIVITÉ & PRESTATIONS MENSUELLES — ${monthTitle.toUpperCase()}</h1>
+                    </div>
+
+                    <div class="kpi-grid">
+                        <div><span>1. Volume Prévu</span><strong style="color:#1A1A1A;">${formatDuree(pPlanned)}</strong></div>
+                        <div><span>2. Réel Réalisé</span><strong style="color:#047857;">${formatDuree(pDone)}</strong></div>
+                        <div><span>3. Ajustements (+/-)</span><strong style="color:#0284c7;">${adjustHours > 0 ? '+' : ''}${formatDuree(adjustHours)}</strong></div>
+                        <div><span>4. Total Dû</span><strong style="color:#4338ca;">${formatDuree(totalPayable)}</strong></div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Date & Jour</th>
+                                <th>Intitulé de la Séance / Stage</th>
+                                <th style="width: 20%;">Horaires</th>
+                                <th style="width: 15%; text-align: center;">Durée</th>
+                                <th style="width: 18%; text-align: right;">Statut Pointé</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+
+                    ${monthAdjusts.length > 0 ? `
+                        <div class="adjust-box">
+                            <strong style="text-transform:uppercase; font-size:7.5pt; display:block; margin-bottom:3px;">Ajustements complémentaires enregistrés :</strong>
+                            ${adjustsHtml}
+                        </div>
+                    ` : ''}
+
+                    <div class="sigs">
+                        <div class="sig-box">
+                            <strong style="color:#C41E3A; font-family:'Fredoka';">Le Professeur / Intervenant :</strong>
+                            <div style="margin-top:4px; font-weight:bold;">Romain FLAMMANG</div>
+                            <div style="font-size:7.5pt; color:#64748b; font-style:italic; margin-top:25px;">Relevé d'heures certifié exact</div>
+                        </div>
+                        <div class="sig-box">
+                            <strong style="color:#C41E3A; font-family:'Fredoka';">Le Président du Club :</strong>
+                            <div style="margin-top:4px; font-weight:bold;">Jordan LOUDENOT</div>
+                            ${sigPres ? `<img src="${sigPres}" style="max-height:48px; margin:4px auto 0 auto; display:block; mix-blend-mode:multiply;">` : '<div style="font-size:7.5pt; color:#64748b; font-style:italic; margin-top:25px;">Visa & validation pour règlement</div>'}
+                        </div>
+                    </div>
+
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() { window.print(); window.close(); }, 300);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
         }
 
         function getWeekNumber(d) {
             const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-            date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+            date.setUTCDate(date.setUTCDate() + 4 - (date.getUTCDay() || 7));
             const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
             return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
         }
 
         async function syncToSupabase(silent = false) {
-            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            if (!silent) showToast("Synchronisation Supabase en cours...");
             try {
-                localStorage.setItem('romain_hours_data_v5', JSON.stringify(romainData)); 
-
+                localStorage.setItem('romain_hours_data_v6', JSON.stringify(romainData)); 
                 const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: romainData });
                 if (error) throw error;
-                
-                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !");
+                if (!silent) showToast("✓ Enregistrement synchronisé sur Supabase !");
             } catch (err) {
                 console.error("Erreur Supabase:", err);
-                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)");
+                if (!silent) showToast("⚠️ Données sauvegardées en local (erreur Supabase)");
             }
         }
 
         async function loadData() {
-            const saved = localStorage.getItem('romain_hours_data_v5') || localStorage.getItem('romain_hours_data_v4') || localStorage.getItem('romain_hours_data_v3');
+            const saved = localStorage.getItem('romain_hours_data_v6') || localStorage.getItem('romain_hours_data_v5');
             if (saved) {
                 try {
                     romainData = JSON.parse(saved);
+                    if (!romainData.customSessions) romainData.customSessions = [];
+                    if (!romainData.sessionOverrides) romainData.sessionOverrides = {};
                     renderPointage();
                     renderAdjustmentsTable();
                 } catch (e) {}
             }
             
             try {
-                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
-                if (error) throw error;
+                const { data: result } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
                 if (result && result.data) {
                     romainData = result.data;
-                    localStorage.setItem('romain_hours_data_v5', JSON.stringify(romainData));
+                    if (!romainData.customSessions) romainData.customSessions = [];
+                    if (!romainData.sessionOverrides) romainData.sessionOverrides = {};
+                    localStorage.setItem('romain_hours_data_v6', JSON.stringify(romainData));
                     renderPointage();
                     renderAdjustmentsTable();
                 }
             } catch(e) {
-                console.error("Erreur chargement Supabase:", e);
+                console.warn("Connexion Supabase heures indisponible.");
             }
         }
 
