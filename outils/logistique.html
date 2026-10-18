@@ -2,26 +2,28 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Logistique, Événements & Matériel — Dojo Dornois</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dojo Manager - Inventaire du Matériel & Équipements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --rouge: #C41E3A;
             --rouge-hover: #A3182E;
             --rouge-clair: #FFEBEF;
-            --rouge-deep: #8B1429;
             --noir-doux: #1A1A1A;
             --gris-fonce: #3D3D3D;
             --gris-moyen: #6B6B6B;
             --gris-clair: #B8B8B8;
             --gris-tres-clair: #E8E8E8;
+            --gris-fond-input: #F8FAFC;
             --fond: #F4F6F9;
             --blanc: #FFFFFF;
-            --bleu: #3498db;
-            --vert: #2ecc71;
-            --orange: #e67e22;
-            --sidebar-width: 280px;
-            --topbar-height: 68px;
+            --vert-succes: #2ECC71;
+            --bleu-info: #3498DB;
+            --sidebar-width: 270px;
+            --topbar-height: 70px;
+            --radius-main: 10px;
+            --radius-sm: 6px;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -34,849 +36,837 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            font-size: 13px;
         }
 
-        /* --- FIX SIDEBAR DÉBORDEMENT --- */
-        .sidebar { 
-            width: var(--sidebar-width); 
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
             min-width: var(--sidebar-width);
             max-width: var(--sidebar-width);
-            background: var(--noir-doux); 
-            color: var(--blanc); 
-            display: flex; 
-            flex-direction: column; 
-            height: 100%; 
-            position: relative; 
-            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
-            flex-shrink: 0; 
-            box-sizing: border-box;
+            background: var(--noir-doux);
+            color: var(--blanc);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            flex-shrink: 0;
             overflow-x: hidden;
             z-index: 100;
         }
 
-        .sidebar * {
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-
-        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
-        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
-        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
-
-        /* ===== MAIN CONTENT ===== */
+        /* --- CONTENU PRINCIPAL --- */
         .main-content {
-            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-width: 0;
         }
 
         .topbar {
-            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.04); flex-shrink: 0; z-index: 50;
+            background: var(--blanc);
+            height: var(--topbar-height);
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            flex-shrink: 0;
+            z-index: 50;
         }
-
-        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); line-height: 1; }
-        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
+        .topbar-title-block h2 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--noir-doux);
+            margin: 0;
+            font-size: 1.35rem;
+        }
+        .topbar-title-block p {
+            margin: 2px 0 0 0;
+            font-size: 0.8rem;
+            color: var(--gris-moyen);
+        }
 
         .app-body {
-            flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
+            flex: 1;
+            padding: 22px 28px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
         }
 
-        /* ===== BOUTONS ET COMPOSANTS ===== */
-        .btn { font-family: 'Roboto', sans-serif; font-weight: 500; padding: 9px 15px; border-radius: 6px; border: none; cursor: pointer; transition: background 0.2s; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+        /* --- BOUTONS --- */
+        .btn {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 600;
+            padding: 9px 15px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-size: 0.88rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+        .btn-primary { background: var(--rouge); color: white; }
+        .btn-primary:hover { background: var(--rouge-hover); }
+        .btn-secondary { background: var(--gris-tres-clair); color: var(--gris-fonce); }
+        .btn-secondary:hover { background: #dcdcdc; }
         .btn-dark { background: var(--noir-doux); color: white; }
         .btn-dark:hover { background: #333; }
-        .btn-outline { background: transparent; border: 1px solid var(--gris-moyen); color: var(--gris-fonce); }
+        .btn-success { background: var(--vert-succes); color: white; }
+        .btn-success:hover { background: #27ae60; }
+        .btn-outline { background: transparent; border: 1px solid var(--gris-clair); color: var(--gris-fonce); }
         .btn-outline:hover { background: var(--gris-tres-clair); }
-        .btn-success { background: var(--vert); color: white; }
-        .btn-danger { background: var(--rouge); color: white; }
-        .btn-warning { background: var(--orange); color: white; }
         .btn-xs { padding: 4px 8px; font-size: 0.78rem; border-radius: 4px; }
 
-        .tabs { display: flex; gap: 10px; margin-bottom: 5px; flex-wrap: wrap; }
-        .tab-btn { padding: 10px 18px; border-radius: 6px; border: 1px solid var(--gris-clair); background: white; cursor: pointer; font-family: 'Fredoka', sans-serif; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
-        .tab-btn.active { background: var(--noir-doux); color: white; border-color: var(--noir-doux); }
-
-        .main-card { background: var(--blanc); padding: 22px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid var(--gris-tres-clair); margin-bottom: 20px; }
-        .main-card h2 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin-top: 0; font-size: 1.25rem; border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 10px; }
-
-        .form-grid { display: flex; flex-wrap: wrap; gap: 12px; background: #fafafa; padding: 15px; border-radius: 6px; border: 1px dashed var(--gris-clair); margin-bottom: 20px; align-items: flex-end; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 150px; }
-        .form-group label { font-size: 0.82rem; font-weight: 500; }
-        .form-group input, .form-group select, .form-group textarea { padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 0.88rem; font-family: inherit; }
-
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; margin-top: 10px; }
-        th, td { padding: 11px 13px; border-bottom: 1px solid var(--gris-tres-clair); }
-        th { background-color: var(--fond); font-family: 'Fredoka', sans-serif; font-weight: 500; }
-
-        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: bold; text-align: center; }
-        .badge-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        .badge-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-
-        .event-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
-        @media(max-width: 900px) { .event-layout { grid-template-columns: 1fr; } }
-        .event-list { border-right: 1px solid var(--gris-tres-clair); padding-right: 15px; }
-        .event-item { padding: 12px; border: 1px solid var(--gris-clair); border-radius: 6px; margin-bottom: 10px; cursor: pointer; background: white; transition: all 0.2s; }
-        .event-item.active { border-left: 5px solid var(--bleu); background: #f4f9fd; font-weight: 500; }
-        
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .card-sub { background: #fafafa; padding: 15px; border-radius: 6px; border: 1px solid var(--gris-tres-clair); }
-        .card-sub h4 { margin-top: 0; font-family: 'Fredoka'; color: var(--gris-fonce); margin-bottom: 10px; }
-
-        .input-edit { width: 90%; padding: 4px; font-size: 0.88rem; border: 1px solid var(--bleu); border-radius: 4px; }
-
-        /* --- TOAST NOTIFICATIONS SYNC CLOUD --- */
-        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
-        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
-        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
-        .toast.error { background: #471a1a; border-left: 4px solid #e74c3c; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-
-        @media print {
-            body { background: white; padding: 0; color: black; display: block !important; }
-            .no-print, .sidebar, .topbar { display: none !important; }
-            .main-content { padding: 0 !important; overflow: visible !important; }
-            .app-body { display: block !important; margin: 0 !important; padding: 0 !important; }
+        /* --- CARTES ET GRILLES --- */
+        .main-card {
+            background: var(--blanc);
+            border-radius: var(--radius-main);
+            border: 1px solid var(--gris-tres-clair);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            padding: 22px;
         }
+        .card-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--gris-tres-clair);
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .card-header-actions h3 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--noir-doux);
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 200px 1.4fr 100px 1.2fr auto;
+            gap: 12px;
+            background: var(--gris-fond-input);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            border: 1px dashed var(--gris-clair);
+            align-items: flex-end;
+            margin-bottom: 18px;
+        }
+        @media (max-width: 1050px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--gris-fonce); }
+        .form-control {
+            width: 100%;
+            padding: 8px 11px;
+            border: 1.5px solid var(--gris-tres-clair);
+            background: white;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            font-family: 'Roboto', sans-serif;
+            color: var(--gris-fonce);
+            outline: none;
+        }
+        .form-control:focus {
+            border-color: var(--rouge);
+            box-shadow: 0 0 0 3px rgba(196,30,58,0.08);
+        }
+
+        /* FILTRES PAR BADGES */
+        .category-filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+            align-items: center;
+        }
+        .badge-filter {
+            background: var(--gris-tres-clair);
+            color: var(--gris-fonce);
+            border: 1px solid var(--gris-clair);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-filter:hover {
+            border-color: var(--rouge);
+            color: var(--rouge);
+        }
+        .badge-filter.active {
+            background: var(--rouge);
+            color: white;
+            border-color: var(--rouge);
+            font-weight: 600;
+        }
+
+        /* TABLEAU */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--gris-tres-clair);
+        }
+        th {
+            background-color: var(--fond);
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 500;
+            color: var(--noir-doux);
+        }
+        tr:hover { background-color: #fafbfc; }
+
+        .cat-tag {
+            display: inline-block;
+            background: #EBF3FA;
+            color: #2980b9;
+            border: 1px solid #BEE0F7;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .qty-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .qty-badge {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.05rem;
+            font-weight: bold;
+            min-width: 28px;
+            text-align: center;
+            color: var(--noir-doux);
+        }
+
+        /* MODALE GESTION CATÉGORIES */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: white; border-radius: 10px; padding: 24px; max-width: 480px; width: 95%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        }
+        .modal-box h3 {
+            font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0 0 15px 0;
+            border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 8px;
+        }
+        .cat-list-edit {
+            max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin: 12px 0;
+        }
+        .cat-item-row {
+            display: flex; justify-content: space-between; align-items: center; background: #fafafa;
+            padding: 6px 10px; border-radius: 4px; border: 1px solid var(--gris-tres-clair);
+        }
+
+        /* TOAST */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 8px; font-size: 0.88rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid var(--vert-succes); }
+        .toast.error { background: #78281f; border-left: 4px solid var(--rouge); }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
     <div class="toast-container" id="toastContainer"></div>
-
-    <!-- ===== SIDEBAR DYNAMIQUE ===== -->
     <div class="sidebar"></div>
 
-    <!-- ===== MAIN CONTENT ===== -->
     <div class="main-content">
-        <div class="topbar no-print">
-            <div class="page-title-area">
-                <h2>📦 Logistique, Événements & Matériel</h2>
-                <p>Planification des bénévoles et inventaire global des équipements du dojo</p>
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="topbar-title-block">
+                <h2>Inventaire & Équipements du Dojo</h2>
+                <p>Recensement exhaustif du matériel, des quantités et des lieux de stockage</p>
             </div>
-            <div>
-                <a href="../index.html" class="btn btn-dark">🏠 Central</a>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="btn btn-outline" onclick="loadData()">🔄 Recharger</button>
+                <button class="btn btn-primary" onclick="imprimerInventaire()">🖨️ Imprimer l'Inventaire (A4)</button>
+                <a href="../index.html" class="btn btn-dark">🏠 Bureau Central</a>
             </div>
         </div>
 
         <div class="app-body">
             
-            <div class="tabs no-print">
-                <button class="tab-btn active" id="btn-tab-events" onclick="switchTab('events')">📅 1. Planificateur d'Événements & Bénévoles</button>
-                <button class="tab-btn" id="btn-tab-inventaire" onclick="switchTab('inventaire')">📦 2. Inventaire du Matériel</button>
-                <button class="tab-btn" id="btn-tab-prets" onclick="switchTab('prets')">🤝 3. Prêts de Matériel</button>
-            </div>
-
-            <!-- ================= MODULE 1 : ÉVÉNEMENTS & BÉNÉVOLES ================= -->
-            <div id="pane-events" class="main-card tab-pane">
-                <div class="event-layout">
-                    <div class="event-list">
-                        <h3>Créer un Événement</h3>
-                        <div style="background: #fafafa; padding: 12px; border-radius:6px; border:1px dashed var(--gris-clair); margin-bottom:15px;">
-                            <div class="form-group" style="margin-bottom:10px;"><label>Nom</label><input type="text" id="ev-name" placeholder="Ex: Olympiades 2026"></div>
-                            <div class="form-group" style="margin-bottom:10px;"><label>Date</label><input type="date" id="ev-date"></div>
-                            <button class="btn btn-dark" style="width:100%; justify-content:center;" onclick="addEvent()">➕ Créer</button>
-                        </div>
-                        <h3>Événements</h3>
-                        <div id="active-events-list"></div>
-                    </div>
-
+            <div class="main-card">
+                <div class="card-header-actions">
                     <div>
-                        <div id="event-details-blank" style="text-align:center; color:var(--gris-moyen); padding:40px;">
-                             Sélectionnez ou créez un événement à gauche pour planifier les bénévoles et les horaires.
-                        </div>
-                        
-                        <div id="event-details-zone" style="display:none;">
-                            <h2 id="current-event-title" style="border:none; padding:0; margin-bottom:5px;">-</h2>
-                            <p id="current-event-date" style="color:var(--gris-moyen); margin-top:0; margin-bottom:20px;">-</p>
-
-                            <div class="grid-3 no-print">
-                                <!-- AJOUTER POSTE -->
-                                <div class="card-sub">
-                                    <h4>🛠️ 1. Ajouter un Poste / Tâche</h4>
-                                    <div class="form-group" style="margin-bottom:8px;"><input type="text" id="p-name" placeholder="Ex: Buvette, Installation..."></div>
-                                    <div class="form-group" style="margin-bottom:8px;"><input type="number" id="p-besoin" placeholder="Nb bénévoles requis" min="1"></div>
-                                    <button class="btn btn-dark btn-xs" style="width:100%;" onclick="addPoste()">Ajouter le poste</button>
-                                </div>
-                                <!-- AFFECTER BÉNÉVOLE -->
-                                <div class="card-sub">
-                                    <h4>🙋‍♂️ 2. Assigner un Bénévole</h4>
-                                    <div class="form-group" style="margin-bottom:8px;">
-                                        <label>Poste cible</label>
-                                        <select id="p-select-assign"></select>
-                                    </div>
-                                    <div class="form-group" style="margin-bottom:8px;"><input type="text" id="p-ben-name" placeholder="Nom du bénévole"></div>
-                                    <div class="form-group" style="margin-bottom:8px;"><input type="text" id="p-ben-creneau" placeholder="Créneau (Ex: 14h-16h)"></div>
-                                    <button class="btn btn-success btn-xs" style="width:100%;" onclick="assignBenevole()">Assigner</button>
-                                </div>
-                                <!-- PLANNING HORAIRE -->
-                                <div class="card-sub">
-                                    <h4>⏱️ 3. Ligne de Planning Horaire</h4>
-                                    <div class="form-group" style="margin-bottom:8px;"><input type="text" id="h-time" placeholder="Heure (Ex: 08:30)"></div>
-                                    <div class="form-group" style="margin-bottom:8px;"><input type="text" id="h-action" placeholder="Action (Ex: Café / Briefing)"></div>
-                                    <button class="btn btn-dark btn-xs" style="width:100%;" onclick="addHoraireLigne()">Ajouter au fil de la journée</button>
-                                </div>
-                            </div>
-
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                                <div>
-                                    <h3>📋 Répartition des Bénévoles</h3>
-                                    <div id="postes-render-zone"></div>
-                                </div>
-                                <div>
-                                    <h3>⏱️ Déroulement Chronologique</h3>
-                                    <table>
-                                        <thead><tr><th>Heure</th><th>Action / Étape</th><th class="no-print">Action</th></tr></thead>
-                                        <tbody id="table-horaires-body"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                        <h3>📦 Registre Général du Matériel</h3>
+                        <span style="font-size:0.8rem; color:var(--gris-moyen);">Mise à jour en temps réel avec synchronisation locale et cloud</span>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-secondary btn-xs" onclick="ouvrirModalCategories()">⚙️ Gérer les Catégories</button>
                     </div>
                 </div>
-            </div>
 
-            <!-- ================= MODULE 2 : INVENTAIRE DU MATÉRIEL ================= -->
-            <div id="pane-inventaire" class="main-card tab-pane" style="display:none;">
-                <h2>Inventaire Général du Matériel Éducatif & Sportif</h2>
-                <div class="form-grid no-print">
+                <!-- FORMULAIRE D'AJOUT -->
+                <div class="form-grid">
                     <div class="form-group">
                         <label>Catégorie</label>
-                        <select id="inv-cat">
-                            <option value="Tatami">🥋 Tatamis</option>
-                            <option value="Pédagogique">🎈 Pédagogique (Cerceaux, Ballons...)</option>
-                            <option value="Agrès / Gym">🤸‍♂️ Agrès & Matelas</option>
-                            <option value="Buvette / Fête">🍻 Buvette & Réception</option>
-                            <option value="Autre">📦 Autre matériel</option>
-                        </select>
+                        <select id="item-cat" class="form-control"></select>
                     </div>
-                    <div class="form-group"><label>Nom de l'équipement</label><input type="text" id="inv-name" placeholder="Ex: Cerceaux plats multicolores"></div>
-                    <div class="form-group"><label>Quantité Totale</label><input type="number" id="inv-qty" min="0" value="1"></div>
-                    <div class="form-group"><label>Lieu de Stockage / État</label><input type="text" id="inv-lieu" placeholder="Ex: Placard Dojo / Bon état"></div>
-                    <button class="btn btn-dark" onclick="addInventaireItem()">💾 Enregistrer</button>
+                    <div class="form-group">
+                        <label>Désignation de l'article / équipement</label>
+                        <input type="text" id="item-name" class="form-control" placeholder="Ex: Tatamis 1x2m, Plots, Cerceaux...">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantité</label>
+                        <input type="number" id="item-qty" class="form-control" value="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Lieu d'entreposage / Remarques</label>
+                        <input type="text" id="item-lieu" class="form-control" placeholder="Ex: Placard n°2, Réserve fond, Tatami...">
+                    </div>
+                    <button class="btn btn-dark" style="height:36px;" onclick="ajouterArticle()">➕ Ajouter</button>
                 </div>
 
-                <div style="margin-bottom: 15px; display:flex; gap:10px;" class="no-print">
-                    <button class="btn btn-outline btn-xs" onclick="filterInventaire('Tous')">Tout afficher</button>
-                    <button class="btn btn-outline btn-xs" onclick="filterInventaire('Tatami')">🥋 Tatamis</button>
-                    <button class="btn btn-outline btn-xs" onclick="filterInventaire('Pédagogique')">🎈 Pédagogique</button>
-                    <button class="btn btn-outline btn-xs" onclick="filterInventaire('Agrès / Gym')">🤸‍♂️ Agrès</button>
-                    <button class="btn btn-outline btn-xs" onclick="filterInventaire('Buvette / Fête')">🍻 Buvette</button>
-                </div>
+                <!-- FILTRES PAR CATÉGORIES -->
+                <div class="category-filter-bar" id="categoryFilterBar"></div>
 
-                <table style="margin-top:20px;">
-                    <thead>
-                        <tr><th>Catégorie</th><th>Nom du Matériel</th><th>Quantité</th><th>Stockage / État</th><th style="text-align:center;" class="no-print">Actions</th></tr>
-                    </thead>
-                    <tbody id="table-inventaire-body"></tbody>
-                </table>
-            </div>
-
-            <!-- ================= MODULE 3 : SUIVI DES PRÊTS ================= -->
-            <div id="pane-prets" class="main-card tab-pane" style="display:none;">
-                <h2>🤝 Registre & Suivi des Prêts de Matériel</h2>
-                
-                <!-- Formulaire d'enregistrement -->
-                <div class="form-grid no-print">
-                    <div class="form-group">
-                        <label>Emprunteur (Asso / Personne)</label>
-                        <input type="text" id="loan-borrower" placeholder="Ex: Comité des Fêtes, Teamgazzz58...">
-                    </div>
-                    <div class="form-group">
-                        <label>Matériel prêté</label>
-                        <input type="text" id="loan-item" placeholder="Ex: 50 Gobelets, 3 Pichets, Panneau...">
-                    </div>
-                    <div class="form-group">
-                        <label>Date du prêt / Événement</label>
-                        <input type="date" id="loan-date">
-                    </div>
-                    <div class="form-group">
-                        <label>Date de Retour Prévue</label>
-                        <input type="date" id="loan-return-date">
-                    </div>
-                    <div class="form-group">
-                        <label>Remarques / Contexte</label>
-                        <input type="text" id="loan-notes" placeholder="Ex: Pour le jambon à la broche">
-                    </div>
-                    <button class="btn btn-dark" onclick="addLoanItem()">💾 Enregistrer le prêt</button>
-                </div>
-
-                <!-- Filtres et Barre de recherche globale -->
-                <div style="background: #fafafa; padding: 15px; border-radius: 6px; border: 1px solid var(--gris-tres-clair); margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;" class="no-print">
-                    <div style="flex: 1; min-width: 250px;" class="form-group">
-                        <label style="margin-bottom: 2px;">🔍 Rechercher par <b>Association / Emprunteur</b> ou par <b>Matériel</b> :</label>
-                        <input type="text" id="loan-search" oninput="renderLoansTable()" placeholder="Tapez un nom d'asso, un mot clé (gobelet, panneau...)...">
-                    </div>
-                    <div class="form-group" style="flex: 0; min-width: 180px;">
-                        <label style="margin-bottom: 2px;">Filtrer par état :</label>
-                        <select id="loan-filter-status" onchange="renderLoansTable()">
-                            <option value="Tous">Tous les prêts (Historique complet)</option>
-                            <option value="En cours">🗓️ Prêts en cours uniquement</option>
-                            <option value="Restitué">✅ Prêts rendus uniquement</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Tableau des prêts -->
-                <table style="margin-top:10px;">
+                <!-- TABLEAU PRINCIPAL -->
+                <table>
                     <thead>
                         <tr>
-                            <th>Emprunteur</th>
-                            <th>Matériel mis à disposition</th>
-                            <th>Date Prêt / Événement</th>
-                            <th>Retour prévu</th>
-                            <th>Statut</th>
-                            <th>Remarques</th>
-                            <th style="text-align:center;" class="no-print">Actions</th>
+                            <th style="width: 140px;">Catégorie</th>
+                            <th>Désignation de l'Équipement</th>
+                            <th style="width: 140px; text-align:center;">Quantité</th>
+                            <th>Lieu d'entreposage / Observations</th>
+                            <th style="width: 110px; text-align:center;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="table-loans-body"></tbody>
+                    <tbody id="inventory-tbody"></tbody>
                 </table>
             </div>
 
         </div>
     </div>
 
-    <script type="text/javascript">
-        let logistiqueDB = {
-            events: [],
-            inventaire: [],
-            prets: [],
-            currentEventId: null
-        };
-
-        let editingItemId = null; 
-        let currentFilterTab = 'Tous';
-
-        // --- CONFIGURATION CLOUD NETWORK ---
-        const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-        const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-        const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-        const SUPABASE_TABLE = 'logistique';
-        
-        function showToast(message, type = "success") {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerText = message;
-            container.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 3500);
-        }
-
-        async function syncToSupabase(silent = false) {
-            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
-            try {
-                localStorage.setItem('dojo_logistique_backup', JSON.stringify(logistiqueDB)); 
-                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: logistiqueDB });
-                if (error) throw error;
-                
-                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
-            } catch (err) {
-                console.error("Erreur Supabase:", err);
-                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
-            }
-        }
-
-        async function loadData() {
-            const saved = localStorage.getItem('dojo_logistique_backup');
-            if (saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    if (data && (data.events || data.inventaire || data.prets)) {
-                        logistiqueDB = data;
-                        if(!logistiqueDB.prets) logistiqueDB.prets = [];
-                    }
-                    finalizeInitialization();
-                } catch(e) {}
-            } else {
-                useFallbackLocalData();
-                finalizeInitialization();
-            }
+    <!-- MODALE GESTION DES CATÉGORIES -->
+    <div class="modal-overlay" id="modalCategories">
+        <div class="modal-box">
+            <h3>📂 Gestion des Catégories</h3>
             
-            try {
-                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
-                if (error) throw error;
-                if (result && result.data) {
-                    logistiqueDB = result.data;
-                    if(!logistiqueDB.prets) logistiqueDB.prets = [];
-                    localStorage.setItem('dojo_logistique_backup', JSON.stringify(logistiqueDB));
-                    finalizeInitialization();
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="new-cat-input" class="form-control" placeholder="Ex: Matériel Médical, Trophées...">
+                <button class="btn btn-primary btn-sm" onclick="ajouterNouvelleCategorie()">Ajouter</button>
+            </div>
+
+            <div class="cat-list-edit" id="modal-cat-list"></div>
+
+            <div style="display:flex; justify-content:flex-end; margin-top:15px;">
+                <button class="btn btn-secondary btn-sm" onclick="fermerModalCategories()">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // ==========================================
+    // DONNÉES & SUPABASE
+    // ==========================================
+    const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+    const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+    const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+    const SUPABASE_TABLE = 'logistique';
+
+    let inventaireDB = {
+        categories: [
+            "🥋 Tatamis & Surfaces",
+            "🎈 Pédagogique & Éveil",
+            "🤸‍♂️ Agrès & Matelas",
+            "🍻 Buvette & Réception",
+            "🏷️ Équipements Divers"
+        ],
+        articles: [
+            { id: 1, cat: "🥋 Tatamis & Surfaces", name: "Tatamis zone principale (1x2m)", qty: 50, lieu: "Sur le praticable - Bon état" },
+            { id: 2, cat: "🥋 Tatamis & Surfaces", name: "Tatamis de rechange", qty: 12, lieu: "Réserve fond de salle" },
+            { id: 3, cat: "🎈 Pédagogique & Éveil", name: "Cerceaux PVC colorés plats", qty: 20, lieu: "Grand placard matériel" },
+            { id: 4, cat: "🎈 Pédagogique & Éveil", name: "Ballons mousse légers", qty: 15, lieu: "Bac plastique étagère droite" },
+            { id: 5, cat: "🤸‍♂️ Agrès & Matelas", name: "Gros tapis de réception / chute", qty: 2, lieu: "Contre le mur du fond" }
+        ]
+    };
+
+    let categorieActive = "Toutes";
+    let editingArticleId = null;
+
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+    }
+
+    // --- SYNCHRONISATION ---
+    async function syncData(silent = false) {
+        localStorage.setItem('dojo_inventaire_data', JSON.stringify(inventaireDB));
+        try {
+            const { data } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+            let fullData = (data && data.data) ? data.data : {};
+            fullData.inventaire = inventaireDB.articles;
+            fullData.inventaireCategories = inventaireDB.categories;
+            await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: fullData });
+            if (!silent) showToast("✓ Inventaire synchronisé sur Supabase !");
+        } catch(e) {
+            console.warn("Erreur Supabase inventaire, maintien en local", e);
+            if (!silent) showToast("✓ Données sauvegardées en local");
+        }
+    }
+
+    async function loadData() {
+        const local = localStorage.getItem('dojo_inventaire_data');
+        if (local) {
+            try { inventaireDB = JSON.parse(local); } catch(e) {}
+        }
+
+        try {
+            const { data: result } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+            if (result && result.data) {
+                if (result.data.inventaire && Array.isArray(result.data.inventaire)) {
+                    inventaireDB.articles = result.data.inventaire;
                 }
-            } catch(e) {
-                console.error("Erreur chargement Supabase:", e);
-            }
-        }
-
-        function useFallbackLocalData() {
-            const local = localStorage.getItem('dojo_logistique_backup');
-            if (local) {
-                logistiqueDB = JSON.parse(local);
-                if(!logistiqueDB.prets) logistiqueDB.prets = [];
-            } else {
-                logistiqueDB.inventaire = [
-                    { id: 1, cat: "Tatami", name: "Tatamis installés (Zone principale)", qty: 50, lieu: "Sur le praticable - Bon état" },
-                    { id: 2, cat: "Tatami", name: "Tatamis de rechange / stockage", qty: 12, lieu: "Réserve fond de salle" },
-                    { id: 3, cat: "Pédagogique", name: "Cerceaux PVC colorés", qty: 20, lieu: "Placard matériel - Neufs" },
-                    { id: 4, cat: "Pédagogique", name: "Ballons mousse (Taïso/Enfants)", qty: 15, lieu: "Grand bac plastique" },
-                    { id: 5, cat: "Agrès / Gym", name: "Gros matelas de chute", qty: 2, lieu: "Contre le mur droite" }
-                ];
-                logistiqueDB.events = [
-                    { id: 101, name: "Olympiades d'été & Barbecue", date: "2026-06-13", postes: [{id:1, name:"Barbecue / Cuisson", besoin:2, bens:[{name:"Jordan", creneau:"11h30-14h"}]},{id:2, name:"Buvette", besoin:3, bens:[]}], horaires: [{id:1, time:"09:00", action:"Installation des tables & barnums"},{id:2, time:"12:00", action:"Début de l'événement / Apéritif"}] }
-                ];
-                logistiqueDB.prets = [
-                    { id: 1, borrower: "Teamgazzz58", item: "1 Panneau d'affichage", date: "2026-07-04", returnDate: "2026-07-06", status: "En cours", notes: "Pour la fête de la moto" },
-                    { id: 2, borrower: "Comité des fêtes de Toury Lurcy", item: "Gobelets et pichets (nombres à déterminer)", date: "2026-09-05", returnDate: "2026-09-07", status: "En cours", notes: "Pour le jambon à la broche" }
-                ];
-                localStorage.setItem('dojo_logistique_backup', JSON.stringify(logistiqueDB));
-            }
-        }
-
-        function finalizeInitialization() {
-            renderEventsList();
-            renderInventaireTable(currentFilterTab);
-            renderLoansTable();
-        }
-
-        // ================= SCRIPT INVENTAIRE =================
-        function addInventaireItem() {
-            const cat = document.getElementById('inv-cat').value;
-            const name = document.getElementById('inv-name').value.trim();
-            const qty = parseInt(document.getElementById('inv-qty').value) || 0;
-            const lieu = document.getElementById('inv-lieu').value.trim() || "Dojo";
-
-            if(!name || qty < 0) { alert("Saisie invalide"); return; }
-
-            logistiqueDB.inventaire.push({ id: Date.now(), cat, name, qty, lieu });
-            syncToSupabase();
-            renderInventaireTable(currentFilterTab);
-            document.getElementById('inv-name').value = '';
-            document.getElementById('inv-qty').value = '1';
-            document.getElementById('inv-lieu').value = '';
-        }
-
-        function updateQty(id, delta) {
-            const item = logistiqueDB.inventaire.find(i => i.id === id);
-            if(item) {
-                item.qty = Math.max(0, item.qty + delta);
-                syncToSupabase();
-                renderInventaireTable(currentFilterTab);
-            }
-        }
-
-        function deleteInvItem(id) {
-            if(confirm("Supprimer cet élément de l'inventaire ?")) {
-                logistiqueDB.inventaire = logistiqueDB.inventaire.filter(i => i.id !== id);
-                syncToSupabase();
-                renderInventaireTable(currentFilterTab);
-            }
-        }
-
-        function startEditItem(id) {
-            editingItemId = id;
-            renderInventaireTable(currentFilterTab);
-        }
-
-        function saveEditItem(id) {
-            const item = logistiqueDB.inventaire.find(i => i.id === id);
-            if(item) {
-                const newName = document.getElementById(`edit-name-${id}`).value.trim();
-                const newQty = parseInt(document.getElementById(`edit-qty-${id}`).value) || 0;
-                const newLieu = document.getElementById(`edit-lieu-${id}`).value.trim();
-                const newCat = document.getElementById(`edit-cat-${id}`).value;
-
-                if(!newName) { alert("Le nom ne peut pas être vide"); return; }
-
-                item.name = newName;
-                item.qty = newQty;
-                item.lieu = newLieu;
-                item.cat = newCat;
-
-                syncToSupabase();
-                editingItemId = null;
-                renderInventaireTable(currentFilterTab);
-            }
-        }
-
-        function cancelEditItem() {
-            editingItemId = null;
-            renderInventaireTable(currentFilterTab);
-        }
-
-        function renderInventaireTable(filter) {
-            currentFilterTab = filter;
-            const tbody = document.getElementById('table-inventaire-body');
-            tbody.innerHTML = '';
-            
-            logistiqueDB.inventaire.forEach(item => {
-                if(filter !== 'Tous' && item.cat !== filter) return;
-
-                const tr = document.createElement('tr');
-                
-                if (editingItemId === item.id) {
-                    tr.style.backgroundColor = "#eef7ff";
-                    tr.innerHTML = `
-                        <td>
-                            <select id="edit-cat-${item.id}" style="padding:4px; font-size:0.85rem;">
-                                <option value="Tatami" ${item.cat === 'Tatami' ? 'selected' : ''}>Tatami</option>
-                                <option value="Pédagogique" ${item.cat === 'Pédagogique' ? 'selected' : ''}>Pédagogique</option>
-                                <option value="Agrès / Gym" ${item.cat === 'Agrès / Gym' ? 'selected' : ''}>Agrès / Gym</option>
-                                <option value="Buvette / Fête" ${item.cat === 'Buvette / Fête' ? 'selected' : ''}>Buvette / Fête</option>
-                                <option value="Autre" ${item.cat === 'Autre' ? 'selected' : ''}>Autre</option>
-                            </select>
-                        </td>
-                        <td><input type="text" id="edit-name-${item.id}" class="input-edit" value="${item.name}"></td>
-                        <td><input type="number" id="edit-qty-${item.id}" class="input-edit" style="width:60px;" value="${item.qty}" min="0"></td>
-                        <td><input type="text" id="edit-lieu-${item.id}" class="input-edit" value="${item.lieu}"></td>
-                        <td style="text-align:center; display:flex; gap:5px; justify-content:center; align-items:center;" class="no-print">
-                            <button class="btn btn-success btn-xs" onclick="saveEditItem(${item.id})">✅</button>
-                            <button class="btn btn-outline btn-xs" onclick="cancelEditItem()">❌</button>
-                        </td>
-                    `;
-                } else {
-                    tr.innerHTML = `
-                        <td><small><b>${item.cat}</b></small></td>
-                        <td><b>${item.name}</b></td>
-                        <td>
-                            <button class="btn btn-outline btn-xs no-print" style="padding: 2px 6px;" onclick="updateQty(${item.id}, -1)">-</button>
-                            <span style="font-weight:bold; margin: 0 8px; font-size:1.05rem;">${item.qty}</span>
-                            <button class="btn btn-outline btn-xs no-print" style="padding: 2px 6px;" onclick="updateQty(${item.id}, 1)">+</button>
-                        </td>
-                        <td><span style="color: gray;">${item.lieu}</span></td>
-                        <td style="text-align:center;" class="no-print">
-                            <button class="btn btn-outline btn-xs" title="Modifier la ligne" onclick="startEditItem(${item.id})">✏️</button>
-                            <button class="btn btn-danger btn-xs" title="Supprimer" onclick="deleteInvItem(${item.id})">❌</button>
-                        </td>
-                    `;
+                if (result.data.inventaireCategories && Array.isArray(result.data.inventaireCategories)) {
+                    inventaireDB.categories = result.data.inventaireCategories;
                 }
-                tbody.appendChild(tr);
-            });
-        }
-
-        function filterInventaire(cat) { renderInventaireTable(cat); }
-
-        // ================= SCRIPT PLANIFICATEUR =================
-        function addEvent() {
-            const name = document.getElementById('ev-name').value.trim();
-            const date = document.getElementById('ev-date').value || new Date().toISOString().split('T')[0];
-            if(!name) return;
-
-            const newEv = { id: Date.now(), name, date, postes: [], horaires: [] };
-            logistiqueDB.events.push(newEv);
-            syncToSupabase();
-            renderEventsList();
-            selectEvent(newEv.id);
-            document.getElementById('ev-name').value = '';
-        }
-
-        function renderEventsList() {
-            const div = document.getElementById('active-events-list');
-            div.innerHTML = '';
-            logistiqueDB.events.forEach(ev => {
-                const item = document.createElement('div');
-                item.className = `event-item ${logistiqueDB.currentEventId === ev.id ? 'active' : ''}`;
-                item.onclick = () => selectEvent(ev.id);
-                item.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span><b>${ev.name}</b><br><small style="color:gray;">📅 ${ev.date}</small></span>
-                        <button class="btn btn-danger btn-xs no-print" style="padding:2px 5px;" onclick="event.stopPropagation(); deleteEvent(${ev.id})">❌</button>
-                    </div>
-                `;
-                div.appendChild(item);
-            });
-        }
-
-        function deleteEvent(id) {
-            if(confirm("Supprimer cet événement et tout son planning ?")) {
-                logistiqueDB.events = logistiqueDB.events.filter(e => e.id !== id);
-                if(logistiqueDB.currentEventId === id) logistiqueDB.currentEventId = null;
-                syncToSupabase();
-                renderEventsList();
-                showCurrentEventDetails();
+                localStorage.setItem('dojo_inventaire_data', JSON.stringify(inventaireDB));
             }
+        } catch(e) {
+            console.warn("Chargement Supabase indisponible, utilisation du cache.");
         }
 
-        function selectEvent(id) {
-            logistiqueDB.currentEventId = id;
-            renderEventsList();
-            showCurrentEventDetails();
+        if (!inventaireDB.categories || inventaireDB.categories.length === 0) {
+            inventaireDB.categories = ["🥋 Tatamis & Surfaces", "🎈 Pédagogique & Éveil", "🤸‍♂️ Agrès & Matelas", "🍻 Buvette & Réception", "🏷️ Équipements Divers"];
+        }
+        if (!inventaireDB.articles) inventaireDB.articles = [];
+
+        reconstruireInterface();
+    }
+
+    function reconstruireInterface() {
+        majSelectCategories();
+        majFiltresBadges();
+        majTableauInventaire();
+    }
+
+    // --- GESTION DES CATÉGORIES ---
+    function majSelectCategories() {
+        const select = document.getElementById('item-cat');
+        select.innerHTML = '';
+        inventaireDB.categories.forEach(cat => {
+            select.innerHTML += `<option value="${cat}">${cat}</option>`;
+        });
+    }
+
+    function majFiltresBadges() {
+        const container = document.getElementById('categoryFilterBar');
+        container.innerHTML = `<span class="badge-filter ${categorieActive === 'Toutes' ? 'active' : ''}" onclick="filtrerParCategorie('Toutes')">Toutes (${inventaireDB.articles.length})</span>`;
+
+        inventaireDB.categories.forEach(cat => {
+            const nb = inventaireDB.articles.filter(a => a.cat === cat).length;
+            container.innerHTML += `
+                <span class="badge-filter ${categorieActive === cat ? 'active' : ''}" onclick="filtrerParCategorie('${cat.replace(/'/g, "\\'")}')">
+                    ${cat} (${nb})
+                </span>
+            `;
+        });
+    }
+
+    function filtrerParCategorie(cat) {
+        categorieActive = cat;
+        majFiltresBadges();
+        majTableauInventaire();
+    }
+
+    function ouvrirModalCategories() {
+        const list = document.getElementById('modal-cat-list');
+        list.innerHTML = '';
+        inventaireDB.categories.forEach((cat, idx) => {
+            list.innerHTML += `
+                <div class="cat-item-row">
+                    <span style="font-weight:600;">${cat}</span>
+                    <button class="btn btn-outline btn-xs" style="color:var(--rouge);" onclick="supprimerCategorie(${idx})">🗑️</button>
+                </div>
+            `;
+        });
+        document.getElementById('modalCategories').classList.add('open');
+    }
+
+    function fermerModalCategories() {
+        document.getElementById('modalCategories').classList.remove('open');
+        majSelectCategories();
+        majFiltresBadges();
+    }
+
+    function ajouterNouvelleCategorie() {
+        const input = document.getElementById('new-cat-input');
+        const val = input.value.trim();
+        if (!val) return;
+        if (inventaireDB.categories.includes(val)) return alert("Cette catégorie existe déjà.");
+
+        inventaireDB.categories.push(val);
+        input.value = '';
+        syncData(true);
+        ouvrirModalCategories();
+        showToast("✓ Catégorie ajoutée !");
+    }
+
+    function supprimerCategorie(idx) {
+        const catName = inventaireDB.categories[idx];
+        const count = inventaireDB.articles.filter(a => a.cat === catName).length;
+        if (count > 0 && !confirm(`Cette catégorie contient ${count} article(s). Continuer la suppression ?`)) {
+            return;
+        }
+        inventaireDB.categories.splice(idx, 1);
+        if (categorieActive === catName) categorieActive = "Toutes";
+        syncData(true);
+        ouvrirModalCategories();
+        reconstruireInterface();
+    }
+
+    // --- GESTION DES ARTICLES ---
+    function ajouterArticle() {
+        const cat = document.getElementById('item-cat').value;
+        const name = document.getElementById('item-name').value.trim();
+        const qty = parseInt(document.getElementById('item-qty').value, 10);
+        const lieu = document.getElementById('item-lieu').value.trim() || "Dojo";
+
+        if (!name || isNaN(qty) || qty < 0) {
+            alert("Veuillez renseigner un nom valide et une quantité positive.");
+            return;
         }
 
-        function showCurrentEventDetails() {
-            const blank = document.getElementById('event-details-blank');
-            const zone = document.getElementById('event-details-zone');
-            
-            if(!logistiqueDB.currentEventId) {
-                blank.style.display = 'block'; zone.style.display = 'none'; return;
-            }
-            
-            blank.style.display = 'none'; zone.style.display = 'block';
-            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
-            
-            document.getElementById('current-event-title').innerText = "🏆 Gestion de : " + ev.name;
-            document.getElementById('current-event-date').innerText = "📆 Date prévue : " + ev.date;
+        inventaireDB.articles.push({
+            id: Date.now(),
+            cat,
+            name,
+            qty,
+            lieu
+        });
 
-            const select = document.getElementById('p-select-assign');
-            select.innerHTML = '';
-            ev.postes.forEach(p => {
-                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-            });
+        document.getElementById('item-name').value = '';
+        document.getElementById('item-qty').value = '1';
+        document.getElementById('item-lieu').value = '';
 
-            renderPostesEtBenevoles(ev);
-            renderHorairesList(ev);
+        syncData();
+        reconstruireInterface();
+    }
+
+    function modifierQuantite(id, delta) {
+        const item = inventaireDB.articles.find(a => a.id === id);
+        if (item) {
+            item.qty = Math.max(0, item.qty + delta);
+            syncData(true);
+            majTableauInventaire();
+        }
+    }
+
+    function supprimerArticle(id) {
+        if (confirm("Supprimer cet article de l'inventaire ?")) {
+            inventaireDB.articles = inventaireDB.articles.filter(a => a.id !== id);
+            syncData();
+            reconstruireInterface();
+        }
+    }
+
+    function activerEditionLigne(id) {
+        editingArticleId = id;
+        majTableauInventaire();
+    }
+
+    function enregistrerEditionLigne(id) {
+        const item = inventaireDB.articles.find(a => a.id === id);
+        if (item) {
+            const newName = document.getElementById(`edit-name-${id}`).value.trim();
+            const newCat = document.getElementById(`edit-cat-${id}`).value;
+            const newQty = parseInt(document.getElementById(`edit-qty-${id}`).value, 10) || 0;
+            const newLieu = document.getElementById(`edit-lieu-${id}`).value.trim();
+
+            if (!newName) return alert("Le nom ne peut pas être vide.");
+
+            item.name = newName;
+            item.cat = newCat;
+            item.qty = newQty;
+            item.lieu = newLieu;
+
+            editingArticleId = null;
+            syncData();
+            reconstruireInterface();
+        }
+    }
+
+    function annulerEditionLigne() {
+        editingArticleId = null;
+        majTableauInventaire();
+    }
+
+    function majTableauInventaire() {
+        const tbody = document.getElementById('inventory-tbody');
+        tbody.innerHTML = '';
+
+        const listeFiltree = inventaireDB.articles.filter(item => {
+            return categorieActive === 'Toutes' || item.cat === categorieActive;
+        });
+
+        if (listeFiltree.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:25px; color:var(--gris-moyen);">Aucun article répertorié dans cette section.</td></tr>`;
+            return;
         }
 
-        function addPoste() {
-            const name = document.getElementById('p-name').value.trim();
-            const besoin = parseInt(document.getElementById('p-besoin').value) || 1;
-            if(!name) return;
+        listeFiltree.forEach(item => {
+            const tr = document.createElement('tr');
 
-            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
-            ev.postes.push({ id: Date.now(), name, besoin, bens: [] });
-            syncToSupabase();
-            showCurrentEventDetails();
-            document.getElementById('p-name').value = '';
-            document.getElementById('p-besoin').value = '';
-        }
+            if (editingArticleId === item.id) {
+                // Mode Édition en ligne
+                let optionsCat = '';
+                inventaireDB.categories.forEach(c => {
+                    optionsCat += `<option value="${c}" ${item.cat === c ? 'selected' : ''}>${c}</option>`;
+                });
 
-        function assignBenevole() {
-            const posteId = parseInt(document.getElementById('p-select-assign').value);
-            const name = document.getElementById('p-ben-name').value.trim();
-            const creneau = document.getElementById('p-ben-creneau').value.trim() || "Toute la journée";
-            if(!name || !posteId) return;
-
-            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
-            const poste = ev.postes.find(p => p.id === posteId);
-            poste.bens.push({ name, creneau });
-            syncToSupabase();
-            showCurrentEventDetails();
-            document.getElementById('p-ben-name').value = '';
-            document.getElementById('p-ben-creneau').value = '';
-        }
-
-        function removeBenevole(posteId, index) {
-            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
-            const poste = ev.postes.find(p => p.id === posteId);
-            poste.bens.splice(index, 1);
-            syncToSupabase();
-            showCurrentEventDetails();
-        }
-
-        function removePoste(posteId) {
-            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
-            ev.postes = ev.postes.filter(p => p.id !== posteId);
-            syncToSupabase();
-            showCurrentEventDetails();
-        }
-
-        function renderPostesEtBenevoles(ev) {
-            const container = document.getElementById('postes-render-zone');
-            container.innerHTML = '';
-
-            if(ev.postes.length === 0) {
-                container.innerHTML = `<p style="color:gray; font-size:0.85rem;">Aucun poste créé pour le moment.</p>`;
-                return;
-            }
-
-            ev.postes.forEach(p => {
-                const box = document.createElement('div');
-                box.style = "background:#fff; border:1px solid var(--gris-clair); padding:12px; border-radius:6px; margin-bottom:10px;";
-                box.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:8px;">
-                        <strong>🛠️ ${p.name} <span style="color:var(--gris-moyen); font-weight:normal;">(${p.bens.length}/${p.besoin} bénévole(s))</span></strong>
-                        <button class="btn btn-danger btn-xs no-print" style="padding:1px 4px; font-size:0.75rem;" onclick="removePoste(${p.id})">Supprimer poste</button>
-                    </div>
-                    <ul style="margin:0; padding-left:20px; font-size:0.85rem;">
-                        ${p.bens.map((b, idx) => `
-                            <li style="margin-bottom:4px;">
-                                <b>${b.name}</b> <span style="color:gray;">(${b.creneau})</span>
-                                <a href="#" class="no-print" style="color:var(--rouge); margin-left:8px; text-decoration:none;" onclick="removeBenevole(${p.id}, ${idx})">❌</a>
-                            </li>
-                        `).join('')}
-                        ${p.bens.length === 0 ? '<li style="color:gray; list-style:none; margin-left:-20px;">⚠️ Aucun volontaire affecté</li>' : ''}
-                    </ul>
-                `;
-                container.appendChild(box);
-            });
-        }
-
-        function addHoraireLigne() {
-            const time = document.getElementById('h-time').value.trim();
-            const action = document.getElementById('h-action').value.trim();
-            if(!time || !action) return;
-
-            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
-            ev.horaires.push({ id: Date.now(), time, action });
-            ev.horaires.sort((a,b) => a.time.localeCompare(b.time));
-            syncToSupabase();
-            showCurrentEventDetails();
-            document.getElementById('h-time').value = '';
-            document.getElementById('h-action').value = '';
-        }
-
-        function removeHoraireLigne(hId) {
-            const ev = logistiqueDB.events.find(e => e.id === logistiqueDB.currentEventId);
-            ev.horaires = ev.horaires.filter(h => h.id !== hId);
-            syncToSupabase();
-            showCurrentEventDetails();
-        }
-
-        function renderHorairesList(ev) {
-            const tbody = document.getElementById('table-horaires-body');
-            tbody.innerHTML = '';
-            if(ev.horaires.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:gray; font-size:0.85rem;">Aucun horaire saisi.</td></tr>`;
-                return;
-            }
-            ev.horaires.forEach(h => {
-                const tr = document.createElement('tr');
+                tr.style.backgroundColor = "#F0F7FF";
                 tr.innerHTML = `
-                    <td><code><b>${h.time}</b></code></td>
-                    <td>${h.action}</td>
-                    <td class="no-print"><button class="btn btn-danger btn-xs" onclick="removeHoraireLigne(${h.id})">❌</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // ================= SCRIPT GESTION DES PRÊTS =================
-        function addLoanItem() {
-            const borrower = document.getElementById('loan-borrower').value.trim();
-            const item = document.getElementById('loan-item').value.trim();
-            const date = document.getElementById('loan-date').value;
-            const returnDate = document.getElementById('loan-return-date').value;
-            const notes = document.getElementById('loan-notes').value.trim();
-
-            if(!borrower || !item) { alert("Veuillez renseigner au minimum l'emprunteur et le matériel prêté."); return; }
-
-            logistiqueDB.prets.push({
-                id: Date.now(),
-                borrower,
-                item,
-                date: date || "-",
-                returnDate: returnDate || "-",
-                status: "En cours",
-                notes: notes || "-"
-            });
-
-            syncToSupabase();
-            renderLoansTable();
-
-            document.getElementById('loan-borrower').value = '';
-            document.getElementById('loan-item').value = '';
-            document.getElementById('loan-date').value = '';
-            document.getElementById('loan-return-date').value = '';
-            document.getElementById('loan-notes').value = '';
-        }
-
-        function toggleLoanStatus(id) {
-            const loan = logistiqueDB.prets.find(l => l.id === id);
-            if(loan) {
-                loan.status = loan.status === "En cours" ? "Restitué" : "En cours";
-                syncToSupabase();
-                renderLoansTable();
-            }
-        }
-
-        function deleteLoan(id) {
-            if(confirm("Supprimer définitivement cette ligne du registre de prêt ?")) {
-                logistiqueDB.prets = logistiqueDB.prets.filter(l => l.id !== id);
-                syncToSupabase();
-                renderLoansTable();
-            }
-        }
-
-        function formatDateFr(dateStr) {
-            if(!dateStr || dateStr === "-") return "-";
-            const parts = dateStr.split('-');
-            if(parts.length !== 3) return dateStr;
-            return `${parts[2]}/${parts[1]}/${parts[0]}`;
-        }
-
-        function renderLoansTable() {
-            const tbody = document.getElementById('table-loans-body');
-            const searchValue = document.getElementById('loan-search').value.toLowerCase().trim();
-            const filterStatus = document.getElementById('loan-filter-status').value;
-            
-            tbody.innerHTML = '';
-
-            if(logistiqueDB.prets.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:gray; padding:20px;">Aucun prêt enregistré dans l'historique.</td></tr>`;
-                return;
-            }
-
-            let countVisible = 0;
-
-            logistiqueDB.prets.forEach(loan => {
-                if(filterStatus !== 'Tous' && loan.status !== filterStatus) return;
-
-                const matchBorrower = loan.borrower.toLowerCase().includes(searchValue);
-                const matchItem = loan.item.toLowerCase().includes(searchValue);
-                if(searchValue !== "" && !matchBorrower && !matchItem) return;
-
-                countVisible++;
-                const tr = document.createElement('tr');
-                
-                const badgeClass = loan.status === 'En cours' ? 'badge-warning' : 'badge-success';
-                const badgeIcon = loan.status === 'En cours' ? '🗓️ En cours' : '✅ Restitué';
-
-                tr.innerHTML = `
-                    <td><b>${loan.borrower}</b></td>
-                    <td><span style="color:#2980b9; font-weight:500;">${loan.item}</span></td>
-                    <td><code>${formatDateFr(loan.date)}</code></td>
-                    <td><code>${formatDateFr(loan.returnDate)}</code></td>
-                    <td><span class="badge ${badgeClass}">${badgeIcon}</span></td>
-                    <td><small style="color:gray;">${loan.notes}</small></td>
-                    <td style="text-align:center; width:130px;" class="no-print">
-                        <button class="btn ${loan.status === 'En cours' ? 'btn-success' : 'btn-warning'} btn-xs" 
-                                title="${loan.status === 'En cours' ? 'Marquer comme Rendu' : 'Remettre En cours'}"
-                                onclick="toggleLoanStatus(${loan.id})">
-                            ${loan.status === 'En cours' ? '✅ Rendu' : '🔄 Relancer'}
-                        </button>
-                        <button class="btn btn-danger btn-xs" title="Supprimer" onclick="deleteLoan(${loan.id})">❌</button>
+                    <td><select id="edit-cat-${item.id}" class="form-control" style="padding:4px; font-size:0.8rem;">${optionsCat}</select></td>
+                    <td><input type="text" id="edit-name-${item.id}" class="form-control" style="padding:4px;" value="${item.name.replace(/"/g, '&quot;')}"></td>
+                    <td style="text-align:center;"><input type="number" id="edit-qty-${item.id}" class="form-control" style="padding:4px; width:70px; text-align:center; margin:0 auto;" min="0" value="${item.qty}"></td>
+                    <td><input type="text" id="edit-lieu-${item.id}" class="form-control" style="padding:4px;" value="${(item.lieu || '').replace(/"/g, '&quot;')}"></td>
+                    <td style="text-align:center;">
+                        <button class="btn btn-success btn-xs" onclick="enregistrerEditionLigne(${item.id})" title="Sauvegarder">✅</button>
+                        <button class="btn btn-secondary btn-xs" onclick="annulerEditionLigne()" title="Annuler">❌</button>
                     </td>
                 `;
-                tbody.appendChild(tr);
-            });
-
-            if(countVisible === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:gray; padding:20px;">Aucun prêt ne correspond à vos critères de recherche.</td></tr>`;
+            } else {
+                // Mode Affichage standard
+                tr.innerHTML = `
+                    <td><span class="cat-tag">${item.cat}</span></td>
+                    <td><strong style="color:var(--noir-doux);">${item.name}</strong></td>
+                    <td style="text-align:center;">
+                        <div class="qty-controls">
+                            <button class="btn btn-outline btn-xs" style="padding:2px 6px;" onclick="modifierQuantite(${item.id}, -1)">-</button>
+                            <span class="qty-badge">${item.qty}</span>
+                            <button class="btn btn-outline btn-xs" style="padding:2px 6px;" onclick="modifierQuantite(${item.id}, 1)">+</button>
+                        </div>
+                    </td>
+                    <td><span style="color:var(--gris-fonce); font-weight:500;">${item.lieu || 'Non précisé'}</span></td>
+                    <td style="text-align:center;">
+                        <button class="btn btn-outline btn-xs" title="Modifier" onclick="activerEditionLigne(${item.id})">✏️</button>
+                        <button class="btn btn-outline btn-xs" style="color:var(--rouge);" title="Supprimer" onclick="supprimerArticle(${item.id})">🗑️</button>
+                    </td>
+                `;
             }
-        }
+            tbody.appendChild(tr);
+        });
+    }
 
-        // NAVIGATION
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
-            
-            document.getElementById(`btn-tab-${tabId}`).classList.add('active');
-            document.getElementById(`pane-${tabId}`).style.display = 'block';
-        }
+    // --- IMPRESSION A4 PAYSAGE AUX NORMES DE LA CHARTE ---
+    function imprimerInventaire() {
+        let totalPieces = 0;
+        let rowsHtml = '';
 
-        window.onload = loadData;
+        // Regroupement par catégories pour un tirage structuré
+        inventaireDB.categories.forEach(cat => {
+            const items = inventaireDB.articles.filter(a => a.cat === cat);
+            if (items.length === 0) return;
 
-        // Liaison globale des gestionnaires d'événements
-        window.switchTab = switchTab;
-        window.addEvent = addEvent;
-        window.deleteEvent = deleteEvent;
-        window.addPoste = addPoste;
-        window.assignBenevole = assignBenevole;
-        window.removeBenevole = removeBenevole;
-        window.removePoste = removePoste;
-        window.addHoraireLigne = addHoraireLigne;
-        window.removeHoraireLigne = removeHoraireLigne;
-        window.addInventaireItem = addInventaireItem;
-        window.updateQty = updateQty;
-        window.deleteInvItem = deleteInvItem;
-        window.startEditItem = startEditItem;
-        window.saveEditItem = saveEditItem;
-        window.cancelEditItem = cancelEditItem;
-        window.filterInventaire = filterInventaire;
-        window.addLoanItem = addLoanItem;
-        window.toggleLoanStatus = toggleLoanStatus;
-        window.deleteLoan = deleteLoan;
-        window.renderLoansTable = renderLoansTable;
-    </script>
+            rowsHtml += `
+                <tr style="background:#F4F6F9; font-weight:bold;">
+                    <td colspan="4" style="font-family:'Fredoka',sans-serif; color:#C41E3A; font-size:9pt; padding:6px 10px; border-bottom:1px solid #D1D5DB;">
+                        ${cat} (${items.length} références)
+                    </td>
+                </tr>
+            `;
 
-    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
-    <script src="../js/sidebar.js"></script>
+            items.forEach(it => {
+                totalPieces += it.qty;
+                rowsHtml += `
+                    <tr style="page-break-inside:avoid;">
+                        <td style="padding:6px 10px; border-bottom:1px solid #E8E8E8; padding-left:18px;">${it.name}</td>
+                        <td style="padding:6px 10px; border-bottom:1px solid #E8E8E8; text-align:center; font-weight:bold; font-size:9.5pt;">${it.qty}</td>
+                        <td style="padding:6px 10px; border-bottom:1px solid #E8E8E8; color:#3D3D3D;">${it.lieu || '-'}</td>
+                        <td style="padding:6px 10px; border-bottom:1px solid #E8E8E8; text-align:center; width:90px; color:#B8B8B8;">[ &nbsp; &nbsp; ]</td>
+                    </tr>
+                `;
+            });
+        });
 
+        const dateEdition = new Date().toLocaleDateString('fr-FR');
+        const printWin = window.open('', '_blank');
+        printWin.document.write(`
+            <!DOCTYPE html>
+            <html lang="fr">
+            <head>
+                <meta charset="UTF-8">
+                <title>Inventaire Officiel - Dojo Dornois</title>
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                <style>
+                    @page {
+                        size: A4 landscape;
+                        margin: 10mm 12mm 14mm 12mm;
+                        @bottom-left {
+                            content: "Dojo Dornois • Association Loi 1901 • RNA : W583001220 • SIRET : 451 928 410 00013 • « Non assujetti à la TVA art. 293-B du CGI »";
+                            font-family: 'Roboto', sans-serif;
+                            font-size: 7.5pt;
+                            color: #6B6B6B;
+                            border-top: 1px solid #E8E8E8;
+                            padding-top: 5px;
+                        }
+                        @bottom-right {
+                            content: "Page " counter(page) " / " counter(pages);
+                            font-family: 'Fredoka', sans-serif;
+                            font-weight: 600;
+                            font-size: 8.5pt;
+                            color: #C41E3A;
+                            border-top: 1px solid #E8E8E8;
+                            padding-top: 5px;
+                        }
+                    }
+
+                    body {
+                        font-family: 'Roboto', sans-serif;
+                        color: #1A1A1A;
+                        background: #FFFFFF;
+                        margin: 0;
+                        padding: 0;
+                        font-size: 8.5pt;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+
+                    table.root-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+
+                    thead { display: table-header-group; }
+                    tbody { display: table-row-group; }
+
+                    .header-official {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 2px solid #C41E3A;
+                        padding-bottom: 10px;
+                        margin-bottom: 12px;
+                    }
+
+                    .brand-block { display: flex; gap: 12px; align-items: center; }
+                    .logo-box {
+                        background-color: #C41E3A;
+                        width: 58px;
+                        height: 58px;
+                        border-radius: 12px;
+                        padding: 5px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-shrink: 0;
+                    }
+                    .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+                    .club-info { font-size: 8pt; line-height: 1.35; color: #3D3D3D; }
+                    .club-name { font-family: 'Fredoka', sans-serif; font-size: 13pt; color: #C41E3A; font-weight: 700; margin-bottom: 1px; }
+
+                    .doc-title-block { text-align: right; }
+                    .doc-title { font-family: 'Fredoka', sans-serif; font-size: 14pt; color: #1A1A1A; margin: 0; text-transform: uppercase; }
+                    .doc-sub { font-size: 8.5pt; color: #6B6B6B; margin-top: 2px; }
+
+                    table.inv-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 8.5pt;
+                        margin-top: 8px;
+                    }
+                    table.inv-table th {
+                        background-color: #1A1A1A;
+                        color: white;
+                        font-family: 'Fredoka', sans-serif;
+                        padding: 7px 10px;
+                        text-align: left;
+                        font-weight: 500;
+                    }
+                </style>
+            </head>
+            <body>
+                <table class="root-table">
+                    <thead>
+                        <tr>
+                            <td>
+                                <div class="header-official">
+                                    <div class="brand-block">
+                                        <div class="logo-box">
+                                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
+                                        </div>
+                                        <div class="club-info">
+                                            <div class="club-name">DOJO DORNOIS</div>
+                                            1 Place de la Mairie - 58390 DORNES<br>
+                                            FFJDA n° CE 08.58.067.0 • Agrément J&S n° 58.S.471<br>
+                                            SIRET 451 928 410 00013 • RNA W583001220
+                                        </div>
+                                    </div>
+                                    <div class="doc-title-block">
+                                        <h1 class="doc-title">INVENTAIRE GÉNÉRAL DU MATÉRIEL</h1>
+                                        <div class="doc-sub">Édité le ${dateEdition} • Total répertorié : <strong>${totalPieces} pièces</strong></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <table class="inv-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Désignation de l'Équipement</th>
+                                            <th style="width: 100px; text-align:center;">Quantité</th>
+                                            <th>Lieu d'entreposage / Observations</th>
+                                            <th style="width: 90px; text-align:center;">Pointage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${rowsHtml}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() { window.print(); window.close(); }, 300);
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWin.document.close();
+    }
+
+    window.onload = loadData;
+</script>
+<script src="../js/sidebar.js"></script>
 </body>
 </html>
