@@ -2,31 +2,33 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Dojo Manager — Caisse & Budget Prévisionnel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Dojo Manager - Caisse & Budget Prévisionnel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --rouge: #C41E3A;
             --rouge-hover: #A3182E;
             --rouge-clair: #FFEBEF;
-            --vert: #2ecc71;
-            --vert-fonce: #27ae60;
-            --bleu: #3498db;
-            --bleu-fonce: #2980b9;
             --noir-doux: #1A1A1A;
             --gris-fonce: #3D3D3D;
             --gris-moyen: #6B6B6B;
             --gris-clair: #B8B8B8;
             --gris-tres-clair: #E8E8E8;
+            --gris-fond-input: #F8FAFC;
+            --blanc-pur: #FFFFFF;
             --fond: #F4F6F9;
             --blanc: #FFFFFF;
+            --vert-succes: #2ECC71;
+            --vert-fonce: #27ae60;
+            --vert-fond: #E8F8F0;
+            --bleu-info: #3498DB;
+            --bleu-fonce: #2980b9;
             --sidebar-width: 270px;
         }
 
         * { box-sizing: border-box; transition: all 0.15s ease; }
         body { font-family: 'Roboto', sans-serif; background-color: var(--fond); margin: 0; padding: 0; color: var(--gris-fonce); display: flex; height: 100vh; overflow: hidden; }
 
-        /* --- SIDEBAR & LAYOUT --- */
         .sidebar { width: var(--sidebar-width); background: var(--noir-doux); color: var(--blanc); display: flex; flex-direction: column; height: 100%; position: relative; box-shadow: 4px 0 15px rgba(0,0,0,0.1); flex-shrink: 0; }
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
@@ -36,21 +38,19 @@
 
         .app-body { flex: 1; padding: 30px; overflow-y: auto; }
 
-        /* --- BOUTONS --- */
         .btn { font-family: 'Roboto', sans-serif; font-weight: bold; padding: 10px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
         .btn-dark { background: var(--noir-doux); color: white; }
         .btn-dark:hover { background: #333; }
         .btn-outline { background: transparent; border: 1px solid var(--gris-moyen); color: var(--gris-fonce); }
         .btn-outline:hover { background: var(--gris-tres-clair); }
-        .btn-success { background: var(--vert); color: white; }
+        .btn-success { background: var(--vert-succes); color: white; }
         .btn-success:hover { background: var(--vert-fonce); }
         .btn-danger { background: var(--rouge); color: white; }
         .btn-danger:hover { background: var(--rouge-hover); }
-        .btn-blue { background: var(--bleu); color: white; }
+        .btn-blue { background: var(--bleu-info); color: white; }
         .btn-blue:hover { background: var(--bleu-fonce); }
         .btn-xs { padding: 6px 12px; font-size: 0.85rem; border-radius: 4px; }
 
-        /* --- ONGLETS --- */
         .tabs { display: flex; gap: 10px; margin-bottom: 25px; }
         .tab-btn { padding: 10px 20px; border-radius: 6px; border: 1px solid var(--gris-clair); background: white; cursor: pointer; font-family: 'Fredoka', sans-serif; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
         .tab-btn.active { background: var(--rouge); color: white; border-color: var(--rouge); }
@@ -59,7 +59,7 @@
         .card-header-actions { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .card-header-actions h2 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0; font-size: 1.3rem; }
 
-        /* --- STYLES CAISSE --- */
+        /* Styles Caisse */
         .depot-grid-split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         @media(max-width: 800px) { .depot-grid-split { grid-template-columns: 1fr; } }
         .depot-box { background: #FAFBFD; border: 1px solid var(--gris-clair); padding: 18px; border-radius: 8px; }
@@ -74,7 +74,7 @@
         .total-box-text { font-size: 1.05rem; color: var(--noir-doux); }
         .total-box-amount { color: var(--vert-fonce); font-size: 1.6rem; font-family: 'Fredoka', sans-serif; font-weight: bold; }
 
-        /* --- STYLES BUDGET --- */
+        /* Styles Budget */
         .config-banner { display: flex; gap: 20px; background: var(--blanc); padding: 15px 20px; border-radius: 8px; border: 1px solid var(--gris-tres-clair); margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
         .form-group { display: flex; flex-direction: column; gap: 5px; }
         .form-group label { font-size: 0.85rem; font-weight: bold; color: var(--gris-fonce); }
@@ -82,7 +82,7 @@
         
         .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
         @media(max-width: 800px) { .kpi-row { grid-template-columns: 1fr; } }
-        .kpi-card { background: white; padding: 16px; border-radius: 8px; border-left: 4px solid var(--gris-clair); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .kpi-card { background: white; padding: 16px; border-radius: 8px; border-left: 5px solid var(--rouge); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
         .kpi-card h4 { margin: 0; font-size: 0.8rem; color: var(--gris-moyen); text-transform: uppercase; }
         .kpi-card .value { font-family: 'Fredoka', sans-serif; font-size: 1.4rem; margin-top: 5px; font-weight: bold; }
 
@@ -108,16 +108,15 @@
         .line-total-footer { text-align: right; font-size: 0.85rem; padding: 6px 12px; color: var(--gris-moyen); font-weight: 500; background: rgba(0,0,0,0.02); border-top: 1px solid var(--gris-tres-clair); }
 
         .grand-total-box { display: flex; justify-content: space-between; align-items: center; font-family: 'Fredoka', sans-serif; font-size: 1.2rem; font-weight: bold; padding: 12px; border-radius: 6px; margin-top: 15px; }
-        .bg-charges { background: #fcebe9; color: var(--rouge); border: 1px solid #f5c6cb; }
-        .bg-produits { background: #e8f8f0; color: var(--vert-fonce); border: 1px solid #c3e6cb; }
+        .bg-charges { background: var(--rouge-clair); color: var(--rouge); border: 1px solid #f5c6cb; }
+        .bg-produits { background: var(--vert-fond); color: var(--vert-fonce); border: 1px solid #c3e6cb; }
         
         .balance-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 0.95rem; font-weight: bold; border-radius: 4px; margin-top: 5px; }
-        .result-positive { background: #e8f8f0; color: var(--vert-fonce); }
-        .result-negative { background: #fcebe9; color: var(--rouge); }
+        .result-positive { background: var(--vert-fond); color: var(--vert-fonce); }
+        .result-negative { background: var(--rouge-clair); color: var(--rouge); }
         .action-icon { cursor: pointer; opacity: 0.5; font-size: 0.9rem; border: none; background: transparent; }
         .action-icon:hover { opacity: 1; }
 
-        /* --- TOAST NOTIFICATIONS --- */
         .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
         .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
         .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
@@ -145,13 +144,12 @@
         </div>
 
         <div class="app-body">
-            <!-- Navigation Onglets -->
             <div class="tabs">
                 <button id="btn-tab-caisse" class="tab-btn active" onclick="switchTab('caisse')">🪙 1. Ventilation Caisse</button>
                 <button id="btn-tab-budget" class="tab-btn" onclick="switchTab('budget')">📊 2. Budget Prévisionnel</button>
             </div>
 
-            <!-- ================= ONGLET 1 : VENTILATION CAISSE ================= -->
+            <!-- ONGLET 1 : VENTILATION CAISSE -->
             <div id="pane-caisse" class="main-card tab-pane">
                 <div class="card-header-actions">
                     <div>
@@ -173,7 +171,7 @@
                         <div class="depot-total-sub">Total Billets : <span id="lbl-inv-b">0,00</span> €</div>
                     </div>
 
-                    <!-- PIECES -->
+                    <!-- PIÈCES -->
                     <div class="depot-box">
                         <h4>🪙 Pièces & Centimes</h4>
                         <div class="depot-item"><span>Pièce de 2 €</span><input type="number" min="0" id="inv-p-2" oninput="calcInventaireCaisseLive()" value="0"></div>
@@ -196,7 +194,7 @@
                 </div>
             </div>
 
-            <!-- ================= ONGLET 2 : BUDGET PRÉVISIONNEL ================= -->
+            <!-- ONGLET 2 : BUDGET PRÉVISIONNEL -->
             <div id="pane-budget" class="main-card tab-pane" style="display:none;">
                 <div class="card-header-actions">
                     <div>
@@ -209,7 +207,6 @@
                     </div>
                 </div>
 
-                <!-- Sélecteur de saison et boutons d'ajouts -->
                 <div class="config-banner">
                     <div class="form-group" style="min-width: 180px;">
                         <label>Saison Budgétaire</label>
@@ -225,7 +222,6 @@
                     </div>
                 </div>
 
-                <!-- KPIs -->
                 <div class="kpi-row">
                     <div class="kpi-card" style="border-left-color: var(--rouge);">
                         <h4>Total Charges Prévues</h4>
@@ -235,13 +231,12 @@
                         <h4>Total Produits Prévus</h4>
                         <div class="value" id="kpi-total-produits" style="color: var(--vert-fonce);">0,00 €</div>
                     </div>
-                    <div class="kpi-card" id="kpi-balance-card" style="border-left-color: var(--bleu);">
+                    <div class="kpi-card" id="kpi-balance-card" style="border-left-color: var(--bleu-info);">
                         <h4>Résultat Prévisionnel</h4>
                         <div class="value" id="kpi-resultat">0,00 €</div>
                     </div>
                 </div>
 
-                <!-- Grille colonnes Charges / Produits -->
                 <div class="budget-grid">
                     <!-- CHARGES -->
                     <div class="budget-column">
@@ -275,9 +270,6 @@
     </div>
 
 <script>
-    // ==========================================
-    // INITIALISATION & SUPABASE
-    // ==========================================
     const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
     const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
     const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
@@ -316,9 +308,7 @@
         if (tabId === 'budget') calculerEtAfficherTout(false);
     }
 
-    // ==========================================
-    // 🪙 LOGIQUE DE LA CAISSE
-    // ==========================================
+    // --- LOGIQUE CAISSE ---
     function calcInventaireCaisseLive() {
         let totB = 0;
         billetDenoms.forEach(d => {
@@ -403,27 +393,25 @@
         }
     }
 
-    // ==========================================
-    // 📊 LOGIQUE DU BUDGET PRÉVISIONNEL
-    // ==========================================
+    // --- LOGIQUE BUDGET ---
     const defaultBudgetExample = {
         charges: [
             { id: 1, title: "Frais Généraux & Matériel", subLines: [
                 { id: 101, label: "Licences", value: 4600.00 },
                 { id: 102, label: "Achat Matériel", value: 150.00 },
-                { id: 103, label: "Entretien et equipement", value: 530.00 },
+                { id: 103, label: "Entretien et équipement", value: 530.00 },
                 { id: 104, label: "Fournitures bureau", value: 200.00 },
                 { id: 105, label: "Entretien et réparation", value: 300.00 },
                 { id: 106, label: "Assurance", value: 530.00 },
-                { id: 107, label: "logiciel kalisport", value: 200.00 },
+                { id: 107, label: "Logiciel Kalisport", value: 200.00 },
                 { id: 108, label: "Cotisation ligue", value: 170.00 },
-                { id: 109, label: "Frais banque (commissions kalisport)", value: 150.00 }
+                { id: 109, label: "Frais banque (commissions Kalisport)", value: 150.00 }
             ]},
             { id: 2, title: "Enseignement & RH", subLines: [
                 { id: 201, label: "Enseignant (cours + compétitions + formations)", value: 15000.00 }
             ]},
             { id: 3, title: "Événements & Communication", subLines: [
-                { id: 301, label: "Fête (gouters + noel + fête famille)", value: 2000.00 },
+                { id: 301, label: "Fête (goûters + noël + fête famille)", value: 2000.00 },
                 { id: 302, label: "Manifestations (stage / compétition)", value: 200.00 },
                 { id: 303, label: "Cadeaux adhérents", value: 800.00 },
                 { id: 304, label: "Publicité (impression flyers)", value: 155.00 },
@@ -437,26 +425,26 @@
         produits: [
             { id: 5, title: "Inscriptions & Adhésions", subLines: [
                 { id: 501, label: "Licences", value: 4508.00 },
-                { id: 502, label: "Cotisations (pass sport compris)", value: 10310.00 }
+                { id: 502, label: "Cotisations (Pass'Sport compris)", value: 10310.00 }
             ]},
             { id: 6, title: "Subventions", subLines: [
                 { id: 601, label: "FDVA", value: 2000.00 },
                 { id: 602, label: "ANS", value: 1000.00 },
                 { id: 603, label: "Dornes", value: 900.00 },
-                { id: 604, label: "Departement", value: 392.00 }
+                { id: 604, label: "Département", value: 392.00 }
             ]},
             { id: 7, title: "Partenariats & Activités Club", subLines: [
                 { id: 701, label: "Sponsoring", value: 500.00 },
                 { id: 702, label: "Locations Dojo (Yoga)", value: 200.00 },
                 { id: 703, label: "Stages vacances Dornes", value: 300.00 },
-                { id: 704, label: "Self défense", value: 300.00 },
+                { id: 704, label: "Self-Défense", value: 300.00 },
                 { id: 705, label: "Sophrologie", value: 350.00 },
-                { id: 706, label: "Evenements", value: 7000.00 }
+                { id: 706, label: "Événements", value: 7000.00 }
             ]},
             { id: 8, title: "Autres Ressources", subLines: [
                 { id: 801, label: "Dons (kms certificateur comptes)", value: 1800.00 },
                 { id: 802, label: "Ventes textiles / équipements", value: 3000.00 },
-                { id: 803, label: "Intérêts Livret A *", value: 1225.00 }
+                { id: 803, label: "Intérêts Livret A", value: 1225.00 }
             ]}
         ]
     };
@@ -515,12 +503,12 @@
 
         if (Math.abs(diff) < 0.01) {
             kpiResultat.innerText = "Équilibré (0,00 €)";
-            kpiResultat.style.color = "var(--bleu)";
-            kpiCard.style.borderLeftColor = "var(--bleu)";
+            kpiResultat.style.color = "var(--bleu-info)";
+            kpiCard.style.borderLeftColor = "var(--bleu-info)";
         } else if (diff > 0) {
             kpiResultat.innerText = "+ " + formatMontant(diff);
             kpiResultat.style.color = "var(--vert-fonce)";
-            kpiCard.style.borderLeftColor = "var(--vert-fonce)";
+            kpiCard.style.borderLeftColor = "var(--vert-succes)";
             
             balanceChargesContainer.innerHTML = `
                 <div class="balance-row result-positive">
@@ -613,7 +601,7 @@
     }
 
     function supprimerLignePrincipale(type, lineId) {
-        if(confirm("Supprimer cette catégorie complète et tout son détail ?")) {
+        if(confirm("Supprimer définitivement cette catégorie complète et tout son détail ?")) {
             budgetDB[currentSaison][type] = budgetDB[currentSaison][type].filter(l => l.id !== lineId);
             calculerEtAfficherTout(true);
         }
@@ -658,6 +646,7 @@
         calculerEtAfficherTout(true);
     }
 
+    // --- IMPRESSION CONFORME CHARTE MASTER DU DOJO DORNOIS ---
     function imprimerBudget() {
         const saisonData = budgetDB[currentSaison] || { charges: [], produits: [] };
         let totalCharges = 0;
@@ -670,11 +659,11 @@
             (l.subLines || []).forEach(s => {
                 const val = parseFloat(s.value) || 0;
                 sTotal += val;
-                rows += `<tr><td style="padding-left:20px; color:#555;">${s.label}</td><td style="text-align:right; font-weight:500;">${formatMontant(val)}</td></tr>`;
+                rows += `<tr><td style="padding-left:18px; color:#555;">${s.label}</td><td style="text-align:right; font-weight:500;">${formatMontant(val)}</td></tr>`;
             });
             totalCharges += sTotal;
             htmlCharges += `
-                <tr style="background:#f2f2f2; font-weight:bold;"><td style="font-family:'Fredoka';">${l.title}</td><td style="text-align:right;">${formatMontant(sTotal)}</td></tr>
+                <tr style="background:#F8FAFC; font-weight:bold; border-top:1px solid #E8E8E8;"><td style="font-family:'Fredoka',sans-serif; color:#1A1A1A;">${l.title}</td><td style="text-align:right;">${formatMontant(sTotal)}</td></tr>
                 ${rows}
             `;
         });
@@ -686,11 +675,11 @@
             (l.subLines || []).forEach(s => {
                 const val = parseFloat(s.value) || 0;
                 sTotal += val;
-                rows += `<tr><td style="padding-left:20px; color:#555;">${s.label}</td><td style="text-align:right; font-weight:500;">${formatMontant(val)}</td></tr>`;
+                rows += `<tr><td style="padding-left:18px; color:#555;">${s.label}</td><td style="text-align:right; font-weight:500;">${formatMontant(val)}</td></tr>`;
             });
             totalProduits += sTotal;
             htmlProduits += `
-                <tr style="background:#f2f2f2; font-weight:bold;"><td style="font-family:'Fredoka';">${l.title}</td><td style="text-align:right;">${formatMontant(sTotal)}</td></tr>
+                <tr style="background:#F8FAFC; font-weight:bold; border-top:1px solid #E8E8E8;"><td style="font-family:'Fredoka',sans-serif; color:#1A1A1A;">${l.title}</td><td style="text-align:right;">${formatMontant(sTotal)}</td></tr>
                 ${rows}
             `;
         });
@@ -701,82 +690,295 @@
 
         if (Math.abs(diff) >= 0.01) {
             if (diff > 0) {
-                balanceHtmlCharges = `<tr style="background:#e8f8f0; font-weight:bold; color:#27ae60;"><td>SOLDE EXCÉDENTAIRE (Équilibre)</td><td style="text-align:right;">${formatMontant(diff)}</td></tr>`;
+                balanceHtmlCharges = `<tr style="background:#E8F8F0; font-weight:bold; color:#27ae60;"><td>SOLDE EXCÉDENTAIRE (Équilibre)</td><td style="text-align:right;">${formatMontant(diff)}</td></tr>`;
             } else {
-                balanceHtmlProduits = `<tr style="background:#fcebe9; font-weight:bold; color:#C41E3A;"><td>SOLDE DÉFICITAIRE (Équilibre)</td><td style="text-align:right;">${formatMontant(Math.abs(diff))}</td></tr>`;
+                balanceHtmlProduits = `<tr style="background:#FFEBEF; font-weight:bold; color:#C41E3A;"><td>SOLDE DÉFICITAIRE (Équilibre)</td><td style="text-align:right;">${formatMontant(Math.abs(diff))}</td></tr>`;
             }
         }
 
+        const dateEdition = new Date().toLocaleDateString('fr-FR');
         const printWindow = window.open('', '_blank');
         printWindow.document.write(`
             <!DOCTYPE html>
-            <html>
+            <html lang="fr">
             <head>
                 <meta charset="UTF-8">
-                <title>Budget Prévisionnel — ${currentSaison}</title>
-                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                <title>Budget Prévisionnel - Dojo Dornois - ${currentSaison}</title>
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
                 <style>
-                    @page { size: A4 landscape; margin: 10mm; }
-                    body { font-family: 'Roboto', sans-serif; color: #1A1A1A; margin:0; padding:0; font-size:8.5pt; }
-                    .print-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #C41E3A; padding-bottom: 8px; margin-bottom: 15px; }
-                    .print-logo-block { display: flex; align-items: center; gap: 15px; }
-                    .print-logo { height: 55px; }
-                    .print-header-titles h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 14pt; color: #1A1A1A; }
-                    .print-header-titles p { margin: 2px 0 0 0; font-size: 8pt; color: #6B6B6B; font-weight: 500; }
-                    .print-club-info { text-align: right; font-size: 8pt; color: #3D3D3D; line-height: 1.4; }
-                    .grid { display: flex; gap: 20px; }
-                    .col { flex: 1; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 8pt; }
-                    th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #E8E8E8; }
-                    th { background-color: #3D3D3D; color: white; font-family: 'Fredoka', sans-serif; }
-                    .total-row { font-weight: bold; background: #e0e0e0 !important; font-size: 9pt; }
-                    .print-footer { position: fixed; bottom: 0; width: 100%; border-top: 1px solid #E8E8E8; padding-top: 5px; text-align: center; font-size: 7pt; color: #6B6B6B; }
+                    @page {
+                        size: A4 landscape;
+                        margin: 10mm 12mm 14mm 12mm;
+                        @bottom-left {
+                            content: "Dojo Dornois • Association Loi 1901 • RNA : W583001220 • SIRET : 451 928 410 00013 • « Non assujetti à la TVA art. 293-B du CGI »";
+                            font-family: 'Roboto', sans-serif;
+                            font-size: 7.5pt;
+                            color: #6B6B6B;
+                            border-top: 1px solid #E8E8E8;
+                            padding-top: 5px;
+                        }
+                        @bottom-right {
+                            content: "Page " counter(page) " / " counter(pages);
+                            font-family: 'Fredoka', sans-serif;
+                            font-weight: 600;
+                            font-size: 8.5pt;
+                            color: #C41E3A;
+                            border-top: 1px solid #E8E8E8;
+                            padding-top: 5px;
+                        }
+                    }
+
+                    *, *::before, *::after { box-sizing: border-box; }
+
+                    body {
+                        font-family: 'Roboto', sans-serif;
+                        color: #1A1A1A;
+                        background: #FFFFFF;
+                        margin: 0;
+                        padding: 0;
+                        font-size: 8.5pt;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+
+                    table.root-layout {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+
+                    thead.root-header { display: table-header-group; }
+                    tfoot.root-footer { display: table-footer-group; }
+                    tbody.root-body { display: table-row-group; }
+
+                    /* En-tête officiel signature de la charte */
+                    .doc-header-official {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 2px solid #C41E3A;
+                        padding-bottom: 10px;
+                        margin-bottom: 12px;
+                    }
+
+                    .doc-brand-block {
+                        display: flex;
+                        gap: 14px;
+                        align-items: center;
+                    }
+
+                    .logo-box-wrapper {
+                        background-color: #C41E3A;
+                        width: 60px;
+                        height: 60px;
+                        border-radius: 12px;
+                        padding: 5px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        box-shadow: 0 4px 10px rgba(196, 30, 58, 0.25);
+                        flex-shrink: 0;
+                    }
+
+                    .club-logo-img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                    }
+
+                    .club-info-text {
+                        font-size: 8pt;
+                        line-height: 1.35;
+                        color: #3D3D3D;
+                    }
+
+                    .club-name-title {
+                        font-family: 'Fredoka', sans-serif;
+                        font-size: 13pt;
+                        color: #C41E3A;
+                        font-weight: 700;
+                        margin-bottom: 1px;
+                        text-transform: uppercase;
+                    }
+
+                    .doc-title-badge-block {
+                        text-align: right;
+                    }
+
+                    .doc-type-title {
+                        font-family: 'Fredoka', sans-serif;
+                        font-size: 14pt;
+                        color: #1A1A1A;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        margin: 0;
+                    }
+
+                    .doc-meta-sub {
+                        font-size: 8.5pt;
+                        color: #6B6B6B;
+                        margin-top: 3px;
+                    }
+
+                    /* Grille budgétaire print */
+                    .grid-budget-print {
+                        display: flex;
+                        gap: 18px;
+                        width: 100%;
+                    }
+
+                    .col-budget-print {
+                        flex: 1;
+                    }
+
+                    .budget-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 8pt;
+                    }
+
+                    .budget-table th {
+                        font-family: 'Fredoka', sans-serif;
+                        font-weight: 600;
+                        color: #FFFFFF;
+                        padding: 7px 10px;
+                        text-align: left;
+                        font-size: 8.5pt;
+                    }
+
+                    .budget-table td {
+                        padding: 5px 8px;
+                        border-bottom: 1px solid #E8E8E8;
+                    }
+
+                    .total-row {
+                        font-weight: bold;
+                        background: #F4F6F9 !important;
+                        font-size: 9pt;
+                        border-top: 2px solid #1A1A1A;
+                    }
+
+                    /* Pied de page de secours répété */
+                    .print-footer-container {
+                        border-top: 1px solid #E8E8E8;
+                        padding-top: 6px;
+                        margin-top: 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        font-size: 7.5pt;
+                        color: #6B6B6B;
+                    }
+
+                    .page-num-tag {
+                        font-family: 'Fredoka', sans-serif;
+                        font-weight: 600;
+                        color: #C41E3A;
+                        font-size: 8.5pt;
+                    }
                 </style>
             </head>
             <body>
-                <div class="print-header">
-                    <div class="print-logo-block">
-                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
-                        <div class="print-header-titles">
-                            <h2>BUDGET PRÉVISIONNEL</h2>
-                            <p>Saison Sportive ${currentSaison} &bull; Édité le ${new Date().toLocaleDateString('fr-FR')}</p>
-                        </div>
-                    </div>
-                    <div class="print-club-info">
-                        <strong>DOJO DORNOIS</strong><br>
-                        Association Loi 1901 &bull; RNA : W583001220<br>
-                        Siège : Mairie, 1 Place de la Mairie, 58390 DORNES
-                    </div>
-                </div>
+                <table class="root-layout">
+                    <!-- En-tête répété automatiquement sur toutes les pages -->
+                    <thead class="root-header">
+                        <tr>
+                            <td>
+                                <div class="doc-header-official">
+                                    <div class="doc-brand-block">
+                                        <div class="logo-box-wrapper">
+                                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo" class="club-logo-img">
+                                        </div>
+                                        <div class="club-info-text">
+                                            <div class="club-name-title">DOJO DORNOIS</div>
+                                            1 Place de la Mairie - 58390 DORNES<br>
+                                            FFJDA n° CE 08.58.067.0 • Agrément J&S n° 58.S.471<br>
+                                            SIRET 451 928 410 00013 • RNA W583001220
+                                        </div>
+                                    </div>
+                                    <div class="doc-title-badge-block">
+                                        <h1 class="doc-type-title">BUDGET PRÉVISIONNEL</h1>
+                                        <div class="doc-meta-sub">
+                                            Saison Sportive : <strong>${currentSaison}</strong> • Édité le ${dateEdition}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </thead>
 
-                <div class="grid">
-                    <div class="col">
-                        <table>
-                            <thead><tr><th style="background:#C41E3A;">CHARGES (Dépenses)</th><th style="text-align:right; background:#C41E3A; width:110px;">Montant</th></tr></thead>
-                            <tbody>
-                                ${htmlCharges}
-                                <tr class="total-row"><td>TOTAL GENERAL DES CHARGES</td><td style="text-align:right;">${formatMontant(totalCharges)}</td></tr>
-                                ${balanceHtmlCharges}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col">
-                        <table>
-                            <thead><tr><th style="background:#27ae60;">PRODUITS (Recettes)</th><th style="text-align:right; background:#27ae60; width:110px;">Montant</th></tr></thead>
-                            <tbody>
-                                ${htmlProduits}
-                                <tr class="total-row"><td>TOTAL GENERAL DES PRODUITS</td><td style="text-align:right;">${formatMontant(totalProduits)}</td></tr>
-                                ${balanceHtmlProduits}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                    <!-- Corps du budget prévisionnel -->
+                    <tbody class="root-body">
+                        <tr>
+                            <td>
+                                <div class="grid-budget-print">
+                                    <!-- COLONNE CHARGES -->
+                                    <div class="col-budget-print">
+                                        <table class="budget-table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="background:#C41E3A;">CHARGES (Dépenses prévues)</th>
+                                                    <th style="background:#C41E3A; text-align:right; width:100px;">Montant</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${htmlCharges}
+                                                <tr class="total-row">
+                                                    <td>TOTAL GÉNÉRAL DES CHARGES</td>
+                                                    <td style="text-align:right; color:#C41E3A;">${formatMontant(totalCharges)}</td>
+                                                </tr>
+                                                ${balanceHtmlCharges}
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                <div class="print-footer">
-                    Document budgétaire interne &bull; Dojo Dornois (Dornes) &bull; RNA : W583001220 &bull; Certifié conforme et généré via l'Intranet Assos
-                </div>
+                                    <!-- COLONNE PRODUITS -->
+                                    <div class="col-budget-print">
+                                        <table class="budget-table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="background:#27ae60;">PRODUITS (Recettes prévues)</th>
+                                                    <th style="background:#27ae60; text-align:right; width:100px;">Montant</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${htmlProduits}
+                                                <tr class="total-row">
+                                                    <td>TOTAL GÉNÉRAL DES PRODUITS</td>
+                                                    <td style="text-align:right; color:#27ae60;">${formatMontant(totalProduits)}</td>
+                                                </tr>
+                                                ${balanceHtmlProduits}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <!-- Pied de page officiel répété -->
+                    <tfoot class="root-footer">
+                        <tr>
+                            <td>
+                                <div class="print-footer-container">
+                                    <div>
+                                        Dojo Dornois • Judo & Disciplines Associées • Association Loi 1901 • RNA : W583001220 • SIRET : 451 928 410 00013 • « Non assujetti à la TVA art. 293-B du CGI »
+                                    </div>
+                                    <div class="page-num-tag">
+                                        Document officiel de gestion interne
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+
                 <script>
-                    window.onload = function() { setTimeout(function() { window.print(); window.close(); }, 250); };
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                            window.close();
+                        }, 300);
+                    };
                 <\/script>
             </body>
             </html>
@@ -784,11 +986,8 @@
         printWindow.document.close();
     }
 
-    // ==========================================
-    // CHARGEMENT GLOBAL ET SYNCHRONISATION
-    // ==========================================
+    // --- CHARGEMENT ET SAUVEGARDE GLOBALE ---
     async function loadAllData() {
-        // 1. Chargement instantané depuis le cache local
         const localCaisse = localStorage.getItem('dojo_caisse_monnaieCounts');
         if (localCaisse) {
             try { monnaieCounts = JSON.parse(localCaisse); } catch(e) {}
@@ -807,9 +1006,7 @@
         loadInventaireCaisseInputs();
         calculerEtAfficherTout(false);
 
-        // 2. Synchronisation en arrière-plan depuis Supabase
         try {
-            // Caisse
             const { data: caisseRes } = await sbClient.from('compta').select('data').eq('id', 1).single();
             if (caisseRes && caisseRes.data && caisseRes.data.monnaieCounts) {
                 monnaieCounts = caisseRes.data.monnaieCounts;
@@ -817,7 +1014,6 @@
                 loadInventaireCaisseInputs();
             }
 
-            // Budget
             const { data: budgetRes } = await sbClient.from('budget').select('data').eq('id', 1).single();
             if (budgetRes && budgetRes.data && typeof budgetRes.data === 'object') {
                 budgetDB = budgetRes.data;
