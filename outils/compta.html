@@ -2,14 +2,17 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Dojo Manager - Ventilation de Caisse</title>
+    <title>Dojo Manager — Caisse & Budget Prévisionnel</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --rouge: #C41E3A;
             --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
             --vert: #2ecc71;
             --vert-fonce: #27ae60;
+            --bleu: #3498db;
+            --bleu-fonce: #2980b9;
             --noir-doux: #1A1A1A;
             --gris-fonce: #3D3D3D;
             --gris-moyen: #6B6B6B;
@@ -20,9 +23,10 @@
             --sidebar-width: 270px;
         }
 
-        * { box-sizing: border-box; transition: all 0.2s ease; }
+        * { box-sizing: border-box; transition: all 0.15s ease; }
         body { font-family: 'Roboto', sans-serif; background-color: var(--fond); margin: 0; padding: 0; color: var(--gris-fonce); display: flex; height: 100vh; overflow: hidden; }
 
+        /* --- SIDEBAR & LAYOUT --- */
         .sidebar { width: var(--sidebar-width); background: var(--noir-doux); color: var(--blanc); display: flex; flex-direction: column; height: 100%; position: relative; box-shadow: 4px 0 15px rgba(0,0,0,0.1); flex-shrink: 0; }
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
@@ -32,6 +36,7 @@
 
         .app-body { flex: 1; padding: 30px; overflow-y: auto; }
 
+        /* --- BOUTONS --- */
         .btn { font-family: 'Roboto', sans-serif; font-weight: bold; padding: 10px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
         .btn-dark { background: var(--noir-doux); color: white; }
         .btn-dark:hover { background: #333; }
@@ -39,32 +44,84 @@
         .btn-outline:hover { background: var(--gris-tres-clair); }
         .btn-success { background: var(--vert); color: white; }
         .btn-success:hover { background: var(--vert-fonce); }
+        .btn-danger { background: var(--rouge); color: white; }
+        .btn-danger:hover { background: var(--rouge-hover); }
+        .btn-blue { background: var(--bleu); color: white; }
+        .btn-blue:hover { background: var(--bleu-fonce); }
         .btn-xs { padding: 6px 12px; font-size: 0.85rem; border-radius: 4px; }
 
-        .main-card { background: var(--blanc); padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid var(--gris-tres-clair); max-width: 900px; margin: 0 auto; }
-        .card-header-actions { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 15px; margin-bottom: 20px; }
+        /* --- ONGLETS --- */
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; }
+        .tab-btn { padding: 10px 20px; border-radius: 6px; border: 1px solid var(--gris-clair); background: white; cursor: pointer; font-family: 'Fredoka', sans-serif; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+        .tab-btn.active { background: var(--rouge); color: white; border-color: var(--rouge); }
+
+        .main-card { background: var(--blanc); padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid var(--gris-tres-clair); }
+        .card-header-actions { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .card-header-actions h2 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0; font-size: 1.3rem; }
 
+        /* --- STYLES CAISSE --- */
         .depot-grid-split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        @media(max-width: 768px) { .depot-grid-split { grid-template-columns: 1fr; } }
-        
+        @media(max-width: 800px) { .depot-grid-split { grid-template-columns: 1fr; } }
         .depot-box { background: #FAFBFD; border: 1px solid var(--gris-clair); padding: 18px; border-radius: 8px; }
         .depot-box h4 { margin-top: 0; font-family: 'Fredoka', sans-serif; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 8px; font-size: 1.1rem; color: var(--noir-doux); }
-        
         .depot-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9rem; }
         .depot-item span { font-weight: 500; }
-        .depot-item input { width: 75px; padding: 6px; text-align: center; border: 1px solid var(--gris-clair); border-radius: 6px; font-size: 0.95rem; font-weight: bold; }
+        .depot-item input { width: 80px; padding: 6px; text-align: center; border: 1px solid var(--gris-clair); border-radius: 6px; font-size: 0.95rem; font-weight: bold; }
         .depot-item input:focus { border-color: var(--vert-fonce); outline: none; background: #fff; }
-
         .depot-total-sub { text-align: right; font-weight: bold; margin-top: 15px; font-size: 1rem; color: var(--gris-fonce); border-top: 1px dashed var(--gris-clair); padding-top: 8px; }
 
         .total-box { display: flex; justify-content: space-between; align-items: center; background: #EBF7EE; padding: 18px 24px; border-radius: 8px; border: 1px solid #BEE5C7; flex-wrap: wrap; gap: 15px; }
         .total-box-text { font-size: 1.05rem; color: var(--noir-doux); }
         .total-box-amount { color: var(--vert-fonce); font-size: 1.6rem; font-family: 'Fredoka', sans-serif; font-weight: bold; }
 
+        /* --- STYLES BUDGET --- */
+        .config-banner { display: flex; gap: 20px; background: var(--blanc); padding: 15px 20px; border-radius: 8px; border: 1px solid var(--gris-tres-clair); margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.85rem; font-weight: bold; color: var(--gris-fonce); }
+        select, input[type="text"], input[type="date"] { padding: 8px 12px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 0.9rem; font-family: 'Roboto', sans-serif; }
+        
+        .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        @media(max-width: 800px) { .kpi-row { grid-template-columns: 1fr; } }
+        .kpi-card { background: white; padding: 16px; border-radius: 8px; border-left: 4px solid var(--gris-clair); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .kpi-card h4 { margin: 0; font-size: 0.8rem; color: var(--gris-moyen); text-transform: uppercase; }
+        .kpi-card .value { font-family: 'Fredoka', sans-serif; font-size: 1.4rem; margin-top: 5px; font-weight: bold; }
+
+        .budget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
+        @media(max-width: 900px) { .budget-grid { grid-template-columns: 1fr; } }
+        .budget-column { background: var(--blanc); border-radius: 8px; border: 1px solid var(--gris-tres-clair); padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .column-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 10px; margin-bottom: 15px; }
+        .column-header h3 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.2rem; }
+        .color-charges { color: var(--rouge); }
+        .color-produits { color: var(--vert-fonce); }
+
+        .line-group { border: 1px solid var(--gris-tres-clair); border-radius: 6px; margin-bottom: 15px; background: #fafbfc; overflow: hidden; }
+        .line-main-header { display: flex; justify-content: space-between; align-items: center; background: var(--gris-tres-clair); padding: 8px 12px; font-weight: bold; }
+        .line-title-input { font-family: 'Fredoka', sans-serif; font-size: 0.95rem; background: transparent; border: none; font-weight: 600; width: 60%; color: var(--noir-doux); }
+        .line-title-input:focus { background: var(--blanc); outline: 1px solid var(--gris-clair); padding: 2px 5px; }
+        
+        .sub-lines-container { padding: 5px 10px; background: var(--blanc); }
+        .sub-line-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--gris-tres-clair); gap: 10px; }
+        .sub-line-item:last-child { border-bottom: none; }
+        .sub-line-label { border: none; background: transparent; font-size: 0.9rem; flex: 1; }
+        .sub-line-label:focus, .sub-line-val:focus { background: #f0f4f8; outline: none; }
+        .sub-line-val { border: none; background: transparent; font-size: 0.9rem; font-weight: bold; width: 85px; text-align: right; }
+        .line-total-footer { text-align: right; font-size: 0.85rem; padding: 6px 12px; color: var(--gris-moyen); font-weight: 500; background: rgba(0,0,0,0.02); border-top: 1px solid var(--gris-tres-clair); }
+
+        .grand-total-box { display: flex; justify-content: space-between; align-items: center; font-family: 'Fredoka', sans-serif; font-size: 1.2rem; font-weight: bold; padding: 12px; border-radius: 6px; margin-top: 15px; }
+        .bg-charges { background: #fcebe9; color: var(--rouge); border: 1px solid #f5c6cb; }
+        .bg-produits { background: #e8f8f0; color: var(--vert-fonce); border: 1px solid #c3e6cb; }
+        
+        .balance-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 0.95rem; font-weight: bold; border-radius: 4px; margin-top: 5px; }
+        .result-positive { background: #e8f8f0; color: var(--vert-fonce); }
+        .result-negative { background: #fcebe9; color: var(--rouge); }
+        .action-icon { cursor: pointer; opacity: 0.5; font-size: 0.9rem; border: none; background: transparent; }
+        .action-icon:hover { opacity: 1; }
+
+        /* --- TOAST NOTIFICATIONS --- */
         .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
         .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
         .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
+        .toast.error { background: #78281f; border-left: 4px solid #e74c3c; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -77,18 +134,25 @@
     <div class="main-content">
         <div class="topbar">
             <div class="topbar-title-block">
-                <h2>Boîte à Monnaie (Caisse Physique)</h2>
-                <p>Décompte physique et inventaire des espèces du Dojo Dornois</p>
+                <h2>Caisse & Budget Prévisionnel</h2>
+                <p>Décompte physique des espèces et gestion prévisionnelle des saisons sportives</p>
             </div>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <button class="btn btn-outline btn-xs" onclick="loadData()">🔄 Recharger</button>
-                <button class="btn btn-success btn-xs" onclick="saveInventaireCaisse(false)">💾 Sauvegarder</button>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <button class="btn btn-outline btn-xs" onclick="loadAllData()">🔄 Supabase</button>
+                <button class="btn btn-success btn-xs" onclick="saveAllCurrent()">☁️ Enregistrer</button>
                 <a href="../index.html" class="btn btn-dark btn-xs">🏠 Bureau Central</a>
             </div>
         </div>
 
         <div class="app-body">
-            <div class="main-card">
+            <!-- Navigation Onglets -->
+            <div class="tabs">
+                <button id="btn-tab-caisse" class="tab-btn active" onclick="switchTab('caisse')">🪙 1. Ventilation Caisse</button>
+                <button id="btn-tab-budget" class="tab-btn" onclick="switchTab('budget')">📊 2. Budget Prévisionnel</button>
+            </div>
+
+            <!-- ================= ONGLET 1 : VENTILATION CAISSE ================= -->
+            <div id="pane-caisse" class="main-card tab-pane">
                 <div class="card-header-actions">
                     <div>
                         <h2>💶 Décompte et Ventilation des Espèces</h2>
@@ -128,22 +192,102 @@
                     <div class="total-box-text">
                         Total Réel en Caisse : <strong class="total-box-amount" id="lbl-inv-total">0,00 €</strong>
                     </div>
-                    <button class="btn btn-success" onclick="saveInventaireCaisse(false)">💾 Enregistrer la ventilation</button>
+                    <button class="btn btn-success" onclick="saveInventaireCaisse(false)">💾 Sauvegarder la caisse</button>
                 </div>
             </div>
+
+            <!-- ================= ONGLET 2 : BUDGET PRÉVISIONNEL ================= -->
+            <div id="pane-budget" class="main-card tab-pane" style="display:none;">
+                <div class="card-header-actions">
+                    <div>
+                        <h2>📊 Élaboration du Budget Prévisionnel</h2>
+                        <span style="font-size:0.85rem; color:var(--gris-moyen);">Anticipation des charges et produits de l'association.</span>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-blue btn-xs" onclick="imprimerBudget()">🖨️ Imprimer A4 Paysage</button>
+                        <button class="btn btn-success btn-xs" onclick="sauvegarderBudget(true)">💾 Enregistrer le budget</button>
+                    </div>
+                </div>
+
+                <!-- Sélecteur de saison et boutons d'ajouts -->
+                <div class="config-banner">
+                    <div class="form-group" style="min-width: 180px;">
+                        <label>Saison Budgétaire</label>
+                        <select id="select-saison" onchange="changerSaison()">
+                            <option value="2026-2027">Saison 2026-2027</option>
+                            <option value="2027-2028">Saison 2027-2028</option>
+                            <option value="2025-2026">Saison 2025-2026</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; text-align: right; display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+                        <button class="btn btn-danger btn-xs" onclick="ajouterLignePrincipale('charges')">➕ Ligne de Charges</button>
+                        <button class="btn btn-success btn-xs" onclick="ajouterLignePrincipale('produits')">➕ Ligne de Produits</button>
+                    </div>
+                </div>
+
+                <!-- KPIs -->
+                <div class="kpi-row">
+                    <div class="kpi-card" style="border-left-color: var(--rouge);">
+                        <h4>Total Charges Prévues</h4>
+                        <div class="value" id="kpi-total-charges" style="color: var(--rouge);">0,00 €</div>
+                    </div>
+                    <div class="kpi-card" style="border-left-color: var(--vert-fonce);">
+                        <h4>Total Produits Prévus</h4>
+                        <div class="value" id="kpi-total-produits" style="color: var(--vert-fonce);">0,00 €</div>
+                    </div>
+                    <div class="kpi-card" id="kpi-balance-card" style="border-left-color: var(--bleu);">
+                        <h4>Résultat Prévisionnel</h4>
+                        <div class="value" id="kpi-resultat">0,00 €</div>
+                    </div>
+                </div>
+
+                <!-- Grille colonnes Charges / Produits -->
+                <div class="budget-grid">
+                    <!-- CHARGES -->
+                    <div class="budget-column">
+                        <div class="column-header">
+                            <h3 class="color-charges">🔴 Dépenses (Charges)</h3>
+                        </div>
+                        <div id="container-charges"></div>
+                        <div class="grand-total-box bg-charges">
+                            <span>TOTAL CHARGES</span>
+                            <span id="total-charges-val">0,00 €</span>
+                        </div>
+                        <div id="balance-charges-container"></div>
+                    </div>
+
+                    <!-- PRODUITS -->
+                    <div class="budget-column">
+                        <div class="column-header">
+                            <h3 class="color-produits">🟢 Recettes (Produits)</h3>
+                        </div>
+                        <div id="container-produits"></div>
+                        <div class="grand-total-box bg-produits">
+                            <span>TOTAL PRODUITS</span>
+                            <span id="total-produits-val">0,00 €</span>
+                        </div>
+                        <div id="balance-produits-container"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
 <script>
-    let comptaDB = { monnaieCounts: {} };
+    // ==========================================
+    // INITIALISATION & SUPABASE
+    // ==========================================
+    const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+    const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+    const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
 
     const billetDenoms = [100, 50, 20, 10, 5];
     const pieceDenoms = [2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01];
 
-    const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
-    const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
-    const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-    const SUPABASE_TABLE = 'compta';
+    let monnaieCounts = {};
+    let budgetDB = {};
+    let currentSaison = "2026-2027";
 
     function showToast(message, type = 'success') {
         const container = document.getElementById('toastContainer');
@@ -163,6 +307,18 @@
         return formatNumberOnly(val) + " €";
     }
 
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('pane-' + tabId).style.display = 'block';
+        document.getElementById('btn-tab-' + tabId).classList.add('active');
+        if (tabId === 'caisse') calcInventaireCaisseLive();
+        if (tabId === 'budget') calculerEtAfficherTout(false);
+    }
+
+    // ==========================================
+    // 🪙 LOGIQUE DE LA CAISSE
+    // ==========================================
     function calcInventaireCaisseLive() {
         let totB = 0;
         billetDenoms.forEach(d => {
@@ -190,71 +346,50 @@
     }
 
     async function saveInventaireCaisse(silent = true) {
-        if (!comptaDB.monnaieCounts) comptaDB.monnaieCounts = {};
-        
         billetDenoms.forEach(d => {
             const el = document.getElementById('inv-b-' + d);
-            comptaDB.monnaieCounts['b' + d] = el ? (parseInt(el.value, 10) || 0) : 0;
+            monnaieCounts['b' + d] = el ? (parseInt(el.value, 10) || 0) : 0;
         });
 
         pieceDenoms.forEach(d => {
             const key = 'p' + d.toString().replace('.', '_');
             const el = document.getElementById('inv-p-' + d);
-            comptaDB.monnaieCounts[key] = el ? (parseInt(el.value, 10) || 0) : 0;
+            monnaieCounts[key] = el ? (parseInt(el.value, 10) || 0) : 0;
         });
 
-        localStorage.setItem('dojo_caisse_monnaieCounts', JSON.stringify(comptaDB.monnaieCounts));
+        localStorage.setItem('dojo_caisse_monnaieCounts', JSON.stringify(monnaieCounts));
 
         try {
-            const { data } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
-            let fullDB = (data && data.data) ? data.data : {};
-            fullDB.monnaieCounts = comptaDB.monnaieCounts;
-            await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: fullDB });
-            if (!silent) showToast("✓ Ventilation enregistrée avec succès !");
+            const { data } = await sbClient.from('compta').select('data').eq('id', 1).single();
+            let fullCompta = (data && data.data) ? data.data : {};
+            fullCompta.monnaieCounts = monnaieCounts;
+            await sbClient.from('compta').upsert({ id: 1, data: fullCompta });
+            if (!silent) showToast("✓ Caisse enregistrée sur Supabase !");
         } catch(e) {
-            console.warn("Erreur Supabase, sauvegarde locale conservée", e);
-            if (!silent) showToast("✓ Ventilation enregistrée localement.");
+            console.warn("Erreur Supabase caisse :", e);
+            if (!silent) showToast("✓ Caisse sauvegardée en local.");
         }
     }
 
     function loadInventaireCaisseInputs() {
-        if (!comptaDB.monnaieCounts) return;
         billetDenoms.forEach(d => {
             const el = document.getElementById('inv-b-' + d);
-            if (el && comptaDB.monnaieCounts['b' + d] !== undefined) {
-                el.value = comptaDB.monnaieCounts['b' + d];
+            if (el && monnaieCounts['b' + d] !== undefined) {
+                el.value = monnaieCounts['b' + d];
             }
         });
         pieceDenoms.forEach(d => {
             const key = 'p' + d.toString().replace('.', '_');
             const el = document.getElementById('inv-p-' + d);
-            if (el && comptaDB.monnaieCounts[key] !== undefined) {
-                el.value = comptaDB.monnaieCounts[key];
+            if (el && monnaieCounts[key] !== undefined) {
+                el.value = monnaieCounts[key];
             }
         });
         calcInventaireCaisseLive();
     }
 
-    async function loadData() {
-        const local = localStorage.getItem('dojo_caisse_monnaieCounts');
-        if (local) {
-            try { comptaDB.monnaieCounts = JSON.parse(local); } catch(e) {}
-        }
-
-        try {
-            const { data } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
-            if (data && data.data && data.data.monnaieCounts) {
-                comptaDB.monnaieCounts = data.data.monnaieCounts;
-            }
-        } catch(e) {
-            console.warn("Chargement Supabase impossible, utilisation des données locales.");
-        }
-
-        loadInventaireCaisseInputs();
-    }
-
     function resetInventaire() {
-        if (confirm("Voulez-vous remettre toutes les pièces et billets à zéro ?")) {
+        if (confirm("Voulez-vous remettre toutes les pièces et billets de la caisse à zéro ?")) {
             billetDenoms.forEach(d => {
                 const el = document.getElementById('inv-b-' + d);
                 if (el) el.value = 0;
@@ -268,7 +403,440 @@
         }
     }
 
-    window.onload = loadData;
+    // ==========================================
+    // 📊 LOGIQUE DU BUDGET PRÉVISIONNEL
+    // ==========================================
+    const defaultBudgetExample = {
+        charges: [
+            { id: 1, title: "Frais Généraux & Matériel", subLines: [
+                { id: 101, label: "Licences", value: 4600.00 },
+                { id: 102, label: "Achat Matériel", value: 150.00 },
+                { id: 103, label: "Entretien et equipement", value: 530.00 },
+                { id: 104, label: "Fournitures bureau", value: 200.00 },
+                { id: 105, label: "Entretien et réparation", value: 300.00 },
+                { id: 106, label: "Assurance", value: 530.00 },
+                { id: 107, label: "logiciel kalisport", value: 200.00 },
+                { id: 108, label: "Cotisation ligue", value: 170.00 },
+                { id: 109, label: "Frais banque (commissions kalisport)", value: 150.00 }
+            ]},
+            { id: 2, title: "Enseignement & RH", subLines: [
+                { id: 201, label: "Enseignant (cours + compétitions + formations)", value: 15000.00 }
+            ]},
+            { id: 3, title: "Événements & Communication", subLines: [
+                { id: 301, label: "Fête (gouters + noel + fête famille)", value: 2000.00 },
+                { id: 302, label: "Manifestations (stage / compétition)", value: 200.00 },
+                { id: 303, label: "Cadeaux adhérents", value: 800.00 },
+                { id: 304, label: "Publicité (impression flyers)", value: 155.00 },
+                { id: 305, label: "Frais événements (soirée + calendriers)", value: 4500.00 }
+            ]},
+            { id: 4, title: "Déplacements & Logistique", subLines: [
+                { id: 401, label: "Déplacements certificateur comptes", value: 1800.00 },
+                { id: 402, label: "Achats textiles / équipements", value: 2500.00 }
+            ]}
+        ],
+        produits: [
+            { id: 5, title: "Inscriptions & Adhésions", subLines: [
+                { id: 501, label: "Licences", value: 4508.00 },
+                { id: 502, label: "Cotisations (pass sport compris)", value: 10310.00 }
+            ]},
+            { id: 6, title: "Subventions", subLines: [
+                { id: 601, label: "FDVA", value: 2000.00 },
+                { id: 602, label: "ANS", value: 1000.00 },
+                { id: 603, label: "Dornes", value: 900.00 },
+                { id: 604, label: "Departement", value: 392.00 }
+            ]},
+            { id: 7, title: "Partenariats & Activités Club", subLines: [
+                { id: 701, label: "Sponsoring", value: 500.00 },
+                { id: 702, label: "Locations Dojo (Yoga)", value: 200.00 },
+                { id: 703, label: "Stages vacances Dornes", value: 300.00 },
+                { id: 704, label: "Self défense", value: 300.00 },
+                { id: 705, label: "Sophrologie", value: 350.00 },
+                { id: 706, label: "Evenements", value: 7000.00 }
+            ]},
+            { id: 8, title: "Autres Ressources", subLines: [
+                { id: 801, label: "Dons (kms certificateur comptes)", value: 1800.00 },
+                { id: 802, label: "Ventes textiles / équipements", value: 3000.00 },
+                { id: 803, label: "Intérêts Livret A *", value: 1225.00 }
+            ]}
+        ]
+    };
+
+    function changerSaison() {
+        currentSaison = document.getElementById('select-saison').value;
+        if (!budgetDB[currentSaison]) {
+            budgetDB[currentSaison] = { charges: [], produits: [] };
+        }
+        calculerEtAfficherTout(false);
+    }
+
+    async function sauvegarderBudget(declencherCloud = true) {
+        localStorage.setItem('dojo_budget_data', JSON.stringify(budgetDB));
+        if (declencherCloud) {
+            try {
+                const { error } = await sbClient.from('budget').upsert({ id: 1, data: budgetDB });
+                if (error) throw error;
+                showToast("✓ Budget synchronisé sur Supabase !", "success");
+            } catch(e) {
+                console.error("Erreur sauvegarde budget Supabase :", e);
+                showToast("⚠️ Données du budget sauvegardées en local", "error");
+            }
+        }
+    }
+
+    function calculerEtAfficherTout(declencherSauvegarde = true) {
+        const saisonData = budgetDB[currentSaison] || { charges: [], produits: [] };
+        
+        renderStructure('charges', saisonData.charges || []);
+        renderStructure('produits', saisonData.produits || []);
+
+        let totalCharges = 0;
+        (saisonData.charges || []).forEach(line => {
+            (line.subLines || []).forEach(sub => totalCharges += (parseFloat(sub.value) || 0));
+        });
+
+        let totalProduits = 0;
+        (saisonData.produits || []).forEach(line => {
+            (line.subLines || []).forEach(sub => totalProduits += (parseFloat(sub.value) || 0));
+        });
+
+        document.getElementById('total-charges-val').innerText = formatMontant(totalCharges);
+        document.getElementById('total-produits-val').innerText = formatMontant(totalProduits);
+        document.getElementById('kpi-total-charges').innerText = formatMontant(totalCharges);
+        document.getElementById('kpi-total-produits').innerText = formatMontant(totalProduits);
+
+        const diff = totalProduits - totalCharges;
+        const kpiResultat = document.getElementById('kpi-resultat');
+        const kpiCard = document.getElementById('kpi-balance-card');
+        const balanceChargesContainer = document.getElementById('balance-charges-container');
+        const balanceProduitsContainer = document.getElementById('balance-produits-container');
+
+        balanceChargesContainer.innerHTML = '';
+        balanceProduitsContainer.innerHTML = '';
+
+        if (Math.abs(diff) < 0.01) {
+            kpiResultat.innerText = "Équilibré (0,00 €)";
+            kpiResultat.style.color = "var(--bleu)";
+            kpiCard.style.borderLeftColor = "var(--bleu)";
+        } else if (diff > 0) {
+            kpiResultat.innerText = "+ " + formatMontant(diff);
+            kpiResultat.style.color = "var(--vert-fonce)";
+            kpiCard.style.borderLeftColor = "var(--vert-fonce)";
+            
+            balanceChargesContainer.innerHTML = `
+                <div class="balance-row result-positive">
+                    <span>SOLDE EXCÉDENTAIRE (Équilibre)</span>
+                    <span>${formatMontant(diff)}</span>
+                </div>
+            `;
+        } else {
+            const absoluDiff = Math.abs(diff);
+            kpiResultat.innerText = "- " + formatMontant(absoluDiff);
+            kpiResultat.style.color = "var(--rouge)";
+            kpiCard.style.borderLeftColor = "var(--rouge)";
+
+            balanceProduitsContainer.innerHTML = `
+                <div class="balance-row result-negative">
+                    <span>SOLDE DÉFICITAIRE (Équilibre)</span>
+                    <span>${formatMontant(absoluDiff)}</span>
+                </div>
+            `;
+        }
+
+        if (declencherSauvegarde) {
+            sauvegarderBudget(true);
+        }
+    }
+
+    function renderStructure(type, dataset) {
+        const container = document.getElementById(`container-${type}`);
+        container.innerHTML = '';
+
+        if (!dataset || dataset.length === 0) {
+            container.innerHTML = `<p style="text-align:center; color:var(--gris-moyen); font-size:0.85rem; padding:15px;">Aucune ligne dans cette section.</p>`;
+            return;
+        }
+
+        dataset.forEach(line => {
+            let lineTotal = 0;
+            (line.subLines || []).forEach(s => lineTotal += (parseFloat(s.value) || 0));
+
+            let subLinesHtml = '';
+            (line.subLines || []).forEach(sub => {
+                subLinesHtml += `
+                    <div class="sub-line-item">
+                        <input type="text" class="sub-line-label" value="${sub.label}" onchange="modifierSousLigne(${line.id}, ${sub.id}, 'label', this.value)">
+                        <input type="number" step="0.01" class="sub-line-val" value="${sub.value}" onchange="modifierSousLigne(${line.id}, ${sub.id}, 'value', this.value)">
+                        <button class="action-icon" title="Supprimer ce détail" onclick="supprimerSousLigne(${line.id}, ${sub.id})">❌</button>
+                    </div>
+                `;
+            });
+
+            const lineHtml = `
+                <div class="line-group">
+                    <div class="line-main-header">
+                        <input type="text" class="line-title-input" value="${line.title}" onchange="modifierLignePrincipale(${line.id}, this.value)">
+                        <div>
+                            <button class="btn btn-dark" style="padding:2px 8px; font-size:0.75rem;" onclick="ajouterSousLigne(${line.id})">➕ Détail</button>
+                            <button class="action-icon" style="opacity:0.7; margin-left:8px;" title="Supprimer la ligne" onclick="supprimerLignePrincipale('${type}', ${line.id})">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="sub-lines-container">
+                        ${subLinesHtml}
+                    </div>
+                    <div class="line-total-footer">
+                        Sous-total : <strong>${formatMontant(lineTotal)}</strong>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += lineHtml;
+        });
+    }
+
+    function ajouterLignePrincipale(type) {
+        if (!budgetDB[currentSaison]) budgetDB[currentSaison] = { charges: [], produits: [] };
+        const dataset = budgetDB[currentSaison][type];
+        const newLine = {
+            id: Date.now(),
+            title: type === 'charges' ? "Nouvelle ligne de charge" : "Nouvelle ligne de produit",
+            subLines: []
+        };
+        dataset.push(newLine);
+        calculerEtAfficherTout(true);
+    }
+
+    function modifierLignePrincipale(lineId, newTitle) {
+        ['charges', 'produits'].forEach(type => {
+            const line = (budgetDB[currentSaison][type] || []).find(l => l.id === lineId);
+            if (line) line.title = newTitle;
+        });
+        calculerEtAfficherTout(true);
+    }
+
+    function supprimerLignePrincipale(type, lineId) {
+        if(confirm("Supprimer cette catégorie complète et tout son détail ?")) {
+            budgetDB[currentSaison][type] = budgetDB[currentSaison][type].filter(l => l.id !== lineId);
+            calculerEtAfficherTout(true);
+        }
+    }
+
+    function ajouterSousLigne(lineId) {
+        ['charges', 'produits'].forEach(type => {
+            const line = (budgetDB[currentSaison][type] || []).find(l => l.id === lineId);
+            if (line) {
+                if (!line.subLines) line.subLines = [];
+                line.subLines.push({
+                    id: Date.now(),
+                    label: "Nouveau détail",
+                    value: 0.00
+                });
+            }
+        });
+        calculerEtAfficherTout(true);
+    }
+
+    function modifierSousLigne(lineId, subId, clef, value) {
+        ['charges', 'produits'].forEach(type => {
+            const line = (budgetDB[currentSaison][type] || []).find(l => l.id === lineId);
+            if (line) {
+                const sub = (line.subLines || []).find(s => s.id === subId);
+                if (sub) {
+                    if (clef === 'value') sub.value = parseFloat(value) || 0;
+                    else sub[clef] = value;
+                }
+            }
+        });
+        calculerEtAfficherTout(true);
+    }
+
+    function supprimerSousLigne(lineId, subId) {
+        ['charges', 'produits'].forEach(type => {
+            const line = (budgetDB[currentSaison][type] || []).find(l => l.id === lineId);
+            if (line) {
+                line.subLines = line.subLines.filter(s => s.id !== subId);
+            }
+        });
+        calculerEtAfficherTout(true);
+    }
+
+    function imprimerBudget() {
+        const saisonData = budgetDB[currentSaison] || { charges: [], produits: [] };
+        let totalCharges = 0;
+        let totalProduits = 0;
+
+        let htmlCharges = '';
+        (saisonData.charges || []).forEach(l => {
+            let sTotal = 0;
+            let rows = '';
+            (l.subLines || []).forEach(s => {
+                const val = parseFloat(s.value) || 0;
+                sTotal += val;
+                rows += `<tr><td style="padding-left:20px; color:#555;">${s.label}</td><td style="text-align:right; font-weight:500;">${formatMontant(val)}</td></tr>`;
+            });
+            totalCharges += sTotal;
+            htmlCharges += `
+                <tr style="background:#f2f2f2; font-weight:bold;"><td style="font-family:'Fredoka';">${l.title}</td><td style="text-align:right;">${formatMontant(sTotal)}</td></tr>
+                ${rows}
+            `;
+        });
+
+        let htmlProduits = '';
+        (saisonData.produits || []).forEach(l => {
+            let sTotal = 0;
+            let rows = '';
+            (l.subLines || []).forEach(s => {
+                const val = parseFloat(s.value) || 0;
+                sTotal += val;
+                rows += `<tr><td style="padding-left:20px; color:#555;">${s.label}</td><td style="text-align:right; font-weight:500;">${formatMontant(val)}</td></tr>`;
+            });
+            totalProduits += sTotal;
+            htmlProduits += `
+                <tr style="background:#f2f2f2; font-weight:bold;"><td style="font-family:'Fredoka';">${l.title}</td><td style="text-align:right;">${formatMontant(sTotal)}</td></tr>
+                ${rows}
+            `;
+        });
+
+        const diff = totalProduits - totalCharges;
+        let balanceHtmlCharges = '';
+        let balanceHtmlProduits = '';
+
+        if (Math.abs(diff) >= 0.01) {
+            if (diff > 0) {
+                balanceHtmlCharges = `<tr style="background:#e8f8f0; font-weight:bold; color:#27ae60;"><td>SOLDE EXCÉDENTAIRE (Équilibre)</td><td style="text-align:right;">${formatMontant(diff)}</td></tr>`;
+            } else {
+                balanceHtmlProduits = `<tr style="background:#fcebe9; font-weight:bold; color:#C41E3A;"><td>SOLDE DÉFICITAIRE (Équilibre)</td><td style="text-align:right;">${formatMontant(Math.abs(diff))}</td></tr>`;
+            }
+        }
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Budget Prévisionnel — ${currentSaison}</title>
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                <style>
+                    @page { size: A4 landscape; margin: 10mm; }
+                    body { font-family: 'Roboto', sans-serif; color: #1A1A1A; margin:0; padding:0; font-size:8.5pt; }
+                    .print-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #C41E3A; padding-bottom: 8px; margin-bottom: 15px; }
+                    .print-logo-block { display: flex; align-items: center; gap: 15px; }
+                    .print-logo { height: 55px; }
+                    .print-header-titles h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 14pt; color: #1A1A1A; }
+                    .print-header-titles p { margin: 2px 0 0 0; font-size: 8pt; color: #6B6B6B; font-weight: 500; }
+                    .print-club-info { text-align: right; font-size: 8pt; color: #3D3D3D; line-height: 1.4; }
+                    .grid { display: flex; gap: 20px; }
+                    .col { flex: 1; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 8pt; }
+                    th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #E8E8E8; }
+                    th { background-color: #3D3D3D; color: white; font-family: 'Fredoka', sans-serif; }
+                    .total-row { font-weight: bold; background: #e0e0e0 !important; font-size: 9pt; }
+                    .print-footer { position: fixed; bottom: 0; width: 100%; border-top: 1px solid #E8E8E8; padding-top: 5px; text-align: center; font-size: 7pt; color: #6B6B6B; }
+                </style>
+            </head>
+            <body>
+                <div class="print-header">
+                    <div class="print-logo-block">
+                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="print-logo">
+                        <div class="print-header-titles">
+                            <h2>BUDGET PRÉVISIONNEL</h2>
+                            <p>Saison Sportive ${currentSaison} &bull; Édité le ${new Date().toLocaleDateString('fr-FR')}</p>
+                        </div>
+                    </div>
+                    <div class="print-club-info">
+                        <strong>DOJO DORNOIS</strong><br>
+                        Association Loi 1901 &bull; RNA : W583001220<br>
+                        Siège : Mairie, 1 Place de la Mairie, 58390 DORNES
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="col">
+                        <table>
+                            <thead><tr><th style="background:#C41E3A;">CHARGES (Dépenses)</th><th style="text-align:right; background:#C41E3A; width:110px;">Montant</th></tr></thead>
+                            <tbody>
+                                ${htmlCharges}
+                                <tr class="total-row"><td>TOTAL GENERAL DES CHARGES</td><td style="text-align:right;">${formatMontant(totalCharges)}</td></tr>
+                                ${balanceHtmlCharges}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col">
+                        <table>
+                            <thead><tr><th style="background:#27ae60;">PRODUITS (Recettes)</th><th style="text-align:right; background:#27ae60; width:110px;">Montant</th></tr></thead>
+                            <tbody>
+                                ${htmlProduits}
+                                <tr class="total-row"><td>TOTAL GENERAL DES PRODUITS</td><td style="text-align:right;">${formatMontant(totalProduits)}</td></tr>
+                                ${balanceHtmlProduits}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="print-footer">
+                    Document budgétaire interne &bull; Dojo Dornois (Dornes) &bull; RNA : W583001220 &bull; Certifié conforme et généré via l'Intranet Assos
+                </div>
+                <script>
+                    window.onload = function() { setTimeout(function() { window.print(); window.close(); }, 250); };
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
+    // ==========================================
+    // CHARGEMENT GLOBAL ET SYNCHRONISATION
+    // ==========================================
+    async function loadAllData() {
+        // 1. Chargement instantané depuis le cache local
+        const localCaisse = localStorage.getItem('dojo_caisse_monnaieCounts');
+        if (localCaisse) {
+            try { monnaieCounts = JSON.parse(localCaisse); } catch(e) {}
+        }
+        const localBudget = localStorage.getItem('dojo_budget_data');
+        if (localBudget) {
+            try { budgetDB = JSON.parse(localBudget); } catch(e) {}
+        } else {
+            budgetDB = { "2026-2027": JSON.parse(JSON.stringify(defaultBudgetExample)) };
+        }
+        
+        currentSaison = document.getElementById('select-saison').value;
+        if (!budgetDB[currentSaison]) {
+            budgetDB[currentSaison] = { charges: [], produits: [] };
+        }
+        loadInventaireCaisseInputs();
+        calculerEtAfficherTout(false);
+
+        // 2. Synchronisation en arrière-plan depuis Supabase
+        try {
+            // Caisse
+            const { data: caisseRes } = await sbClient.from('compta').select('data').eq('id', 1).single();
+            if (caisseRes && caisseRes.data && caisseRes.data.monnaieCounts) {
+                monnaieCounts = caisseRes.data.monnaieCounts;
+                localStorage.setItem('dojo_caisse_monnaieCounts', JSON.stringify(monnaieCounts));
+                loadInventaireCaisseInputs();
+            }
+
+            // Budget
+            const { data: budgetRes } = await sbClient.from('budget').select('data').eq('id', 1).single();
+            if (budgetRes && budgetRes.data && typeof budgetRes.data === 'object') {
+                budgetDB = budgetRes.data;
+                localStorage.setItem('dojo_budget_data', JSON.stringify(budgetDB));
+                if (!budgetDB[currentSaison]) budgetDB[currentSaison] = { charges: [], produits: [] };
+                calculerEtAfficherTout(false);
+            }
+        } catch(e) {
+            console.warn("Connexion réseau Supabase indisponible, utilisation du cache local.");
+        }
+    }
+
+    async function saveAllCurrent() {
+        await saveInventaireCaisse(true);
+        await sauvegarderBudget(true);
+        showToast("✓ Caisse et Budget enregistrés sur Supabase !");
+    }
+
+    window.onload = loadAllData;
 </script>
 <script src="../js/sidebar.js"></script>
 </body>
