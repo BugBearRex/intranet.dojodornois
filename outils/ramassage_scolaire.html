@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dojo Manager — Prise en Charge École des Mardis (16h15)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #CBD5E1;
+            --gris-tres-clair: #E2E8F0;
+            --gris-fond-input: #F8FAFC;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --vert-succes: #2ECC71;
+            --vert-fond: #E8F8F0;
+            --orange: #E67E22;
+            --orange-fond: #FEF5E7;
+            --bleu-info: #3498DB;
+            --sidebar-width: 270px;
+            --topbar-height: 70px;
+            --radius-main: 10px;
+            --radius-sm: 6px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            color: var(--gris-fonce);
+            margin: 0; padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux);
+            color: var(--blanc);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        /* --- LAYOUT PRINCIPAL --- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .topbar {
+            background: var(--blanc);
+            height: var(--topbar-height);
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            flex-shrink: 0;
+            z-index: 50;
+        }
+        .topbar-title-block h2 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--noir-doux);
+            margin: 0;
+            font-size: 1.35rem;
+        }
+        .topbar-title-block p {
+            margin: 2px 0 0 0;
+            font-size: 0.8rem;
+            color: var(--gris-moyen);
+        }
+
+        .app-body {
+            flex: 1;
+            padding: 22px 28px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* --- BOUTONS --- */
+        .btn {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 600;
+            padding: 9px 15px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-size: 0.88rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+        .btn-primary { background: var(--rouge); color: white; }
+        .btn-primary:hover { background: var(--rouge-hover); }
+        .btn-secondary { background: var(--gris-tres-clair); color: var(--gris-fonce); }
+        .btn-secondary:hover { background: #dcdcdc; }
+        .btn-dark { background: var(--noir-doux); color: white; }
+        .btn-dark:hover { background: #333; }
+        .btn-success { background: var(--vert-succes); color: white; }
+        .btn-success:hover { background: #27ae60; }
+        .btn-outline { background: transparent; border: 1px solid var(--gris-clair); color: var(--gris-fonce); }
+        .btn-outline:hover { background: var(--gris-tres-clair); }
+        .btn-xs { padding: 4px 8px; font-size: 0.78rem; border-radius: 4px; }
+
+        /* --- KPIS CARDS --- */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        @media (max-width: 900px) {
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
+        }
+        .kpi-card {
+            background: var(--blanc);
+            padding: 16px;
+            border-radius: var(--radius-main);
+            border: 1px solid var(--gris-tres-clair);
+            border-left: 5px solid var(--rouge);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .kpi-title {
+            font-size: 0.75rem;
+            color: var(--gris-moyen);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .kpi-value {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.6rem;
+            color: var(--noir-doux);
+            margin-top: 2px;
+            font-weight: 700;
+        }
+
+        /* --- CONTENEUR PRINCIPAL --- */
+        .main-card {
+            background: var(--blanc);
+            border-radius: var(--radius-main);
+            border: 1px solid var(--gris-tres-clair);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            padding: 22px;
+        }
+        .card-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--gris-tres-clair);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .card-header-actions h3 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--noir-doux);
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        /* --- FORMULAIRE D'AJOUT --- */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 120px 160px 180px 1fr auto;
+            gap: 10px;
+            background: var(--gris-fond-input);
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            border: 1px dashed var(--gris-clair);
+            align-items: flex-end;
+            margin-bottom: 16px;
+        }
+        @media (max-width: 1100px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--gris-fonce); }
+        .form-control {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1.5px solid var(--gris-tres-clair);
+            background: white;
+            border-radius: var(--radius-sm);
+            font-size: 0.86rem;
+            font-family: 'Roboto', sans-serif;
+            color: var(--gris-fonce);
+            outline: none;
+        }
+        .form-control:focus {
+            border-color: var(--rouge);
+            box-shadow: 0 0 0 3px rgba(196,30,58,0.08);
+        }
+
+        /* --- FILTRES --- */
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+            background: #fafafa;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gris-tres-clair);
+        }
+        .filter-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .badge-filter {
+            background: var(--blanc);
+            color: var(--gris-fonce);
+            border: 1px solid var(--gris-clair);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .badge-filter:hover { border-color: var(--rouge); color: var(--rouge); }
+        .badge-filter.active {
+            background: var(--rouge);
+            color: white;
+            border-color: var(--rouge);
+            font-weight: 600;
+        }
+
+        /* --- TABLEAU --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--gris-tres-clair);
+        }
+        th {
+            background-color: var(--fond);
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 500;
+            color: var(--noir-doux);
+        }
+        tr:hover { background-color: #fafbfc; }
+
+        .badge-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-tous { background: var(--rouge-clair); color: var(--rouge); border: 1px solid #fecaca; }
+        .badge-occas { background: var(--orange-fond); color: var(--orange); border: 1px solid #fed7aa; }
+        .badge-ok { background: var(--vert-fond); color: var(--vert-succes); border: 1px solid #bbf7d0; }
+        .badge-attente { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+
+        /* --- MODALE D'ÉDITION --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: white; border-radius: 12px; padding: 24px; max-width: 480px; width: 95%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        }
+        .modal-box h3 {
+            font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0 0 15px 0;
+            border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 8px; font-size: 1.2rem;
+        }
+
+        /* --- TOAST --- */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { color: white; padding: 12px 18px; border-radius: 8px; font-size: 0.88rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast.success { background: #1a472a; border-left: 4px solid var(--vert-succes); }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <div class="sidebar"></div>
+
+    <div class="main-content">
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="topbar-title-block">
+                <h2>Prise en Charge École — Mardis 16h15</h2>
+                <p>Gestion du ramassage scolaire, suivi des autorisations et feuille d'appel du Dojo</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="btn btn-outline" onclick="loadData()">🔄 Recharger</button>
+                <button class="btn btn-primary" onclick="imprimerFeuilleAppelA4()">🖨️ Imprimer la Feuille d'Appel (A4)</button>
+                <a href="../index.html" class="btn btn-dark">🏠 Bureau Central</a>
+            </div>
+        </div>
+
+        <div class="app-body">
+            
+            <!-- KPIS -->
+            <div class="kpi-grid">
+                <div class="kpi-card" style="border-left-color: var(--rouge);">
+                    <div class="kpi-title">Total Enfants Inscrits</div>
+                    <div class="kpi-value" id="kpi-total">0</div>
+                </div>
+                <div class="kpi-card" style="border-left-color: var(--rouge);">
+                    <div class="kpi-title">Tous les Mardis (Fixes)</div>
+                    <div class="kpi-value" id="kpi-tous" style="color: var(--rouge);">0</div>
+                </div>
+                <div class="kpi-card" style="border-left-color: var(--orange);">
+                    <div class="kpi-title">Occasionnels</div>
+                    <div class="kpi-value" id="kpi-occas" style="color: var(--orange);">0</div>
+                </div>
+                <div class="kpi-card" style="border-left-color: var(--vert-succes);">
+                    <div class="kpi-title">Autorisations en Attente</div>
+                    <div class="kpi-value" id="kpi-attente" style="color: #dc2626;">0</div>
+                </div>
+            </div>
+
+            <!-- CONTENEUR PRINCIPAL -->
+            <div class="main-card">
+                <div class="card-header-actions">
+                    <div>
+                        <h3>📋 Liste des Enfants Récupérés à l'École de Dornes</h3>
+                        <span style="font-size:0.8rem; color:var(--gris-moyen);">Rendez-vous à 16h15 devant le portail de l'école primaire • Départ pédestre sécurisé</span>
+                    </div>
+                </div>
+
+                <!-- FORMULAIRE D'AJOUT RAPIDE -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nom & Prénom de l'Enfant *</label>
+                        <input type="text" id="add-nom" class="form-control" placeholder="Ex: Lucas DUPONT">
+                    </div>
+                    <div class="form-group">
+                        <label>Classe *</label>
+                        <select id="add-classe" class="form-control">
+                            <option value="CP">CP</option>
+                            <option value="CE1">CE1</option>
+                            <option value="CE2">CE2</option>
+                            <option value="CM1">CM1</option>
+                            <option value="CM2">CM2</option>
+                            <option value="GS">GS</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fréquence *</label>
+                        <select id="add-freq" class="form-control">
+                            <option value="tous">Tous les mardis</option>
+                            <option value="occasionnel">Occasionnellement</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Autorisation Parentale *</label>
+                        <select id="add-autorisation" class="form-control">
+                            <option value="oui">✅ Remplie & Signée</option>
+                            <option value="non">⏳ En attente</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Parents / Téléphone</label>
+                        <input type="text" id="add-contact" class="form-control" placeholder="Ex: 06 12 34 56 78">
+                    </div>
+                    <button class="btn btn-dark" style="height:36px;" onclick="ajouterEnfant()">➕ Inscrire</button>
+                </div>
+
+                <!-- FILTRES & RECHERCHE -->
+                <div class="filter-bar">
+                    <div class="filter-badges" id="filterBadges">
+                        <span class="badge-filter active" onclick="filtrerListe('tous-groupes')">Tous les enfants</span>
+                        <span class="badge-filter" onclick="filtrerListe('freq-tous')">📅 Tous les mardis</span>
+                        <span class="badge-filter" onclick="filtrerListe('freq-occas')">⏳ Occasionnels</span>
+                        <span class="badge-filter" onclick="filtrerListe('auto-manquante')">⚠️ Sans autorisation</span>
+                    </div>
+                    <div style="min-width: 200px;">
+                        <input type="text" id="searchInput" class="form-control" placeholder="🔍 Rechercher un élève, une classe..." oninput="reconstruireTableau()">
+                    </div>
+                </div>
+
+                <!-- TABLEAU -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom & Prénom de l'Élève</th>
+                            <th style="width: 90px; text-align:center;">Classe</th>
+                            <th style="width: 160px;">Fréquence</th>
+                            <th style="width: 170px;">Autorisation</th>
+                            <th>Contact Parents / Remarques</th>
+                            <th style="width: 110px; text-align:center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="children-tbody"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALE MODIFICATION D'UN ENFANT -->
+    <div class="modal-overlay" id="modalEditChild">
+        <div class="modal-box">
+            <h3>✏️ Modifier la Fiche Élève</h3>
+            <input type="hidden" id="edit-id">
+            
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div class="form-group">
+                    <label>Nom & Prénom de l'Enfant :</label>
+                    <input type="text" id="edit-nom" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Classe à l'école :</label>
+                    <select id="edit-classe" class="form-control">
+                        <option value="CP">CP</option>
+                        <option value="CE1">CE1</option>
+                        <option value="CE2">CE2</option>
+                        <option value="CM1">CM1</option>
+                        <option value="CM2">CM2</option>
+                        <option value="GS">GS</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fréquence de prise en charge :</label>
+                    <select id="edit-freq" class="form-control">
+                        <option value="tous">Tous les mardis (Régulier)</option>
+                        <option value="occasionnel">Occasionnellement (Sur prévenance)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Statut de l'autorisation parentale :</label>
+                    <select id="edit-autorisation" class="form-control">
+                        <option value="oui">✅ Remplie & Signée</option>
+                        <option value="non">⏳ En attente de signature</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Contact Parents / Téléphone :</label>
+                    <input type="text" id="edit-contact" class="form-control">
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px;">
+                <button class="btn btn-secondary btn-sm" onclick="fermerModalEdit()">Annuler</button>
+                <button class="btn btn-primary btn-sm" onclick="enregistrerModifEnfant()">💾 Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // ==========================================
+    // INITIALISATION & SUPABASE
+    // ==========================================
+    const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
+    const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
+    const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
+    const SUPABASE_TABLE = 'ramassage_scolaire';
+
+    let ramassageDB = {
+        enfants: [
+            { id: 1, nom: "Lucas DUPONT", classe: "CE1", freq: "tous", autorisation: "oui", contact: "06 12 34 56 78 (Maman)" },
+            { id: 2, nom: "Emma MARTIN", classe: "CP", freq: "tous", autorisation: "oui", contact: "06 98 76 54 32 (Papa)" },
+            { id: 3, nom: "Jules BERNARD", classe: "CM1", freq: "occasionnel", autorisation: "non", contact: "06 45 12 78 90 (À relancer)" },
+            { id: 4, nom: "Léonie MOREAU", classe: "CE2", freq: "tous", autorisation: "oui", contact: "07 89 65 41 23" }
+        ]
+    };
+
+    let filtreActif = 'tous-groupes';
+
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+    }
+
+    // --- SYNCHRONISATION ---
+    async function syncData(silent = false) {
+        localStorage.setItem('dojo_ramassage_scolaire', JSON.stringify(ramassageDB));
+        try {
+            const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: ramassageDB });
+            if (error) throw error;
+            if (!silent) showToast("✓ Liste synchronisée sur Supabase !");
+        } catch(e) {
+            console.warn("Erreur Supabase ramassage, maintien local :", e);
+            if (!silent) showToast("✓ Données sauvegardées en local");
+        }
+    }
+
+    async function loadData() {
+        const local = localStorage.getItem('dojo_ramassage_scolaire');
+        if (local) {
+            try { ramassageDB = JSON.parse(local); } catch(e) {}
+        }
+
+        try {
+            const { data: res } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+            if (res && res.data && res.data.enfants) {
+                ramassageDB = res.data;
+                localStorage.setItem('dojo_ramassage_scolaire', JSON.stringify(ramassageDB));
+            }
+        } catch(e) {
+            console.warn("Connexion réseau Supabase indisponible, utilisation du cache.");
+        }
+
+        if (!ramassageDB.enfants) ramassageDB.enfants = [];
+        actualiserKPIs();
+        reconstruireTableau();
+    }
+
+    // --- LOGIQUE KPIS ---
+    function actualiserKPIs() {
+        const total = ramassageDB.enfants.length;
+        const tous = ramassageDB.enfants.filter(e => e.freq === 'tous').length;
+        const occas = ramassageDB.enfants.filter(e => e.freq === 'occasionnel').length;
+        const sansAuto = ramassageDB.enfants.filter(e => e.autorisation === 'non').length;
+
+        document.getElementById('kpi-total').innerText = total;
+        document.getElementById('kpi-tous').innerText = tous;
+        document.getElementById('kpi-occas').innerText = occas;
+        document.getElementById('kpi-attente').innerText = sansAuto;
+    }
+
+    // --- GESTION DES FILTRES ---
+    function filtrerListe(filtre) {
+        filtreActif = filtre;
+        document.querySelectorAll('.badge-filter').forEach(b => b.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        reconstruireTableau();
+    }
+
+    // --- TABLEAU ---
+    function reconstruireTableau() {
+        const tbody = document.getElementById('children-tbody');
+        tbody.innerHTML = '';
+
+        const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+
+        const listeFiltree = ramassageDB.enfants.filter(e => {
+            // Filtre par catégorie
+            if (filtreActif === 'freq-tous' && e.freq !== 'tous') return false;
+            if (filtreActif === 'freq-occas' && e.freq !== 'occasionnel') return false;
+            if (filtreActif === 'auto-manquante' && e.autorisation !== 'non') return false;
+
+            // Filtre recherche textuelle
+            if (search) {
+                const matchNom = e.nom.toLowerCase().includes(search);
+                const matchClasse = e.classe.toLowerCase().includes(search);
+                const matchContact = (e.contact || '').toLowerCase().includes(search);
+                if (!matchNom && !matchClasse && !matchContact) return false;
+            }
+            return true;
+        });
+
+        // Tri alphabétique par nom
+        listeFiltree.sort((a,b) => a.nom.localeCompare(b.nom));
+
+        if (listeFiltree.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:25px; color:var(--gris-moyen);">Aucun élève ne correspond aux critères sélectionnés.</td></tr>`;
+            return;
+        }
+
+        listeFiltree.forEach(enf => {
+            const tr = document.createElement('tr');
+            
+            const badgeFreq = enf.freq === 'tous'
+                ? `<span class="badge-status badge-tous">Tous les mardis</span>`
+                : `<span class="badge-status badge-occas">Occasionnel</span>`;
+
+            const badgeAuto = enf.autorisation === 'oui'
+                ? `<span class="badge-status badge-ok">✅ Remplie</span>`
+                : `<span class="badge-status badge-attente">⏳ En attente</span>`;
+
+            tr.innerHTML = `
+                <td><strong style="color:var(--noir-doux); font-size:0.95rem;">${enf.nom}</strong></td>
+                <td style="text-align:center;"><span style="font-family:'Fredoka'; font-weight:bold; background:#F1F5F9; padding:2px 8px; border-radius:4px;">${enf.classe}</span></td>
+                <td>${badgeFreq}</td>
+                <td>${badgeAuto}</td>
+                <td><span style="color:var(--gris-fonce); font-size:0.85rem;">${enf.contact || '-'}</span></td>
+                <td style="text-align:center;">
+                    <button class="btn btn-outline btn-xs" onclick="ouvrirModalEdit(${enf.id})" title="Modifier">✏️</button>
+                    <button class="btn btn-outline btn-xs" style="color:var(--rouge);" onclick="supprimerEnfant(${enf.id})" title="Supprimer">🗑️</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- ACTIONS AJOUT / MODIF / SUPPR ---
+    function ajouterEnfant() {
+        const nom = document.getElementById('add-nom').value.trim();
+        const classe = document.getElementById('add-classe').value;
+        const freq = document.getElementById('add-freq').value;
+        const autorisation = document.getElementById('add-autorisation').value;
+        const contact = document.getElementById('add-contact').value.trim();
+
+        if (!nom) {
+            alert("Veuillez renseigner le nom et le prénom de l'enfant.");
+            return;
+        }
+
+        ramassageDB.enfants.push({
+            id: Date.now(),
+            nom,
+            classe,
+            freq,
+            autorisation,
+            contact
+        });
+
+        document.getElementById('add-nom').value = '';
+        document.getElementById('add-contact').value = '';
+
+        syncData();
+        actualiserKPIs();
+        reconstruireTableau();
+        showToast("✓ Élève inscrit sur la liste de prise en charge !");
+    }
+
+    function supprimerEnfant(id) {
+        const enf = ramassageDB.enfants.find(e => e.id === id);
+        if (enf && confirm(`Retirer ${enf.nom} de la liste de prise en charge ?`)) {
+            ramassageDB.enfants = ramassageDB.enfants.filter(e => e.id !== id);
+            syncData();
+            actualiserKPIs();
+            reconstruireTableau();
+            showToast("✓ Élève retiré de la liste.");
+        }
+    }
+
+    function ouvrirModalEdit(id) {
+        const enf = ramassageDB.enfants.find(e => e.id === id);
+        if (!enf) return;
+
+        document.getElementById('edit-id').value = enf.id;
+        document.getElementById('edit-nom').value = enf.nom;
+        document.getElementById('edit-classe').value = enf.classe;
+        document.getElementById('edit-freq').value = enf.freq;
+        document.getElementById('edit-autorisation').value = enf.autorisation;
+        document.getElementById('edit-contact').value = enf.contact || '';
+
+        document.getElementById('modalEditChild').classList.add('open');
+    }
+
+    function fermerModalEdit() {
+        document.getElementById('modalEditChild').classList.remove('open');
+    }
+
+    function enregistrerModifEnfant() {
+        const id = parseInt(document.getElementById('edit-id').value, 10);
+        const enf = ramassageDB.enfants.find(e => e.id === id);
+        if (!enf) return;
+
+        const nom = document.getElementById('edit-nom').value.trim();
+        if (!nom) return alert("Le nom ne peut pas être vide.");
+
+        enf.nom = nom;
+        enf.classe = document.getElementById('edit-classe').value;
+        enf.freq = document.getElementById('edit-freq').value;
+        enf.autorisation = document.getElementById('edit-autorisation').value;
+        enf.contact = document.getElementById('edit-contact').value.trim();
+
+        fermerModalEdit();
+        syncData();
+        actualiserKPIs();
+        reconstruireTableau();
+        showToast("✓ Fiche élève mise à jour !");
+    }
+
+    // --- IMPRESSION FEUILLE D'APPEL OFFICIELLE A4 PORTRAIT ---
+    function imprimerFeuilleAppelA4() {
+        const liste = [...ramassageDB.enfants].sort((a,b) => a.nom.localeCompare(b.nom));
+        
+        let rowsHtml = '';
+        liste.forEach((e, index) => {
+            const freqTxt = e.freq === 'tous' ? 'Tous les mardis' : 'Occasionnel';
+            const autoBadge = e.autorisation === 'oui' 
+                ? '<strong style="color:#047857;">OUI</strong>' 
+                : '<strong style="color:#C41E3A; background:#FFEBEF; padding:1px 4px; border-radius:3px;">NON</strong>';
+
+            rowsHtml += `
+                <tr style="page-break-inside: avoid;">
+                    <td style="padding: 7px 10px; border-bottom: 1px solid #E2E8F0; text-align: center; color: #64748b; font-size: 8pt;">${index + 1}</td>
+                    <td style="padding: 7px 10px; border-bottom: 1px solid #E2E8F0; font-weight: bold; font-size: 9.5pt; color: #1A1A1A;">${e.nom}</td>
+                    <td style="padding: 7px 10px; border-bottom: 1px solid #E2E8F0; text-align: center; font-weight: bold; font-family: 'Fredoka', sans-serif;">${e.classe}</td>
+                    <td style="padding: 7px 10px; border-bottom: 1px solid #E2E8F0; font-size: 8.5pt;">${freqTxt}</td>
+                    <td style="padding: 7px 10px; border-bottom: 1px solid #E2E8F0; text-align: center; font-size: 8.5pt;">${autoBadge}</td>
+                    <td style="padding: 7px 10px; border-bottom: 1px solid #E2E8F0; font-size: 8pt; color: #475569;">${e.contact || '-'}</td>
+                    <td style="padding: 7px 10px; border-bottom: 1px solid #E2E8F0; text-align: center; width: 85px;">
+                        <div style="width: 24px; height: 18px; border: 1.5px solid #1A1A1A; border-radius: 3px; margin: 0 auto;"></div>
+                    </td>
+                </tr>
+            `;
+        });
+
+        const totalTous = liste.filter(e => e.freq === 'tous').length;
+        const totalOccas = liste.filter(e => e.freq === 'occasionnel').length;
+
+        const printWin = window.open('', '_blank');
+        printWin.document.write(`
+            <!DOCTYPE html>
+            <html lang="fr">
+            <head>
+                <meta charset="UTF-8">
+                <title>Feuille d'Appel Prise en Charge École - Dojo Dornois</title>
+                <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+                <style>
+                    @page {
+                        size: A4 portrait;
+                        margin: 10mm 12mm 14mm 12mm;
+                        @bottom-left {
+                            content: "Dojo Dornois • Association Loi 1901 • RNA : W583001220 • SIRET : 451 928 410 00013 • « Non assujetti à la TVA art. 293-B du CGI »";
+                            font-family: 'Roboto', sans-serif;
+                            font-size: 7.5pt;
+                            color: #6B6B6B;
+                            border-top: 1px solid #E8E8E8;
+                            padding-top: 5px;
+                        }
+                        @bottom-right {
+                            content: "Page " counter(page) " / " counter(pages);
+                            font-family: 'Fredoka', sans-serif;
+                            font-weight: 600;
+                            font-size: 8.5pt;
+                            color: #C41E3A;
+                            border-top: 1px solid #E8E8E8;
+                            padding-top: 5px;
+                        }
+                    }
+
+                    body {
+                        font-family: 'Roboto', sans-serif;
+                        color: #1A1A1A;
+                        background: #FFFFFF;
+                        margin: 0;
+                        padding: 0;
+                        font-size: 9pt;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+
+                    .header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 2px solid #C41E3A;
+                        padding-bottom: 10px;
+                        margin-bottom: 12px;
+                    }
+                    .brand { display: flex; gap: 12px; align-items: center; }
+                    .logo-box {
+                        background-color: #C41E3A;
+                        width: 58px;
+                        height: 58px;
+                        border-radius: 12px;
+                        padding: 5px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+                    .info { font-size: 8pt; line-height: 1.35; color: #3D3D3D; }
+                    .name { font-family: 'Fredoka', sans-serif; font-size: 13pt; color: #C41E3A; font-weight: 700; margin-bottom: 1px; }
+
+                    .meta-badge {
+                        background: #FAF3F4;
+                        border: 1px solid #B8B8B8;
+                        border-left: 4px solid #C41E3A;
+                        border-radius: 6px;
+                        padding: 6px 12px;
+                        text-align: right;
+                        font-size: 8.5pt;
+                    }
+
+                    .title-bar {
+                        text-align: center;
+                        border-top: 2px solid #C41E3A;
+                        border-bottom: 2px solid #C41E3A;
+                        padding: 5px 0;
+                        margin: 10px 0 12px 0;
+                    }
+                    .title-bar h1 {
+                        font-family: 'Fredoka', sans-serif;
+                        font-size: 13.5pt;
+                        color: #C41E3A;
+                        margin: 0;
+                        text-transform: uppercase;
+                    }
+                    .title-bar p {
+                        margin: 2px 0 0 0;
+                        font-size: 8.5pt;
+                        color: #3D3D3D;
+                        font-weight: 600;
+                    }
+
+                    .consignes-box {
+                        background: #F8FAFC;
+                        border: 1px solid #E2E8F0;
+                        border-left: 3.5px solid #2B6CB0;
+                        padding: 8px 12px;
+                        border-radius: 4px;
+                        font-size: 8.2pt;
+                        line-height: 1.4;
+                        color: #2D3748;
+                        margin-bottom: 12px;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 8.8pt;
+                    }
+                    thead { display: table-header-group; }
+                    tbody { display: table-row-group; }
+
+                    th {
+                        background-color: #1A1A1A;
+                        color: white;
+                        font-family: 'Fredoka', sans-serif;
+                        padding: 7px 10px;
+                        text-align: left;
+                        font-weight: 500;
+                        font-size: 8.2pt;
+                    }
+
+                    .signatures-row {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-end;
+                        margin-top: 25px;
+                        padding-top: 10px;
+                        border-top: 1px dashed #CBD5E1;
+                        page-break-inside: avoid;
+                    }
+                    .sig-cell {
+                        width: 45%;
+                        border: 1px dashed #B8B8B8;
+                        border-radius: 6px;
+                        padding: 8px 12px;
+                        min-height: 75px;
+                        font-size: 8pt;
+                        background: #FAFAFA;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="brand">
+                        <div class="logo-box">
+                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
+                        </div>
+                        <div class="info">
+                            <div class="name">DOJO DORNOIS</div>
+                            1 Place de la Mairie - 58390 DORNES<br>
+                            FFJDA n° CE 08.58.067.0 • Agrément J&S n° 58.S.471<br>
+                            SIRET 451 928 410 00013 • RNA W583001220
+                        </div>
+                    </div>
+                    <div class="meta-badge">
+                        <strong style="color:#C41E3A; font-family:'Fredoka'; font-size:10pt;">ÉCOLE PRIMAIRE DE DORNES</strong><br>
+                        Prise en charge : <strong>Mardi à 16 h 15</strong><br>
+                        Effectif : <strong>${liste.length} inscrits</strong> (${totalTous} fixes / ${totalOccas} occas.)
+                    </div>
+                </div>
+
+                <div class="title-bar">
+                    <h1>FEUILLE D'APPEL & PRISE EN CHARGE SCOLAIRE</h1>
+                    <p>Départ école primaire 16h15 ➔ Accompagnement sécurisé ➔ Dojo Henri Pierrehumbert</p>
+                </div>
+
+                <div class="consignes-box">
+                    <strong>Rappel sécurité & encadrement :</strong> Prise en charge exclusive par <strong>Jordan LOUDENOT</strong> ou <strong>Romain FLAMMANG</strong> munis de gilets réfléchissants. Pointage individuel obligatoire au portail avant le départ pédestre vers le dojo.
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 30px; text-align: center;">N°</th>
+                            <th>Nom & Prénom de l'Élève</th>
+                            <th style="width: 70px; text-align: center;">Classe</th>
+                            <th style="width: 120px;">Fréquence</th>
+                            <th style="width: 95px; text-align: center;">Autorisation</th>
+                            <th>Contact / Téléphone</th>
+                            <th style="width: 85px; text-align: center;">Présent(e)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+
+                <div class="signatures-row">
+                    <div class="sig-cell">
+                        <strong>Encadrant du Dojo Dornois (Prise en charge) :</strong><br>
+                        <span style="font-size:7.5pt; color:#64748b;">Visa et validation de l'effectif récupéré :</span>
+                    </div>
+                    <div class="sig-cell" style="text-align: right;">
+                        <strong>Date de la séance :</strong> Mardi ____ / ____ / 2026<br>
+                        <span style="font-size:7.5pt; color:#64748b;">Début du cours de Judo : 17 h 30</span>
+                    </div>
+                </div>
+
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() { window.print(); window.close(); }, 300);
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWin.document.close();
+    }
+
+    window.onload = loadData;
+</script>
+<script src="../js/sidebar.js"></script>
+</body>
+</html>
