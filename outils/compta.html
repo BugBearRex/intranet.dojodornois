@@ -747,10 +747,8 @@
                     }
 
                     thead.root-header { display: table-header-group; }
-                    tfoot.root-footer { display: table-footer-group; }
                     tbody.root-body { display: table-row-group; }
 
-                    /* En-tête officiel signature de la charte */
                     .doc-header-official {
                         display: flex;
                         justify-content: space-between;
@@ -819,7 +817,6 @@
                         margin-top: 3px;
                     }
 
-                    /* Grille budgétaire print */
                     .grid-budget-print {
                         display: flex;
                         gap: 18px;
@@ -856,30 +853,10 @@
                         font-size: 9pt;
                         border-top: 2px solid #1A1A1A;
                     }
-
-                    /* Pied de page de secours répété */
-                    .print-footer-container {
-                        border-top: 1px solid #E8E8E8;
-                        padding-top: 6px;
-                        margin-top: 10px;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        font-size: 7.5pt;
-                        color: #6B6B6B;
-                    }
-
-                    .page-num-tag {
-                        font-family: 'Fredoka', sans-serif;
-                        font-weight: 600;
-                        color: #C41E3A;
-                        font-size: 8.5pt;
-                    }
                 </style>
             </head>
             <body>
                 <table class="root-layout">
-                    <!-- En-tête répété automatiquement sur toutes les pages -->
                     <thead class="root-header">
                         <tr>
                             <td>
@@ -905,13 +882,10 @@
                             </td>
                         </tr>
                     </thead>
-
-                    <!-- Corps du budget prévisionnel -->
                     <tbody class="root-body">
                         <tr>
                             <td>
                                 <div class="grid-budget-print">
-                                    <!-- COLONNE CHARGES -->
                                     <div class="col-budget-print">
                                         <table class="budget-table">
                                             <thead>
@@ -930,8 +904,6 @@
                                             </tbody>
                                         </table>
                                     </div>
-
-                                    <!-- COLONNE PRODUITS -->
                                     <div class="col-budget-print">
                                         <table class="budget-table">
                                             <thead>
@@ -954,22 +926,6 @@
                             </td>
                         </tr>
                     </tbody>
-
-                    <!-- Pied de page officiel répété -->
-                    <tfoot class="root-footer">
-                        <tr>
-                            <td>
-                                <div class="print-footer-container">
-                                    <div>
-                                        Dojo Dornois • Judo & Disciplines Associées • Association Loi 1901 • RNA : W583001220 • SIRET : 451 928 410 00013 • « Non assujetti à la TVA art. 293-B du CGI »
-                                    </div>
-                                    <div class="page-num-tag">
-                                        Document officiel de gestion interne
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tfoot>
                 </table>
 
                 <script>
