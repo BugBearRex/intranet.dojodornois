@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur de Messages Kalisport - Dojo Dornois</title>
+    <title>Méga Générateur Kalisport & Gmail — Dojo Dornois</title>
 
     <!-- POLICES OFFICIELLES CHARTE DOJO DORNOIS -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -23,6 +23,9 @@
             --gris-clair: #B8B8B8;
             --gris-tres-clair: #E8E8E8;
             --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --sidebar-width: 270px;
+            --topbar-height: 68px;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -31,39 +34,72 @@
             font-family: 'Roboto', sans-serif;
             background-color: var(--fond);
             color: var(--gris-fonce);
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-size: 13px;
+            display: flex; height: 100vh; overflow: hidden;
+        }
+
+        h1, h2, h3, h4, .font-fredoka { font-family: 'Fredoka', sans-serif; }
+        code, pre, .font-mono { font-family: 'Roboto Mono', monospace; }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--noir-doux);
+            color: var(--blanc);
             display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        h1, h2, h3, h4, h5, h6, .font-fredoka {
-            font-family: 'Fredoka', sans-serif;
-        }
-
-        code, pre {
-            font-family: 'Roboto Mono', monospace;
-        }
-
-        .logo-box-wrapper {
-            background-color: var(--rouge);
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
-            padding: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.25);
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
             flex-shrink: 0;
+            overflow-x: hidden;
+            z-index: 100;
         }
 
-        .club-logo-img {
+        .tab-btn-main {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
+            padding: 10px 18px;
+            border-bottom: 3px solid transparent;
+            color: var(--gris-moyen);
+            transition: all 0.2s ease;
+        }
+        .tab-btn-main.active {
+            color: var(--rouge);
+            border-bottom-color: var(--rouge);
+            background: white;
+            font-weight: 700;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 8px 11px;
+            border: 1px solid var(--gris-tres-clair);
+            background: #F8FAFC;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        .input-field:focus {
+            border-color: var(--rouge);
+            background: #FFFFFF;
+        }
+
+        .source-textarea {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            padding: 16px;
+            background: #1E293B;
+            color: #F8FAFC;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 11.5px;
+            line-height: 1.5;
+            border: none;
+            outline: none;
+            resize: none;
         }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -74,203 +110,391 @@
 </head>
 <body class="h-full flex text-slate-800 antialiased">
 
-    <!-- SIDEBAR UNIFIÉE (Chargée automatiquement via ../js/sidebar.js) -->
+    <!-- SIDEBAR UNIFIÉE -->
     <div class="sidebar no-print"></div>
 
     <!-- MAIN CONTAINER -->
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden main-content h-screen">
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden h-screen">
         
-        <!-- TOPBAR OFFICIELLE -->
-        <header class="no-print bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0">
+        <!-- TOPBAR -->
+        <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-3">
-                <div class="logo-box-wrapper">
-                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo" class="club-logo-img">
+                <div class="w-10 h-10 rounded-xl bg-[#C41E3A] text-white flex items-center justify-center font-bold font-fredoka text-xl shadow-md">
+                    🥋
                 </div>
                 <div>
-                    <h1 class="font-fredoka text-lg font-bold text-[#1A1A1A]">Générateur de Messages Kalisport</h1>
-                    <p class="text-xs text-slate-500">Outil intranet pour convocations, annonces de stages &amp; bilans d'événements</p>
+                    <h1 class="font-fredoka text-lg font-bold text-[#1A1A1A]">Méga Générateur de Codes Kalisport &amp; Gmail</h1>
+                    <p class="text-xs text-slate-500">Convocations, articles, fiches boutique &amp; courriels enrichis</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-2">
-                <span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-full font-medium border border-amber-200">
-                    <i class="fa-solid fa-envelope-circle-check mr-1"></i> Astuce Mail : <strong>sansmail@dojo.fr</strong>
-                </span>
+                <button onclick="copierCodeSourceKalisport()" class="px-3.5 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm" title="Coller dans le mode source de Kalisport">
+                    <i class="fa-solid fa-code text-amber-400"></i> Copier pour Kalisport (Code Source)
+                </button>
+                <button onclick="copierRenduPourGmail()" class="px-3.5 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm" title="Coller directement dans le corps d'un e-mail Gmail">
+                    <i class="fa-brands fa-google text-white"></i> Copier pour Gmail (Visuel)
+                </button>
+                <a href="../index.html" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition">
+                    🏠 Central
+                </a>
             </div>
         </header>
 
-        <!-- CONTENU EN 2 COLONNES -->
-        <main class="flex-1 flex overflow-hidden p-4 gap-4">
+        <!-- BARRE DES ONGLETS MAÎTRES -->
+        <div class="bg-slate-100 border-b border-slate-200 px-6 flex justify-between items-center shrink-0">
+            <div class="flex gap-2">
+                <button onclick="changerModule('messages')" id="tab-btn-messages" class="tab-btn-main active flex items-center gap-2">
+                    <i class="fa-solid fa-bullhorn text-[#C41E3A]"></i> 1. Messages &amp; Convocations
+                </button>
+                <button onclick="changerModule('articles')" id="tab-btn-articles" class="tab-btn-main flex items-center gap-2">
+                    <i class="fa-solid fa-newspaper"></i> 2. Articles d'Actualité
+                </button>
+                <button onclick="changerModule('boutique')" id="tab-btn-boutique" class="tab-btn-main flex items-center gap-2">
+                    <i class="fa-solid fa-store"></i> 3. Fiches Boutique
+                </button>
+            </div>
+            <button id="btn-toggle-source" onclick="basculerModeCodeSource()" class="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-md text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
+                <i class="fa-solid fa-code text-[#C41E3A]"></i> <span>Éditer le Code Source</span>
+            </button>
+        </div>
+
+        <!-- ESPACE DE TRAVAIL SPLIT (FORMULAIRE / APERÇU) -->
+        <div class="flex-1 flex overflow-hidden p-4 gap-4">
             
-            <!-- COLONNE GAUCHE : SÉLECTEUR & FORMULAIRE -->
+            <!-- COLONNE GAUCHE : FORMULAIRES DE CONFIGURATION OU ÉDITEUR CODE SOURCE -->
             <div class="w-5/12 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
                 
-                <!-- SELECTEUR DE TYPE DE MESSAGE -->
-                <div class="p-3 bg-slate-50 border-b border-slate-200 flex gap-2">
-                    <button id="btn-mode-debut" onclick="setMessageType('debut')" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-[#C41E3A] text-white border-[#C41E3A]">
-                        <i class="fa-solid fa-bullhorn"></i> 1. Début / Convocation
-                    </button>
-                    <button id="btn-mode-fin" onclick="setMessageType('fin')" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border-slate-200 hover:bg-slate-100">
-                        <i class="fa-solid fa-flag-checkered"></i> 2. Fin / Résumé &amp; Photos
-                    </button>
-                </div>
-
-                <!-- FORMULAIRE DYNAMIQUE -->
-                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                <!-- ZONE FORMULAIRES -->
+                <div id="conteneur-formulaires" class="flex-1 overflow-y-auto p-4 space-y-4">
                     
-                    <!-- SELECTEUR DE COULEUR PERSONNALISÉE -->
-                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-palette text-slate-600"></i>
-                            <span class="text-[11px] font-bold text-slate-700">Couleur du thème :</span>
+                    <!-- ================= SOUS-FORMULAIRE 1 : MESSAGES & CONVOCATIONS ================= -->
+                    <div id="form-module-messages" class="space-y-4">
+                        <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg flex gap-2">
+                            <button id="msg-mode-debut" onclick="setModeMessage('debut')" class="flex-1 py-1.5 px-3 rounded-md text-xs font-bold font-fredoka bg-[#C41E3A] text-white">
+                                📢 1. Début / Convocation
+                            </button>
+                            <button id="msg-mode-fin" onclick="setModeMessage('fin')" class="flex-1 py-1.5 px-3 rounded-md text-xs font-bold font-fredoka bg-white text-slate-600 border border-slate-200 hover:bg-slate-100">
+                                📸 2. Fin / Résumé &amp; Bilan
+                            </button>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <input type="color" id="f-color" value="#C41E3A" onchange="updateGenerator()" class="w-8 h-8 rounded border border-slate-300 cursor-pointer bg-transparent">
-                            <span id="lbl-color-code" class="font-mono text-[11px] text-slate-500 font-bold">#C41E3A</span>
-                        </div>
-                    </div>
 
-                    <div class="grid grid-cols-4 gap-2">
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-700"><i class="fa-solid fa-palette text-slate-600 mr-1"></i> Couleur du thème :</span>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="msg-color" value="#C41E3A" onchange="actualiserRendu()" class="w-7 h-7 rounded border cursor-pointer bg-transparent">
+                                <span id="msg-color-hex" class="font-mono text-[11px] text-slate-500 font-bold">#C41E3A</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">Émoji</label>
+                                <input type="text" id="msg-emoji" value="🥋" oninput="actualiserRendu()" class="input-field text-center text-sm font-bold">
+                            </div>
+                            <div class="col-span-3">
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">Titre de l'Événement</label>
+                                <input type="text" id="msg-titre" value="STAGE MULTI-ACTIVITÉS DU DOJO" oninput="actualiserRendu()" class="input-field font-bold">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">Sous-titre</label>
+                                <input type="text" id="msg-soustitre" value="Dojo Dornois • Événement Club" oninput="actualiserRendu()" class="input-field">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">Badge Date / Tag</label>
+                                <input type="text" id="msg-date" value="📅 Mercredi 12 Août 2026" oninput="actualiserRendu()" class="input-field">
+                            </div>
+                        </div>
+
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Émoji</label>
-                            <input type="text" id="f-emoji" value="🥋" oninput="updateGenerator()" class="w-full text-center p-2 border border-slate-300 rounded-lg text-base focus:border-[#C41E3A] outline-none">
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Texte d'Introduction</label>
+                            <textarea id="msg-intro" rows="3" oninput="actualiserRendu()" class="input-field">Bonjour à tous ! Un stage multi-activités est organisé pour vos enfants. C'est l'occasion idéale pour eux de partager un moment convivial sur les tapis autour du judo et de jeux ludiques. Le stage est gratuit pour les licenciés du Dojo.</textarea>
                         </div>
-                        <div class="col-span-3">
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Titre de l'Événement</label>
-                            <input type="text" id="f-titre" value="STAGE MULTI-ACTIVITÉS DU DOJO" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold focus:border-[#C41E3A] outline-none">
-                        </div>
-                    </div>
 
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Sous-titre / En-tête</label>
-                            <input type="text" id="f-soustitre" value="Dojo Dornois • Événement Club" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs focus:border-[#C41E3A] outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Badge Date / Tag</label>
-                            <input type="text" id="f-date" value="📅 Mercredi 12 Août 2026" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs focus:border-[#C41E3A] outline-none">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Texte de Présentation / Intro</label>
-                        <textarea id="f-intro" rows="3" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs focus:border-[#C41E3A] outline-none">Bonjour à tous ! Un stage multi-activités est organisé pour vos enfants le mercredi 12 août. C'est l'occasion idéale pour eux de partager un moment convivial sur les tapis autour du judo et de jeux ludiques. Le stage est gratuit pour les licenciés du Dojo.</textarea>
-                    </div>
-
-                    <div class="border border-slate-200 rounded-lg p-3 bg-slate-50/50 space-y-2">
-                        <label class="block text-[11px] font-bold text-[#C41E3A] uppercase font-fredoka" id="lbl-bloc-titre">⏰ Programme ou Points clés (1 par ligne)</label>
-                        <input type="text" id="f-bloctitre" value="⏰ Programme de la journée :" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold focus:border-[#C41E3A] outline-none mb-1">
-                        
-                        <textarea id="f-liste" rows="4" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs focus:border-[#C41E3A] outline-none">09h45 • 10h00 : Accueil des participants au dojo
+                        <div class="border border-slate-200 rounded-lg p-3 bg-slate-50 space-y-2">
+                            <label class="block text-[11px] font-bold text-[#C41E3A] uppercase font-fredoka">⏰ Programme / Points clés (1 par ligne)</label>
+                            <input type="text" id="msg-bloctitre" value="⏰ Programme de la journée :" oninput="actualiserRendu()" class="input-field font-bold mb-1">
+                            <textarea id="msg-liste" rows="4" oninput="actualiserRendu()" class="input-field">09h45 • 10h00 : Accueil des participants au dojo
 10h00 • 12h00 : Session Judo & activités ludiques sur le tatami
-12h00 • 14h00 : Pause repas (Repas/pique-nique apporté par les enfants • Le Dojo fournit les boissons)
-14h00 • 16h00 : Temps calme, grands jeux & animations l'après-midi</textarea>
-                    </div>
+12h00 • 14h00 : Pause repas (Pique-nique apporté par les enfants • Boissons fournies)
+14h00 • 16h00 : Grands jeux & animations l'après-midi</textarea>
+                        </div>
 
-                    <div class="border border-amber-200 rounded-lg p-3 bg-amber-50/50 space-y-2">
-                        <label class="block text-[11px] font-bold text-amber-800 uppercase font-fredoka">⚠️ Message d'alerte / Consigne</label>
-                        <textarea id="f-alerte" rows="4" oninput="updateGenerator()" class="w-full p-2 border border-amber-300 rounded-lg text-xs focus:border-amber-500 outline-none">Organisation & Logistique :
-Merci de bien vouloir valider la présence ou l'absence de votre enfant directement via cette convocation pour nous permettre d'ajuster l'encadrement et les boissons.
+                        <div class="border border-amber-200 rounded-lg p-3 bg-amber-50/60 space-y-2">
+                            <label class="block text-[11px] font-bold text-amber-800 uppercase font-fredoka">⚠️ Message d'alerte &amp; Inscription</label>
+                            <textarea id="msg-alerte" rows="3" oninput="actualiserRendu()" class="input-field">Organisation & Logistique :
+Merci de bien vouloir valider la présence ou l'absence de votre enfant directement via cette convocation pour ajuster l'encadrement.
 
 Remarque : Si vous ne souhaitez pas renseigner d'adresse email, indiquez simplement sansmail@dojo.fr dans le champ requis.</textarea>
+                        </div>
+
+                        <div id="msg-conditions-box" class="border border-sky-200 rounded-lg p-3 bg-sky-50/60 space-y-2">
+                            <label class="block text-[11px] font-bold text-sky-800 uppercase font-fredoka">ℹ️ Conditions de maintien</label>
+                            <textarea id="msg-conditions" rows="2" oninput="actualiserRendu()" class="input-field">Pour que le stage puisse se dérouler, un minimum de 6 participants est requis. 
+Sous réserve de conditions météo favorables (annulation possible en cas de forte canicule ou orages).</textarea>
+                        </div>
                     </div>
 
-                    <!-- NOUVEAU BLOC : CONDITIONS DE MAINTIEN -->
-                    <div id="bloc-conditions-ui" class="border border-sky-200 rounded-lg p-3 bg-sky-50/50 space-y-2 mt-4">
-                        <label class="block text-[11px] font-bold text-sky-800 uppercase font-fredoka">ℹ️ Conditions de maintien</label>
-                        <textarea id="f-conditions" rows="3" oninput="updateGenerator()" class="w-full p-2 border border-sky-300 rounded-lg text-xs focus:border-sky-500 outline-none">Pour que le stage puisse se dérouler dans les meilleures conditions, il faut un minimum de 6 participants (idéalement 8). 
-L'événement est sous réserve de conditions météorologiques favorables et propices (annulation possible si forte canicule ou gros orages).</textarea>
+                    <!-- ================= SOUS-FORMULAIRE 2 : ARTICLES D'ACTUALITÉ ================= -->
+                    <div id="form-module-articles" class="space-y-4 hidden">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Date de parution</label>
+                                <input type="text" id="art-date" class="input-field" value="28 Juillet 2026" oninput="actualiserRendu()">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Discipline / Rubrique</label>
+                                <input type="text" id="art-cat" class="input-field" value="Judo • Compétition" oninput="actualiserRendu()">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Titre de l'article</label>
+                            <input type="text" id="art-titre" class="input-field font-semibold" value="Superbes résultats au tournoi de Nevers" oninput="actualiserRendu()">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Texte d'introduction (Liseré rouge)</label>
+                            <textarea id="art-intro" rows="2" class="input-field" oninput="actualiserRendu()">Le week-end dernier, nos judokas ont fièrement représenté le club lors du tournoi régional de Nevers. Retour en images et en chiffres sur cette belle journée.</textarea>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+                            <label class="block text-xs font-bold text-slate-800">📸 Image principale (Optionnelle)</label>
+                            <input type="text" id="art-img" class="input-field" placeholder="Collez l'URL publique de l'image (ou laissez vide)" oninput="actualiserRendu()">
+                            <input type="text" id="art-caption" class="input-field" placeholder="Légende de la photo" value="📷 Remise des récompenses sur le podium." oninput="actualiserRendu()">
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-bold text-slate-800">📝 Paragraphes du corps de l'article</label>
+                                <button type="button" onclick="ajouterSectionArticle()" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-medium border">
+                                    <i class="fa-solid fa-plus text-[#C41E3A]"></i> + Bloc
+                                </button>
+                            </div>
+                            <div id="liste-sections-article" class="space-y-3"></div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Encadré Focus / Citation (Optionnel)</label>
+                            <textarea id="art-focus" rows="2" class="input-field" oninput="actualiserRendu()">💡 À retenir : Prochain rendez-vous le samedi 15 août pour l'entraînement commun de rentrée au dojo municipal !</textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Message de conclusion</label>
+                                <input type="text" id="art-closing" class="input-field" value="À très bientôt sur les tatamis ! 👋" oninput="actualiserRendu()">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Signature</label>
+                                <input type="text" id="art-sig" class="input-field" value="🥋 L'équipe du Dojo Dornois" oninput="actualiserRendu()">
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Pied de Page</label>
-                        <input type="text" id="f-footer" value="Dojo Dornois • Amitié • Entraide • Esprit de Famille" oninput="updateGenerator()" class="w-full p-2 border border-slate-300 rounded-lg text-xs focus:border-[#C41E3A] outline-none">
+                    <!-- ================= SOUS-FORMULAIRE 3 : FICHES BOUTIQUE ================= -->
+                    <div id="form-module-boutique" class="space-y-4 hidden">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Nom du produit &amp; Réf.</label>
+                                <input type="text" id="prod-nom" class="input-field font-semibold" value="Basic-T - 029030" oninput="actualiserRendu()">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Prix affiché</label>
+                                <input type="text" id="prod-prix" class="input-field" value="à partir de 10,00 €" oninput="actualiserRendu()">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Slogan / Tagline</label>
+                            <input type="text" id="prod-tagline" class="input-field" value="🔥 BEST SELLER • T-shirt unisexe" oninput="actualiserRendu()">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Points forts (1 ligne = 1 puce verte)</label>
+                            <textarea id="prod-points" rows="3" class="input-field" oninput="actualiserRendu()">Bande de propreté intégrée au col
+Col avec élasthanne pour une meilleure tenue
+Coupe et taille standards européennes</textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Matière / Qualité</label>
+                                <input type="text" id="prod-qualite" class="input-field" value="100% coton de qualité supérieure" oninput="actualiserRendu()">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Grammage</label>
+                                <input type="text" id="prod-poids" class="input-field" value="145 g/m²" oninput="actualiserRendu()">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Tailles disponibles</label>
+                                <input type="text" id="prod-tailles" class="input-field" value="du XS au 4XL" oninput="actualiserRendu()">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Couleurs</label>
+                                <input type="text" id="prod-couleurs" class="input-field" value="00 (Blanc)" oninput="actualiserRendu()">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Informations de Marquage</label>
+                            <textarea id="prod-marquage" rows="2" class="input-field" oninput="actualiserRendu()">💡 Marquage officiel : Ce t-shirt inclut le logo du Dojo Dornois côté cœur et le logo Sport Comm en contre-cœur.</textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Boutons Liens Déclinaisons (Format: Nom | URL)</label>
+                            <textarea id="prod-liens" rows="2" class="input-field" oninput="actualiserRendu()">👚 Version Femme | https://dojodornois.fr/produits/basic-t-femme
+🧒 Version Junior | https://dojodornois.fr/produits/basic-t-junior</textarea>
+                        </div>
                     </div>
 
+                </div>
+
+                <!-- ZONE ÉDITEUR CODE SOURCE COMPLET (BASCULE) -->
+                <div id="conteneur-code-source" class="flex-1 hidden">
+                    <textarea id="editeur-code-source-direct" class="source-textarea" placeholder="Collez ou modifiez directement votre code HTML ici..." oninput="actualiserRenduDepuisCodeSource()"></textarea>
                 </div>
             </div>
 
-            <!-- COLONNE DROITE : APERÇU EN DIRECT & CODE BRUT -->
+            <!-- COLONNE DROITE : APERÇU EN DIRECT ET CODE BRUT COPIABLE -->
             <div class="w-7/12 flex flex-col gap-4 overflow-hidden">
                 
+                <!-- APERÇU VISUEL -->
                 <div class="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
-                    <div class="p-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                    <div class="p-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center shrink-0">
                         <span class="font-fredoka text-xs font-bold text-slate-700 flex items-center gap-2">
-                            <i class="fa-solid fa-eye text-[#C41E3A]"></i> Aperçu en Direct (Rendu Kalisport)
+                            <i class="fa-solid fa-eye text-[#C41E3A]"></i> Aperçu en Direct (Rendu Kalisport &amp; Gmail)
                         </span>
-                        <span class="text-[10px] text-slate-400">Largeur optimale responsive</span>
+                        <div class="flex gap-2">
+                            <button onclick="copierRenduPourGmail()" class="text-[11px] font-bold text-[#C41E3A] hover:underline flex items-center gap-1">
+                                <i class="fa-brands fa-google"></i> Copier Visuel Gmail
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex-1 p-4 overflow-y-auto bg-slate-100 flex justify-center items-start">
-                        <div id="render-preview" class="w-full max-w-[680px]"></div>
+                    <div class="flex-1 p-5 overflow-y-auto bg-slate-100 flex justify-center items-start">
+                        <div id="zone-rendu-visuel" class="w-full max-w-[680px]"></div>
                     </div>
                 </div>
 
-                <div class="h-2/5 bg-slate-900 rounded-xl shadow-sm border border-slate-800 flex flex-col overflow-hidden">
+                <!-- CODE BRUT COPIABLE EN TEMPS RÉEL -->
+                <div class="h-2/5 bg-slate-900 rounded-xl shadow-sm border border-slate-800 flex flex-col overflow-hidden shrink-0">
                     <div class="p-2.5 bg-slate-950 border-b border-slate-800 flex justify-between items-center px-4">
                         <span class="font-mono text-xs font-bold text-slate-300 flex items-center gap-2">
-                            <i class="fa-solid fa-code text-amber-400"></i> Code HTML Brut (prêt à coller)
+                            <i class="fa-solid fa-code text-amber-400"></i> Code Source HTML (Prêt pour Kalisport)
                         </span>
-                        <button onclick="copyCode()" id="btn-copy" class="px-3 py-1 bg-[#C41E3A] hover:bg-[#A3182E] text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition-all shadow-sm">
+                        <button onclick="copierCodeSourceKalisport()" id="btn-copy-code" class="px-3 py-1 bg-[#C41E3A] hover:bg-[#A3182E] text-white text-xs font-bold rounded flex items-center gap-1.5 transition shadow-sm">
                             <i class="fa-solid fa-copy"></i> Copier le Code
                         </button>
                     </div>
                     <div class="flex-1 p-3 overflow-y-auto">
-                        <textarea id="raw-code" readonly class="w-full h-full bg-transparent text-slate-200 font-mono text-[11px] border-none outline-none resize-none leading-relaxed"></textarea>
+                        <textarea id="zone-code-brut" readonly class="w-full h-full bg-transparent text-slate-200 font-mono text-[11px] border-none outline-none resize-none leading-relaxed"></textarea>
                     </div>
                 </div>
 
             </div>
 
-        </main>
+        </div>
     </div>
 
-    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE INTRA -->
+    <!-- SCRIPT SIDEBAR UNIFIÉE -->
     <script src="../js/sidebar.js"></script>
 
     <script>
-        let currentMode = 'debut';
+        let moduleActif = 'messages'; // 'messages', 'articles', 'boutique'
+        let modeMessage = 'debut';     // 'debut' ou 'fin'
+        let modeCodeSourceActif = false;
+        let codeManuelModifie = false;
 
-        function setMessageType(mode) {
-            currentMode = mode;
-            const btnDebut = document.getElementById('btn-mode-debut');
-            const btnFin = document.getElementById('btn-mode-fin');
-            const blocConditionsUI = document.getElementById('bloc-conditions-ui');
+        let sectionsArticle = [
+            {
+                titre: "Un événement marquant",
+                texte: "Le week-end dernier, nos judokas ont participé au tournoi régional de Nevers. Une ambiance électrique, des combats intenses, et surtout une magnifique cohésion d'équipe sur et en dehors des tatamis."
+            },
+            {
+                titre: "Des résultats prometteurs",
+                texte: "Nos jeunes ont particulièrement brillé lors de cette édition : trois podiums décrochés de haute lutte, dont une superbe première place pour Hugo. Bravo à tous pour leur engagement et le respect du code moral !"
+            }
+        ];
+
+        function changerModule(mod) {
+            if (modeCodeSourceActif) basculerModeCodeSource();
+            codeManuelModifie = false;
+            moduleActif = mod;
+
+            ['messages', 'articles', 'boutique'].forEach(m => {
+                document.getElementById(`tab-btn-${m}`).classList.remove('active');
+                document.getElementById(`form-module-${m}`).classList.add('hidden');
+            });
+
+            document.getElementById(`tab-btn-${mod}`).classList.add('active');
+            document.getElementById(`form-module-${mod}`).classList.remove('hidden');
+
+            actualiserRendu();
+        }
+
+        function setModeMessage(mode) {
+            modeMessage = mode;
+            const btnDebut = document.getElementById('msg-mode-debut');
+            const btnFin = document.getElementById('msg-mode-fin');
+            const boxCond = document.getElementById('msg-conditions-box');
 
             if (mode === 'debut') {
-                btnDebut.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-[#C41E3A] text-white border-[#C41E3A]";
-                btnFin.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border-slate-200 hover:bg-slate-100";
-                
-                document.getElementById('f-color').value = '#C41E3A';
-                document.getElementById('f-emoji').value = '🥋';
-                document.getElementById('f-titre').value = 'STAGE MULTI-ACTIVITÉS DU DOJO';
-                document.getElementById('f-soustitre').value = 'Dojo Dornois • Événement Club';
-                document.getElementById('f-date').value = '📅 Mercredi 12 Août 2026';
-                document.getElementById('f-intro').value = "Bonjour à tous ! Un stage multi-activités est organisé pour vos enfants le mercredi 12 août. C'est l'occasion idéale pour eux de partager un moment convivial sur les tapis autour du judo et de jeux ludiques. Le stage est gratuit pour les licenciés du Dojo.";
-                document.getElementById('f-bloctitre').value = '⏰ Programme de la journée :';
-                document.getElementById('f-liste').value = "09h45 • 10h00 : Accueil des participants au dojo\n10h00 • 12h00 : Session Judo & activités ludiques sur le tatami\n12h00 • 14h00 : Pause repas (Repas/pique-nique apporté par les enfants • Le Dojo fournit les boissons)\n14h00 • 16h00 : Temps calme, grands jeux & animations l'après-midi";
-                document.getElementById('f-alerte').value = "Organisation & Logistique :\nMerci de bien vouloir valider la présence ou l'absence de votre enfant directement via cette convocation pour nous permettre d'ajuster l'encadrement et les boissons.\n\nRemarque : Si vous ne souhaitez pas renseigner d'adresse email, indiquez simplement sansmail@dojo.fr dans le champ requis.";
-                
-                blocConditionsUI.style.display = 'block';
-                document.getElementById('f-conditions').value = "Pour que le stage puisse se dérouler dans les meilleures conditions, il faut un minimum de 6 participants (idéalement 8). \nL'événement est sous réserve de conditions météorologiques favorables et propices (annulation possible si forte canicule ou gros orages).";
+                btnDebut.className = "flex-1 py-1.5 px-3 rounded-md text-xs font-bold font-fredoka bg-[#C41E3A] text-white";
+                btnFin.className = "flex-1 py-1.5 px-3 rounded-md text-xs font-bold font-fredoka bg-white text-slate-600 border border-slate-200 hover:bg-slate-100";
+                document.getElementById('msg-color').value = '#C41E3A';
+                document.getElementById('msg-emoji').value = '🥋';
+                document.getElementById('msg-titre').value = 'STAGE MULTI-ACTIVITÉS DU DOJO';
+                document.getElementById('msg-soustitre').value = 'Dojo Dornois • Événement Club';
+                document.getElementById('msg-date').value = '📅 Mercredi 12 Août 2026';
+                boxCond.style.display = 'block';
             } else {
-                btnFin.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-[#1E40AF] text-white border-[#1E40AF]";
-                btnDebut.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold font-fredoka border transition-all flex items-center justify-center gap-2 bg-white text-slate-600 border-slate-200 hover:bg-slate-100";
-
-                document.getElementById('f-color').value = '#1E40AF';
-                document.getElementById('f-emoji').value = '👏';
-                document.getElementById('f-titre').value = 'RETOUR SUR LE STAGE DU DOJO !';
-                document.getElementById('f-soustitre').value = 'Dojo Dornois • Bilan & Souvenirs';
-                document.getElementById('f-date').value = '📸 Album disponible';
-                document.getElementById('f-intro').value = "Un grand bravo à tous les enfants ayant participé à notre stage ! La journée s'est déroulée dans une excellente ambiance, rythmée par du judo, des jeux, du partage et de très belles valeurs du code moral.";
-                document.getElementById('f-bloctitre').value = '🌟 Résumé & Remerciements :';
-                document.getElementById('f-liste').value = "Une superbe énergie : Les enfants ont donné le meilleur d'eux-mêmes sur le tatami du matin au soir !\nEsprit d'équipe : Mention spéciale pour l'entraide entre les grands et les plus petits lors des grands jeux.\nMerci aux encadrants : Un grand merci aux professeurs et bénévoles mobilisés pour le bon déroulement du stage.";
-                document.getElementById('f-alerte').value = "Photos de la journée :\nRetrouvez quelques clichés du stage ci-dessous ainsi que dans la galerie photos du site !";
-                
-                blocConditionsUI.style.display = 'none';
-                document.getElementById('f-conditions').value = "";
+                btnFin.className = "flex-1 py-1.5 px-3 rounded-md text-xs font-bold font-fredoka bg-[#1E40AF] text-white";
+                btnDebut.className = "flex-1 py-1.5 px-3 rounded-md text-xs font-bold font-fredoka bg-white text-slate-600 border border-slate-200 hover:bg-slate-100";
+                document.getElementById('msg-color').value = '#1E40AF';
+                document.getElementById('msg-emoji').value = '📸';
+                document.getElementById('msg-titre').value = 'RETOUR SUR LE STAGE DU DOJO !';
+                document.getElementById('msg-soustitre').value = 'Dojo Dornois • Bilan & Souvenirs';
+                document.getElementById('msg-date').value = '📸 Album photos disponible';
+                boxCond.style.display = 'none';
             }
+            codeManuelModifie = false;
+            actualiserRendu();
+        }
 
-            updateGenerator();
+        function basculerModeCodeSource() {
+            modeCodeSourceActif = !modeCodeSourceActif;
+            const formConteneur = document.getElementById('conteneur-formulaires');
+            const sourceConteneur = document.getElementById('conteneur-code-source');
+            const btnToggle = document.getElementById('btn-toggle-source');
+            const textareaSource = document.getElementById('editeur-code-source-direct');
+
+            if (modeCodeSourceActif) {
+                textareaSource.value = codeManuelModifie ? textareaSource.value : genererCodeCourant();
+                formConteneur.classList.add('hidden');
+                sourceConteneur.classList.remove('hidden');
+                btnToggle.classList.add('bg-[#1A1A1A]', 'text-white');
+                btnToggle.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Revenir au Formulaire';
+            } else {
+                sourceConteneur.classList.add('hidden');
+                formConteneur.classList.remove('hidden');
+                btnToggle.classList.remove('bg-[#1A1A1A]', 'text-white');
+                btnToggle.innerHTML = '<i class="fa-solid fa-code text-[#C41E3A]"></i> Éditer le Code Source';
+                actualiserRendu();
+            }
+        }
+
+        function echapper(str) {
+            return (str || '')
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
         }
 
         function hexToRgba(hex, alpha) {
@@ -280,101 +504,93 @@ L'événement est sous réserve de conditions météorologiques favorables et pr
             return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
         }
 
-        function updateGenerator() {
-            const primaryColor = document.getElementById('f-color').value || '#C41E3A';
-            document.getElementById('lbl-color-code').textContent = primaryColor.toUpperCase();
-
-            const emoji = document.getElementById('f-emoji').value || '🥋';
-            const titre = document.getElementById('f-titre').value || '';
-            const soustitre = document.getElementById('f-soustitre').value || '';
-            const dateStr = document.getElementById('f-date').value || '';
-            const intro = document.getElementById('f-intro').value || '';
-            const bloctitre = document.getElementById('f-bloctitre').value || '';
-            const listeRaw = document.getElementById('f-liste').value || '';
-            const alerteRaw = document.getElementById('f-alerte').value || '';
-            const conditionsRaw = document.getElementById('f-conditions').value || '';
-            const footer = document.getElementById('f-footer').value || '';
+        // ================= GÉNÉRATION 1 : MESSAGES & CONVOCATIONS =================
+        function genererCodeMessage() {
+            const color = document.getElementById('msg-color').value || '#C41E3A';
+            document.getElementById('msg-color-hex').innerText = color.toUpperCase();
+            const emoji = document.getElementById('msg-emoji').value || '🥋';
+            const titre = echapper(document.getElementById('msg-titre').value);
+            const soustitre = echapper(document.getElementById('msg-soustitre').value);
+            const dateStr = echapper(document.getElementById('msg-date').value);
+            const intro = echapper(document.getElementById('msg-intro').value);
+            const bloctitre = echapper(document.getElementById('msg-bloctitre').value);
+            const listeRaw = document.getElementById('msg-liste').value || '';
+            const alerteRaw = document.getElementById('msg-alerte').value || '';
+            const conditionsRaw = document.getElementById('msg-conditions').value || '';
 
             const lines = listeRaw.split('\n').filter(l => l.trim() !== '');
             let listHtml = '';
-            lines.forEach(line => {
-                if (line.includes(':')) {
-                    const parts = line.split(':');
-                    const head = parts.shift();
-                    const rest = parts.join(':');
-                    listHtml += `\n      <li style="margin-bottom: 6px;"><strong>${head.trim()} :</strong>${rest}</li>`;
+            lines.forEach(l => {
+                if (l.includes(':')) {
+                    const p = l.split(':');
+                    const h = p.shift();
+                    listHtml += `\n      <li style="margin-bottom:6px;"><strong>${echapper(h.trim())} :</strong>${echapper(p.join(':'))}</li>`;
                 } else {
-                    listHtml += `\n      <li style="margin-bottom: 6px;">${line.trim()}</li>`;
+                    listHtml += `\n      <li style="margin-bottom:6px;">${echapper(l.trim())}</li>`;
                 }
             });
 
-            const badgeBg = hexToRgba(primaryColor, 0.12);
-            const badgeTxt = primaryColor;
-            const badgeBorder = hexToRgba(primaryColor, 0.3);
-            
-            const alertBg = (currentMode === 'debut') ? '#FEF3C7' : hexToRgba(primaryColor, 0.08);
-            const alertBorder = (currentMode === 'debut') ? '#FDE68A' : hexToRgba(primaryColor, 0.25);
-            const alertTxt = (currentMode === 'debut') ? '#B45309' : primaryColor;
-            const alertIcon = (currentMode === 'debut') ? '⚠️' : '📷';
-
-            const alertParagraphs = alerteRaw.split('\n\n');
+            const alertParas = alerteRaw.split('\n\n');
             let alertHtml = '';
-            
-            alertParagraphs.forEach((para, idx) => {
-                const subLines = para.split('\n').filter(l => l.trim() !== '');
-                if (subLines.length > 0) {
-                    if (idx > 0) alertHtml += `<div style="margin-top: 10px;"></div>`;
-                    alertHtml += `<strong>${subLines[0]}</strong>`;
-                    for (let i = 1; i < subLines.length; i++) {
-                        alertHtml += `<br />\n      <span style="display: inline-block; margin-top: 4px;"><em>${subLines[i]}</em></span>`;
+            alertParas.forEach((p, idx) => {
+                const sl = p.split('\n').filter(x => x.trim() !== '');
+                if (sl.length > 0) {
+                    if (idx > 0) alertHtml += `<div style="margin-top:10px;"></div>`;
+                    alertHtml += `<strong>${echapper(sl[0])}</strong>`;
+                    for (let i = 1; i < sl.length; i++) {
+                        alertHtml += `<br />\n      <span style="display:inline-block; margin-top:4px;"><em>${echapper(sl[i])}</em></span>`;
                     }
                 }
             });
 
             let conditionsHtml = '';
-            if (conditionsRaw.trim() !== '') {
-                const condLines = conditionsRaw.split('\n').filter(l => l.trim() !== '');
-                let condContent = '';
-                condLines.forEach((line, i) => {
-                    if (i > 0) condContent += `<br />`;
-                    condContent += `<em>${line}</em>`;
+            if (modeMessage === 'debut' && conditionsRaw.trim() !== '') {
+                const cl = conditionsRaw.split('\n').filter(x => x.trim() !== '');
+                let cTxt = '';
+                cl.forEach((x, i) => {
+                    if (i > 0) cTxt += '<br />';
+                    cTxt += `<em>${echapper(x)}</em>`;
                 });
-
                 conditionsHtml = `
-  <!-- BLOC CONDITIONS DE MAINTIEN -->
+  <!-- BLOC CONDITIONS -->
   <div style="background-color: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 8px; padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
     <span style="font-size: 20px; line-height: 1;">ℹ️</span>
     <div style="font-size: 12.5px; color: #0369A1; line-height: 1.6;">
       <strong>Conditions de maintien :</strong><br />
-      <span style="display: inline-block; margin-top: 4px;">${condContent}</span>
+      <span style="display: inline-block; margin-top: 4px;">${cTxt}</span>
     </div>
   </div>`;
             }
 
-            const fullHtml = `<div style="font-family: 'Roboto', 'Segoe UI', Arial, sans-serif; background-color: #F4F6F9; border: 1px solid #E2E8F0; border-radius: 12px; padding: 22px; max-width: 680px; margin: 10px 0; color: #3D3D3D;">
+            const alertBg = modeMessage === 'debut' ? '#FEF3C7' : hexToRgba(color, 0.08);
+            const alertBorder = modeMessage === 'debut' ? '#FDE68A' : hexToRgba(color, 0.25);
+            const alertTxt = modeMessage === 'debut' ? '#B45309' : color;
+            const alertIcon = modeMessage === 'debut' ? '⚠️' : '📷';
+
+            return `<div style="font-family: 'Roboto', Arial, sans-serif; background-color: #F4F6F9; border: 1px solid #E2E8F0; border-radius: 12px; padding: 22px; max-width: 680px; margin: 10px auto; color: #3D3D3D;">
   <!-- EN-TÊTE DU MESSAGE -->
-  <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid ${primaryColor}; padding-bottom: 12px; margin-bottom: 18px;">
+  <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid ${color}; padding-bottom: 12px; margin-bottom: 18px;">
     <div style="display: flex; align-items: center; gap: 12px;">
-      <div style="background-color: ${primaryColor}; color: #FFFFFF; font-family: 'Fredoka', Arial, sans-serif; font-weight: bold; font-size: 20px; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">${emoji}</div>
+      <div style="background-color: ${color}; color: #FFFFFF; font-family: 'Fredoka', Arial, sans-serif; font-weight: bold; font-size: 20px; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">${emoji}</div>
       <div>
-        <h3 style="font-family: 'Fredoka', Arial, sans-serif; font-size: 18px; font-weight: bold; margin: 0; color: ${primaryColor};">${titre}</h3>
+        <h3 style="font-family: 'Fredoka', Arial, sans-serif; font-size: 18px; font-weight: bold; margin: 0; color: ${color};">${titre}</h3>
         <span style="font-size: 11px; color: #6B6B6B; font-weight: bold; text-transform: uppercase;">${soustitre}</span>
       </div>
     </div>
-    <div style="background-color: ${badgeBg}; color: ${badgeTxt}; padding: 6px 12px; border-radius: 8px; font-family: 'Fredoka', Arial, sans-serif; font-weight: bold; font-size: 12px; border: 1px solid ${badgeBorder};">${dateStr}</div>
+    <div style="background-color: ${hexToRgba(color, 0.12)}; color: ${color}; padding: 6px 12px; border-radius: 8px; font-family: 'Fredoka', Arial, sans-serif; font-weight: bold; font-size: 12px; border: 1px solid ${hexToRgba(color, 0.3)};">${dateStr}</div>
   </div>
 
-  <!-- MESSAGE INTRO -->
+  <!-- INTRODUCTION -->
   <p style="font-size: 13px; line-height: 1.6; color: #1A1A1A; margin-bottom: 18px;">${intro}</p>
 
   <!-- PROGRAMME OU POINTS CLES -->
-  <div style="background-color: #FFFFFF; border-left: 4px solid ${primaryColor}; border-radius: 8px; padding: 16px; margin-bottom: 18px; border-top: 1px solid #E8E8E8; border-right: 1px solid #E8E8E8; border-bottom: 1px solid #E8E8E8;">
-    <h4 style="font-family: 'Fredoka', Arial, sans-serif; font-size: 14px; color: ${primaryColor}; margin: 0 0 12px 0; text-transform: uppercase;">${bloctitre}</h4>
+  <div style="background-color: #FFFFFF; border-left: 4px solid ${color}; border-radius: 8px; padding: 16px; margin-bottom: 18px; border-top: 1px solid #E8E8E8; border-right: 1px solid #E8E8E8; border-bottom: 1px solid #E8E8E8;">
+    <h4 style="font-family: 'Fredoka', Arial, sans-serif; font-size: 14px; color: ${color}; margin: 0 0 12px 0; text-transform: uppercase;">${bloctitre}</h4>
     <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.8; color: #3D3D3D;">${listHtml}
     </ul>
   </div>
 
-  <!-- BLOC INFORMATION / CONSIGNES -->
+  <!-- CONSIGNES / ALERTES -->
   <div style="background-color: ${alertBg}; border: 1px solid ${alertBorder}; border-radius: 8px; padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
     <span style="font-size: 20px; line-height: 1;">${alertIcon}</span>
     <div style="font-size: 12.5px; color: ${alertTxt}; line-height: 1.6;">
@@ -383,33 +599,255 @@ L'événement est sous réserve de conditions météorologiques favorables et pr
   </div>
 ${conditionsHtml}
   <!-- PIED DE PAGE -->
-  <div style="text-align: center; font-size: 11px; color: #6B6B6B; border-top: 1px solid #E8E8E8; padding-top: 12px; margin-top: 12px;">${footer}</div>
+  <div style="text-align: center; font-size: 11px; color: #6B6B6B; border-top: 1px solid #E8E8E8; padding-top: 12px; margin-top: 12px;">
+    Dojo Dornois • Judo, Jujitsu &amp; Disciplines Associées • Esprit de Famille
+  </div>
 </div>`;
-
-            document.getElementById('render-preview').innerHTML = fullHtml;
-            document.getElementById('raw-code').value = fullHtml;
         }
 
-        function copyCode() {
-            const rawCode = document.getElementById('raw-code');
-            rawCode.select();
-            document.execCommand('copy');
-            
-            const btn = document.getElementById('btn-copy');
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> Copié !';
-            btn.classList.remove('bg-[#C41E3A]', 'hover:bg-[#A3182E]');
-            btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        // ================= GÉNÉRATION 2 : ARTICLES D'ACTUALITÉ =================
+        function genererCodeArticle() {
+            const date = echapper(document.getElementById('art-date').value);
+            const cat = echapper(document.getElementById('art-cat').value);
+            const titre = echapper(document.getElementById('art-titre').value);
+            const intro = echapper(document.getElementById('art-intro').value);
+            const img = document.getElementById('art-img').value.trim();
+            const caption = echapper(document.getElementById('art-caption').value);
+            const focus = echapper(document.getElementById('art-focus').value);
+            const closing = echapper(document.getElementById('art-closing').value);
+            const sig = echapper(document.getElementById('art-sig').value);
 
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copier le Code';
-                btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                btn.classList.add('bg-[#C41E3A]', 'hover:bg-[#A3182E]');
-            }, 2000);
+            let corpsHtml = '';
+            sectionsArticle.forEach(sec => {
+                const t = echapper(sec.titre.trim());
+                const txt = echapper(sec.texte.trim());
+                if (t) corpsHtml += `<h2 style="font-family:'Fredoka',sans-serif; font-size:1.35rem; color:#1A1A1A; margin:25px 0 10px 0; border-bottom:2px solid #C41E3A; padding-bottom:4px;">${t}</h2>\n`;
+                if (txt) corpsHtml += `<p style="font-size:0.95rem; line-height:1.7; color:#3D3D3D; margin-bottom:14px; text-align:justify;">${txt.replace(/\n/g, '<br>')}</p>\n`;
+            });
+
+            let imgHtml = '';
+            if (img) {
+                imgHtml = `
+<div style="text-align:center; margin:20px 0;">
+  <img src="${img}" alt="${titre}" style="width:100%; max-height:420px; object-fit:cover; border-radius:8px; border:1px solid #E8E8E8;">
+  ${caption ? `<div style="font-size:0.85rem; color:#6B6B6B; margin-top:6px; font-style:italic;">${caption}</div>` : ''}
+</div>\n`;
+            }
+
+            let focusHtml = '';
+            if (focus) {
+                focusHtml = `
+<div style="background:#FFFFFF; border-left:4px solid #1A1A1A; padding:15px 18px; border-radius:0 6px 6px 0; margin:22px 0; border:1px solid #F0F0F0; border-left:4px solid #1A1A1A;">
+  <p style="margin:0; font-size:0.95rem; color:#1A1A1A;">${focus}</p>
+</div>\n`;
+            }
+
+            return `<div style="font-family:'Roboto',Arial,sans-serif; color:#3D3D3D; max-width:800px; margin:0 auto; padding:15px; line-height:1.7;">
+  <div style="text-align:center; margin-bottom:25px;">
+    <div style="font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; color:#6B6B6B; margin-bottom:8px;">
+      <span>${date}</span> &nbsp;|&nbsp; <span style="color:#C41E3A; font-weight:bold;">${cat}</span>
+    </div>
+    <h1 style="font-family:'Fredoka',sans-serif; font-size:2.1rem; color:#1A1A1A; margin:0; line-height:1.2;">${titre}</h1>
+  </div>
+
+  <div style="background:#FAFAFA; border-left:4px solid #C41E3A; padding:18px 20px; margin-bottom:24px; border-radius:0 6px 6px 0; font-size:1.05rem; color:#4A4A4A; font-style:italic;">
+    ${intro}
+  </div>
+
+  ${imgHtml}
+
+  <div style="margin-bottom:25px;">
+    ${corpsHtml}
+    ${focusHtml}
+  </div>
+
+  <div style="border-top:1px dashed #E8E8E8; padding-top:20px; text-align:center; margin-top:30px;">
+    <p style="margin:4px 0; font-size:0.95rem; color:#6B6B6B;">${closing}</p>
+    <p style="font-family:'Fredoka',sans-serif; font-size:1.05rem; color:#C41E3A; font-weight:600; margin-top:6px;">${sig}</p>
+  </div>
+</div>`;
         }
 
-        window.onload = function() {
-            updateGenerator();
-        };
+        // ================= GÉNÉRATION 3 : FICHES BOUTIQUE =================
+        function genererCodeBoutique() {
+            const nom = echapper(document.getElementById('prod-nom').value);
+            const prix = echapper(document.getElementById('prod-prix').value);
+            const tagline = echapper(document.getElementById('prod-tagline').value);
+            const qualite = echapper(document.getElementById('prod-qualite').value);
+            const poids = echapper(document.getElementById('prod-poids').value);
+            const tailles = echapper(document.getElementById('prod-tailles').value);
+            const couleurs = echapper(document.getElementById('prod-couleurs').value);
+            const marquage = echapper(document.getElementById('prod-marquage').value);
+
+            const pointsRaw = document.getElementById('prod-points').value.split('\n');
+            let pointsHtml = '';
+            pointsRaw.forEach(p => {
+                if (p.trim()) {
+                    pointsHtml += `<li style="padding:4px 0; display:flex; align-items:center; font-size:0.92rem; color:#4A4A4A;"><span style="color:#2E7D32; font-weight:bold; margin-right:8px;">✓</span> ${echapper(p.trim())}</li>\n`;
+                }
+            });
+
+            const liensRaw = document.getElementById('prod-liens').value.split('\n');
+            let boutonsHtml = '';
+            liensRaw.forEach(l => {
+                const parts = l.split('|');
+                if (parts.length === 2 && parts[0].trim()) {
+                    boutonsHtml += `<a href="${parts[1].trim()}" style="display:inline-block; border:1px solid #E8E8E8; background:#FAFAFA; color:#4A4A4A; padding:6px 14px; border-radius:4px; text-decoration:none; font-size:0.85rem; font-weight:bold; margin:4px;">${echapper(parts[0].trim())}</a> `;
+                }
+            });
+
+            return `<div style="font-family:'Roboto',Arial,sans-serif; color:#3D3D3D; max-width:800px; margin:0 auto; padding:15px; line-height:1.7;">
+  <div style="text-align:center; margin-bottom:25px;">
+    <h1 style="font-family:'Fredoka',sans-serif; font-size:2rem; color:#1A1A1A; margin:0 0 6px 0; text-transform:uppercase;">${nom}</h1>
+    <div style="font-family:'Fredoka',sans-serif; font-size:1.3rem; font-weight:bold; color:#C41E3A;">${prix}</div>
+  </div>
+
+  <div style="background:#FFFFFF; padding:22px 25px; border-radius:8px; border:1px solid #EAEAEA; box-shadow:0 2px 8px rgba(0,0,0,0.02); margin-bottom:20px;">
+    <h2 style="font-family:'Fredoka',sans-serif; font-size:1.3rem; color:#1A1A1A; margin-top:0; margin-bottom:4px;">Caractéristiques</h2>
+    <div style="font-size:0.95rem; color:#6B6B6B; font-style:italic; margin-bottom:16px;">${tagline}</div>
+    <ul style="list-style:none; padding:0; margin:0 0 18px 0; border-bottom:1px solid #F0F0F0; padding-bottom:12px;">
+      ${pointsHtml}
+    </ul>
+    <div style="font-size:0.92rem; color:#4A4A4A; line-height:1.6;">
+      <p style="margin:4px 0;"><strong style="color:#1A1A1A; display:inline-block; width:90px;">Qualité :</strong> ${qualite}</p>
+      <p style="margin:4px 0;"><strong style="color:#1A1A1A; display:inline-block; width:90px;">Poids :</strong> ${poids}</p>
+      <p style="margin:4px 0;"><strong style="color:#1A1A1A; display:inline-block; width:90px;">Tailles :</strong> ${tailles}</p>
+      <p style="margin:4px 0;"><strong style="color:#1A1A1A; display:inline-block; width:90px;">Couleur :</strong> ${couleurs}</p>
+    </div>
+    ${boutonsHtml ? `<div style="margin-top:18px; padding-top:14px; border-top:1px dashed #EAEAEA; text-align:center;">${boutonsHtml}</div>` : ''}
+  </div>
+
+  <div style="background:#FAFAFA; border-left:4px solid #C41E3A; padding:15px 18px; border-radius:0 6px 6px 0; font-size:0.92rem; color:#4A4A4A; margin-bottom:18px;">
+    ${marquage}
+  </div>
+
+  <div style="background:#FFFFFF; border-left:4px solid #1A1A1A; padding:18px 20px; border-radius:0 6px 6px 0; margin-bottom:16px; border:1px solid #F0F0F0; border-left:4px solid #1A1A1A;">
+    <h3 style="font-family:'Fredoka',sans-serif; margin-top:0; margin-bottom:8px; font-size:1.1rem; color:#1A1A1A;">Livraison &amp; Retrait au Dojo</h3>
+    <p style="margin:4px 0; font-size:0.9rem; color:#4A4A4A;">Commandez en ligne et récupérez vos articles directement auprès des bénévoles au dojo.</p>
+    <p style="margin:4px 0; font-size:0.9rem; color:#4A4A4A;">⚠️ Les commandes auprès du fournisseur sont validées les <strong>1 et 15 de chaque mois</strong>.</p>
+  </div>
+</div>`;
+        }
+
+        // ================= GESTION GLOBALE RENDU ET COPIE =================
+        function genererCodeCourant() {
+            if (moduleActif === 'messages') return genererCodeMessage();
+            if (moduleActif === 'articles') return genererCodeArticle();
+            if (moduleActif === 'boutique') return genererCodeBoutique();
+            return '';
+        }
+
+        function actualiserRendu() {
+            if (modeCodeSourceActif) return;
+            const code = genererCodeCourant();
+            document.getElementById('zone-rendu-visuel').innerHTML = code;
+            document.getElementById('zone-code-brut').value = code;
+        }
+
+        function actualiserRenduDepuisCodeSource() {
+            codeManuelModifie = true;
+            const code = document.getElementById('editeur-code-source-direct').value;
+            document.getElementById('zone-rendu-visuel').innerHTML = code;
+            document.getElementById('zone-code-brut').value = code;
+        }
+
+        function copierCodeSourceKalisport() {
+            const code = (modeCodeSourceActif || codeManuelModifie)
+                ? document.getElementById('editeur-code-source-direct').value
+                : genererCodeCourant();
+
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.getElementById('btn-copy-code');
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Code Copié !';
+                btn.classList.add('bg-blue-600');
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copier le Code';
+                    btn.classList.remove('bg-blue-600');
+                }, 2000);
+            }).catch(() => alert("Erreur lors de la copie du code source."));
+        }
+
+        function copierRenduPourGmail() {
+            const cible = document.getElementById('zone-rendu-visuel');
+            if (!cible || !cible.innerHTML.trim()) return alert("Aucun contenu à copier.");
+
+            const range = document.createRange();
+            range.selectNode(cible);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            try {
+                document.execCommand('copy');
+                alert("✅ Rendu visuel copié ! Vous pouvez directement le coller (Ctrl+V) dans Gmail.");
+            } catch (err) {
+                alert("Erreur lors de la copie pour Gmail.");
+            }
+            selection.removeAllRanges();
+        }
+
+        // GESTION DES SECTIONS DE L'ARTICLE
+        function rendreSectionsArticleForm() {
+            const conteneur = document.getElementById('liste-sections-article');
+            conteneur.innerHTML = '';
+
+            sectionsArticle.forEach((sec, idx) => {
+                const b = document.createElement('div');
+                b.className = 'p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2';
+                b.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold text-slate-600">Paragraphe ${idx + 1}</span>
+                        <div class="flex gap-1">
+                            ${idx > 0 ? `<button type="button" onclick="deplacerSectionArticle(${idx}, -1)" class="px-1.5 py-0.5 text-slate-500 hover:text-slate-800 text-xs"><i class="fa-solid fa-arrow-up"></i></button>` : ''}
+                            ${idx < sectionsArticle.length - 1 ? `<button type="button" onclick="deplacerSectionArticle(${idx}, 1)" class="px-1.5 py-0.5 text-slate-500 hover:text-slate-800 text-xs"><i class="fa-solid fa-arrow-down"></i></button>` : ''}
+                            <button type="button" onclick="supprimerSectionArticle(${idx})" class="px-1.5 py-0.5 text-rose-600 hover:text-rose-800 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <input type="text" class="input-field font-semibold text-xs mb-1" placeholder="Sous-titre (Optionnel)" value="${echapper(sec.titre)}" oninput="modifierSectionArticle(${idx}, 'titre', this.value)">
+                    <textarea rows="2" class="input-field text-xs" placeholder="Texte du paragraphe..." oninput="modifierSectionArticle(${idx}, 'texte', this.value)">${echapper(sec.texte)}</textarea>
+                `;
+                conteneur.appendChild(b);
+            });
+        }
+
+        function ajouterSectionArticle() {
+            sectionsArticle.push({ titre: "", texte: "" });
+            rendreSectionsArticleForm();
+            codeManuelModifie = false;
+            actualiserRendu();
+        }
+
+        function supprimerSectionArticle(idx) {
+            if (sectionsArticle.length <= 1) sectionsArticle = [{ titre: "", texte: "" }];
+            else sectionsArticle.splice(idx, 1);
+            rendreSectionsArticleForm();
+            codeManuelModifie = false;
+            actualiserRendu();
+        }
+
+        function modifierSectionArticle(idx, champ, val) {
+            sectionsArticle[idx][champ] = val;
+            codeManuelModifie = false;
+            actualiserRendu();
+        }
+
+        function deplacerSectionArticle(idx, dir) {
+            const target = idx + dir;
+            if (target >= 0 && target < sectionsArticle.length) {
+                const tmp = sectionsArticle[idx];
+                sectionsArticle[idx] = sectionsArticle[target];
+                sectionsArticle[target] = tmp;
+                rendreSectionsArticleForm();
+                codeManuelModifie = false;
+                actualiserRendu();
+            }
+        }
+
+        // INITIALISATION
+        window.addEventListener('DOMContentLoaded', () => {
+            rendreSectionsArticleForm();
+            actualiserRendu();
+        });
     </script>
 </body>
 </html>
