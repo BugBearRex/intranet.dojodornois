@@ -391,8 +391,38 @@
                         <select id="rec_type" class="form-control" onchange="adapterTypeRecu()">
                             <option value="depense">Attestation d'engagement associatif (Dépenses / Remboursements)</option>
                             <option value="recette">Reçu de règlement (Recette / Cotisations / Adhésions)</option>
-                            <option value="justificatif_virement">Justificatif de mouvement interne (Virement compte à compte)</option>
+                            <option value="justificatif_virement" selected>Justificatif de mouvement interne (Virement compte à compte)</option>
                         </select>
+                    </div>
+
+                    <!-- Champ Adhérent/Bénéficiaire (Reçus et Dépenses) -->
+                    <div class="form-group" id="wrapper-rec-concerne" style="display: none;">
+                        <label id="lbl-rec-concerne">Personne / Entité concernée :</label>
+                        <input type="text" id="rec_concerne" class="form-control" value="Trésorerie du Club" oninput="majApercuRecu()">
+                    </div>
+
+                    <!-- Sélecteurs de comptes pour Mouvement Interne -->
+                    <div id="wrapper-mvt-comptes" class="form-grid">
+                        <div class="form-group">
+                            <label>Compte émetteur (débité) :</label>
+                            <select id="mvt_source" class="form-control" onchange="majComptesMouvement()">
+                                <option value="Crédit Agricole (Compte Courant)">Crédit Agricole (Compte Courant)</option>
+                                <option value="Crédit Agricole Livret A" selected>Crédit Agricole Livret A</option>
+                                <option value="Caisse">Caisse</option>
+                                <option value="Crédit Agricole Parts sociales">Crédit Agricole Parts sociales</option>
+                                <option value="Dépôt à Terme 12 mois">Dépôt à Terme 12 mois</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Compte destinataire (crédité) :</label>
+                            <select id="mvt_dest" class="form-control" onchange="majComptesMouvement()">
+                                <option value="Crédit Agricole (Compte Courant)" selected>Crédit Agricole (Compte Courant)</option>
+                                <option value="Crédit Agricole Livret A">Crédit Agricole Livret A</option>
+                                <option value="Caisse">Caisse</option>
+                                <option value="Crédit Agricole Parts sociales">Crédit Agricole Parts sociales</option>
+                                <option value="Dépôt à Terme 12 mois">Dépôt à Terme 12 mois</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="form-grid">
@@ -404,11 +434,6 @@
                             <label>Date d'effet / règlement :</label>
                             <input type="text" id="rec_date" class="form-control" value="18/10/2026" oninput="majApercuRecu()">
                         </div>
-                    </div>
-
-                    <div class="form-group" id="wrapper-rec-concerne">
-                        <label id="lbl-rec-concerne">Personne / Entité concernée :</label>
-                        <input type="text" id="rec_concerne" class="form-control" value="Trésorerie du Club" oninput="majApercuRecu()">
                     </div>
 
                     <div class="form-grid">
@@ -438,12 +463,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label id="lbl-rec-objet">Objet / Libellé de l'opération :</label>
-                        <input type="text" id="rec_objet" class="form-control" value="Virement interne de fonds du compte épargne vers le compte courant" oninput="majApercuRecu()">
+                        <label id="lbl-rec-objet">Nature du mouvement de fonds :</label>
+                        <input type="text" id="rec_objet" class="form-control" value="Virement interne de fonds de Crédit Agricole Livret A vers Crédit Agricole (Compte Courant)" oninput="majApercuRecu()">
                     </div>
 
                     <div class="form-group">
-                        <label id="lbl-rec-remarques">Observations / Justificatifs :</label>
+                        <label id="lbl-rec-remarques">Complément d'information / Contexte :</label>
                         <textarea id="rec_remarques" class="form-control" rows="2" oninput="majApercuRecu()">Ajustement de trésorerie pour couvrir les dépenses courantes et les prochains règlements.</textarea>
                     </div>
 
@@ -895,22 +920,33 @@
         return texte.trim().replace(/\s+/g, ' ');
     }
 
+    // --- GESTION MOUVEMENTS INTERNES ---
+    function majComptesMouvement() {
+        const src = document.getElementById('mvt_source').value;
+        const dest = document.getElementById('mvt_dest').value;
+        document.getElementById('rec_objet').value = `Virement interne de fonds de ${src} vers ${dest}`;
+        majApercuRecu();
+    }
+
     // --- REÇUS & ATTESTATIONS ---
     function adapterTypeRecu() {
         const type = document.getElementById('rec_type').value;
         const wrapConcerne = document.getElementById('wrapper-rec-concerne');
+        const wrapMvt = document.getElementById('wrapper-mvt-comptes');
         const mode = document.getElementById('rec_mode');
 
         if (type === 'justificatif_virement') {
             wrapConcerne.style.display = 'none';
+            wrapMvt.style.display = 'grid';
             mode.value = "Virement bancaire";
-            mode.disabled = true;
+            mode.disabled = false;
             document.getElementById('lbl-rec-objet').innerText = "Nature du mouvement de fonds :";
             document.getElementById('lbl-rec-remarques').innerText = "Complément d'information / Contexte :";
             document.getElementById('rec_num').value = "VIR-" + new Date().toISOString().slice(0,10).replace(/-/g,"") + "-01";
-            document.getElementById('rec_objet').value = "Virement interne de fonds du Compte Épargne vers le Compte Courant";
+            majComptesMouvement();
         } else {
             wrapConcerne.style.display = 'block';
+            wrapMvt.style.display = 'none';
             mode.disabled = false;
             if (type === 'depense') {
                 document.getElementById('lbl-rec-concerne').innerText = "Personne remboursée / bénéficiaire :";
@@ -957,7 +993,7 @@
         document.getElementById('pv-rec-date').innerText = date;
         document.getElementById('pv-rec-objet').innerText = objet;
         document.getElementById('pv-rec-mode').innerText = mode;
-        document.getElementById('pv-rec-montant').innerText = montant.toFixed(2) + " €";
+        document.getElementById('pv-rec-montant').innerText = montant.toFixed(2).replace('.', ',') + " €";
         document.getElementById('pv-rec-fait').innerText = `Fait à Dornes, le ${date}`;
 
         const rowRem = document.getElementById('pv-row-remarques');
@@ -973,19 +1009,21 @@
         if (type === 'depense') {
             titre = "ATTESTATION OFFICIELLE";
             soustitre = "Attestation d'acte ou d'engagement associatif";
-            certif = `L'association <strong>DOJO DORNOIS</strong>, représentée par ${signataire}, certifie et atteste sur l'honneur l'exactitude des faits suivants concernant <strong>${concerne}</strong> :<br><br>L'engagement, le dépôt ou la constatation de frais s'élevant à l'équivalent de <strong>${montant.toFixed(2)} €</strong> (${montantLettres}), lié au motif d'intérêt associatif suivant : <em>${objet}</em>.`;
+            certif = `L'association <strong>DOJO DORNOIS</strong>, représentée par ${signataire}, certifie et atteste sur l'honneur l'exactitude des faits suivants concernant <strong>${concerne}</strong> :<br><br>L'engagement, le dépôt ou la constatation de frais s'élevant à l'équivalent de <strong>${montant.toFixed(2).replace('.', ',')} €</strong> (${montantLettres}), lié au motif d'intérêt associatif suivant : <em>${objet}</em>.`;
             lblDate = "Date d'effet :";
             lblTot = "Montant Certifié :";
         } else if (type === 'recette') {
             titre = "REÇU DE RÈGLEMENT";
             soustitre = "Attestation d'encaissement et de recette";
-            certif = `L'association <strong>DOJO DORNOIS</strong>, représentée par ${signataire}, certifie et atteste avoir bien reçu et encaissé de la part de <strong>${concerne}</strong> la somme totale de <strong>${montant.toFixed(2)} €</strong> (${montantLettres}).<br><br>Cet encaissement correspond au motif d'adhésion ou de prestation suivant : <em>${objet}</em>.`;
+            certif = `L'association <strong>DOJO DORNOIS</strong>, représentée par ${signataire}, certifie et atteste avoir bien reçu et encaissé de la part de <strong>${concerne}</strong> la somme totale de <strong>${montant.toFixed(2).replace('.', ',')} €</strong> (${montantLettres}).<br><br>Cet encaissement correspond au motif d'adhésion ou de prestation suivant : <em>${objet}</em>.`;
             lblDate = "Date de réception :";
             lblTot = "Montant Encaissé :";
         } else {
+            const src = document.getElementById('mvt_source').value;
+            const dest = document.getElementById('mvt_dest').value;
             titre = "JUSTIFICATIF DE MOUVEMENT";
             soustitre = "Attestation de virement de fonds interne";
-            certif = `L'association <strong>DOJO DORNOIS</strong>, représentée par ${signataire}, valide et atteste par le présent document la bonne exécution comptable du mouvement financier interne suivant :<br><br>Un transfert de fonds d'un montant de <strong>${montant.toFixed(2)} €</strong> (${montantLettres}) réalisé par <strong>virement bancaire</strong> depuis le <strong>Compte Épargne</strong> du club vers son <strong>Compte Courant</strong>.`;
+            certif = `L'association <strong>DOJO DORNOIS</strong>, représentée par ${signataire}, valide et atteste par le présent document la bonne exécution comptable du mouvement financier interne suivant :<br><br>Un transfert de fonds d'un montant de <strong>${montant.toFixed(2).replace('.', ',')} €</strong> (${montantLettres}) réalisé par <strong>${mode.toLowerCase()}</strong> depuis le <strong>${src}</strong> du club vers son <strong>${dest}</strong>.`;
             lblDate = "Date de l'opération :";
             lblTot = "Montant Transféré :";
         }
