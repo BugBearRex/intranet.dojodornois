@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan des Tatamis - Dojo Dornois</title>
+    <link rel="icon" type="image/png" href="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- STYLE DYNAMIQUE POUR L'IMPRESSION (Mis à jour par JS) -->
+    <style id="dynamic-print-style">
+        @page { size: A4 portrait; margin: 10mm; }
+    </style>
+
+    <style>
+        :root {
+            --rouge: #C41E3A;
+            --rouge-fonce: #A3182E;
+            --rouge-clair: rgba(196, 30, 58, 0.08);
+            --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-tres-clair: #EFEFEF;
+            --fond: #F4F6F9;
+            --blanc: #FFFFFF;
+            --glass-bg: rgba(255, 255, 255, 0.88);
+            --glass-border: rgba(255, 255, 255, 0.65);
+
+            /* Teintes officielles */
+            --tatami-rouge: #C41E3A;
+            --tatami-vert: #2D6A4F;
+            --tatami-bleu: #2B6CB0;
+            --tatami-jaune: #E5C347;
+            --tatami-bleu-ciel: #5B9BD5;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            background-image: url("data:image/svg+xml,%3Csvg width='56' height='100' viewBox='0 0 56 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 68L28 84L56 68L56 84L28 100Z' fill='none' stroke='%23C41E3A' stroke-opacity='0.16' stroke-width='1.8'/%3E%3C/svg%3E");
+            color: var(--gris-fonce);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px 40px;
+        }
+
+        .page-container {
+            width: 100%;
+            max-width: 1060px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* HEADER */
+        .header-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 18px; }
+
+        .logo-box {
+            width: 58px; height: 58px;
+            background: var(--rouge);
+            border-radius: 14px;
+            transform: rotate(-2.5deg);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 6px 14px rgba(196, 30, 58, 0.3);
+            flex-shrink: 0;
+        }
+        .logo-box img { width: 44px; height: auto; object-fit: contain; }
+
+        .header-title h1 { font-family: 'Fredoka', sans-serif; font-size: 1.6rem; color: var(--noir-doux); letter-spacing: 0.3px; }
+        .header-title p { font-size: 0.88rem; color: var(--gris-moyen); font-weight: 500; margin-top: 2px; }
+
+        /* ONGLETS */
+        .tabs-nav {
+            display: flex; gap: 10px; background: rgba(0,0,0,0.04); padding: 6px; border-radius: 12px; width: 100%; flex-wrap: wrap;
+        }
+        .tab-btn {
+            flex: 1; border: none; background: transparent; padding: 12px 14px; font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem; border-radius: 8px; cursor: pointer; color: var(--gris-moyen);
+            transition: all 0.25s ease; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 200px;
+        }
+        .tab-btn:hover { color: var(--rouge); background: rgba(255, 255, 255, 0.6); }
+        .tab-btn.active { background: var(--blanc); color: var(--rouge); box-shadow: 0 4px 12px rgba(196, 30, 58, 0.12); }
+
+        /* CONTENU ONGLETS */
+        .tab-content {
+            display: none; background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px; border: 1px solid var(--glass-border); padding: 26px; box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .view-header {
+            display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;
+            border-bottom: 1.5px dashed rgba(196, 30, 58, 0.2); padding-bottom: 14px; margin-bottom: 18px;
+        }
+        .view-title-wrap h2 { font-family: 'Fredoka', sans-serif; font-size: 1.35rem; color: var(--rouge); }
+        .view-title-wrap p { font-size: 0.85rem; color: var(--gris-moyen); margin-top: 3px; }
+
+        /* BADGES */
+        .badges-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+        .t-badge {
+            display: inline-flex; align-items: center; gap: 10px; padding: 7px 14px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+        .t-badge .count { font-size: 0.95rem; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.28); }
+        .bg-rouge { background: var(--tatami-rouge); color: #FFF; }
+        .bg-vert { background: var(--tatami-vert); color: #FFF; }
+        .bg-bleu { background: var(--tatami-bleu); color: #FFF; }
+        .bg-jaune { background: var(--tatami-jaune); color: #2B2B2B; }
+        .bg-ciel { background: var(--tatami-bleu-ciel); color: #FFF; }
+        .bg-total { background: #2D3748; color: #FFF; }
+
+        /* SCHÉMAS SVG */
+        .tatami-plan-container {
+            background: #FAFAFA; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 20px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .tatami-plan-container svg { width: 100%; height: auto; display: block; }
+        .legend-notice { margin-top: 14px; font-size: 0.82rem; color: var(--gris-moyen); text-align: center; line-height: 1.5; }
+
+        /* ACTIONS */
+        .footer-action {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 10px; padding: 0 4px;
+        }
+        .print-btn {
+            background: var(--rouge); color: #FFF; border: none; padding: 9px 20px; font-family: 'Fredoka', sans-serif;
+            font-size: 0.9rem; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(196, 30, 58, 0.2); transition: all 0.2s ease;
+        }
+        .print-btn:hover { background: var(--rouge-fonce); transform: translateY(-1px); }
+
+        /* BUILDER INTERACTIF */
+        .builder-layout { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+        .builder-palette { display: flex; flex-direction: column; gap: 12px; width: 220px; background: #FFF; padding: 16px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); }
+        .btn-spawn {
+            width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 700; font-family: 'Fredoka', sans-serif;
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-spawn[disabled] { opacity: 0.4; cursor: not-allowed; }
+        .builder-workspace { flex: 1; display: flex; justify-content: center; overflow: auto; }
+        .builder-grid {
+            width: 560px; height: 560px; background-color: #FAFAFA;
+            background-image: linear-gradient(to right, rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.1) 1px, transparent 1px);
+            background-size: 35px 35px; border: 2px solid #1A1A1A; position: relative; touch-action: none;
+        }
+        .tatami-drag {
+            position: absolute; width: 70px; height: 35px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 0 6px rgba(255,255,255,0.2);
+            border-radius: 2px; cursor: grab;
+        }
+        .tatami-drag.vertical { width: 35px; height: 70px; }
+        .tatami-drag:active { cursor: grabbing; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; }
+        .bg-drag-rouge { background-color: var(--tatami-rouge); }
+        .bg-drag-vert { background-color: var(--tatami-vert); }
+        .bg-drag-bleu { background-color: var(--tatami-bleu); }
+        .bg-drag-jaune { background-color: var(--tatami-jaune); }
+        .bg-drag-ciel { background-color: var(--tatami-bleu-ciel); }
+
+        /* =======================================================
+           RÈGLES D'IMPRESSION (DYNAMIQUES ET STRICTES 1 PAGE)
+           ======================================================= */
+        @media print {
+            body { background: #FFF !important; margin: 0; padding: 0; }
+            body * { visibility: hidden; }
+            
+            .page-container, .page-container * { visibility: visible; }
+            .tabs-nav, .header-card, .footer-action { display: none !important; }
+            
+            .page-container { margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: none !important; }
+
+            .tab-content { display: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+            .tab-content.active {
+                display: flex !important;
+                flex-direction: column;
+                position: absolute; left: 0; top: 0; width: 100%; height: 100vh;
+                align-items: center; justify-content: flex-start;
+                page-break-inside: avoid;
+            }
+
+            .view-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+            .badges-grid { width: 100%; justify-content: center; margin-bottom: 15px; }
+            
+            .tatami-plan-container { 
+                border: none !important; background: transparent !important; box-shadow: none !important; 
+                width: 100%; display: flex; justify-content: center; margin: 0 !important; padding: 0 !important;
+            }
+
+            /* REDIMENSIONNEMENT SELON L'ORIENTATION (1 PAGE STRICTE) */
+            #tab1.active .tatami-plan-container svg,
+            #tab2.active .tatami-plan-container svg {
+                max-height: 23cm !important; /* Limite pour le mode Portrait A4 */
+                width: auto !important;
+            }
+
+            #tab3.active .tatami-plan-container svg {
+                max-height: 15cm !important; /* Limite pour le mode Paysage A4 */
+                width: auto !important;
+            }
+
+            #tab4.active .builder-palette { display: none !important; }
+            #tab4.active .builder-workspace { width: 100%; justify-content: center; }
+            #tab4.active .builder-grid { border: 2px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-container">
+
+        <!-- HEADER OFFICIEL DOJO DORNOIS -->
+        <header class="header-card">
+            <div class="header-left">
+                <div class="logo-box">
+                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo Dojo Dornois">
+                </div>
+                <div class="header-title">
+                    <h1>Plan Technique des Tatamis</h1>
+                    <p>Dojo Dornois • Gestion des surfaces & configurations officielles</p>
+                </div>
+            </div>
+            <button class="print-btn" onclick="window.print()">🖨️ Imprimer la vue active</button>
+        </header>
+
+        <!-- SÉLECTEUR D'ONGLETS -->
+        <nav class="tabs-nav">
+            <button class="tab-btn active" onclick="openTab(1, this)">🥋 Disp. 1 (Portrait)</button>
+            <button class="tab-btn" onclick="openTab(2, this)">🏛️ Disp. 2 (Portrait)</button>
+            <button class="tab-btn" onclick="openTab(3, this)">✨ Disp. Propre (Paysage)</button>
+            <button class="tab-btn" onclick="openTab(4, this)" style="background:var(--rouge); color:#FFF;">🛠️ Mode Libre (Paysage)</button>
+        </nav>
+
+        <!-- ================= ONGLET 1 : CLASSIQUE ================= -->
+        <section id="tab1" class="tab-content active">
+            <div class="view-header">
+                <div class="view-title-wrap">
+                    <h2>Disposition 1 • Configuration Officielle Dojo (7m × 16m)</h2>
+                    <p>Surface de 112 m² avec couloirs de sécurité latéraux rouges</p>
+                </div>
+                <div class="t-badge bg-total">Total : <span class="count">56</span></div>
+            </div>
+            <div class="badges-grid">
+                <div class="t-badge bg-rouge">Rouge : <span class="count">16</span></div>
+                <div class="t-badge bg-jaune">Jaune : <span class="count">20</span></div>
+                <div class="t-badge bg-bleu">Bleu : <span class="count">10</span></div>
+                <div class="t-badge bg-vert">Vert : <span class="count">10</span></div>
+            </div>
+            <div class="tatami-plan-container">
+                <svg viewBox="0 0 70 160" style="max-width: 320px;" xmlns="http://www.w3.org/2000/svg">
+                    <g style="fill:var(--tatami-rouge); stroke:#1A1A1A; stroke-width:0.4;">
+                        <rect x="0" y="0" width="10" height="20" /><rect x="0" y="20" width="10" height="20" /><rect x="0" y="40" width="10" height="20" /><rect x="0" y="60" width="10" height="20" /><rect x="0" y="80" width="10" height="20" /><rect x="0" y="100" width="10" height="20" /><rect x="0" y="120" width="10" height="20" /><rect x="0" y="140" width="10" height="20" />
+                        <rect x="60" y="0" width="10" height="20" /><rect x="60" y="20" width="10" height="20" /><rect x="60" y="40" width="10" height="20" /><rect x="60" y="60" width="10" height="20" /><rect x="60" y="80" width="10" height="20" /><rect x="60" y="100" width="10" height="20" /><rect x="60" y="120" width="10" height="20" /><rect x="60" y="140" width="10" height="20" />
+                    </g>
+                    <g style="fill:var(--tatami-vert); stroke:#1A1A1A; stroke-width:0.4;">
+                        <rect x="10" y="0" width="10" height="20" /><rect x="20" y="0" width="10" height="20" /><rect x="30" y="0" width="10" height="20" /><rect x="40" y="0" width="10" height="20" /><rect x="50" y="0" width="10" height="20" />
+                        <rect x="10" y="140" width="10" height="20" /><rect x="20" y="140" width="10" height="20" /><rect x="30" y="140" width="10" height="20" /><rect x="40" y="140" width="10" height="20" /><rect x="50" y="140" width="10" height="20" />
+                    </g>
+                    <g style="fill:var(--tatami-jaune); stroke:#1A1A1A; stroke-width:0.4;">
+                        <rect x="10" y="20" width="20" height="10" /><rect x="10" y="30" width="20" height="10" /><rect x="30" y="20" width="10" height="20" /><rect x="40" y="20" width="20" height="10" /><rect x="40" y="30" width="20" height="10" />
+                        <rect x="10" y="40" width="10" height="20" /><rect x="20" y="40" width="10" height="20" /><rect x="30" y="40" width="20" height="10" /><rect x="30" y="50" width="20" height="10" /><rect x="50" y="40" width="10" height="20" />
+                        <rect x="10" y="100" width="20" height="10" /><rect x="10" y="110" width="20" height="10" /><rect x="30" y="100" width="10" height="20" /><rect x="40" y="100" width="20" height="10" /><rect x="40" y="110" width="20" height="10" />
+                        <rect x="10" y="120" width="10" height="20" /><rect x="20" y="120" width="10" height="20" /><rect x="30" y="120" width="20" height="10" /><rect x="30" y="130" width="20" height="10" /><rect x="50" y="120" width="10" height="20" />
+                    </g>
+                    <g style="fill:var(--tatami-bleu); stroke:#1A1A1A; stroke-width:0.4;">
+                        <rect x="10" y="60" width="20" height="10" /><rect x="10" y="70" width="20" height="10" /><rect x="30" y="60" width="10" height="20" /><rect x="40" y="60" width="20" height="10" /><rect x="40" y="70" width="20" height="10" />
+                        <rect x="10" y="80" width="10" height="20" /><rect x="20" y="80" width="10" height="20" /><rect x="30" y="80" width="20" height="10" /><rect x="30" y="90" width="20" height="10" /><rect x="50" y="80" width="10" height="20" />
+                    </g>
+                </svg>
+            </div>
+        </section>
+
+        <!-- ================= ONGLET 2 : SALLE DES FÊTES ================= -->
+        <section id="tab2" class="tab-content">
+            <div class="view-header">
+                <div class="view-title-wrap">
+                    <h2>Disposition 2 • Salle des Fêtes (7m × 14m)</h2>
+                    <p>Surface de 98 m² numérotée pour un montage sans erreur</p>
+                </div>
+                <div class="t-badge bg-total">Total : <span class="count">49</span></div>
+            </div>
+            <div class="badges-grid">
+                <div class="t-badge bg-ciel">Bleu Ciel : <span class="count">29</span></div>
+                <div class="t-badge bg-jaune">Jaune : <span class="count">20</span></div>
+            </div>
+            <div class="tatami-plan-container">
+                <svg viewBox="0 0 70 140" style="max-width: 320px;" xmlns="http://www.w3.org/2000/svg">
+                    <style>.lbl { font-family: 'Roboto', sans-serif; font-size: 3.5px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: #1A1A1A; }</style>
+                    <g style="fill:var(--tatami-bleu-ciel); stroke:#1A1A1A; stroke-width:0.4;">
+                        <rect x="0" y="0" width="10" height="20" /><text x="5" y="10" class="lbl">1</text>
+                        <rect x="10" y="0" width="10" height="20" /><text x="15" y="10" class="lbl">2</text>
+                        <rect x="20" y="0" width="10" height="20" /><text x="25" y="10" class="lbl">3</text>
+                        <rect x="30" y="0" width="10" height="20" /><text x="35" y="10" class="lbl">4</text>
+                        <rect x="40" y="0" width="10" height="20" /><text x="45" y="10" class="lbl">5</text>
+                        <rect x="50" y="0" width="10" height="20" /><text x="55" y="10" class="lbl">6</text>
+                        <rect x="60" y="0" width="10" height="20" /><text x="65" y="10" class="lbl">7</text>
+                        <rect x="0" y="20" width="10" height="20" /><text x="5" y="30" class="lbl">8</text>
+                        <rect x="0" y="40" width="10" height="20" /><text x="5" y="50" class="lbl">9</text>
+                        <rect x="60" y="20" width="10" height="20" /><text x="65" y="30" class="lbl">18</text>
+                        <rect x="60" y="40" width="10" height="20" /><text x="65" y="50" class="lbl">17</text>
+                        <rect x="0" y="60" width="10" height="20" /><text x="5" y="70" class="lbl">10</text>
+                        <rect x="10" y="60" width="10" height="20" /><text x="15" y="70" class="lbl">11</text>
+                        <rect x="20" y="60" width="10" height="20" /><text x="25" y="70" class="lbl">12</text>
+                        <rect x="30" y="60" width="10" height="20" /><text x="35" y="70" class="lbl">13</text>
+                        <rect x="40" y="60" width="10" height="20" /><text x="45" y="70" class="lbl">14</text>
+                        <rect x="50" y="60" width="10" height="20" /><text x="55" y="70" class="lbl">15</text>
+                        <rect x="60" y="60" width="10" height="20" /><text x="65" y="70" class="lbl">16</text>
+                        <rect x="0" y="80" width="10" height="20" /><text x="5" y="90" class="lbl">19</text>
+                        <rect x="0" y="100" width="10" height="20" /><text x="5" y="110" class="lbl">20</text>
+                        <rect x="60" y="80" width="10" height="20" /><text x="65" y="90" class="lbl">29</text>
+                        <rect x="60" y="100" width="10" height="20" /><text x="65" y="110" class="lbl">28</text>
+                        <rect x="0" y="120" width="10" height="20" /><text x="5" y="130" class="lbl">21</text>
+                        <rect x="10" y="120" width="10" height="20" /><text x="15" y="130" class="lbl">22</text>
+                        <rect x="20" y="120" width="10" height="20" /><text x="25" y="130" class="lbl">23</text>
+                        <rect x="30" y="120" width="10" height="20" /><text x="35" y="130" class="lbl">24</text>
+                        <rect x="40" y="120" width="10" height="20" /><text x="45" y="130" class="lbl">25</text>
+                        <rect x="50" y="120" width="10" height="20" /><text x="55" y="130" class="lbl">26</text>
+                        <rect x="60" y="120" width="10" height="20" /><text x="65" y="130" class="lbl">27</text>
+                    </g>
+                    <g style="fill:var(--tatami-jaune); stroke:#1A1A1A; stroke-width:0.4;">
+                        <rect x="10" y="20" width="20" height="10" /><text x="20" y="25" class="lbl">1</text>
+                        <rect x="10" y="30" width="20" height="10" /><text x="20" y="35" class="lbl">2</text>
+                        <rect x="30" y="20" width="10" height="20" /><text x="35" y="30" class="lbl">3</text>
+                        <rect x="40" y="20" width="20" height="10" /><text x="50" y="25" class="lbl">4</text>
+                        <rect x="40" y="30" width="20" height="10" /><text x="50" y="35" class="lbl">5</text>
+                        <rect x="10" y="40" width="10" height="20" /><text x="15" y="50" class="lbl">6</text>
+                        <rect x="20" y="40" width="10" height="20" /><text x="25" y="50" class="lbl">7</text>
+                        <rect x="30" y="40" width="20" height="10" /><text x="40" y="45" class="lbl">8</text>
+                        <rect x="30" y="50" width="20" height="10" /><text x="40" y="55" class="lbl">9</text>
+                        <rect x="50" y="40" width="10" height="20" /><text x="55" y="50" class="lbl">10</text>
+                        <rect x="10" y="80" width="20" height="10" /><text x="20" y="85" class="lbl">11</text>
+                        <rect x="10" y="90" width="20" height="10" /><text x="20" y="95" class="lbl">12</text>
+                        <rect x="30" y="80" width="10" height="20" /><text x="35" y="90" class="lbl">13</text>
+                        <rect x="40" y="80" width="20" height="10" /><text x="50" y="85" class="lbl">14</text>
+                        <rect x="40" y="90" width="20" height="10" /><text x="50" y="95" class="lbl">15</text>
+                        <rect x="10" y="100" width="10" height="20" /><text x="15" y="110" class="lbl">16</text>
+                        <rect x="20" y="100" width="10" height="20" /><text x="25" y="110" class="lbl">17</text>
+                        <rect x="30" y="100" width="20" height="10" /><text x="40" y="105" class="lbl">18</text>
+                        <rect x="30" y="110" width="20" height="10" /><text x="40" y="115" class="lbl">19</text>
+                        <rect x="50" y="100" width="10" height="20" /><text x="55" y="110" class="lbl">20</text>
+                    </g>
+                </svg>
+            </div>
+        </section>
+
+        <!-- ================= ONGLET 3 : GRANDE SURFACE (PROPRE, CONFORME SOURCE 6) ================= -->
+        <section id="tab3" class="tab-content">
+            <div class="view-header">
+                <div class="view-title-wrap">
+                    <h2>Disposition 3 • Grande disposition rectangulaire parfaite (12m × 14m)</h2>
+                    <p>Reproduction exacte de la structure harmonieuse : 100% plein, aucun espace blanc.</p>
+                </div>
+                <div class="t-badge bg-total">Total : <span class="count">84 / 85 Tatamis</span></div>
+            </div>
+            
+            <div class="badges-grid">
+                <div class="t-badge bg-ciel">Bleu Ciel : <span class="count">28</span></div>
+                <div class="t-badge bg-rouge">Rouge : <span class="count">16</span></div>
+                <div class="t-badge bg-jaune">Jaune : <span class="count">20</span></div>
+                <div class="t-badge bg-bleu">Bleu : <span class="count">10</span></div>
+                <div class="t-badge bg-vert">Vert : <span class="count">10</span></div>
+            </div>
+
+            <div class="tatami-plan-container">
+                <svg viewBox="0 0 120 140" style="max-width: 520px;" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <style>
+                            .t3-rouge { fill: var(--tatami-rouge); stroke: #1A1A1A; stroke-width: 0.4; }
+                            .t3-vert { fill: var(--tatami-vert); stroke: #1A1A1A; stroke-width: 0.4; }
+                            .t3-jaune { fill: var(--tatami-jaune); stroke: #1A1A1A; stroke-width: 0.4; }
+                            .t3-bleu { fill: var(--tatami-bleu); stroke: #1A1A1A; stroke-width: 0.4; }
+                            .t3-ciel { fill: var(--tatami-bleu-ciel); stroke: #1A1A1A; stroke-width: 0.4; }
+                            .t3-lbl { font-family: 'Fredoka', sans-serif; font-size: 3.4px; font-weight: 700; fill: #1A1A1A; text-anchor: middle; dominant-baseline: central; opacity: 0.75; }
+                        </style>
+                    </defs>
+
+                    <!-- BLOCS BLEU CIEL (Couloirs Latéraux) -->
+                    <g class="t3-ciel">
+                        <!-- Colonnes Gauche (x=0 et x=10) -->
+                        <rect x="0" y="0" width="10" height="20" /><rect x="0" y="20" width="10" height="20" /><rect x="0" y="40" width="10" height="20" /><rect x="0" y="60" width="10" height="20" /><rect x="0" y="80" width="10" height="20" /><rect x="0" y="100" width="10" height="20" /><rect x="0" y="120" width="10" height="20" />
+                        <rect x="10" y="0" width="10" height="20" /><rect x="10" y="20" width="10" height="20" /><rect x="10" y="40" width="10" height="20" /><rect x="10" y="60" width="10" height="20" /><rect x="10" y="80" width="10" height="20" /><rect x="10" y="100" width="10" height="20" /><rect x="10" y="120" width="10" height="20" />
+                        <!-- Colonnes Droite (x=100 et x=110) -->
+                        <rect x="100" y="0" width="10" height="20" /><rect x="100" y="20" width="10" height="20" /><rect x="100" y="40" width="10" height="20" /><rect x="100" y="60" width="10" height="20" /><rect x="100" y="80" width="10" height="20" /><rect x="100" y="100" width="10" height="20" /><rect x="100" y="120" width="10" height="20" />
+                        <rect x="110" y="0" width="10" height="20" /><rect x="110" y="20" width="10" height="20" /><rect x="110" y="40" width="10" height="20" /><rect x="110" y="60" width="10" height="20" /><rect x="110" y="80" width="10" height="20" /><rect x="110" y="100" width="10" height="20" /><rect x="110" y="120" width="10" height="20" />
+                    </g>
+
+                    <!-- BLOCS ROUGES (Sécurités Haut & Bas) -->
+                    <g class="t3-rouge">
+                        <!-- Haut -->
+                        <rect x="20" y="0" width="10" height="20" /><rect x="30" y="0" width="10" height="20" /><rect x="40" y="0" width="10" height="20" /><rect x="50" y="0" width="10" height="20" /><rect x="60" y="0" width="10" height="20" /><rect x="70" y="0" width="10" height="20" /><rect x="80" y="0" width="10" height="20" /><rect x="90" y="0" width="10" height="20" />
+                        <!-- Bas -->
+                        <rect x="20" y="120" width="10" height="20" /><rect x="30" y="120" width="10" height="20" /><rect x="40" y="120" width="10" height="20" /><rect x="50" y="120" width="10" height="20" /><rect x="60" y="120" width="10" height="20" /><rect x="70" y="120" width="10" height="20" /><rect x="80" y="120" width="10" height="20" /><rect x="90" y="120" width="10" height="20" />
+                    </g>
+
+                    <!-- BLOCS JAUNES (La Grande Zone A & B) -->
+                    <g class="t3-jaune">
+                        <!-- Moitié Gauche (Zone A) -->
+                        <rect x="20" y="20" width="20" height="10" /><rect x="40" y="20" width="20" height="10" />
+                        <rect x="20" y="30" width="10" height="20" /><rect x="30" y="30" width="20" height="10" /><rect x="30" y="40" width="20" height="10" /><rect x="50" y="30" width="10" height="20" />
+                        <rect x="20" y="50" width="10" height="20" /><rect x="30" y="50" width="20" height="10" /><rect x="30" y="60" width="20" height="10" /><rect x="50" y="50" width="10" height="20" />
+                        
+                        <!-- Moitié Droite (Zone B) -->
+                        <rect x="60" y="20" width="20" height="10" /><rect x="80" y="20" width="20" height="10" />
+                        <rect x="60" y="30" width="10" height="20" /><rect x="70" y="30" width="20" height="10" /><rect x="70" y="40" width="20" height="10" /><rect x="90" y="30" width="10" height="20" />
+                        <rect x="60" y="50" width="10" height="20" /><rect x="70" y="50" width="20" height="10" /><rect x="70" y="60" width="20" height="10" /><rect x="90" y="50" width="10" height="20" />
+                    </g>
+
+                    <!-- BLOCS BLEUS (Les 2 zones latérales du bas) -->
+                    <g class="t3-bleu">
+                        <!-- Bleu Gauche -->
+                        <rect x="20" y="70" width="20" height="10" />
+                        <rect x="20" y="80" width="10" height="20" /><rect x="30" y="80" width="10" height="20" />
+                        <rect x="20" y="100" width="10" height="20" /><rect x="30" y="100" width="10" height="20" />
+                        
+                        <!-- Bleu Droite -->
+                        <rect x="80" y="70" width="20" height="10" />
+                        <rect x="80" y="80" width="10" height="20" /><rect x="90" y="80" width="10" height="20" />
+                        <rect x="80" y="100" width="10" height="20" /><rect x="90" y="100" width="10" height="20" />
+                    </g>
+
+                    <!-- BLOCS VERTS (La zone centrale du bas) -->
+                    <g class="t3-vert">
+                        <rect x="40" y="70" width="20" height="10" /><rect x="60" y="70" width="20" height="10" />
+                        <rect x="40" y="80" width="10" height="20" /><rect x="50" y="80" width="20" height="10" /><rect x="50" y="90" width="20" height="10" /><rect x="70" y="80" width="10" height="20" />
+                        <rect x="40" y="100" width="10" height="20" /><rect x="50" y="100" width="20" height="10" /><rect x="50" y="110" width="20" height="10" /><rect x="70" y="100" width="10" height="20" />
+                    </g>
+
+                    <!-- Labels Textuels (Super propres) -->
+                    <text x="40" y="45" class="t3-lbl">ZONE A</text>
+                    <text x="80" y="45" class="t3-lbl">ZONE B</text>
+                </svg>
+            </div>
+        </section>
+
+        <!-- ================= ONGLET 4 : MODE INTERACTIF ================= -->
+        <section id="tab4" class="tab-content">
+            <div class="view-header">
+                <div class="view-title-wrap">
+                    <h2>🛠️ Disposition Libre (Créateur de plan interactif)</h2>
+                    <p>
+                        <strong>1. Clique</strong> sur une couleur pour ajouter • <strong>2. Glisse</strong> pour déplacer et aimanter • <strong>3. Double-clic</strong> pour pivoter • <strong>4. Glisse hors grille</strong> pour supprimer.
+                    </p>
+                </div>
+            </div>
+
+            <div class="builder-layout">
+                <!-- PALETTE (INVENTAIRE) -->
+                <div class="builder-palette">
+                    <h3 style="margin-top:0; font-family:'Fredoka'; font-size:1.1rem; color:var(--noir-doux); border-bottom:1px solid #EFEFEF; padding-bottom:8px;">Inventaire (85)</h3>
+                    <button class="btn-spawn bg-drag-rouge" style="color:#FFF;" onclick="spawnTatami('rouge')" id="btn-rouge">Rouge (16)</button>
+                    <button class="btn-spawn bg-drag-jaune" style="color:#1A1A1A;" onclick="spawnTatami('jaune')" id="btn-jaune">Jaune (20)</button>
+                    <button class="btn-spawn bg-drag-bleu" style="color:#FFF;" onclick="spawnTatami('bleu')" id="btn-bleu">Bleu (10)</button>
+                    <button class="btn-spawn bg-drag-vert" style="color:#FFF;" onclick="spawnTatami('vert')" id="btn-vert">Vert (10)</button>
+                    <button class="btn-spawn bg-drag-ciel" style="color:#FFF;" onclick="spawnTatami('ciel')" id="btn-ciel">Bleu Ciel (29)</button>
+                </div>
+
+                <!-- ZONE DE DESSIN -->
+                <div class="builder-workspace">
+                    <div class="builder-grid" id="builder-grid"></div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- SCRIPT JS (Gestion des onglets, de l'impression Portrait/Paysage, et du mode libre) -->
+    <script>
+        function openTab(tabIndex, btn) {
+            // Nettoyage de l'interface
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            // Activation de l'onglet
+            document.getElementById('tab' + tabIndex).classList.add('active');
+            btn.classList.add('active');
+
+            // INJECTION DYNAMIQUE DE LA BALISE @page POUR L'IMPRESSION !
+            const printStyle = document.getElementById('dynamic-print-style');
+            if (tabIndex === 1 || tabIndex === 2) {
+                // Pour Vue 1 et Vue 2 => Forcer l'impression en PORTRAIT
+                printStyle.innerHTML = '@page { size: A4 portrait; margin: 10mm; }';
+            } else {
+                // Pour Vue 3 et Vue 4 => Forcer l'impression en PAYSAGE
+                printStyle.innerHTML = '@page { size: A4 landscape; margin: 10mm; }';
+            }
+        }
+
+        /* --- MOTEUR INTERACTIF (ONGLET 4) --- */
+        const CELL_SIZE = 35; // 1 mètre = 35px
+        const GRID_MAX = 560; // 16 mètres * 35px = 560px
+        
+        let inventory = { rouge: 16, jaune: 20, bleu: 10, vert: 10, ciel: 29 };
+        let activeDrag = null;
+        let dragStartX = 0, dragStartY = 0;
+        let initialLeft = 0, initialTop = 0;
+
+        function updatePalette() {
+            ['rouge', 'jaune', 'bleu', 'vert', 'ciel'].forEach(c => {
+                const btn = document.getElementById('btn-' + c);
+                let label = c.charAt(0).toUpperCase() + c.slice(1);
+                if (c === 'ciel') label = 'Bleu Ciel';
+                
+                btn.innerText = `${label} (${inventory[c]})`;
+                btn.disabled = (inventory[c] <= 0);
+            });
+        }
+
+        function spawnTatami(color) {
+            if (inventory[color] <= 0) return;
+            inventory[color]--;
+            updatePalette();
+
+            const t = document.createElement('div');
+            t.className = `tatami-drag bg-drag-${color}`;
+            t.dataset.color = color;
+            t.style.left = '245px'; 
+            t.style.top = '245px';
+
+            t.onmousedown = (e) => {
+                activeDrag = t;
+                dragStartX = e.clientX; dragStartY = e.clientY;
+                initialLeft = parseInt(t.style.left || 0); initialTop = parseInt(t.style.top || 0);
+                t.style.zIndex = '1000';
+            };
+
+            t.ondblclick = () => {
+                t.classList.toggle('vertical');
+                let cl = parseInt(t.style.left), ct = parseInt(t.style.top);
+                const cw = t.classList.contains('vertical') ? CELL_SIZE : (CELL_SIZE * 2);
+                const ch = t.classList.contains('vertical') ? (CELL_SIZE * 2) : CELL_SIZE;
+                if (cl + cw > GRID_MAX) t.style.left = (GRID_MAX - cw) + 'px';
+                if (ct + ch > GRID_MAX) t.style.top = (GRID_MAX - ch) + 'px';
+            };
+
+            document.getElementById('builder-grid').appendChild(t);
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            if (!activeDrag) return;
+            const dx = e.clientX - dragStartX; const dy = e.clientY - dragStartY;
+            activeDrag.style.left = (initialLeft + dx) + 'px';
+            activeDrag.style.top = (initialTop + dy) + 'px';
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            if (!activeDrag) return;
+            const t = activeDrag; activeDrag = null; t.style.zIndex = '';
+            let finalLeft = Math.round(parseInt(t.style.left) / CELL_SIZE) * CELL_SIZE;
+            let finalTop = Math.round(parseInt(t.style.top) / CELL_SIZE) * CELL_SIZE;
+            const w = t.classList.contains('vertical') ? CELL_SIZE : (CELL_SIZE * 2);
+            const h = t.classList.contains('vertical') ? (CELL_SIZE * 2) : CELL_SIZE;
+
+            if (finalLeft < -20 || finalTop < -20 || finalLeft + w > GRID_MAX + 20 || finalTop + h > GRID_MAX + 20) {
+                inventory[t.dataset.color]++;
+                t.remove();
+                updatePalette();
+            } else {
+                if (finalLeft < 0) finalLeft = 0; if (finalTop < 0) finalTop = 0;
+                if (finalLeft + w > GRID_MAX) finalLeft = GRID_MAX - w;
+                if (finalTop + h > GRID_MAX) finalTop = GRID_MAX - h;
+                t.style.left = finalLeft + 'px'; t.style.top = finalTop + 'px';
+            }
+        });
+
+        updatePalette();
+    </script>
+</body>
+</html>
