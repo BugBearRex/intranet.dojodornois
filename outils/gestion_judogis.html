@@ -2,24 +2,33 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Gestion des Judogis — Intranet Dojo Dornois</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght=400;600&family=Roboto:wght=400;500;700&display=swap" rel="stylesheet">
+    <title>Pilotage des Judogis & Prêts — Intranet Dojo Dornois</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --rouge: #C41E3A;
             --rouge-hover: #A3182E;
             --rouge-clair: #FFEBEF;
             --rouge-deep: #8B1429;
+            --bleu-ecole: #2563EB;
+            --bleu-ecole-hover: #1D4ED8;
+            --bleu-ecole-clair: #EFF6FF;
+            --vert: #16A34A;
+            --vert-clair: #DCFCE7;
+            --orange: #EA580C;
+            --orange-clair: #FFEDD5;
+            --violet: #7C3AED;
+            --violet-clair: #F3E8FF;
             --noir-doux: #1A1A1A;
             --gris-fonce: #3D3D3D;
             --gris-moyen: #6B6B6B;
             --gris-clair: #B8B8B8;
-            --gris-tres-clair: #E8E8E8;
+            --gris-tres-clair: #E2E8F0;
             --fond: #F4F6F9;
             --blanc: #FFFFFF;
             
             --sidebar-width: 280px;
-            --topbar-height: 68px;
+            --topbar-height: 70px;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -34,7 +43,7 @@
             overflow: hidden;
         }
 
-        /* --- FIX SIDEBAR DEBORDEMENT --- */
+        /* --- SIDEBAR --- */
         .sidebar { 
             width: var(--sidebar-width); 
             min-width: var(--sidebar-width);
@@ -47,16 +56,10 @@
             position: relative; 
             box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
             flex-shrink: 0; 
-            box-sizing: border-box;
             overflow-x: hidden;
             z-index: 100;
         }
-
-        .sidebar * {
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-
+        .sidebar * { max-width: 100%; box-sizing: border-box; }
         .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
         .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
         .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
@@ -79,40 +82,46 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid var(--gris-tres-clair);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             flex-shrink: 0;
             z-index: 50;
         }
 
         .topbar-left { display: flex; align-items: center; gap: 16px; }
-
         .page-title-area h2 {
             font-family: 'Fredoka', sans-serif;
             margin: 0;
             font-size: 1.35rem;
             color: var(--noir-doux);
-            line-height: 1;
+            line-height: 1.1;
         }
-
         .page-title-area p {
-            margin: 2px 0 0 0;
+            margin: 3px 0 0 0;
             font-size: 0.78rem;
             color: var(--gris-moyen);
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         /* ===== SYSTEME D'ONGLETS ===== */
         .tabs-header {
             display: flex;
             background: var(--blanc);
-            padding: 10px 28px 0 28px;
+            padding: 8px 28px 0 28px;
             border-bottom: 1px solid var(--gris-tres-clair);
-            gap: 10px;
+            gap: 8px;
+            overflow-x: auto;
+            flex-shrink: 0;
         }
 
         .tab-btn {
             font-family: 'Fredoka', sans-serif;
-            font-size: 0.95rem;
-            padding: 12px 20px;
+            font-size: 0.92rem;
+            padding: 11px 18px;
             border: none;
             background: transparent;
             color: var(--gris-moyen);
@@ -122,6 +131,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
         }
 
         .tab-btn:hover {
@@ -137,23 +147,91 @@
             font-weight: 600;
         }
 
+        .tab-btn.ecole-tab:hover {
+            color: var(--bleu-ecole);
+            background: var(--bleu-ecole-clair);
+        }
+        .tab-btn.ecole-tab.active {
+            color: var(--bleu-ecole);
+            border-bottom-color: var(--bleu-ecole);
+        }
+
+        .tab-counter {
+            background: var(--gris-tres-clair);
+            color: var(--gris-fonce);
+            font-size: 0.72rem;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+        }
+        .tab-btn.active .tab-counter { background: var(--rouge); color: var(--blanc); }
+        .tab-btn.ecole-tab.active .tab-counter { background: var(--bleu-ecole); color: var(--blanc); }
+
         .dashboard-body {
             flex: 1;
-            padding: 24px 28px;
+            padding: 22px 28px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: var(--gris-tres-clair) transparent;
         }
 
-        .tab-content {
-            display: none;
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ===== KPI CARDS ===== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
         }
 
-        .tab-content.active {
-            display: block;
+        .kpi-card {
+            background: var(--blanc);
+            border-radius: 10px;
+            padding: 15px 18px;
+            border: 1px solid var(--gris-tres-clair);
+            border-left: 5px solid var(--rouge);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .kpi-card.dispo { border-left-color: var(--vert); }
+        .kpi-card.orphan { border-left-color: var(--orange); }
+        .kpi-card.ecole { border-left-color: var(--bleu-ecole); background: linear-gradient(to right, #EFF6FF 0%, #FFFFFF 35%); }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--gris-moyen);
+            margin-bottom: 6px;
         }
 
-        /* ===== COIN INTERFACE COMPOSANTS ===== */
+        .kpi-value {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--noir-doux);
+            line-height: 1.1;
+        }
+
+        .kpi-sub {
+            font-size: 0.78rem;
+            color: var(--gris-moyen);
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== CARDS & SECTIONS ===== */
         .card {
             background: var(--blanc);
             border-radius: 10px;
@@ -162,155 +240,269 @@
             padding: 20px;
             margin-bottom: 20px;
         }
+        .card.card-ecole { border-top: 3px solid var(--bleu-ecole); }
+        .card.card-club { border-top: 3px solid var(--rouge); }
 
         .card-title {
             font-family: 'Fredoka', sans-serif;
-            font-size: 1.1rem;
+            font-size: 1.08rem;
             color: var(--rouge);
             margin: 0 0 15px 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .card-title.ecole { color: var(--bleu-ecole); }
+        .card-title.dark { color: var(--noir-doux); }
+
+        .isolation-banner {
+            background: var(--bleu-ecole-clair);
+            border: 1px solid #BFDBFE;
+            border-left: 5px solid var(--bleu-ecole);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            color: #1E3A8A;
+            font-size: 0.86rem;
         }
 
-        /* ===== STYLES DES TABLEAUX ===== */
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-        }
-
+        /* ===== TABLEAUX ===== */
+        .table-responsive { width: 100%; overflow-x: auto; }
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
         }
-
         th {
             background: var(--fond);
             color: var(--noir-doux);
             font-weight: 600;
-            padding: 12px 16px;
+            padding: 11px 14px;
             border-bottom: 2px solid var(--gris-tres-clair);
+            white-space: nowrap;
         }
-
         td {
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-bottom: 1px solid var(--gris-tres-clair);
             color: var(--gris-fonce);
+            vertical-align: middle;
         }
+        tr:hover td { background-color: rgba(244, 246, 249, 0.6); }
 
-        tr:hover td {
-            background-color: rgba(244, 246, 249, 0.5);
+        /* ===== BADGES ===== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            white-space: nowrap;
         }
+        .badge-club { background: var(--rouge-clair); color: var(--rouge); }
+        .badge-ecole { background: var(--bleu-ecole-clair); color: var(--bleu-ecole); }
+        .badge-vert { background: var(--vert-clair); color: var(--vert); }
+        .badge-orange { background: var(--orange-clair); color: var(--orange); }
+        .badge-violet { background: var(--violet-clair); color: var(--violet); }
+        .badge-gris { background: var(--fond); color: var(--gris-moyen); border: 1px solid var(--gris-tres-clair); }
 
         /* ===== CONTROLES & FORMULAIRES ===== */
         .form-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 12px;
             align-items: end;
         }
-
         .form-group {
             display: flex;
             flex-direction: column;
             gap: 5px;
         }
-
         .form-group label {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 600;
             color: var(--gris-fonce);
         }
-
         .form-control {
-            padding: 9px 12px;
+            padding: 8px 11px;
             border: 1.5px solid var(--gris-tres-clair);
             border-radius: 7px;
-            font-size: 0.875rem;
+            font-size: 0.86rem;
             background: var(--blanc);
             font-family: 'Roboto', sans-serif;
+            height: 38px;
         }
-
+        textarea.form-control { height: auto; }
         .form-control:focus {
             outline: none;
             border-color: var(--rouge);
             box-shadow: 0 0 0 3px rgba(196,30,58,0.08);
         }
 
+        .checkbox-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 0.82rem;
+            color: var(--gris-fonce);
+            cursor: pointer;
+            user-select: none;
+        }
+        .checkbox-line input { width: 16px; height: 16px; accent-color: var(--rouge); cursor: pointer; }
+
+        /* ===== BOUTONS ===== */
         .btn {
             background: var(--rouge);
             color: white;
             border: none;
-            padding: 10px 16px;
-            border-radius: 6px;
+            padding: 9px 15px;
+            border-radius: 7px;
             cursor: pointer;
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: background 0.15s;
+            transition: all 0.15s;
             height: 38px;
             justify-content: center;
+            white-space: nowrap;
         }
-
         .btn:hover { background: var(--rouge-hover); }
-        .btn-danger { background: #e74c3c; }
-        .btn-danger:hover { background: #c0392b; }
+        .btn-ecole { background: var(--bleu-ecole); }
+        .btn-ecole:hover { background: var(--bleu-ecole-hover); }
+        .btn-success { background: var(--vert); }
+        .btn-success:hover { background: #15803D; }
         .btn-secondary { background: var(--gris-moyen); }
         .btn-secondary:hover { background: var(--gris-fonce); }
-
-        .actions-cell {
-            display: flex;
-            gap: 6px;
+        .btn-outline {
+            background: var(--blanc);
+            color: var(--gris-fonce);
+            border: 1.5px solid var(--gris-tres-clair);
         }
+        .btn-outline:hover { border-color: var(--rouge); color: var(--rouge); }
 
+        .actions-cell { display: flex; gap: 5px; align-items: center; flex-wrap: nowrap; }
         .btn-action {
-            padding: 4px 8px;
-            font-size: 0.8rem;
-            border-radius: 4px;
+            padding: 5px 8px;
+            font-size: 0.78rem;
+            border-radius: 5px;
             border: none;
             cursor: pointer;
             color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
         }
-        .btn-edit { background: #f1c40f; color: var(--noir-doux); font-weight: 500; }
+        .btn-edit { background: #f1c40f; color: var(--noir-doux); }
         .btn-edit:hover { background: #f39c12; }
+        .btn-return { background: var(--vert); color: white; }
+        .btn-return:hover { background: #15803D; }
         .btn-delete { background: #e74c3c; }
         .btn-delete:hover { background: #c0392b; }
 
-        /* ===== INVENTAIRE BADGES ===== */
+        /* ===== CONTROLES D'INVENTAIRE ===== */
         .grid-inventaire {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
             gap: 20px;
         }
 
-        .stock-badge {
+        .stock-control-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
             background: var(--fond);
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            padding: 3px;
+            border-radius: 6px;
+            border: 1px solid var(--gris-tres-clair);
         }
-        .stock-badge.complet {
-            background: var(--rouge-clair);
-            color: var(--rouge);
+        .stock-btn-mini {
+            width: 26px;
+            height: 26px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--blanc);
+            color: var(--noir-doux);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        }
+        .stock-btn-mini:hover { background: var(--rouge); color: var(--blanc); }
+        .stock-input-direct {
+            width: 48px;
+            height: 26px;
+            text-align: center;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            background: var(--blanc);
+            color: var(--noir-doux);
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            background: var(--fond);
+            padding: 10px 14px;
+            border-radius: 8px;
         }
 
         /* ===== TOAST NOTIFICATION ===== */
         .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
-        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.86rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.25s ease; }
         .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
         .toast.error { background: #641E16; border-left: 4px solid #e74c3c; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 
+        /* ===== IMPRESSION A4 OFFICIELLE ===== */
+        .print-only-header, .print-only-footer { display: none; }
+
         @media print {
-            body { background: white; padding: 0; color: black; display: block !important; }
-            .no-print, .sidebar, .topbar { display: none !important; }
-            .main-content { padding: 0 !important; overflow: visible !important; }
-            .dashboard-body { display: block !important; margin: 0 !important; padding: 0 !important; }
+            @page { size: A4 landscape; margin: 10mm; }
+            body { background: white !important; padding: 0 !important; color: black !important; display: block !important; height: auto !important; overflow: visible !important; }
+            .no-print, .sidebar, .topbar, .tabs-header, .toast-container { display: none !important; }
+            .main-content { display: block !important; height: auto !important; overflow: visible !important; }
+            .dashboard-body { padding: 0 !important; overflow: visible !important; }
+            .card { box-shadow: none !important; border: 1px solid #ccc !important; page-break-inside: avoid; margin-bottom: 12px !important; padding: 12px !important; }
+            .print-only-header {
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 3px solid #C41E3A;
+                padding-bottom: 10px;
+                margin-bottom: 15px;
+            }
+            .print-only-footer {
+                display: block !important;
+                margin-top: 15px;
+                padding-top: 8px;
+                border-top: 1px solid #ccc;
+                font-size: 0.72rem;
+                color: #555;
+                text-align: center;
+            }
+            th, td { padding: 6px 8px !important; font-size: 0.78rem !important; }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -320,91 +512,204 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- ===== SIDEBAR DYNAMIQUE ===== -->
-    <div class="sidebar"></div>
+    <div class="sidebar no-print"></div>
 
     <!-- ===== MAIN CONTENT AREA ===== -->
     <div class="main-content">
         <div class="topbar no-print">
             <div class="topbar-left">
                 <div class="page-title-area">
-                    <h2>Gestion Vestiaire & Judogis</h2>
-                    <p>Suivi des prêts de tenues et inventaire du stock club</p>
+                    <h2>🥋 Gestion Vestiaire & Pilotage des Judogis</h2>
+                    <p>Suivi des prêts, inventaire du Stock Global Club et registre séparé des Judogis Écoles</p>
                 </div>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn btn-outline" onclick="syncToSupabase(false)">☁️ Sync Supabase</button>
+                <button class="btn btn-outline" onclick="exportBackupJSON()">💾 Sauvegarde JSON</button>
+                <button class="btn" onclick="window.print()">🖨️ Imprimer la vue</button>
             </div>
         </div>
 
         <!-- Onglets de Navigation -->
         <div class="tabs-header no-print">
-            <button class="tab-btn active" onclick="switchTab('tab-prets', this)">🤝 Suivi des Prêts</button>
-            <button class="tab-btn" onclick="switchTab('tab-inventaire', this)">📊 Inventaire du Stock</button>
+            <button class="tab-btn active" onclick="switchTab('tab-prets', this)">
+                🤝 Suivi des Prêts <span class="tab-counter" id="badge-count-prets">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-inventaire', this)">
+                📊 Inventaire du Stock Global (Club)
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-pilotage', this)">
+                🧭 Synthèse & Pochettes (Stock Club)
+            </button>
+            <button class="tab-btn ecole-tab" onclick="switchTab('tab-ecoles', this)">
+                🏫 Judogis Achetés Écoles (Hors Stock) <span class="tab-counter" id="badge-count-ecoles">0</span>
+            </button>
         </div>
 
         <div class="dashboard-body">
 
-            <!-- ================= ONGLET 1 : LES PRÊTS ================= -->
+            <!-- EN-TÊTE D'IMPRESSION OFFICIEL DOJO DORNOIS -->
+            <div class="print-only-header">
+                <div style="display:flex; align-items:center; gap:14px;">
+                    <div style="width:48px; height:48px; background:#C41E3A; border-radius:12px; display:flex; align-items:center; justify-content:center; color:white; font-family:'Fredoka',sans-serif; font-weight:700; font-size:1.2rem;">DD</div>
+                    <div>
+                        <h1 style="margin:0; font-family:'Fredoka',sans-serif; font-size:1.3rem; color:#1A1A1A;">DOJO DORNOIS — PILOTAGE DES JUDOGIS & PRÊTS</h1>
+                        <p style="margin:2px 0 0 0; font-size:0.8rem; color:#555;">Registre logistique des tenues du Club et suivi de la dotation Écoles</p>
+                    </div>
+                </div>
+                <div style="text-align:right; font-size:0.78rem; color:#333;">
+                    <strong>Édité le :</strong> <span id="print-date-now"></span><br>
+                    <span>Dojo Dornois • Dornes (58390)</span>
+                </div>
+            </div>
+
+            <!-- ================= BANDEAU KPI (STOCK GLOBAL = CLUB UNIQUEMENT) ================= -->
+            <div class="kpi-grid">
+                <div class="kpi-card dispo">
+                    <div class="kpi-header">
+                        <span>📦 Stock Global Dispo (Club)</span>
+                        <span class="badge badge-vert">En caisse</span>
+                    </div>
+                    <div class="kpi-value" id="kpi-club-complets">0 complet(s)</div>
+                    <div class="kpi-sub" id="kpi-club-pieces">
+                        0 vestes • 0 pantalons en réserve
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span>🤝 Prêts Actifs (En cours)</span>
+                        <span class="badge badge-club">Sortis</span>
+                    </div>
+                    <div class="kpi-value" id="kpi-prets-actifs">0 prêt(s)</div>
+                    <div class="kpi-sub" id="kpi-prets-detail">
+                        0 prêt(s) Club • 0 prêt(s) École
+                    </div>
+                </div>
+
+                <div class="kpi-card orphan">
+                    <div class="kpi-header">
+                        <span>🧩 Pièces Dépareillées (Club)</span>
+                        <span class="badge badge-orange">Dépannage</span>
+                    </div>
+                    <div class="kpi-value" id="kpi-club-orphelins">0 pièce(s)</div>
+                    <div class="kpi-sub" id="kpi-club-orphelins-detail">
+                        0 veste(s) seule(s) • 0 pantalon(s) seul(s)
+                    </div>
+                </div>
+
+                <div class="kpi-card ecole">
+                    <div class="kpi-header">
+                        <span>🏫 Dotation Écoles (Isolée)</span>
+                        <span class="badge badge-ecole">Hors Stock Club</span>
+                    </div>
+                    <div class="kpi-value" id="kpi-ecole-total">0 acheté(s)</div>
+                    <div class="kpi-sub" id="kpi-ecole-sub">
+                        Non inclus dans le stock global du club
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= ONGLET 1 : SUIVI DES PRÊTS ================= -->
             <div id="tab-prets" class="tab-content active">
-                <!-- Formulaire d'ajout / modification -->
-                <div class="card no-print">
-                    <div class="card-title" id="form-pret-title">📝 Enregistrer un nouveau prêt</div>
+                <div class="card card-club no-print">
+                    <div class="card-title" id="form-pret-title">📝 Enregistrer un prêt de Judogi (Veste + Pantalon)</div>
                     <form id="form-pret" onsubmit="handlePretSubmit(event)">
                         <input type="hidden" id="pret-id">
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Nom & Prénom du Judoka</label>
+                                <label>Nom & Prénom du Judoka / Élève *</label>
                                 <input type="text" id="pret-nom" class="form-control" placeholder="Ex: Roman Loudenot" required>
                             </div>
                             <div class="form-group">
-                                <label>Taille Veste (cm)</label>
-                                <select id="pret-taille-veste" class="form-control">
-                                    <!-- Rempli dynamiquement en JS -->
+                                <label>Provenance de la tenue</label>
+                                <select id="pret-origine" class="form-control" onchange="togglePretOrigineHint()">
+                                    <option value="Club">🥋 Stock Global Club (Adhérent / Essai)</option>
+                                    <option value="École">🏫 Dotation École (Cycle scolaire)</option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Taille Veste (cm)</label>
+                                <select id="pret-taille-veste" class="form-control" onchange="syncPantalonSelect('pret-taille-veste', 'pret-taille-pantalon')"></select>
                             </div>
                             <div class="form-group">
                                 <label>Taille Pantalon (cm)</label>
-                                <select id="pret-taille-pantalon" class="form-control">
-                                    <!-- Rempli dynamiquement en JS -->
+                                <select id="pret-taille-pantalon" class="form-control"></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Ceinture fournie</label>
+                                <select id="pret-ceinture" class="form-control">
+                                    <option value="Oui (Blanche)">Oui (Blanche)</option>
+                                    <option value="Non">Non (Veste/Pantalon seuls)</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Date du prêt</label>
+                                <label>Date du prêt *</label>
                                 <input type="date" id="pret-date" class="form-control" required>
                             </div>
-                            <div>
+                            <div class="form-group">
+                                <label>Groupe / Classe / Remarque</label>
+                                <input type="text" id="pret-note" class="form-control" placeholder="Ex: Cours Baby, Caution OK, CP Dornes...">
+                            </div>
+                            <div style="display:flex; gap:6px;">
                                 <button type="submit" class="btn" id="btn-save-pret">💾 Enregistrer le prêt</button>
                                 <button type="button" class="btn btn-secondary" id="btn-cancel-pret" style="display:none;" onclick="resetPretForm()">Annuler</button>
                             </div>
                         </div>
+                        <label class="checkbox-line">
+                            <input type="checkbox" id="pret-auto-stock" checked>
+                            <span id="pret-auto-stock-label">Déduire automatiquement la veste et le pantalon du <strong>Stock Global Club</strong> (et les réintégrer au clic sur « Récupéré »).</span>
+                        </label>
                     </form>
                 </div>
 
                 <!-- Tableau des judogis prêtés -->
                 <div class="card">
-                    <div class="card-title">🥋 Liste des tenues actuellement prêtées</div>
+                    <div class="card-title">
+                        <span>🥋 Liste des tenues prêtées</span>
+                        <div class="no-print" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                            <input type="text" id="search-pret" class="form-control" placeholder="🔍 Rechercher un nom, taille, classe..." oninput="renderPrets()" style="width:230px; height:34px;">
+                            <select id="filter-origine-pret" class="form-control" onchange="renderPrets()" style="height:34px;">
+                                <option value="tous">Toutes provenances (Club + École)</option>
+                                <option value="Club">🥋 Prêts Club uniquement</option>
+                                <option value="École">🏫 Prêts École uniquement</option>
+                            </select>
+                            <select id="filter-statut-pret" class="form-control" onchange="renderPrets()" style="height:34px;">
+                                <option value="en_cours">🟢 En cours uniquement</option>
+                                <option value="rendu">⚪ Historique des retours</option>
+                                <option value="tous">📋 Tous (En cours + Rendus)</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Judoka</th>
+                                    <th>Judoka / Élève</th>
+                                    <th>Parc</th>
                                     <th>Taille Veste</th>
                                     <th>Taille Pantalon</th>
-                                    <th>Date d'attribution</th>
+                                    <th>Ceinture</th>
+                                    <th>Groupe / Remarque</th>
+                                    <th>Date du prêt</th>
+                                    <th>Statut</th>
                                     <th class="no-print">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="tbody-prets">
-                                <!-- Rempli dynamiquement -->
-                            </tbody>
+                            <tbody id="tbody-prets"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- ================= ONGLET 2 : INVENTAIRE ================= -->
+            <!-- ================= ONGLET 2 : INVENTAIRE DU STOCK GLOBAL (CLUB) ================= -->
             <div id="tab-inventaire" class="tab-content">
                 
                 <!-- Zone de Notes / Stock en attente -->
                 <div class="card no-print" style="margin-bottom: 20px;">
-                    <div class="card-title">📝 Bloc-notes & Tenues à identifier <span style="font-size: 0.8rem; color: var(--gris-moyen); font-family: 'Roboto', sans-serif;">(Tailles inconnues, retouches, remarques)</span></div>
+                    <div class="card-title">
+                        <span>📝 Bloc-notes Vestiaire & Tenues à identifier <span style="font-size: 0.8rem; color: var(--gris-moyen); font-family: 'Roboto', sans-serif;">(Tailles inconnues, étiquettes effacées, retouches)</span></span>
+                    </div>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <textarea id="stock-notes" class="form-control" rows="3" placeholder="Ex: 4 vestes et 4 pantalons dont la taille est inconnue (étiquettes effacées) - à mesurer." style="resize: vertical;"></textarea>
                         <div style="display: flex; justify-content: flex-end;">
@@ -414,69 +719,225 @@
                 </div>
 
                 <div class="grid-inventaire">
-                    <!-- Section Vestes -->
-                    <div class="card">
-                        <div class="card-title">🧥 Stock des Vestes</div>
+                    <!-- Section Vestes Club -->
+                    <div class="card card-club">
+                        <div class="card-title">🧥 Stock des Vestes (Club)</div>
                         <div class="table-responsive">
                             <table>
                                 <thead>
                                     <tr>
                                         <th>Taille</th>
-                                        <th>Quantité disponible</th>
-                                        <th class="no-print">Action rapide</th>
+                                        <th>Quantité dispo</th>
+                                        <th class="no-print">Ajuster</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tbody-stock-vestes">
-                                    <!-- Rempli en JS -->
-                                </tbody>
+                                <tbody id="tbody-stock-vestes"></tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Section Pantalons -->
-                    <div class="card">
-                        <div class="card-title">🩳 Stock des Pantalons</div>
+                    <!-- Section Pantalons Club -->
+                    <div class="card card-club">
+                        <div class="card-title">🩳 Stock des Pantalons (Club)</div>
                         <div class="table-responsive">
                             <table>
                                 <thead>
                                     <tr>
                                         <th>Taille</th>
-                                        <th>Quantité disponible</th>
-                                        <th class="no-print">Action rapide</th>
+                                        <th>Quantité dispo</th>
+                                        <th class="no-print">Ajuster</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tbody-stock-pantalons">
-                                    <!-- Rempli en JS -->
-                                </tbody>
+                                <tbody id="tbody-stock-pantalons"></tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Section Judogis Complets -->
-                    <div class="card">
-                        <div class="card-title">🥋 Judogis Complets Disponibles <span style="font-size: 0.8rem; color: var(--gris-moyen); font-family: 'Roboto', sans-serif;">(Vestes + Pantalons de même taille)</span></div>
+                    <!-- Section Judogis Complets & Dépareillés Club -->
+                    <div class="card card-club">
+                        <div class="card-title">
+                            <span>🥋 Judogis Complets & Pièces Seules</span>
+                        </div>
                         <div class="table-responsive">
                             <table>
                                 <thead>
                                     <tr>
                                         <th>Taille</th>
-                                        <th>Tenues complètes</th>
+                                        <th>Complets Dispo</th>
+                                        <th>Pièces Seules (Dépannage)</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tbody-stock-complets">
-                                    <!-- Rempli en JS -->
-                                </tbody>
+                                <tbody id="tbody-stock-complets"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- ================= ONGLET 3 : SYNTHÈSE & POCHETTES (STOCK CLUB) ================= -->
+            <div id="tab-pilotage" class="tab-content">
+                <div class="card card-club">
+                    <div class="card-title dark">
+                        <span>🧭 Tableau de Pilotage du Stock Global Club (Hors Dotation Écoles)</span>
+                        <span style="font-size:0.8rem; font-family:'Roboto',sans-serif; color:var(--gris-moyen);">
+                            Permet de voir d'un coup d'œil ce qui est en caisse, ce qui est prêté aux adhérents et les pochettes à étiqueter
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Taille</th>
+                                    <th>🧥 Vestes en Caisse</th>
+                                    <th>🩳 Pantalons en Caisse</th>
+                                    <th>🥋 Pochettes « Judogi Complet »</th>
+                                    <th>🟠 Pochettes « Veste Seule »</th>
+                                    <th>🟣 Pochettes « Pantalon Seul »</th>
+                                    <th>🤝 Actuellement Prêtés (Club)</th>
+                                    <th>🏛️ Patrimoine Total Club</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-pilotage-club"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= ONGLET 4 : JUDOGIS ACHETÉS ÉCOLES (HORS STOCK GLOBAL) ================= -->
+            <div id="tab-ecoles" class="tab-content">
+
+                <div class="isolation-banner">
+                    <div>
+                        <strong>🔒 Parc Écoles sanctuarisé (Hors Stock Global du Club) :</strong><br>
+                        Les judogis (veste + pantalon) enregistrés dans cet onglet sont réservés aux interventions scolaires (TER / Écoles) et <strong>ne s'ajoutent pas</strong> au stock global du club.
+                    </div>
+                    <div class="no-print" style="display:flex; gap:8px;">
+                        <button type="button" class="btn btn-ecole" onclick="preloadDotationEcoles()">
+                            ⚡ Pré-remplir la répartition Écoles (110 à 150 cm)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Formulaire d'enregistrement d'un achat / lot de judogis pour les écoles -->
+                <div class="card card-ecole no-print">
+                    <div class="card-title ecole" id="form-ecole-title">➕ Enregistrer des Judogis achetés pour les Écoles (Veste + Pantalon)</div>
+                    <form id="form-ecole-achat" onsubmit="handleEcoleAchatSubmit(event)">
+                        <input type="hidden" id="ecole-achat-id">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Quantité de tenues *</label>
+                                <input type="number" id="ecole-qte" class="form-control" min="1" value="10" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Taille Veste (cm) *</label>
+                                <select id="ecole-taille-veste" class="form-control" onchange="syncPantalonSelect('ecole-taille-veste', 'ecole-taille-pantalon')"></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Taille Pantalon (cm) *</label>
+                                <select id="ecole-taille-pantalon" class="form-control"></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Ceinture blanche incluse</label>
+                                <select id="ecole-ceinture" class="form-control">
+                                    <option value="Oui">Oui (Veste + Pantalon + Ceinture)</option>
+                                    <option value="Non">Non (Veste + Pantalon)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Classe / École d'affectation</label>
+                                <select id="ecole-affectation" class="form-control">
+                                    <option value="Dotation Générale Écoles (TER)">Dotation Générale Écoles (TER)</option>
+                                    <option value="PS / MS (Maternelle)">PS / MS (Maternelle)</option>
+                                    <option value="GS (Grande Section)">GS (Grande Section)</option>
+                                    <option value="CP">CP</option>
+                                    <option value="CE1">CE1</option>
+                                    <option value="CE2">CE2</option>
+                                    <option value="CM1">CM1</option>
+                                    <option value="CM2">CM2</option>
+                                    <option value="École de Dornes">École de Dornes</option>
+                                    <option value="École de Chantenay-Saint-Imbert">École de Chantenay-Saint-Imbert</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Fournisseur / Lot</label>
+                                <input type="text" id="ecole-fournisseur" class="form-control" value="Décathlon Avermes" placeholder="Ex: Décathlon Avermes">
+                            </div>
+                            <div class="form-group">
+                                <label>Prix unitaire (€)</label>
+                                <input type="number" step="0.01" id="ecole-prix" class="form-control" value="12" placeholder="12.00">
+                            </div>
+                            <div class="form-group">
+                                <label>Date d'achat</label>
+                                <input type="date" id="ecole-date" class="form-control" required>
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                <button type="submit" class="btn btn-ecole" id="btn-save-ecole-achat">💾 Enregistrer dans Parc Écoles</button>
+                                <button type="button" class="btn btn-secondary" id="btn-cancel-ecole-achat" style="display:none;" onclick="resetEcoleAchatForm()">Annuler</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap:20px;">
+                    <!-- Récapitulatif par taille des Judogis Écoles -->
+                    <div class="card card-ecole">
+                        <div class="card-title ecole">
+                            <span>📊 Récapitulatif par Taille — Judogis Écoles</span>
+                            <span class="badge badge-ecole" id="badge-total-ecole-synthese">0 tenue(s)</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Taille</th>
+                                        <th>🧥 Vestes Écoles</th>
+                                        <th>🩳 Pantalons Écoles</th>
+                                        <th>🥋 Complets Écoles</th>
+                                        <th>🎒 En prêt élève</th>
+                                        <th>✅ Dispo Caisse École</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-ecole-par-taille"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Journal des lots de judogis achetés pour les écoles -->
+                    <div class="card card-ecole">
+                        <div class="card-title ecole">
+                            <span>🧾 Lots & Judogis Écoles enregistrés</span>
+                            <span class="badge badge-gris" id="badge-cout-ecole">Investissement : 0 €</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qté</th>
+                                        <th>Veste / Pantalon</th>
+                                        <th>Affectation / Classe</th>
+                                        <th>Fournisseur & Date</th>
+                                        <th>Montant</th>
+                                        <th class="no-print">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-ecole-achats"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- PIED DE PAGE D'IMPRESSION -->
+            <div class="print-only-footer">
+                Dojo Dornois — Outil de pilotage logistique des Judogis (Stock Global Club & Registre séparé des Judogis Écoles)
+            </div>
+
         </div>
     </div>
 
     <script type="text/javascript">
-        // --- SWITCHER ONGLET ---
+        // --- SWITCHER D'ONGLET ---
         function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -484,19 +945,20 @@
             btn.classList.add('active');
         }
 
-        // --- GLOBAL LOGISTIQUE DATABASE COMPONENT ---
-        let logistiqueDB = {
-            prets: [],
-            stockVestes: {},
-            stockPantalons: {},
-            notes: ""
-        };
-
         const taillesDefaut = [
             "100 cm", "110 cm", "120 cm", "130 cm", "140 cm", "150 cm", 
             "160 cm", "165 cm", "170 cm", "175 cm", "180 cm", "185 cm", 
             "190 cm", "195 cm", "200 cm"
         ];
+
+        // --- STRUCTURE DE DONNÉES UNIFIÉE ---
+        let logistiqueDB = {
+            prets: [],            // Liste des prêts (avec origine: 'Club' ou 'École')
+            stockVestes: {},      // Stock Global Club - Vestes uniquement
+            stockPantalons: {},   // Stock Global Club - Pantalons uniquement
+            achatsEcoles: [],     // Lots de judogis achetés pour les écoles (Hors stock club)
+            notes: ""
+        };
 
         // --- INTERCONNEXION SUPABASE ---
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
@@ -513,172 +975,412 @@
             setTimeout(() => { toast.remove(); }, 3500);
         }
 
-        async function syncToSupabase(silent = false) {
-            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
-            try {
-                const payload = logistiqueDB;
-                localStorage.setItem('dojo_logistique_unified', JSON.stringify(payload)); 
+        function normalizeDB(raw) {
+            if (!raw || typeof raw !== 'object') return;
 
-                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+            logistiqueDB.prets = Array.isArray(raw.prets) ? raw.prets.map(p => ({
+                id: p.id || Date.now() + Math.random(),
+                nom: p.nom || "Sans nom",
+                origine: p.origine || "Club",
+                veste: p.veste || "120 cm",
+                pantalon: p.pantalon || "120 cm",
+                ceinture: p.ceinture || "Oui (Blanche)",
+                date: p.date || new Date().toISOString().split('T')[0],
+                note: p.note || "",
+                statut: p.statut || "en_cours"
+            })) : [];
+
+            logistiqueDB.stockVestes = raw.stockVestes || {};
+            logistiqueDB.stockPantalons = raw.stockPantalons || {};
+
+            taillesDefaut.forEach(t => {
+                if (typeof logistiqueDB.stockVestes[t] === 'undefined') logistiqueDB.stockVestes[t] = 0;
+                if (typeof logistiqueDB.stockPantalons[t] === 'undefined') logistiqueDB.stockPantalons[t] = 0;
+            });
+
+            logistiqueDB.achatsEcoles = Array.isArray(raw.achatsEcoles) ? raw.achatsEcoles : [];
+            logistiqueDB.notes = typeof raw.notes === 'string' ? raw.notes : "";
+        }
+
+        async function syncToSupabase(silent = false) {
+            if (!silent) showToast("Synchronisation Supabase en cours...");
+            try {
+                localStorage.setItem('dojo_logistique_unified', JSON.stringify(logistiqueDB)); 
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: logistiqueDB });
                 if (error) throw error;
-                
-                if (!silent && typeof showToast === 'function') showToast("✓ ☁️ Enregistrement synchronisé sur Supabase !", "success");
+                if (!silent) showToast("✓ ☁️ Enregistrement synchronisé sur Supabase !", "success");
             } catch (err) {
                 console.error("Erreur Supabase:", err);
-                if (typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+                if (!silent) showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
             }
         }
 
         async function loadData() {
-            // 1. Sync load from localStorage for instant UI
+            document.getElementById('print-date-now').innerText = new Date().toLocaleDateString('fr-FR');
+
+            // 1. Chargement local immédiat
             const unifiedBackup = localStorage.getItem('dojo_logistique_unified');
             if (unifiedBackup) {
                 try {
-                    logistiqueDB = JSON.parse(unifiedBackup);
-                    if (typeof logistiqueDB.notes === 'undefined') logistiqueDB.notes = "";
-                } catch(e) {}
+                    normalizeDB(JSON.parse(unifiedBackup));
+                } catch(e) { console.error(e); }
             } else {
-                logistiqueDB.prets = JSON.parse(localStorage.getItem('dd_judogis_prets')) || [
-                    { id: 1, nom: "Natéo Loudenot", veste: "120 cm", pantalon: "120 cm", date: "2025-09-06" },
-                    { id: 2, nom: "Félix Dupont", veste: "130 cm", pantalon: "140 cm", date: "2025-10-12" }
-                ];
-                logistiqueDB.stockVestes = JSON.parse(localStorage.getItem('dd_stock_vestes')) || {
-                    "100 cm": 5, "110 cm": 8, "120 cm": 12, "130 cm": 6, "140 cm": 4, "150 cm": 3, 
-                    "160 cm": 2, "165 cm": 0, "170 cm": 1, "175 cm": 0, "180 cm": 2, "185 cm": 0, 
-                    "190 cm": 0, "195 cm": 0, "200 cm": 1
+                const fallback = {
+                    prets: JSON.parse(localStorage.getItem('dd_judogis_prets')) || [
+                        { id: 1, nom: "Natéo Loudenot", origine: "Club", veste: "120 cm", pantalon: "120 cm", ceinture: "Oui (Blanche)", date: "2025-09-06", note: "", statut: "en_cours" },
+                        { id: 2, nom: "Félix Dupont", origine: "Club", veste: "130 cm", pantalon: "140 cm", ceinture: "Oui (Blanche)", date: "2025-10-12", note: "", statut: "en_cours" }
+                    ],
+                    stockVestes: JSON.parse(localStorage.getItem('dd_stock_vestes')) || {
+                        "100 cm": 5, "110 cm": 8, "120 cm": 12, "130 cm": 6, "140 cm": 4, "150 cm": 3, 
+                        "160 cm": 2, "165 cm": 0, "170 cm": 1, "175 cm": 0, "180 cm": 2, "185 cm": 0, 
+                        "190 cm": 0, "195 cm": 0, "200 cm": 1
+                    },
+                    stockPantalons: JSON.parse(localStorage.getItem('dd_stock_pantalons')) || {
+                        "100 cm": 4, "110 cm": 7, "120 cm": 10, "130 cm": 5, "140 cm": 5, "150 cm": 2, 
+                        "160 cm": 3, "165 cm": 1, "170 cm": 1, "175 cm": 0, "180 cm": 1, "185 cm": 0, 
+                        "190 cm": 0, "195 cm": 0, "200 cm": 1
+                    },
+                    achatsEcoles: [],
+                    notes: ""
                 };
-                logistiqueDB.stockPantalons = JSON.parse(localStorage.getItem('dd_stock_pantalons')) || {
-                    "100 cm": 4, "110 cm": 7, "120 cm": 10, "130 cm": 5, "140 cm": 5, "150 cm": 2, 
-                    "160 cm": 3, "165 cm": 1, "170 cm": 1, "175 cm": 0, "180 cm": 1, "185 cm": 0, 
-                    "190 cm": 0, "195 cm": 0, "200 cm": 1
-                };
-                logistiqueDB.notes = "";
+                normalizeDB(fallback);
             }
-            finalizeInitialization();
 
-            // 2. Async fetch from Supabase
+            initFormSelects();
+            refreshAllUI();
+
+            // 2. Chargement asynchrone Supabase
             try {
                 const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
-                if (error) throw error;
-                if (result && result.data && (result.data.prets || result.data.stockVestes || result.data.stockPantalons || typeof result.data.notes !== 'undefined')) {
-                    logistiqueDB = result.data;
-                    if (typeof logistiqueDB.notes === 'undefined') logistiqueDB.notes = "";
+                if (!error && result && result.data) {
+                    normalizeDB(result.data);
                     localStorage.setItem('dojo_logistique_unified', JSON.stringify(logistiqueDB));
-                    finalizeInitialization();
-                    console.log("✓ Données Supabase chargées et interface mise à jour.");
+                    refreshAllUI();
                 }
             } catch(e) {
                 console.error("Erreur chargement Supabase:", e);
             }
         }
 
-        function finalizeInitialization() {
-            initFormSelects();
-            document.getElementById('pret-date').valueAsDate = new Date();
+        function initFormSelects() {
+            const vPret = document.getElementById('pret-taille-veste');
+            const pPret = document.getElementById('pret-taille-pantalon');
+            const vEcole = document.getElementById('ecole-taille-veste');
+            const pEcole = document.getElementById('ecole-taille-pantalon');
+
+            vPret.innerHTML = '<option value="Aucune">Aucune veste</option>';
+            pPret.innerHTML = '<option value="Aucun">Aucun pantalon</option>';
+            vEcole.innerHTML = '<option value="Aucune">Aucune veste</option>';
+            pEcole.innerHTML = '<option value="Aucun">Aucun pantalon</option>';
+
+            taillesDefaut.forEach(t => {
+                vPret.innerHTML += `<option value="${t}">${t}</option>`;
+                pPret.innerHTML += `<option value="${t}">${t}</option>`;
+                vEcole.innerHTML += `<option value="${t}">${t}</option>`;
+                pEcole.innerHTML += `<option value="${t}">${t}</option>`;
+            });
+
+            vPret.value = "120 cm";
+            pPret.value = "120 cm";
+            vEcole.value = "130 cm";
+            pEcole.value = "130 cm";
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('pret-date').value = today;
+            document.getElementById('ecole-date').value = today;
+        }
+
+        function syncPantalonSelect(vesteSelectId, pantalonSelectId) {
+            const vVal = document.getElementById(vesteSelectId).value;
+            const pEl = document.getElementById(pantalonSelectId);
+            if (vVal !== "Aucune" && taillesDefaut.includes(vVal)) {
+                pEl.value = vVal;
+            }
+        }
+
+        function togglePretOrigineHint() {
+            const origine = document.getElementById('pret-origine').value;
+            const label = document.getElementById('pret-auto-stock-label');
+            const checkbox = document.getElementById('pret-auto-stock');
+            if (origine === 'Club') {
+                checkbox.disabled = false;
+                label.innerHTML = `Déduire automatiquement la veste et le pantalon du <strong>Stock Global Club</strong> (et les réintégrer au clic sur « Récupéré »).`;
+            } else {
+                checkbox.disabled = false;
+                label.innerHTML = `Comptabiliser ce prêt sur la <strong>Dotation Écoles (Hors Stock Club)</strong> sans toucher au stock global du club.`;
+            }
+        }
+
+        function refreshAllUI() {
             const notesField = document.getElementById('stock-notes');
             if (notesField) notesField.value = logistiqueDB.notes || "";
+
+            renderKPIs();
             renderPrets();
-            renderStock();
+            renderStockClub();
+            renderPilotageClub();
+            renderEcolesTab();
         }
 
-        // --- GESTION DES NOTES ---
-        function saveNotes() {
-            const notesField = document.getElementById('stock-notes');
-            logistiqueDB.notes = notesField.value;
-            syncToSupabase(false);
-        }
+        // --- CALCULS KPI (STOCK GLOBAL = CLUB UNIQUEMENT) ---
+        function renderKPIs() {
+            let totalClubV = 0, totalClubP = 0, totalClubComplets = 0;
+            let totalVestesSeules = 0, totalPantalonsSeuls = 0;
 
-        // --- REMPLISSAGE DES SELECTS DU FORMULAIRE ---
-        function initFormSelects() {
-            const vSelect = document.getElementById('pret-taille-veste');
-            const pSelect = document.getElementById('pret-taille-pantalon');
-            
-            vSelect.innerHTML = '<option value="Aucune">Aucune veste</option>';
-            pSelect.innerHTML = '<option value="Aucun">Aucun pantalon</option>';
-            
-            taillesDefaut.forEach(taille => {
-                vSelect.innerHTML += `<option value="${taille}">${taille}</option>`;
-                pSelect.innerHTML += `<option value="${taille}">${taille}</option>`;
+            taillesDefaut.forEach(t => {
+                const v = logistiqueDB.stockVestes[t] || 0;
+                const p = logistiqueDB.stockPantalons[t] || 0;
+                const comp = Math.min(v, p);
+                totalClubV += v;
+                totalClubP += p;
+                totalClubComplets += comp;
+                if (v > p) totalVestesSeules += (v - p);
+                if (p > v) totalPantalonsSeuls += (p - v);
             });
+
+            const pretsActifs = logistiqueDB.prets.filter(p => (p.statut || 'en_cours') === 'en_cours');
+            const pretsClubActifs = pretsActifs.filter(p => (p.origine || 'Club') === 'Club').length;
+            const pretsEcoleActifs = pretsActifs.filter(p => p.origine === 'École').length;
+
+            // Calcul Dotation Écoles (Isolée)
+            let ecoleV = 0, ecoleP = 0;
+            logistiqueDB.achatsEcoles.forEach(a => {
+                const q = parseInt(a.qte) || 0;
+                if (a.veste && a.veste !== 'Aucune') ecoleV += q;
+                if (a.pantalon && a.pantalon !== 'Aucun' && a.pantalon !== 'Aucune') ecoleP += q;
+            });
+            const ecoleComplets = Math.min(ecoleV, ecoleP);
+
+            document.getElementById('kpi-club-complets').innerText = `${totalClubComplets} complet(s)`;
+            document.getElementById('kpi-club-pieces').innerText = `${totalClubV} vestes • ${totalClubP} pantalons en caisse`;
+
+            document.getElementById('kpi-prets-actifs').innerText = `${pretsActifs.length} en cours`;
+            document.getElementById('kpi-prets-detail').innerText = `${pretsClubActifs} prêt(s) Club • ${pretsEcoleActifs} prêt(s) École`;
+
+            document.getElementById('kpi-club-orphelins').innerText = `${totalVestesSeules + totalPantalonsSeuls} pièce(s)`;
+            document.getElementById('kpi-club-orphelins-detail').innerText = `${totalVestesSeules} veste(s) seule(s) • ${totalPantalonsSeuls} pantalon(s) seul(s)`;
+
+            document.getElementById('kpi-ecole-total').innerText = `${ecoleComplets} judogi(s)`;
+            document.getElementById('kpi-ecole-sub').innerText = `${ecoleV} V / ${ecoleP} P achetés (Hors stock club)`;
+
+            document.getElementById('badge-count-prets').innerText = pretsActifs.length;
+            document.getElementById('badge-count-ecoles').innerText = ecoleComplets;
         }
 
-        // --- RENDUS DES TABLEAUX ---
+        // --- ONGLET 1 : GESTION DES PRÊTS ---
         function renderPrets() {
             const tbody = document.getElementById('tbody-prets');
+            const search = (document.getElementById('search-pret')?.value || '').toLowerCase();
+            const origineFilter = document.getElementById('filter-origine-pret')?.value || 'tous';
+            const statutFilter = document.getElementById('filter-statut-pret')?.value || 'en_cours';
+
             tbody.innerHTML = '';
-            if(!logistiqueDB.prets || logistiqueDB.prets.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gris-moyen);">Aucun prêt en cours actuellement.</td></tr>`;
+
+            const filtered = logistiqueDB.prets.filter(p => {
+                const st = p.statut || 'en_cours';
+                const orig = p.origine || 'Club';
+                if (statutFilter !== 'tous' && st !== statutFilter) return false;
+                if (origineFilter !== 'tous' && orig !== origineFilter) return false;
+                const txt = `${p.nom} ${orig} ${p.veste} ${p.pantalon} ${p.note || ''}`.toLowerCase();
+                return txt.includes(search);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--gris-moyen); padding:18px;">Aucun prêt trouvé pour ces critères.</td></tr>`;
                 return;
             }
-            logistiqueDB.prets.forEach(p => {
+
+            filtered.forEach(p => {
+                const isRendu = p.statut === 'rendu';
+                const orig = p.origine || 'Club';
                 const tr = document.createElement('tr');
+                if (isRendu) tr.style.opacity = '0.6';
+
                 tr.innerHTML = `
                     <td><strong>${p.nom}</strong></td>
-                    <td>${p.veste}</td>
-                    <td>${p.pantalon}</td>
-                    <td>${p.date.split('-').reverse().join('/')}</td>
+                    <td><span class="badge ${orig === 'École' ? 'badge-ecole' : 'badge-club'}">${orig === 'École' ? '🏫 École' : '🥋 Club'}</span></td>
+                    <td><strong>${p.veste}</strong></td>
+                    <td><strong>${p.pantalon}</strong></td>
+                    <td>${p.ceinture || 'Oui'}</td>
+                    <td><small>${p.note || '—'}</small></td>
+                    <td>${(p.date || '').split('-').reverse().join('/')}</td>
+                    <td>${isRendu ? '<span class="badge badge-gris">✔️ Récupéré</span>' : '<span class="badge badge-vert">🟢 En prêt</span>'}</td>
                     <td class="actions-cell no-print">
                         <button class="btn-action btn-edit" onclick="editPret(${p.id})">✏️ Modifier</button>
-                        <button class="btn-action btn-delete" onclick="deletePret(${p.id})">❌ Récupéré</button>
+                        ${!isRendu ? `<button class="btn-action btn-return" onclick="returnPret(${p.id})">🔄 Récupéré</button>` : ''}
+                        <button class="btn-action btn-delete" onclick="deletePret(${p.id})" title="Supprimer définitivement">🗑️</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function renderStock() {
-            // Vestes
+        function handlePretSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('pret-id').value;
+            const nom = document.getElementById('pret-nom').value.trim();
+            const origine = document.getElementById('pret-origine').value;
+            const veste = document.getElementById('pret-taille-veste').value;
+            const pantalon = document.getElementById('pret-taille-pantalon').value;
+            const ceinture = document.getElementById('pret-ceinture').value;
+            const date = document.getElementById('pret-date').value;
+            const note = document.getElementById('pret-note').value.trim();
+            const autoStock = document.getElementById('pret-auto-stock').checked;
+
+            if (id) {
+                const old = logistiqueDB.prets.find(p => p.id == id);
+                if (old && autoStock && (old.statut || 'en_cours') === 'en_cours') {
+                    // Si l'ancien prêt était sur le stock Club, on restaure l'ancien stock Club
+                    if ((old.origine || 'Club') === 'Club') {
+                        if (old.veste !== "Aucune") logistiqueDB.stockVestes[old.veste] = (logistiqueDB.stockVestes[old.veste] || 0) + 1;
+                        if (old.pantalon !== "Aucun" && old.pantalon !== "Aucune") logistiqueDB.stockPantalons[old.pantalon] = (logistiqueDB.stockPantalons[old.pantalon] || 0) + 1;
+                    }
+                    // Si le prêt modifié est sur le stock Club, on déduit la nouvelle taille du stock Club
+                    if (origine === 'Club') {
+                        if (veste !== "Aucune") logistiqueDB.stockVestes[veste] = Math.max(0, (logistiqueDB.stockVestes[veste] || 0) - 1);
+                        if (pantalon !== "Aucun" && pantalon !== "Aucune") logistiqueDB.stockPantalons[pantalon] = Math.max(0, (logistiqueDB.stockPantalons[pantalon] || 0) - 1);
+                    }
+                }
+                logistiqueDB.prets = logistiqueDB.prets.map(p => p.id == id ? { ...p, nom, origine, veste, pantalon, ceinture, date, note } : p);
+                showToast("Prêt mis à jour avec succès !");
+            } else {
+                // Déduction uniquement si c'est un prêt Club (les prêts École sont gérés sur le parc École)
+                if (autoStock && origine === 'Club') {
+                    if (veste !== "Aucune") logistiqueDB.stockVestes[veste] = Math.max(0, (logistiqueDB.stockVestes[veste] || 0) - 1);
+                    if (pantalon !== "Aucun" && pantalon !== "Aucune") logistiqueDB.stockPantalons[pantalon] = Math.max(0, (logistiqueDB.stockPantalons[pantalon] || 0) - 1);
+                }
+                logistiqueDB.prets.unshift({
+                    id: Date.now(), nom, origine, veste, pantalon, ceinture, date, note, statut: 'en_cours'
+                });
+                showToast("Nouveau prêt enregistré !");
+            }
+
+            syncToSupabase(true);
+            resetPretForm();
+            refreshAllUI();
+        }
+
+        function editPret(id) {
+            const pret = logistiqueDB.prets.find(p => p.id == id);
+            if (!pret) return;
+
+            document.getElementById('pret-id').value = pret.id;
+            document.getElementById('pret-nom').value = pret.nom;
+            document.getElementById('pret-origine').value = pret.origine || "Club";
+            document.getElementById('pret-taille-veste').value = pret.veste;
+            document.getElementById('pret-taille-pantalon').value = pret.pantalon;
+            document.getElementById('pret-ceinture').value = pret.ceinture || "Oui (Blanche)";
+            document.getElementById('pret-date').value = pret.date;
+            document.getElementById('pret-note').value = pret.note || "";
+
+            togglePretOrigineHint();
+            document.getElementById('form-pret-title').innerText = "✏️ Modifier le prêt de " + pret.nom;
+            document.getElementById('btn-save-pret').innerText = "💾 Mettre à jour";
+            document.getElementById('btn-cancel-pret').style.display = "inline-flex";
+        }
+
+        function returnPret(id) {
+            const pret = logistiqueDB.prets.find(p => p.id == id);
+            if (!pret) return;
+            const autoStock = document.getElementById('pret-auto-stock').checked;
+
+            if (confirm(`Confirmer le retour de la tenue de ${pret.nom} (${pret.veste} / ${pret.pantalon}) ?`)) {
+                pret.statut = 'rendu';
+                if (autoStock && (pret.origine || 'Club') === 'Club') {
+                    if (pret.veste !== "Aucune") logistiqueDB.stockVestes[pret.veste] = (logistiqueDB.stockVestes[pret.veste] || 0) + 1;
+                    if (pret.pantalon !== "Aucun" && pret.pantalon !== "Aucune") logistiqueDB.stockPantalons[pret.pantalon] = (logistiqueDB.stockPantalons[pret.pantalon] || 0) + 1;
+                }
+                syncToSupabase(true);
+                refreshAllUI();
+                showToast("Le judogi a été marqué comme récupéré !");
+            }
+        }
+
+        function deletePret(id) {
+            if (confirm("Supprimer définitivement cette ligne du registre des prêts ?")) {
+                logistiqueDB.prets = logistiqueDB.prets.filter(p => p.id != id);
+                syncToSupabase(true);
+                refreshAllUI();
+                showToast("Ligne supprimée.");
+            }
+        }
+
+        function resetPretForm() {
+            document.getElementById('pret-id').value = "";
+            document.getElementById('pret-nom').value = "";
+            document.getElementById('pret-origine').value = "Club";
+            document.getElementById('pret-taille-veste').value = "120 cm";
+            document.getElementById('pret-taille-pantalon').value = "120 cm";
+            document.getElementById('pret-ceinture').value = "Oui (Blanche)";
+            document.getElementById('pret-note').value = "";
+            document.getElementById('pret-date').value = new Date().toISOString().split('T')[0];
+
+            togglePretOrigineHint();
+            document.getElementById('form-pret-title').innerText = "📝 Enregistrer un prêt de Judogi (Veste + Pantalon)";
+            document.getElementById('btn-save-pret').innerText = "💾 Enregistrer le prêt";
+            document.getElementById('btn-cancel-pret').style.display = "none";
+        }
+
+        // --- ONGLET 2 : INVENTAIRE DU STOCK GLOBAL (CLUB) ---
+        function renderStockClub() {
             const tbodyV = document.getElementById('tbody-stock-vestes');
-            tbodyV.innerHTML = '';
-            taillesDefaut.forEach(taille => {
-                const qte = logistiqueDB.stockVestes[taille] || 0;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${taille}</strong></td>
-                    <td><span class="stock-badge">${qte} en stock</span></td>
-                    <td class="actions-cell no-print">
-                        <button class="btn-action btn-edit" onclick="changeStock('veste', '${taille}', 1)">➕</button>
-                        <button class="btn-action btn-delete" onclick="changeStock('veste', '${taille}', -1)">➖</button>
-                    </td>
-                `;
-                tbodyV.appendChild(tr);
-            });
-
-            // Pantalons
             const tbodyP = document.getElementById('tbody-stock-pantalons');
+            const tbodyC = document.getElementById('tbody-stock-complets');
+
+            tbodyV.innerHTML = '';
             tbodyP.innerHTML = '';
+            tbodyC.innerHTML = '';
+
             taillesDefaut.forEach(taille => {
-                const qte = logistiqueDB.stockPantalons[taille] || 0;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
+                const qteV = logistiqueDB.stockVestes[taille] || 0;
+                const qteP = logistiqueDB.stockPantalons[taille] || 0;
+                const complets = Math.min(qteV, qteP);
+
+                // Vestes
+                const trV = document.createElement('tr');
+                trV.innerHTML = `
                     <td><strong>${taille}</strong></td>
-                    <td><span class="stock-badge">${qte} en stock</span></td>
+                    <td><span class="badge ${qteV > 0 ? 'badge-gris' : 'badge-gris'}">${qteV} en stock</span></td>
                     <td class="actions-cell no-print">
-                        <button class="btn-action btn-edit" onclick="changeStock('pantalon', '${taille}', 1)">➕</button>
-                        <button class="btn-action btn-delete" onclick="changeStock('pantalon', '${taille}', -1)">➖</button>
+                        <div class="stock-control-group">
+                            <button class="stock-btn-mini" onclick="changeStock('veste', '${taille}', -1)">−</button>
+                            <input type="number" min="0" class="stock-input-direct" value="${qteV}" onchange="setDirectStock('veste', '${taille}', this.value)">
+                            <button class="stock-btn-mini" onclick="changeStock('veste', '${taille}', 1)">+</button>
+                        </div>
                     </td>
                 `;
-                tbodyP.appendChild(tr);
-            });
+                tbodyV.appendChild(trV);
 
-            // Judogis Complets (Calcul automatique)
-            const tbodyC = document.getElementById('tbody-stock-complets');
-            tbodyC.innerHTML = '';
-            taillesDefaut.forEach(taille => {
-                const qteVeste = logistiqueDB.stockVestes[taille] || 0;
-                const qtePantalon = logistiqueDB.stockPantalons[taille] || 0;
-                const complets = Math.min(qteVeste, qtePantalon);
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
+                // Pantalons
+                const trP = document.createElement('tr');
+                trP.innerHTML = `
                     <td><strong>${taille}</strong></td>
-                    <td><span class="stock-badge complet">${complets} complet(s)</span></td>
+                    <td><span class="badge badge-gris">${qteP} en stock</span></td>
+                    <td class="actions-cell no-print">
+                        <div class="stock-control-group">
+                            <button class="stock-btn-mini" onclick="changeStock('pantalon', '${taille}', -1)">−</button>
+                            <input type="number" min="0" class="stock-input-direct" value="${qteP}" onchange="setDirectStock('pantalon', '${taille}', this.value)">
+                            <button class="stock-btn-mini" onclick="changeStock('pantalon', '${taille}', 1)">+</button>
+                        </div>
+                    </td>
                 `;
-                tbodyC.appendChild(tr);
+                tbodyP.appendChild(trP);
+
+                // Complets & Dépareillés
+                let orphanBadge = `<span style="color:var(--gris-clair);">Aucune pièce seule</span>`;
+                if (qteV > qteP) orphanBadge = `<span class="badge badge-orange">+${qteV - qteP} Veste(s) seule(s)</span>`;
+                if (qteP > qteV) orphanBadge = `<span class="badge badge-violet">+${qteP - qteV} Pantalon(s) seul(s)</span>`;
+
+                const trC = document.createElement('tr');
+                trC.innerHTML = `
+                    <td><strong>${taille}</strong></td>
+                    <td><span class="badge ${complets > 0 ? 'badge-club' : 'badge-gris'}">${complets} complet(s)</span></td>
+                    <td>${orphanBadge}</td>
+                `;
+                tbodyC.appendChild(trC);
             });
         }
 
-        // --- OPERATIONS STOCK ---
         function changeStock(type, taille, offset) {
             if (type === 'veste') {
                 logistiqueDB.stockVestes[taille] = Math.max(0, (logistiqueDB.stockVestes[taille] || 0) + offset);
@@ -686,77 +1388,293 @@
                 logistiqueDB.stockPantalons[taille] = Math.max(0, (logistiqueDB.stockPantalons[taille] || 0) + offset);
             }
             syncToSupabase(true);
-            renderStock();
-            showToast("Quantité de l'inventaire ajustée.");
+            refreshAllUI();
         }
 
-        // --- ENREGISTRER / MODIFIER UN PRÊT ---
-        function handlePretSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('pret-id').value;
-            const nom = document.getElementById('pret-nom').value.trim();
-            const veste = document.getElementById('pret-taille-veste').value;
-            const pantalon = document.getElementById('pret-taille-pantalon').value;
-            const date = document.getElementById('pret-date').value;
-
-            if(id) {
-                logistiqueDB.prets = logistiqueDB.prets.map(p => p.id == id ? { id: parseInt(id), nom, veste, pantalon, date } : p);
-                showToast("Prêt mis à jour avec succès !");
+        function setDirectStock(type, taille, val) {
+            const num = Math.max(0, parseInt(val) || 0);
+            if (type === 'veste') {
+                logistiqueDB.stockVestes[taille] = num;
             } else {
-                logistiqueDB.prets.push({ id: Date.now(), nom, veste, pantalon, date });
-                showToast("Nouveau prêt enregistré !");
+                logistiqueDB.stockPantalons[taille] = num;
+            }
+            syncToSupabase(true);
+            refreshAllUI();
+            showToast(`Stock Club (${taille}) ajusté à ${num}.`);
+        }
+
+        function saveNotes() {
+            const notesField = document.getElementById('stock-notes');
+            logistiqueDB.notes = notesField.value;
+            syncToSupabase(false);
+        }
+
+        // --- ONGLET 3 : SYNTHÈSE & POCHETTES (STOCK GLOBAL CLUB) ---
+        function renderPilotageClub() {
+            const tbody = document.getElementById('tbody-pilotage-club');
+            tbody.innerHTML = '';
+
+            // Comptage des prêts Club en cours par taille
+            const pretsClubV = {}, pretsClubP = {};
+            taillesDefaut.forEach(t => { pretsClubV[t] = 0; pretsClubP[t] = 0; });
+
+            logistiqueDB.prets
+                .filter(p => (p.statut || 'en_cours') === 'en_cours' && (p.origine || 'Club') === 'Club')
+                .forEach(p => {
+                    if (pretsClubV[p.veste] !== undefined) pretsClubV[p.veste]++;
+                    if (pretsClubP[p.pantalon] !== undefined) pretsClubP[p.pantalon]++;
+                });
+
+            taillesDefaut.forEach(t => {
+                const v = logistiqueDB.stockVestes[t] || 0;
+                const p = logistiqueDB.stockPantalons[t] || 0;
+                const comp = Math.min(v, p);
+                const vSeule = Math.max(0, v - p);
+                const pSeul = Math.max(0, p - v);
+                const prV = pretsClubV[t] || 0;
+                const prP = pretsClubP[t] || 0;
+                const patV = v + prV;
+                const patP = p + prP;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${t}</strong></td>
+                    <td>${v}</td>
+                    <td>${p}</td>
+                    <td><span class="badge ${comp > 0 ? 'badge-club' : 'badge-gris'}">${comp} pochette(s) Complet</span></td>
+                    <td>${vSeule > 0 ? `<span class="badge badge-orange">${vSeule} Veste(s) seule(s)</span>` : '<span style="color:var(--gris-clair);">0</span>'}</td>
+                    <td>${pSeul > 0 ? `<span class="badge badge-violet">${pSeul} Pantalon(s) seul(s)</span>` : '<span style="color:var(--gris-clair);">0</span>'}</td>
+                    <td>${prV > 0 || prP > 0 ? `<span class="badge badge-vert">${prV} V / ${prP} P en prêt</span>` : '<span style="color:var(--gris-clair);">0</span>'}</td>
+                    <td><strong>${patV} V / ${patP} P</strong> <small style="color:var(--gris-moyen);">(${Math.min(patV, patP)} cpl)</small></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- ONGLET 4 : JUDOGIS ACHETÉS POUR LES ÉCOLES (HORS STOCK GLOBAL) ---
+        function handleEcoleAchatSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('ecole-achat-id').value;
+            const qte = Math.max(1, parseInt(document.getElementById('ecole-qte').value) || 1);
+            const veste = document.getElementById('ecole-taille-veste').value;
+            const pantalon = document.getElementById('ecole-taille-pantalon').value;
+            const ceinture = document.getElementById('ecole-ceinture').value;
+            const affectation = document.getElementById('ecole-affectation').value;
+            const fournisseur = document.getElementById('ecole-fournisseur').value.trim();
+            const prix = parseFloat(document.getElementById('ecole-prix').value) || 0;
+            const date = document.getElementById('ecole-date').value;
+
+            if (id) {
+                logistiqueDB.achatsEcoles = logistiqueDB.achatsEcoles.map(a =>
+                    a.id == id ? { ...a, qte, veste, pantalon, ceinture, affectation, fournisseur, prix, date } : a
+                );
+                showToast("Lot de judogis Écoles mis à jour !");
+            } else {
+                logistiqueDB.achatsEcoles.unshift({
+                    id: Date.now(),
+                    qte,
+                    veste,
+                    pantalon,
+                    ceinture,
+                    affectation,
+                    fournisseur,
+                    prix,
+                    date
+                });
+                showToast(`+${qte} judogi(s) enregistré(s) dans le Parc Écoles (hors stock club) !`);
             }
 
             syncToSupabase(true);
-            resetPretForm();
-            renderPrets();
+            resetEcoleAchatForm();
+            refreshAllUI();
         }
 
-        function editPret(id) {
-            const pret = logistiqueDB.prets.find(p => p.id === id);
-            if(!pret) return;
+        function editEcoleAchat(id) {
+            const item = logistiqueDB.achatsEcoles.find(a => a.id == id);
+            if (!item) return;
 
-            document.getElementById('pret-id').value = pret.id;
-            document.getElementById('pret-nom').value = pret.nom;
-            document.getElementById('pret-taille-veste').value = pret.veste;
-            document.getElementById('pret-taille-pantalon').value = pret.pantalon;
-            document.getElementById('pret-date').value = pret.date;
+            document.getElementById('ecole-achat-id').value = item.id;
+            document.getElementById('ecole-qte').value = item.qte;
+            document.getElementById('ecole-taille-veste').value = item.veste;
+            document.getElementById('ecole-taille-pantalon').value = item.pantalon;
+            document.getElementById('ecole-ceinture').value = item.ceinture || "Oui";
+            document.getElementById('ecole-affectation').value = item.affectation || "Dotation Générale Écoles (TER)";
+            document.getElementById('ecole-fournisseur').value = item.fournisseur || "Décathlon Avermes";
+            document.getElementById('ecole-prix').value = item.prix ?? 12;
+            document.getElementById('ecole-date').value = item.date;
 
-            document.getElementById('form-pret-title').innerText = "✏️ Modifier le prêt de " + pret.nom;
-            document.getElementById('btn-save-pret').innerText = "💾 Mettre à jour";
-            document.getElementById('btn-cancel-pret').style.display = "inline-flex";
+            document.getElementById('form-ecole-title').innerText = "✏️ Modifier le lot de Judogis Écoles";
+            document.getElementById('btn-save-ecole-achat').innerText = "💾 Mettre à jour";
+            document.getElementById('btn-cancel-ecole-achat').style.display = "inline-flex";
         }
 
-        function deletePret(id) {
-            if(confirm("Confirmer le retour du judogi au club ? Cela le supprimera des prêts en cours.")) {
-                logistiqueDB.prets = logistiqueDB.prets.filter(p => p.id !== id);
+        function deleteEcoleAchat(id) {
+            if (confirm("Supprimer ce lot de judogis du registre des écoles ?")) {
+                logistiqueDB.achatsEcoles = logistiqueDB.achatsEcoles.filter(a => a.id != id);
                 syncToSupabase(true);
-                renderPrets();
-                showToast("Le judogi a été réintégré.");
+                refreshAllUI();
+                showToast("Lot supprimé du parc Écoles.");
             }
         }
 
-        function resetPretForm() {
-            document.getElementById('pret-id').value = "";
-            document.getElementById('pret-nom').value = "";
-            document.getElementById('pret-taille-veste').value = "120 cm";
-            document.getElementById('pret-taille-pantalon').value = "120 cm";
-            document.getElementById('pret-date').valueAsDate = new Date();
+        function resetEcoleAchatForm() {
+            document.getElementById('ecole-achat-id').value = "";
+            document.getElementById('ecole-qte').value = "10";
+            document.getElementById('ecole-taille-veste').value = "130 cm";
+            document.getElementById('ecole-taille-pantalon').value = "130 cm";
+            document.getElementById('ecole-ceinture').value = "Oui";
+            document.getElementById('ecole-affectation').value = "Dotation Générale Écoles (TER)";
+            document.getElementById('ecole-fournisseur').value = "Décathlon Avermes";
+            document.getElementById('ecole-prix').value = "12";
+            document.getElementById('ecole-date').value = new Date().toISOString().split('T')[0];
 
-            document.getElementById('form-pret-title').innerText = "📝 Enregistrer un nouveau prêt";
-            document.getElementById('btn-save-pret').innerText = "💾 Enregistrer le prêt";
-            document.getElementById('btn-cancel-pret').style.display = "none";
+            document.getElementById('form-ecole-title').innerText = "➕ Enregistrer des Judogis achetés pour les Écoles (Veste + Pantalon)";
+            document.getElementById('btn-save-ecole-achat').innerText = "💾 Enregistrer dans Parc Écoles";
+            document.getElementById('btn-cancel-ecole-achat').style.display = "none";
+        }
+
+        function preloadDotationEcoles() {
+            if (confirm("Pré-remplir le registre Écoles avec la répartition par classes (PS/MS : 21 en 110cm, GS : 13 en 120cm + 4 en 130cm, CP : 20 en 130cm, CE1 : 12 en 130cm + 5 en 140cm, CE2 : 12 en 130cm + 12 en 140cm, CM1 : 15 en 140cm + 6 en 150cm, CM2 : 8 en 140cm + 12 en 150cm) ?")) {
+                const today = new Date().toISOString().split('T')[0];
+                const lotsTypes = [
+                    { qte: 21, veste: "110 cm", pantalon: "110 cm", affectation: "PS / MS (Maternelle)" },
+                    { qte: 13, veste: "120 cm", pantalon: "120 cm", affectation: "GS (Grande Section)" },
+                    { qte: 4,  veste: "130 cm", pantalon: "130 cm", affectation: "GS (Grande Section)" },
+                    { qte: 20, veste: "130 cm", pantalon: "130 cm", affectation: "CP" },
+                    { qte: 12, veste: "130 cm", pantalon: "130 cm", affectation: "CE1" },
+                    { qte: 5,  veste: "140 cm", pantalon: "140 cm", affectation: "CE1" },
+                    { qte: 12, veste: "130 cm", pantalon: "130 cm", affectation: "CE2" },
+                    { qte: 12, veste: "140 cm", pantalon: "140 cm", affectation: "CE2" },
+                    { qte: 15, veste: "140 cm", pantalon: "140 cm", affectation: "CM1" },
+                    { qte: 6,  veste: "150 cm", pantalon: "150 cm", affectation: "CM1" },
+                    { qte: 8,  veste: "140 cm", pantalon: "140 cm", affectation: "CM2" },
+                    { qte: 12, veste: "150 cm", pantalon: "150 cm", affectation: "CM2" }
+                ];
+
+                logistiqueDB.achatsEcoles = lotsTypes.map((l, idx) => ({
+                    id: Date.now() + idx,
+                    qte: l.qte,
+                    veste: l.veste,
+                    pantalon: l.pantalon,
+                    ceinture: "Oui",
+                    affectation: l.affectation,
+                    fournisseur: "Décathlon Avermes",
+                    prix: 12,
+                    date: today
+                }));
+
+                syncToSupabase(false);
+                refreshAllUI();
+            }
+        }
+
+        function renderEcolesTab() {
+            const tbodySynthese = document.getElementById('tbody-ecole-par-taille');
+            const tbodyAchats = document.getElementById('tbody-ecole-achats');
+
+            tbodySynthese.innerHTML = '';
+            tbodyAchats.innerHTML = '';
+
+            // 1. Calcul par taille des judogis achetés pour les écoles
+            const ecoleV = {}, ecoleP = {}, pretsEcoleV = {}, pretsEcoleP = {};
+            taillesDefaut.forEach(t => {
+                ecoleV[t] = 0;
+                ecoleP[t] = 0;
+                pretsEcoleV[t] = 0;
+                pretsEcoleP[t] = 0;
+            });
+
+            let totalInvestissement = 0;
+            let totalTenuesEcole = 0;
+
+            logistiqueDB.achatsEcoles.forEach(a => {
+                const q = parseInt(a.qte) || 0;
+                const pu = parseFloat(a.prix) || 0;
+                totalInvestissement += (q * pu);
+
+                if (ecoleV[a.veste] !== undefined) ecoleV[a.veste] += q;
+                if (ecoleP[a.pantalon] !== undefined) ecoleP[a.pantalon] += q;
+            });
+
+            // Prêts actifs rattachés au parc École
+            logistiqueDB.prets
+                .filter(p => (p.statut || 'en_cours') === 'en_cours' && p.origine === 'École')
+                .forEach(p => {
+                    if (pretsEcoleV[p.veste] !== undefined) pretsEcoleV[p.veste]++;
+                    if (pretsEcoleP[p.pantalon] !== undefined) pretsEcoleP[p.pantalon]++;
+                });
+
+            taillesDefaut.forEach(t => {
+                const v = ecoleV[t] || 0;
+                const p = ecoleP[t] || 0;
+                const comp = Math.min(v, p);
+                totalTenuesEcole += comp;
+
+                const prV = pretsEcoleV[t] || 0;
+                const prP = pretsEcoleP[t] || 0;
+                const dispoV = Math.max(0, v - prV);
+                const dispoP = Math.max(0, p - prP);
+                const dispoComp = Math.min(dispoV, dispoP);
+
+                // On affiche toutes les tailles enfants (100 à 160 cm) ou toute taille ayant au moins 1 pièce école
+                if (["100 cm", "110 cm", "120 cm", "130 cm", "140 cm", "150 cm", "160 cm"].includes(t) || v > 0 || p > 0 || prV > 0 || prP > 0) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${t}</strong></td>
+                        <td>${v}</td>
+                        <td>${p}</td>
+                        <td><span class="badge ${comp > 0 ? 'badge-ecole' : 'badge-gris'}">${comp} acheté(s)</span></td>
+                        <td>${prV > 0 || prP > 0 ? `<span class="badge badge-orange">${prV} V / ${prP} P</span>` : '<span style="color:var(--gris-clair);">0</span>'}</td>
+                        <td><span class="badge ${dispoComp > 0 ? 'badge-vert' : 'badge-gris'}">${dispoComp} dispo (${dispoV}V/${dispoP}P)</span></td>
+                    `;
+                    tbodySynthese.appendChild(tr);
+                }
+            });
+
+            document.getElementById('badge-total-ecole-synthese').innerText = `${totalTenuesEcole} complet(s) achetés`;
+            document.getElementById('badge-cout-ecole').innerText = `Investissement : ${totalInvestissement.toFixed(2).replace('.00', '')} €`;
+
+            // 2. Journal des lots enregistrés
+            if (logistiqueDB.achatsEcoles.length === 0) {
+                tbodyAchats.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--gris-moyen); padding:18px;">Aucun lot de judogis Écoles enregistré pour le moment.</td></tr>`;
+                return;
+            }
+
+            logistiqueDB.achatsEcoles.forEach(a => {
+                const montant = ((parseInt(a.qte) || 0) * (parseFloat(a.prix) || 0)).toFixed(2).replace('.00', '');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge badge-ecole" style="font-size:0.85rem;">x${a.qte}</span></td>
+                    <td>
+                        <strong>V: ${a.veste} / P: ${a.pantalon}</strong><br>
+                        <small style="color:var(--gris-moyen);">Ceinture : ${a.ceinture || 'Oui'}</small>
+                    </td>
+                    <td><span class="badge badge-gris">${a.affectation || 'Écoles'}</span></td>
+                    <td>
+                        <strong>${a.fournisseur || '—'}</strong><br>
+                        <small style="color:var(--gris-moyen);">${(a.date || '').split('-').reverse().join('/')}</small>
+                    </td>
+                    <td><strong>${montant} €</strong> <small style="color:var(--gris-moyen);">(${a.prix || 0}€/u)</small></td>
+                    <td class="actions-cell no-print">
+                        <button class="btn-action btn-edit" onclick="editEcoleAchat(${a.id})" title="Modifier ce lot">✏️</button>
+                        <button class="btn-action btn-delete" onclick="deleteEcoleAchat(${a.id})" title="Supprimer ce lot">🗑️</button>
+                    </td>
+                `;
+                tbodyAchats.appendChild(tr);
+            });
+        }
+
+        function exportBackupJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logistiqueDB, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `sauvegarde_judogis_dojo_dornois_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
         }
 
         window.onload = loadData;
-
-        window.switchTab = switchTab;
-        window.changeStock = changeStock;
-        window.handlePretSubmit = handlePretSubmit;
-        window.editPret = editPret;
-        window.deletePret = deletePret;
-        window.resetPretForm = resetPretForm;
-        window.saveNotes = saveNotes;
     </script>
 
     <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
