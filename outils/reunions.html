@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion & Préparation des Réunions - Dojo Dornois</title>
+    <title>Studio Réunions & Comptes-Rendus - Dojo Dornois</title>
+    <link rel="icon" type="image/png" href="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
 
     <!-- POLICES OFFICIELLES CHARTE DOJO DORNOIS -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -11,6 +12,7 @@
     <!-- TAILWIND CSS & FONTAWESOME -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -39,16 +41,117 @@
 
         h1, h2, h3, h4, .font-fredoka { font-family: 'Fredoka', sans-serif; }
 
-        .tab-btn.active {
+        /* Navigation Onglets Principaux */
+        .main-tab-btn {
+            padding: 10px 16px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: #64748B;
+            border-bottom: 3px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .main-tab-btn:hover {
+            color: #1E293B;
+            background: #F8FAFC;
+        }
+        .main-tab-btn.active {
             color: var(--rouge);
-            border-bottom: 3px solid var(--rouge);
+            border-bottom-color: var(--rouge);
+            background: #FFF9FA;
             font-weight: 700;
         }
 
-        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
-        .toast { color: white; padding: 12px 18px; border-radius: 8px; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
-        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
-        .toast.error { background: #7f1d1d; border-left: 4px solid #f87171; }
+        /* Pastilles Membres CoDir */
+        .member-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid #E2E8F0;
+            background: white;
+            color: #64748B;
+            transition: all 0.15s ease;
+        }
+        .member-chip:hover { border-color: #CBD5E1; transform: translateY(-1px); }
+        .member-chip.state-present {
+            background: #DCFCE7;
+            color: #166534;
+            border-color: #86EFAC;
+        }
+        .member-chip.state-excuse {
+            background: #FEF3C7;
+            color: #92400E;
+            border-color: #FDE68A;
+        }
+
+        /* Sommaire latéral */
+        .toc-item {
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+        .toc-item:hover { background: #F1F5F9; }
+        .toc-item.active-toc {
+            background: #FFEBEF;
+            border-left-color: var(--rouge);
+            color: var(--rouge);
+            font-weight: 700;
+        }
+        .toc-item.dragging-toc {
+            opacity: 0.4;
+            background: #FFEBEF;
+        }
+
+        /* Cartes Points Ordre du Jour */
+        .point-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #E2E8F0;
+            border-left: 5px solid #CBD5E1;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
+        }
+        .point-card:hover {
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+        .point-card.status-todo { border-left-color: #F59E0B; }
+        .point-card.status-validated { border-left-color: #10B981; }
+        .point-card.status-discussed { border-left-color: #0284C7; }
+        .point-card.status-postponed { border-left-color: #94A3B8; }
+
+        /* Mini barre d'outils d'édition */
+        .mini-toolbar button {
+            padding: 2px 7px;
+            font-size: 0.72rem;
+            border-radius: 5px;
+            background: white;
+            border: 1px solid #CBD5E1;
+            color: #475569;
+            font-weight: 600;
+            transition: all 0.15s;
+        }
+        .mini-toolbar button:hover {
+            border-color: var(--rouge);
+            color: var(--rouge);
+            background: #FFF9FA;
+        }
 
         .preserve-format {
             white-space: pre-wrap;
@@ -56,13 +159,54 @@
             text-align: justify;
         }
 
-        /* IMPRESSION A4 PORTRAIT NATIVE */
+        /* Dropdown Export */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 6px);
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+            width: 290px;
+            z-index: 100;
+            padding: 6px;
+        }
+        .dropdown-menu.open { display: block; }
+
+        /* Notifications Toast */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-weight: 500; font-size: 0.88rem; box-shadow: 0 8px 25px rgba(0,0,0,0.2); font-family: 'Fredoka', sans-serif; }
+        .toast.success { background: #1E293B; border-left: 4px solid #2ecc71; }
+        .toast.error { background: #7f1d1d; border-left: 4px solid #f87171; }
+
+        /* Feuille Aperçu A4 à l'écran */
+        .a4-screen-sheet {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 15mm 14mm;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 4px;
+            color: #1e293b;
+            text-align: justify;
+        }
+
+        /* IMPRESSION A4 PORTRAIT NATIVE SANS PAGE 1 BLANCHE */
         #printable-reunion-area { display: none; }
 
         @media print {
             @page {
                 size: A4 portrait;
                 margin: 12mm 10mm 15mm 10mm;
+                @bottom-left {
+                    content: "Dojo Dornois - Comité Directeur (RNA : W583001220)";
+                    font-family: 'Roboto', sans-serif;
+                    font-size: 8pt;
+                    color: #64748b;
+                }
                 @bottom-right {
                     content: "Page " counter(page) " / " counter(pages);
                     font-family: 'Fredoka', sans-serif;
@@ -72,226 +216,556 @@
                 }
             }
 
-            .no-print, .sidebar, header, main { display: none !important; }
-            body { background: white !important; height: auto !important; overflow: visible !important; }
+            html, body {
+                background: white !important;
+                height: auto !important;
+                min-height: 0 !important;
+                max-height: none !important;
+                overflow: visible !important;
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Masquage intégral de toute l'interface écran (y compris .main-content qui avait h-screen) */
+            .no-print,
+            .sidebar,
+            #sidebar-container,
+            .toast-container,
+            #toastContainer,
+            .main-content,
+            header,
+            main {
+                display: none !important;
+                height: 0 !important;
+                overflow: hidden !important;
+            }
 
             #printable-reunion-area {
                 display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
                 background: white !important;
                 color: #1e293b !important;
                 text-align: justify;
             }
 
+            .print-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+
+            .print-table thead {
+                display: table-header-group !important;
+            }
+
+            .print-table tfoot {
+                display: table-footer-group !important;
+            }
+
+            .print-table tr,
             .print-point-card {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="h-full flex text-slate-800 antialiased">
 
     <!-- 1. SIDEBAR UNIFIÉE INTÉGRÉE AUTOMATIQUEMENT -->
     <div class="sidebar no-print"></div>
 
-    <div class="toast-container" id="toastContainer"></div>
+    <div class="toast-container no-print" id="toastContainer"></div>
 
     <!-- 2. CONTENU PRINCIPAL DE L'APPLICATION -->
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden main-content h-screen">
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden main-content h-screen no-print">
         
-        <!-- Topbar -->
-        <header class="bg-white border-b border-slate-200 px-6 py-3.5 flex items-center justify-between shrink-0 no-print">
+        <!-- TOPBAR STUDIO -->
+        <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0 no-print flex-wrap gap-3">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-[#C41E3A] text-white flex items-center justify-center font-bold font-fredoka text-xl shadow-md">
                     📋
                 </div>
                 <div>
-                    <h1 class="font-fredoka text-xl font-bold text-[#1A1A1A]">Préparation & Suivi des Réunions</h1>
-                    <p class="text-xs text-slate-500">Ordre du jour, préparation personnelle, notes de séance & export pour Compte-Rendu</p>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-fredoka text-lg font-bold text-[#1A1A1A]">Studio Réunions & Comptes-Rendus</h1>
+                        <span id="sync-badge" class="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-semibold">
+                            <i class="fa-solid fa-check"></i> Sauvegardé
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500">Préparation CoDir • Conduite de séance en direct • Génération de Compte-Rendu</p>
                 </div>
             </div>
-            
-            <div class="flex items-center gap-2">
-                <button onclick="copierHtmlPourKalisport()" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm" title="Copier le code HTML de pré-réunion (Points + Contexte) pour Kalisport">
-                    <i class="fa-solid fa-code"></i> HTML Kalisport (Ordre du Jour)
+
+            <!-- Sélecteur rapide de réunion + Actions d'export par étape -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <!-- Sélecteur rapide de réunion -->
+                <select id="quick-reunion-select" onchange="chargerReunionArchive(this.value)" class="px-3 py-1.5 bg-slate-100 border border-slate-300 rounded-lg text-xs font-bold text-slate-700 outline-none focus:border-[#C41E3A] max-w-[230px] truncate">
+                </select>
+
+                <button onclick="nouvelleReunion()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-1.5 transition" title="Créer une nouvelle réunion vierge">
+                    <i class="fa-solid fa-plus text-[#C41E3A]"></i> Nouvelle
                 </button>
-                <button onclick="copierHtmlPourKalisportCR()" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm" title="Copier le code HTML de compte-rendu (Points + Contexte + Décisions) pour Kalisport">
-                    <i class="fa-solid fa-file-code"></i> HTML Kalisport (Compte-Rendu)
-                </button>
-                <button onclick="copierPourGemini()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
-                    <i class="fa-solid fa-copy"></i> Copier pour Compte-Rendu Gemini
-                </button>
-                <button onclick="saveReunionsToSupabase()" class="px-4 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
-                    <i class="fa-solid fa-database"></i> Enregistrer vers Supabase
+
+                <!-- MENU 1 : AVANT LA RÉUNION (POUR LE CODIR) -->
+                <div class="relative">
+                    <button onclick="toggleDropdown('drop-avant')" class="px-3.5 py-2 bg-sky-700 hover:bg-sky-800 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
+                        <i class="fa-solid fa-paper-plane"></i> 1. Envoyer au CoDir <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </button>
+                    <div id="drop-avant" class="dropdown-menu">
+                        <div class="px-3 py-1.5 text-[10px] font-bold uppercase text-slate-400 border-b mb-1">Avant réunion (Contexte seul, sans notes perso)</div>
+                        <button onclick="imprimerReunion('codir'); closeAllDropdowns();" class="w-full text-left px-3 py-2 hover:bg-slate-100 rounded-lg text-xs font-semibold flex items-center gap-2.5 text-slate-700">
+                            <i class="fa-solid fa-file-pdf text-sky-600 w-4"></i> Imprimer / PDF « Dossier CoDir »
+                        </button>
+                        <button onclick="copierHtmlPourKalisport(); closeAllDropdowns();" class="w-full text-left px-3 py-2 hover:bg-slate-100 rounded-lg text-xs font-semibold flex items-center gap-2.5 text-slate-700">
+                            <i class="fa-solid fa-code text-amber-600 w-4"></i> Copier HTML Kalisport (Ordre du jour)
+                        </button>
+                        <button onclick="ouvrirApercuMail('convocation'); closeAllDropdowns();" class="w-full text-left px-3 py-2 hover:bg-slate-100 rounded-lg text-xs font-semibold flex items-center gap-2.5 text-slate-700">
+                            <i class="fa-solid fa-envelope text-rose-600 w-4"></i> Générer le Mail de Convocation CoDir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MENU 2 : APRÈS LA RÉUNION (SYNTHÈSE & COMPTE-RENDU) -->
+                <div class="relative">
+                    <button onclick="toggleDropdown('drop-apres')" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> 2. Compte-Rendu & Export <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </button>
+                    <div id="drop-apres" class="dropdown-menu">
+                        <div class="px-3 py-1.5 text-[10px] font-bold uppercase text-slate-400 border-b mb-1">Après réunion (Synthèse & Décisions)</div>
+                        <button onclick="copierPourGemini(); closeAllDropdowns();" class="w-full text-left px-3 py-2 hover:bg-indigo-50 rounded-lg text-xs font-bold flex items-center gap-2.5 text-indigo-700">
+                            <i class="fa-solid fa-robot w-4"></i> Copier le Prompt Complet pour Gemini
+                        </button>
+                        <button onclick="imprimerReunion('cr'); closeAllDropdowns();" class="w-full text-left px-3 py-2 hover:bg-slate-100 rounded-lg text-xs font-semibold flex items-center gap-2.5 text-slate-700">
+                            <i class="fa-solid fa-print text-emerald-600 w-4"></i> Imprimer / PDF « Compte-Rendu Officiel »
+                        </button>
+                        <button onclick="copierHtmlPourKalisportCR(); closeAllDropdowns();" class="w-full text-left px-3 py-2 hover:bg-slate-100 rounded-lg text-xs font-semibold flex items-center gap-2.5 text-slate-700">
+                            <i class="fa-solid fa-file-code text-emerald-700 w-4"></i> Copier HTML Kalisport (Compte-Rendu)
+                        </button>
+                        <button onclick="imprimerReunion('complet'); closeAllDropdowns();" class="w-full text-left px-3 py-2 hover:bg-slate-100 rounded-lg text-xs font-semibold flex items-center gap-2.5 text-slate-700">
+                            <i class="fa-solid fa-lock text-slate-700 w-4"></i> Imprimer Tout (Intégral + Notes Perso)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bouton Synchronisation Supabase -->
+                <button onclick="saveReunionsToSupabase(false)" class="px-3.5 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm" title="Sauvegarder dans le Cloud Supabase">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Sync Cloud
                 </button>
             </div>
         </header>
 
-        <!-- Main Workspace -->
-        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+        <!-- BARRE D'ONGLETS DES 4 MODES DE TRAVAIL -->
+        <div class="bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0 no-print overflow-x-auto">
+            <div class="flex items-center gap-1">
+                <button onclick="switchTab('editeur')" id="tab-btn-editeur" class="main-tab-btn active">
+                    <i class="fa-solid fa-sliders"></i> 1. Préparation & Ordre du Jour
+                </button>
+                <button onclick="switchTab('live')" id="tab-btn-live" class="main-tab-btn">
+                    <i class="fa-solid fa-microphone-lines"></i> 2. Mode Séance Live (Prise de notes)
+                </button>
+                <button onclick="switchTab('apercu')" id="tab-btn-apercu" class="main-tab-btn">
+                    <i class="fa-solid fa-file-lines"></i> 3. Aperçu A4, Synthèse & Mails
+                </button>
+                <button onclick="switchTab('historique')" id="tab-btn-historique" class="main-tab-btn">
+                    <i class="fa-solid fa-box-archive"></i> 4. Historique (<span id="count-historique-tab">1</span>)
+                </button>
+            </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
-                <div class="border-b border-slate-200 bg-slate-50 px-4 flex gap-4">
-                    <button onclick="switchTab('editeur')" id="tab-btn-editeur" class="tab-btn active py-3.5 font-fredoka font-semibold text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-pen-to-square"></i> 1. Réunion en cours / Éditeur
-                    </button>
-                    <button onclick="switchTab('historique')" id="tab-btn-historique" class="tab-btn py-3.5 font-fredoka font-semibold text-sm text-slate-500 flex items-center gap-2">
-                        <i class="fa-solid fa-box-archive"></i> 2. Historique des Réunions
-                    </button>
+            <!-- Indicateur de progression des points -->
+            <div class="hidden lg:flex items-center gap-3 text-xs">
+                <span id="progress-text" class="font-bold text-slate-600">0 / 0 points actés</span>
+                <div class="w-28 h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
                 </div>
+            </div>
+        </div>
 
-                <!-- ONGLET 1 : ÉDITEUR & CONDUITE DE RÉUNION -->
-                <div id="pane-editeur" class="p-6 space-y-6">
-                    
-                    <!-- INFORMATIONS GÉNÉRALES -->
-                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
-                        <div class="flex justify-between items-center border-b pb-2 flex-wrap gap-2">
-                            <h3 class="font-fredoka text-base font-bold text-slate-800">📌 Cadre de la Réunion</h3>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <button onclick="nouvelleReunion()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded-lg text-xs font-bold transition">
-                                    <i class="fa-solid fa-plus"></i> Nouvelle Réunion
-                                </button>
-                                <button onclick="imprimerReunion('codir')" class="px-3 py-1.5 bg-sky-700 hover:bg-sky-800 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                                    <i class="fa-solid fa-print"></i> Imprimer pour CoDir (Contexte seul)
-                                </button>
-                                <button onclick="imprimerReunion('complet')" class="px-3 py-1.5 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                                    <i class="fa-solid fa-print"></i> Imprimer Tout (Intégral)
-                                </button>
-                            </div>
-                        </div>
+        <!-- ZONE DE TRAVAIL PRINCIPALE -->
+        <main class="flex-1 overflow-y-auto p-5 no-print" onclick="closeAllDropdowns(event)">
 
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Titre / Objet de la Réunion</label>
-                                <input type="text" id="reu-title" value="" oninput="autoSaveCurrent()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold font-fredoka focus:ring-2 focus:ring-[#C41E3A] outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Date & Horaire</label>
-                                <input type="text" id="reu-date" value="" oninput="autoSaveCurrent()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Lieu / Salle</label>
-                                <input type="text" id="reu-lieu" value="" oninput="autoSaveCurrent()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold">
-                            </div>
-                        </div>
+            <!-- ========================================================================= -->
+            <!-- ONGLET 1 : PRÉPARATION & ÉDITEUR COMPLET (AVEC SOMMAIRE LATÉRAL)          -->
+            <!-- ========================================================================= -->
+            <div id="pane-editeur" class="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                
+                <!-- COLONNE GAUCHE (3/12) : SOMMAIRE INTERACTIF & FILTRES D'AFFICHAGE -->
+                <div class="lg:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 lg:sticky lg:top-0 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                        <h3 class="font-fredoka text-sm font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-list-ol text-[#C41E3A]"></i> Sommaire (<span id="toc-count">0</span>)
+                        </h3>
+                        <button onclick="addPoint()" class="px-2.5 py-1 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Point
+                        </button>
+                    </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Participants / Présents</label>
-                                <input type="text" id="reu-participants" placeholder="Ex: Jordan Loudenot, Romain Flammang, Serge..." oninput="autoSaveCurrent()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Excusés / Membres Absents</label>
-                                <input type="text" id="reu-excuses" placeholder="Ex: Marc Direito, Yoann David..." oninput="autoSaveCurrent()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs">
-                            </div>
+                    <!-- Recherche rapide d'un point -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="filter-points-input" oninput="renderPoints()" placeholder="Filtrer un point ou mot-clé..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-[#C41E3A]">
+                    </div>
+
+                    <!-- Affichage sélectif des 3 couches de texte -->
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
+                        <div class="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Couches visibles à l'écran :</div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button onclick="toggleLayer('contexte')" id="btn-layer-contexte" class="px-2 py-1 rounded text-[11px] font-bold bg-slate-800 text-white transition">
+                                📌 Contexte CoDir
+                            </button>
+                            <button onclick="toggleLayer('prep')" id="btn-layer-prep" class="px-2 py-1 rounded text-[11px] font-bold bg-amber-600 text-white transition">
+                                💡 Prépa Perso
+                            </button>
+                            <button onclick="toggleLayer('notes')" id="btn-layer-notes" class="px-2 py-1 rounded text-[11px] font-bold bg-sky-600 text-white transition">
+                                🗣️ Notes Séance
+                            </button>
                         </div>
                     </div>
 
-                    <!-- BLOC ORDRE DU JOUR & NOTES DE SÉANCE -->
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-fredoka text-base font-bold text-slate-800">🎯 Points à l'Ordre du Jour & Retranscription</h3>
-                            <button onclick="addPoint()" class="px-3 py-1.5 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-                                <i class="fa-solid fa-plus"></i> Ajouter un Point
+                    <!-- Liste des points (Glisser-déposer + Saut direct) -->
+                    <div class="text-[11px] text-slate-400 italic">💡 Cliquez pour aller au point, ou glissez pour changer l'ordre :</div>
+                    <div id="toc-list" class="space-y-1 max-h-[420px] overflow-y-auto pr-1">
+                        <!-- Injecté en JS -->
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-100 flex justify-between gap-2">
+                        <button onclick="toggleAllCollapse(false)" class="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-[11px] font-bold text-slate-600">
+                            <i class="fa-solid fa-expand"></i> Tout déplier
+                        </button>
+                        <button onclick="toggleAllCollapse(true)" class="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-[11px] font-bold text-slate-600">
+                            <i class="fa-solid fa-compress"></i> Tout replier
+                        </button>
+                    </div>
+                </div>
+
+                <!-- COLONNE DROITE (9/12) : CADRE DE LA RÉUNION + CARTES DES POINTS -->
+                <div class="lg:col-span-9 space-y-5">
+                    
+                    <!-- BLOC CADRE DE LA RÉUNION & POINTAGE RAPIDE CODIR -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3 flex-wrap gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-6 bg-[#C41E3A] rounded-full"></span>
+                                <h3 class="font-fredoka text-base font-bold text-slate-800">Cadre de la Réunion & Participants</h3>
+                            </div>
+                            <button onclick="toggleCadreDetails()" id="btn-toggle-cadre" class="text-xs font-bold text-slate-500 hover:text-[#C41E3A] flex items-center gap-1">
+                                <i class="fa-solid fa-chevron-up"></i> Masquer l'en-tête
                             </button>
                         </div>
 
-                        <div id="points-container" class="space-y-4">
-                            <!-- Injecté dynamiquement en JS -->
+                        <div id="cadre-details-body" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                                <div class="md:col-span-6">
+                                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Titre / Objet de la Réunion</label>
+                                    <input type="text" id="reu-title" oninput="autoSaveCurrent()" class="w-full px-3 py-2 bg-slate-50 focus:bg-white border border-slate-300 rounded-xl text-sm font-bold font-fredoka text-[#C41E3A] focus:ring-2 focus:ring-[#C41E3A] outline-none">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Date & Horaire</label>
+                                    <input type="text" id="reu-date" oninput="autoSaveCurrent()" placeholder="Ex: Vendredi 28 Août - 18h30" class="w-full px-3 py-2 bg-slate-50 focus:bg-white border border-slate-300 rounded-xl text-xs font-bold">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Lieu / Salle</label>
+                                    <input type="text" id="reu-lieu" oninput="autoSaveCurrent()" placeholder="Ex: Dojo Henri Pierrehumbert" class="w-full px-3 py-2 bg-slate-50 focus:bg-white border border-slate-300 rounded-xl text-xs font-bold">
+                                </div>
+                            </div>
+
+                            <!-- Sélecteur interactif des membres du CoDir en 1 clic -->
+                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
+                                <div class="flex items-center justify-between flex-wrap gap-2">
+                                    <span class="text-[11px] font-bold uppercase text-slate-600 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-user-check text-[#C41E3A]"></i> Pointage rapide Équipe & CoDir (Cliquez : <span class="text-emerald-700">1x = Présent</span> • <span class="text-amber-700">2x = Excusé</span> • <span class="text-slate-500">3x = Retirer</span>)
+                                    </span>
+                                    <button onclick="tousPresentsCoDir()" class="text-[11px] font-bold text-emerald-700 hover:underline">
+                                        ✓ Mettre tout le CoDir présent
+                                    </button>
+                                </div>
+                                <div id="codir-chips-container" class="flex flex-wrap gap-1.5">
+                                    <!-- Pastilles membres générées en JS -->
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-emerald-800 uppercase mb-1">👥 Participants / Présents (Modifiable)</label>
+                                    <input type="text" id="reu-participants" oninput="autoSaveCurrent(); syncChipsFromInputs();" placeholder="Liste des présents..." class="w-full px-3 py-2 border border-emerald-200 bg-emerald-50/30 rounded-xl text-xs font-medium">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-amber-800 uppercase mb-1">🎗️ Excusés / Membres Absents (Modifiable)</label>
+                                    <input type="text" id="reu-excuses" oninput="autoSaveCurrent(); syncChipsFromInputs();" placeholder="Liste des excusés..." class="w-full px-3 py-2 border border-amber-200 bg-amber-50/30 rounded-xl text-xs font-medium">
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                </div>
+                    <!-- LISTE DES POINTS DE L'ORDRE DU JOUR -->
+                    <div id="points-container" class="space-y-4">
+                        <!-- Injecté dynamiquement en JS -->
+                    </div>
 
-                <!-- ONGLET 2 : HISTORIQUE -->
-                <div id="pane-historique" class="p-6 hidden space-y-6">
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-4">
-                        <h3 class="font-fredoka text-base font-bold text-[#C41E3A] border-b pb-2">📦 Réunions Archivées & Préparées</h3>
-                        <div id="reunions-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Liste des réunions -->
+                    <!-- Bouton d'ajout en bas de liste -->
+                    <div class="flex justify-center pt-2 pb-8">
+                        <button onclick="addPoint()" class="px-5 py-2.5 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl text-sm font-fredoka font-bold transition flex items-center gap-2 shadow-md">
+                            <i class="fa-solid fa-plus-circle"></i> Ajouter un nouveau point à l'ordre du jour
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- ONGLET 2 : MODE SÉANCE LIVE (CONDUITE DE RÉUNION SANS DISTRACTION)        -->
+            <!-- ========================================================================= -->
+            <div id="pane-live" class="hidden max-w-[1600px] mx-auto space-y-4">
+                
+                <!-- Barre de contrôle Live + Chronomètre -->
+                <div class="bg-[#1A1A1A] text-white p-4 rounded-2xl shadow-md flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center gap-4">
+                        <span class="px-3 py-1 bg-[#C41E3A] rounded-full text-xs font-fredoka font-bold uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> Mode Séance Live
+                        </span>
+                        <div>
+                            <div class="font-fredoka font-bold text-base" id="live-reu-title">Réunion</div>
+                            <div class="text-xs text-slate-400" id="live-point-counter">Point 1 sur 13</div>
                         </div>
+                    </div>
+
+                    <!-- Chronomètre de séance -->
+                    <div class="flex items-center gap-3 bg-slate-800 px-4 py-2 rounded-xl border border-slate-700">
+                        <i class="fa-regular fa-clock text-[#C41E3A]"></i>
+                        <span id="live-timer-display" class="font-mono text-base font-bold">00:00:00</span>
+                        <button onclick="toggleTimer()" id="btn-timer-toggle" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 rounded text-xs font-bold">Démarrer</button>
+                        <button onclick="resetTimer()" class="text-slate-400 hover:text-white text-xs" title="Réinitialiser"><i class="fa-solid fa-rotate-left"></i></button>
+                    </div>
+
+                    <!-- Navigation Précédent / Suivant -->
+                    <div class="flex items-center gap-2">
+                        <button onclick="navigateLivePoint(-1)" id="btn-live-prev" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-arrow-left"></i> Point précédent
+                        </button>
+                        <button onclick="navigateLivePoint(1)" id="btn-live-next" class="px-4 py-2 bg-[#C41E3A] hover:bg-[#A3182E] rounded-xl text-xs font-bold flex items-center gap-1.5">
+                            Point suivant <i class="fa-solid fa-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
 
+                <!-- Grille Live : Gauche (Piste Points) | Centre (Contexte & Prépa) | Droite (Notes & Décisions Live) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                    
+                    <!-- Liste rapide des points (3/12) -->
+                    <div class="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-3.5 space-y-2 max-h-[72vh] overflow-y-auto">
+                        <div class="text-xs font-fredoka font-bold text-slate-500 uppercase px-1">Ordre du jour</div>
+                        <div id="live-sidebar-list" class="space-y-1"></div>
+                    </div>
+
+                    <!-- Rappel Contexte CoDir + Notes Perso Jordan (4/12) -->
+                    <div class="lg:col-span-4 space-y-4">
+                        <div class="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 shadow-sm">
+                            <div class="flex items-center justify-between border-b pb-2">
+                                <span class="text-xs font-fredoka font-bold uppercase text-slate-500">📌 Contexte partagé au CoDir</span>
+                                <span id="live-files-badge" class="text-[11px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-semibold hidden"></span>
+                            </div>
+                            <div id="live-contexte-view" class="text-sm text-slate-700 leading-relaxed preserve-format min-h-[120px]"></div>
+                        </div>
+
+                        <div class="bg-amber-50 rounded-2xl border border-amber-200 p-5 space-y-2 shadow-sm">
+                            <div class="text-xs font-fredoka font-bold uppercase text-amber-800 flex items-center justify-between">
+                                <span>💡 Mon Pense-Bête / Arguments (Privé)</span>
+                                <span class="text-[10px] bg-amber-200/70 px-2 py-0.5 rounded">Visible uniquement par vous</span>
+                            </div>
+                            <textarea id="live-prep-input" oninput="saveLivePointFields()" rows="5" class="w-full bg-white/80 border border-amber-300 rounded-xl p-3 text-xs text-slate-800 outline-none focus:ring-2 focus:ring-amber-400" placeholder="Vos notes personnelles pour mener la discussion..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Prise de notes en direct & Décisions (5/12) -->
+                    <div class="lg:col-span-5 bg-white rounded-2xl border-2 border-sky-500 p-5 space-y-4 shadow-md">
+                        <div class="flex items-center justify-between flex-wrap gap-2 border-b pb-3">
+                            <h3 id="live-point-title" class="font-fredoka text-base font-bold text-[#C41E3A]">Titre du point</h3>
+                            <select id="live-point-status" onchange="saveLivePointFields()" class="px-3 py-1 rounded-full text-xs font-bold border outline-none">
+                                <option value="todo">⏳ À débattre</option>
+                                <option value="validated">✅ Validé / Acté</option>
+                                <option value="discussed">💬 Discuté (Info)</option>
+                                <option value="postponed">⏸️ Reporté</option>
+                            </select>
+                        </div>
+
+                        <!-- Boutons d'insertion 1-clic pendant que les gens parlent -->
+                        <div class="space-y-1.5">
+                            <span class="text-[11px] font-bold uppercase text-slate-400">Actions rapides de prise de notes :</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="validerCommeContexteLive()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                                    <i class="fa-solid fa-check-double"></i> Tout le contexte est validé (+ détails)
+                                </button>
+                                <button onclick="appendLiveSnippet('✅ DÉCISION VALIDÉE À L\'UNANIMITÉ : ')" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold">
+                                    🗳️ Vote unanime
+                                </button>
+                                <button onclick="appendLiveSnippet('👉 ACTION À SUIVRE : [Qui ?] doit faire [Quoi ?] avant le [Date]')" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold">
+                                    🎯 Action à suivre
+                                </button>
+                                <button onclick="appendLiveSnippet('💬 Intervention / Remarque : ')" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold">
+                                    💬 Remarque
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-sky-900 uppercase mb-1.5 font-fredoka">
+                                🗣️ Ce qui se dit en réunion & Décisions arrêtées :
+                            </label>
+                            <textarea id="live-notes-input" oninput="saveLivePointFields()" rows="11" class="w-full p-3.5 bg-sky-50/40 border border-sky-300 rounded-xl text-sm font-medium text-slate-800 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500 leading-relaxed" placeholder="Tapez ici au fil de la discussion : arguments, ajustements par rapport au contexte, montants votés, qui s'occupe de quoi..."></textarea>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-2 text-xs text-slate-400">
+                            <span>Sauvegarde instantanée à chaque frappe</span>
+                            <button onclick="navigateLivePoint(1)" class="text-[#C41E3A] font-bold hover:underline">
+                                Passer au point suivant →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- ONGLET 3 : APERÇU DOCUMENT A4 EN DIRECT, SYNTHÈSE & GÉNÉRATEUR DE MAILS   -->
+            <!-- ========================================================================= -->
+            <div id="pane-apercu" class="hidden max-w-[1500px] mx-auto space-y-5">
+                
+                <!-- Barre de choix du mode d'aperçu -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-bold uppercase text-slate-400 mr-1">Mode d'aperçu :</span>
+                        <button onclick="setPreviewMode('codir')" id="btn-prev-codir" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#C41E3A] text-white transition">
+                            📘 1. Dossier Préparation CoDir (Contexte seul)
+                        </button>
+                        <button onclick="setPreviewMode('cr')" id="btn-prev-cr" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                            📗 2. Compte-Rendu Officiel (Contexte + Décisions)
+                        </button>
+                        <button onclick="setPreviewMode('complet')" id="btn-prev-complet" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                            🔒 3. Dossier Intégral (+ Notes Privées)
+                        </button>
+                        <button onclick="setPreviewMode('mail')" id="btn-prev-mail" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                            ✉️ 4. Mail d'accompagnement (Convocation / CR)
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="imprimerDepuisApercu()" id="btn-print-apercu" class="px-4 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-print"></i> Imprimer / Exporter ce PDF A4
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sous-panneau Mail (affiché uniquement en mode 'mail') -->
+                <div id="mail-generator-container" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 space-y-4">
+                        <h3 class="font-fredoka font-bold text-base text-[#C41E3A]">✉️ Paramètres du Mail au CoDir</h3>
+                        <p class="text-xs text-slate-500">Générez en un clic le mail habillé à la charte du Dojo Dornois pour envoyer soit votre Dossier de Préparation avant la réunion, soit le Compte-Rendu après.</p>
+                        
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-700">Type de courriel :</label>
+                            <select id="mail-type-select" onchange="renderMailPreview()" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold">
+                                <option value="convocation">📅 Avant réunion : Convocation + Dossier de Contexte</option>
+                                <option value="cr">✅ Après réunion : Envoi du Compte-Rendu Officiel</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-700">Mot personnalisé en ouverture / conclusion (facultatif) :</label>
+                            <textarea id="mail-custom-note" oninput="renderMailPreview()" rows="4" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs" placeholder="Ex: Merci encore à toutes et tous pour votre présence, ou rappel pour les codes de la boîte à clés..."></textarea>
+                        </div>
+
+                        <div class="pt-2 space-y-2">
+                            <button onclick="copierMailRichePourGmail()" class="w-full py-2.5 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-copy"></i> Copier le Design Visuel (Coller dans Gmail)
+                            </button>
+                            <button onclick="copierMailHtmlCode()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-code"></i> Copier le Code HTML (Kalisport)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-8 bg-slate-200 p-6 rounded-2xl overflow-y-auto">
+                        <div id="mail-live-render"></div>
+                    </div>
+                </div>
+
+                <!-- Feuille A4 d'aperçu en direct -->
+                <div id="a4-preview-wrapper" class="bg-slate-300 p-6 rounded-2xl overflow-x-auto">
+                    <div id="a4-live-sheet" class="a4-screen-sheet">
+                        <!-- Injecté dynamiquement par renderLiveA4Preview() -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- ONGLET 4 : HISTORIQUE & BIBLIOTHÈQUE DES RÉUNIONS                         -->
+            <!-- ========================================================================= -->
+            <div id="pane-historique" class="hidden max-w-[1400px] mx-auto space-y-5">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-3">
+                        <div>
+                            <h3 class="font-fredoka text-lg font-bold text-[#C41E3A]">📦 Bibliothèque & Historique des Réunions</h3>
+                            <p class="text-xs text-slate-500">Retrouvez toutes vos réunions préparées et archivées. Vous pouvez les ouvrir, les dupliquer ou exporter une sauvegarde.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="exporterJsonReunions()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                                <i class="fa-solid fa-download"></i> Sauvegarde JSON
+                            </button>
+                            <button onclick="document.getElementById('import-json-reunions').click()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                                <i class="fa-solid fa-upload"></i> Importer JSON
+                            </button>
+                            <input type="file" id="import-json-reunions" accept=".json" class="hidden" onchange="importerJsonReunions(event)">
+                            <button onclick="nouvelleReunion()" class="px-4 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl text-xs font-bold flex items-center gap-1.5">
+                                <i class="fa-solid fa-plus"></i> Créer une Réunion
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="reunions-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Injecté en JS -->
+                    </div>
+                </div>
             </div>
 
         </main>
     </div>
 
     <!-- 3. ZONE IMPRESSION A4 PORTRAIT NATIVE -->
-    <div id="printable-reunion-area">
-        <table style="width:100%; border-collapse:collapse;">
-            <thead>
-                <tr>
-                    <td style="padding-bottom:12px; border-bottom:2px solid #C41E3A;">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div style="display:flex; gap:12px; align-items:center;">
-                                <div style="background:#C41E3A; width:50px; height:48px; border-radius:8px; padding:3px; display:flex; align-items:center; justify-content:center;">
-                                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width:100%; height:100%; object-fit:contain;">
-                                </div>
-                                <div>
-                                    <h1 style="margin:0; font-size:14pt; color:#C41E3A; font-family:'Fredoka', sans-serif; font-weight:bold;">DOJO DORNOIS</h1>
-                                    <div style="font-size:7.5pt; color:#64748b; line-height:1.2;">
-                                        1 Place de la Mairie - 58390 DORNES<br>
-                                        FFJDA n° CE 08.58.067.0 • SIRET n° 451 928 410 00013 • RNA W583001220
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="text-align:right;">
-                                <strong style="font-size:9pt; text-transform:uppercase; font-family:'Fredoka', sans-serif; display:block;" id="p-label-type">Dossier de Préparation CoDir</strong>
-                                <div style="color:#C41E3A; font-size:11pt; font-family:'Fredoka', sans-serif; font-weight:bold;" id="p-date">--/--/----</div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="padding-top:12px; padding-bottom:12px;">
-                        
-                        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px; margin-bottom:15px; text-align:left;">
-                            <h2 style="font-family:'Fredoka', sans-serif; color:#C41E3A; font-size:13pt; margin:0 0 4px 0;" id="p-title">Titre Réunion</h2>
-                            <div style="font-size:8.5pt; color:#475569; font-weight:bold;">
-                                <div><strong>Lieu :</strong> <span id="p-lieu">--</span></div>
-                                <div><strong>Participants :</strong> <span id="p-participants">--</span></div>
-                                <div><strong>Excusés / Absents :</strong> <span id="p-excuses">--</span></div>
-                            </div>
-                        </div>
-
-                        <div id="p-points-body">
-                            <!-- Points imprimables -->
-                        </div>
-
-                    </td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td style="border-top:1px solid #e2e8f0; padding-top:8px; font-size:7.5pt; color:#64748b; text-align:left;">
-                        <span style="font-style:italic;">Document extrait de l'Intranet Officiel du Dojo Dornois le <span id="p-export-date">--/--/----</span>.</span>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
+    <div id="printable-reunion-area"></div>
 
     <!-- SCRIPT SIDEBAR UNIFIÉE -->
     <script src="../js/sidebar.js"></script>
 
     <script>
+        /* ========================================================================= */
+        /* CONFIGURATION SUPABASE & MEMBRES CODIR                                    */
+        /* ========================================================================= */
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
         const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
         const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
         const SUPABASE_TABLE = 'reunions';
 
-        // Modèle exact repris du Dossier de Préparation CoDir
+        const MEMBRES_HABITUELS = [
+            "Jordan Loudenot",
+            "Romain Flammang",
+            "Laetitia Bernard",
+            "Fanny Thévenin",
+            "Hélène Chaussin",
+            "Régis D'Argent",
+            "Marc Direito",
+            "Yoann David",
+            "Philippe Flammang"
+        ];
+
+        // Modèle par défaut
         const defaultReunionRentrée = {
             id: 'reu_rentree_2026_v5',
             title: "Réunion de Rentrée du Comité Directeur",
             date: "Vendredi 28 Août 2026 - 18h30",
             lieu: "Dojo Dornois",
-            participants: "Jordan Loudenot, Romain Flammang, Laetitia Bernard, Thevenin Fanny, Hélène Chaussin, Régis D'Argent",
+            participants: "Jordan Loudenot, Romain Flammang, Laetitia Bernard, Fanny Thévenin, Hélène Chaussin, Régis D'Argent",
             excuses: "Marc Direito, Yoann David",
             points: [
                 {
@@ -301,6 +775,7 @@
                     prep: "",
                     notes: "",
                     files: "R2026-08-26 - PJ01 - Convention & Planning des Interventions Scolaires - Dojo Dornois _ École de Dornes",
+                    status: "todo",
                     collapsed: false
                 },
                 {
@@ -310,15 +785,17 @@
                     prep: "",
                     notes: "",
                     files: "",
+                    status: "todo",
                     collapsed: false
                 },
                 {
                     id: 103,
                     title: "🎟️ 3. Événements Fin 2026 & Dates Saison 2027",
-                    contexte: "Le point sur les événements de fin d'année 2026 et surtout l'anticipation des dates de TOUS nos événements 2027. AG le 14/11 - Marché de Noël AACD à discuter - Noël du Dojo le 19/12 (à déterminer les cadeaux que l'on fera aux enfants). Voir si on refait les calendriers par Inititatives - Prévoir toutes les dates approximatives de 2027 (Janvier à Décembre) car réunion de réservation de la salle des fêtes à la mi-octobre certainement.",
+                    contexte: "Le point sur les événements de fin d'année 2026 et surtout l'anticipation des dates de TOUS nos événements 2027. AG le 14/11 - Marché de Noël AACD à discuter - Noël du Dojo le 19/12 (à déterminer les cadeaux que l'on fera aux enfants). Voir si on refait les calendriers par Initiatives - Prévoir toutes les dates approximatives de 2027 (Janvier à Décembre) car réunion de réservation de la salle des fêtes à la mi-octobre certainement.",
                     prep: "",
                     notes: "",
                     files: "",
+                    status: "todo",
                     collapsed: false
                 },
                 {
@@ -328,6 +805,7 @@
                     prep: "",
                     notes: "",
                     files: "",
+                    status: "todo",
                     collapsed: false
                 },
                 {
@@ -337,42 +815,47 @@
                     prep: "",
                     notes: "",
                     files: "",
+                    status: "todo",
                     collapsed: false
                 },
                 {
                     id: 106,
                     title: "🖥️ 6. Démo du nouvel Intranet Club",
-                    contexte: "Démo du nouvel Intranet que j'ai structuré pour le club (documents et chartes unifiés). Rapide présentation, pour vous montrer un peu l'évolution de la charte graphique présenté dernièrement.",
+                    contexte: "Démo du nouvel Intranet que j'ai structuré pour le club (documents et chartes unifiés). Rapide présentation, pour vous montrer un peu l'évolution de la charte graphique présentée dernièrement.",
                     prep: "",
                     notes: "",
                     files: "",
+                    status: "todo",
                     collapsed: false
                 },
                 {
                     id: 107,
                     title: "💳 7. Politiques Tarifaires, Gratuité Licenciés & Inscriptions Stages",
-                    contexte: "Désormais pour les activités proposées hors cours (self défense, stage...), on ne fera pas payer les licenciés, on ne fera payer que les extérieurs une somme correcte pour participer au club (les licenciés paient déjà leur cotisation). Ajouter la mention 'Inscriptions obligatoires' pour les participations aux stages. Gestion des stages et évènement comme self défense. géré par kalisport. Donc stages genre vacances tout géré par le module organisation et équipes (adhérents). Et self défense géré par le module Stages (adhérents + extérieur) .Après rien n'empêche à un extérieur de venir essayer sur un stage pendant les vacances à voir.",
+                    contexte: "Désormais pour les activités proposées hors cours (self défense, stage...), on ne fera pas payer les licenciés, on ne fera payer que les extérieurs une somme correcte pour participer au club (les licenciés paient déjà leur cotisation). Ajouter la mention 'Inscriptions obligatoires' pour les participations aux stages. Gestion des stages et événements comme self défense gérés par Kalisport.",
                     prep: "",
                     notes: "",
                     files: "",
+                    status: "todo",
                     collapsed: false
                 },
                 {
                     id: 108,
                     title: "📱 8. Messagerie Officielle : Intégration & Transition Kalisport",
-                    contexte: "Configurer Kalisport en tant que messagerie principale. WhatsApp est pratique mais tout le monde n'est pas dessus et tout le monde ne lit pas. De plus, à chaque saison il va falloir changer de catégories tout un tas de parents donc risque d'erreur. Voir si Kalisport gère bien les réponses aussi, le but étant de communiquer dans les deux sens. Le logiciel est payé à l'année et permet de tout gérer ou presque depuis son interface.",
+                    contexte: "Configurer Kalisport en tant que messagerie principale. WhatsApp est pratique mais tout le monde n'est pas dessus et tout le monde ne lit pas. De plus, à chaque saison il va falloir changer de catégories tout un tas de parents donc risque d'erreur.",
                     prep: "",
                     notes: "",
                     files: "R2026-08-26 - PJ08 - Transition Messagerie vers Kalisport",
+                    status: "todo",
                     collapsed: false
                 },
                 {
                     id: 109,
                     title: "🛡️ 9. Colosse aux pieds d'argile",
-                    contexte: "Présentation d'une proposition d'adhésion du Dojo Dornois à l'association « Colosse aux pieds d'argile », reconnue pour son action dans la prévention et la lutte contre les dérives, violences sexuelles, le harcèlement et le bizutage en milieu sportif. Cette démarche s'inscrit dans notre volonté de renforcer la protection des pratiquants (notamment les enfants) et de positionner notre club de manière claire et engagée sur la sécurité et le bien-être au sein du dojo. Romain et Jordan ont déjà suivi la formation dédiée dispensée par l'association.\nCoût de l'adhésion : 50 € / an",
+                    contexte: "Présentation d'une proposition d'adhésion du Dojo Dornois à l'association « Colosse aux pieds d'argile », reconnue pour son action dans la prévention et la lutte contre les dérives, violences sexuelles, le harcèlement et le bizutage en milieu sportif.\nCoût de l'adhésion : 50 € / an",
                     prep: "",
                     notes: "",
                     files: "",
+                    status: "todo",
                     collapsed: false
                 },
                 {
@@ -382,15 +865,17 @@
                     prep: "",
                     notes: "",
                     files: "",
+                    status: "todo",
                     collapsed: false
                 },
                 {
                     id: 111,
                     title: "🗼 11. Antenne à Chantenay St Imbert",
-                    contexte: "Mme Billard, maman du petit Amaury a un contact à la mairie pour étudier le projet. Voir si Romain intéressé et comment on pourrait organiser tout ça alors soit pour cette saison soit la saison prochaine (si Romain salarié, on pourrait lui donner des heures grâce à cette antenne)",
+                    contexte: "Mme Billard, maman du petit Amaury a un contact à la mairie pour étudier le projet. Voir si Romain intéressé et comment on pourrait organiser tout ça alors soit pour cette saison soit la saison prochaine.",
                     prep: "",
                     notes: "",
                     files: "",
+                    status: "todo",
                     collapsed: false
                 },
                 {
@@ -400,6 +885,7 @@
                     prep: "",
                     notes: "",
                     files: "R2026-08-28 - PJ12 - Budget Prévisionnel - 2026-2027",
+                    status: "todo",
                     collapsed: false
                 },
                 {
@@ -409,6 +895,7 @@
                     prep: "",
                     notes: "",
                     files: "",
+                    status: "todo",
                     collapsed: false
                 }
             ]
@@ -417,77 +904,336 @@
         let currentReunion = JSON.parse(JSON.stringify(defaultReunionRentrée));
         let reunionsDB = [JSON.parse(JSON.stringify(defaultReunionRentrée))];
 
-        function switchTab(tabId) {
-            document.querySelectorAll('#pane-editeur, #pane-historique').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'text-[#C41E3A]'));
-            
-            document.getElementById('pane-' + tabId).classList.remove('hidden');
-            document.getElementById('tab-btn-' + tabId).classList.add('active');
+        // États d'interface
+        let activeTab = 'editeur';
+        let visibleLayers = { contexte: true, prep: true, notes: true };
+        let cadreVisible = true;
+        let draggedTocIndex = null;
+        let livePointIndex = 0;
+        let currentPreviewMode = 'codir'; // 'codir', 'cr', 'complet', 'mail'
 
-            if (tabId === 'historique') renderHistorique();
+        // Chronomètre Live
+        let timerSeconds = 0;
+        let timerInterval = null;
+
+        /* ========================================================================= */
+        /* NAVIGATION ENTRE LES 4 ONGLETS                                            */
+        /* ========================================================================= */
+        function switchTab(tabId) {
+            activeTab = tabId;
+            ['editeur', 'live', 'apercu', 'historique'].forEach(id => {
+                document.getElementById('pane-' + id).classList.toggle('hidden', id !== tabId);
+                document.getElementById('tab-btn-' + id).classList.toggle('active', id === tabId);
+            });
+
+            if (tabId === 'live') {
+                if (livePointIndex >= currentReunion.points.length) livePointIndex = 0;
+                renderLiveMode();
+            } else if (tabId === 'apercu') {
+                renderPreviewPane();
+            } else if (tabId === 'historique') {
+                renderHistorique();
+            } else {
+                renderPoints();
+            }
+        }
+
+        function toggleDropdown(id) {
+            const el = document.getElementById(id);
+            const isOpen = el.classList.contains('open');
+            closeAllDropdowns();
+            if (!isOpen) el.classList.add('open');
+        }
+
+        function closeAllDropdowns(e) {
+            if (e && e.target.closest('.relative')) return;
+            document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('open'));
+        }
+
+        /* ========================================================================= */
+        /* GESTION DES PARTICIPANTS (PUCES INTERACTIVES CODIR)                       */
+        /* ========================================================================= */
+        function parseNamesList(str) {
+            if (!str) return [];
+            return str.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        function renderCoDirChips() {
+            const container = document.getElementById('codir-chips-container');
+            if (!container) return;
+
+            const presents = parseNamesList(document.getElementById('reu-participants').value);
+            const excuses = parseNamesList(document.getElementById('reu-excuses').value);
+
+            container.innerHTML = '';
+            MEMBRES_HABITUELS.forEach(membre => {
+                const isPresent = presents.some(n => n.toLowerCase() === membre.toLowerCase());
+                const isExcuse = excuses.some(n => n.toLowerCase() === membre.toLowerCase());
+
+                let stateClass = '';
+                let icon = '<i class="fa-regular fa-circle text-slate-300"></i>';
+                if (isPresent) {
+                    stateClass = 'state-present';
+                    icon = '<i class="fa-solid fa-circle-check text-emerald-600"></i>';
+                } else if (isExcuse) {
+                    stateClass = 'state-excuse';
+                    icon = '<i class="fa-solid fa-circle-xmark text-amber-600"></i>';
+                }
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `member-chip ${stateClass}`;
+                btn.innerHTML = `${icon} <span>${membre}</span>`;
+                btn.onclick = () => cycleMemberState(membre);
+                container.appendChild(btn);
+            });
+        }
+
+        function cycleMemberState(membre) {
+            let presents = parseNamesList(document.getElementById('reu-participants').value);
+            let excuses = parseNamesList(document.getElementById('reu-excuses').value);
+
+            const inPresentIdx = presents.findIndex(n => n.toLowerCase() === membre.toLowerCase());
+            const inExcuseIdx = excuses.findIndex(n => n.toLowerCase() === membre.toLowerCase());
+
+            if (inPresentIdx === -1 && inExcuseIdx === -1) {
+                presents.push(membre);
+            } else if (inPresentIdx !== -1) {
+                presents.splice(inPresentIdx, 1);
+                excuses.push(membre);
+            } else {
+                excuses.splice(inExcuseIdx, 1);
+            }
+
+            document.getElementById('reu-participants').value = presents.join(', ');
+            document.getElementById('reu-excuses').value = excuses.join(', ');
+            renderCoDirChips();
+            autoSaveCurrent();
+        }
+
+        function tousPresentsCoDir() {
+            document.getElementById('reu-participants').value = MEMBRES_HABITUELS.slice(0, 8).join(', ');
+            document.getElementById('reu-excuses').value = '';
+            renderCoDirChips();
+            autoSaveCurrent();
+            showToast("👥 Tous les membres du CoDir ont été pointés présents !");
+        }
+
+        function syncChipsFromInputs() {
+            renderCoDirChips();
+        }
+
+        function toggleCadreDetails() {
+            cadreVisible = !cadreVisible;
+            document.getElementById('cadre-details-body').classList.toggle('hidden', !cadreVisible);
+            document.getElementById('btn-toggle-cadre').innerHTML = cadreVisible
+                ? '<i class="fa-solid fa-chevron-up"></i> Masquer l\'en-tête'
+                : '<i class="fa-solid fa-chevron-down"></i> Afficher l\'en-tête';
+        }
+
+        /* ========================================================================= */
+        /* GESTION DES COUCHES VISIBLES & BARRE DE PROGRESSION                       */
+        /* ========================================================================= */
+        function toggleLayer(layer) {
+            visibleLayers[layer] = !visibleLayers[layer];
+            const btn = document.getElementById('btn-layer-' + layer);
+            btn.classList.toggle('opacity-40', !visibleLayers[layer]);
+            renderPoints();
+        }
+
+        function updateProgressBar() {
+            const total = currentReunion.points.length || 1;
+            const done = currentReunion.points.filter(p => p.status === 'validated' || p.status === 'discussed' || (p.notes && p.notes.trim().length > 5)).length;
+            const pct = Math.round((done / total) * 100);
+            document.getElementById('progress-text').innerText = `${done} / ${currentReunion.points.length} points traités (${pct}%)`;
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('toc-count').innerText = currentReunion.points.length;
+            document.getElementById('count-historique-tab').innerText = reunionsDB.length;
+        }
+
+        /* ========================================================================= */
+        /* RENDU DU SOMMAIRE LATÉRAL & DES CARTES DE L'ORDRE DU JOUR                 */
+        /* ========================================================================= */
+        function renderToc() {
+            const toc = document.getElementById('toc-list');
+            if (!toc) return;
+            toc.innerHTML = '';
+
+            currentReunion.points.forEach((p, idx) => {
+                if (!p.status) p.status = (p.notes && p.notes.trim()) ? 'validated' : 'todo';
+
+                let dotColor = 'bg-amber-400';
+                if (p.status === 'validated') dotColor = 'bg-emerald-500';
+                if (p.status === 'discussed') dotColor = 'bg-sky-500';
+                if (p.status === 'postponed') dotColor = 'bg-slate-400';
+
+                const item = document.createElement('div');
+                item.className = 'toc-item';
+                item.draggable = true;
+
+                item.ondragstart = () => {
+                    draggedTocIndex = idx;
+                    item.classList.add('dragging-toc');
+                };
+                item.ondragend = () => item.classList.remove('dragging-toc');
+                item.ondragover = (e) => e.preventDefault();
+                item.ondrop = (e) => {
+                    e.preventDefault();
+                    if (draggedTocIndex === null || draggedTocIndex === idx) return;
+                    const moved = currentReunion.points.splice(draggedTocIndex, 1)[0];
+                    currentReunion.points.splice(idx, 0, moved);
+                    draggedTocIndex = null;
+                    autoSaveCurrent();
+                    renderPoints();
+                };
+
+                item.onclick = () => {
+                    const target = document.getElementById(`point-card-${idx}`);
+                    if (target) {
+                        if (currentReunion.points[idx].collapsed) {
+                            currentReunion.points[idx].collapsed = false;
+                            renderPoints();
+                        }
+                        setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+                    }
+                };
+
+                item.innerHTML = `
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <span class="text-slate-300 cursor-grab">⠿</span>
+                        <span class="w-2 h-2 rounded-full shrink-0 ${dotColor}"></span>
+                        <span class="truncate font-medium text-slate-700">${escapeHtml(p.title)}</span>
+                    </div>
+                    ${p.notes && p.notes.trim() ? '<i class="fa-solid fa-check text-[10px] text-emerald-600"></i>' : ''}
+                `;
+                toc.appendChild(item);
+            });
         }
 
         function renderPoints() {
+            renderToc();
+            updateProgressBar();
+            populateQuickReunionSelect();
+
             const container = document.getElementById('points-container');
             container.innerHTML = '';
 
+            const filterQuery = (document.getElementById('filter-points-input')?.value || '').trim().toLowerCase();
+
             currentReunion.points.forEach((p, idx) => {
+                if (!p.status) p.status = 'todo';
+
+                if (filterQuery) {
+                    const hay = `${p.title} ${p.contexte} ${p.prep} ${p.notes} ${p.files}`.toLowerCase();
+                    if (!hay.includes(filterQuery)) return;
+                }
+
                 const card = document.createElement('div');
-                card.className = "bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4";
+                card.id = `point-card-${idx}`;
+                card.className = `point-card status-${p.status} p-5 space-y-4`;
                 const isCollapsed = !!p.collapsed;
-                
+
+                let statusBadgeClass = 'bg-amber-50 text-amber-800 border-amber-200';
+                if (p.status === 'validated') statusBadgeClass = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+                if (p.status === 'discussed') statusBadgeClass = 'bg-sky-50 text-sky-800 border-sky-200';
+                if (p.status === 'postponed') statusBadgeClass = 'bg-slate-100 text-slate-600 border-slate-200';
+
                 card.innerHTML = `
-                    <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-2">
-                        <div class="flex items-center gap-2 flex-1 min-w-[250px]">
+                    <!-- En-tête du point -->
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3 flex-wrap gap-2">
+                        <div class="flex items-center gap-2.5 flex-1 min-w-[260px]">
                             <div class="flex flex-col gap-0.5">
-                                <button onclick="movePoint(${idx}, -1)" ${idx === 0 ? 'disabled class="opacity-30 cursor-not-allowed text-xs text-slate-400"' : 'class="text-xs text-slate-600 hover:text-[#C41E3A]"'} title="Monter">
+                                <button onclick="movePoint(${idx}, -1)" ${idx === 0 ? 'disabled class="opacity-25 cursor-not-allowed text-[11px] text-slate-400"' : 'class="text-[11px] text-slate-500 hover:text-[#C41E3A]"'} title="Monter">
                                     <i class="fa-solid fa-chevron-up"></i>
                                 </button>
-                                <button onclick="movePoint(${idx}, 1)" ${idx === currentReunion.points.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed text-xs text-slate-400"' : 'class="text-xs text-slate-600 hover:text-[#C41E3A]"'} title="Descendre">
+                                <button onclick="movePoint(${idx}, 1)" ${idx === currentReunion.points.length - 1 ? 'disabled class="opacity-25 cursor-not-allowed text-[11px] text-slate-400"' : 'class="text-[11px] text-slate-500 hover:text-[#C41E3A]"'} title="Descendre">
                                     <i class="fa-solid fa-chevron-down"></i>
                                 </button>
                             </div>
-                            <span class="text-xs font-bold text-slate-400">#${idx + 1}</span>
-                            <input type="text" value="${p.title.replace(/"/g, '&quot;')}" oninput="updatePointTitle(${idx}, this.value)" class="font-fredoka font-bold text-sm text-[#C41E3A] bg-transparent border-b border-transparent hover:border-slate-300 focus:border-[#C41E3A] outline-none w-full" placeholder="Intitulé du point...">
+                            <span class="px-2 py-0.5 bg-slate-100 rounded text-xs font-bold text-slate-500">#${idx + 1}</span>
+                            <input type="text" value="${(p.title || '').replace(/"/g, '&quot;')}" oninput="updatePointTitle(${idx}, this.value)" class="font-fredoka font-bold text-base text-[#C41E3A] bg-transparent border-b border-transparent hover:border-slate-300 focus:border-[#C41E3A] outline-none w-full" placeholder="Intitulé du point à l'ordre du jour...">
                         </div>
-                        <div class="flex items-center gap-2">
+
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <!-- Statut du point -->
+                            <select onchange="updatePointStatus(${idx}, this.value)" class="px-2.5 py-1 rounded-full text-xs font-bold border ${statusBadgeClass} outline-none cursor-pointer">
+                                <option value="todo" ${p.status === 'todo' ? 'selected' : ''}>⏳ À débattre</option>
+                                <option value="validated" ${p.status === 'validated' ? 'selected' : ''}>✅ Validé / Acté</option>
+                                <option value="discussed" ${p.status === 'discussed' ? 'selected' : ''}>💬 Discuté</option>
+                                <option value="postponed" ${p.status === 'postponed' ? 'selected' : ''}>⏸️ Reporté</option>
+                            </select>
+
+                            <button onclick="openPointInLiveMode(${idx})" class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-xs rounded-lg transition" title="Ouvrir ce point en mode Séance Live">
+                                <i class="fa-solid fa-microphone-lines"></i> Live
+                            </button>
+
                             <button onclick="toggleCollapse(${idx})" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition flex items-center gap-1">
                                 <i class="fa-solid ${isCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'}"></i>
                                 <span>${isCollapsed ? 'Déplier' : 'Replier'}</span>
                             </button>
-                            <button onclick="deletePoint(${idx})" class="text-rose-600 hover:text-rose-800 text-xs font-bold shrink-0 px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+
+                            <button onclick="duplicatePoint(${idx})" class="text-slate-400 hover:text-indigo-600 text-xs px-1.5 py-1" title="Dupliquer ce point"><i class="fa-solid fa-clone"></i></button>
+                            <button onclick="deletePoint(${idx})" class="text-slate-400 hover:text-rose-600 text-xs px-1.5 py-1" title="Supprimer ce point"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
 
+                    <!-- Corps du point -->
                     <div class="${isCollapsed ? 'hidden' : 'space-y-4'}">
-                        <div class="bg-indigo-50/60 p-3 rounded-xl border border-indigo-200 flex items-center gap-3">
+                        <!-- Pièces jointes -->
+                        <div class="bg-indigo-50/50 px-3.5 py-2.5 rounded-xl border border-indigo-200/80 flex items-center gap-3 flex-wrap">
                             <label class="text-[11px] font-bold text-indigo-900 uppercase font-fredoka shrink-0 flex items-center gap-1.5">
-                                📎 Fichiers joints / Pièces transmises :
+                                📎 Pièces jointes / Réf. Dossier :
                             </label>
-                            <input type="text" value="${(p.files || '').replace(/"/g, '&quot;')}" oninput="updatePointFiles(${idx}, this.value)" class="w-full px-2.5 py-1 bg-white border border-indigo-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-1 focus:ring-indigo-400" placeholder="Ex: R2026-08-26 - PJ01...">
+                            <input type="text" value="${(p.files || '').replace(/"/g, '&quot;')}" oninput="updatePointFiles(${idx}, this.value)" class="flex-1 min-w-[220px] px-2.5 py-1 bg-white border border-indigo-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-1 focus:ring-indigo-400" placeholder="Ex: R2026-08-26 - PJ01 - Convention Écoles...">
                         </div>
 
-                        <div class="space-y-4">
-                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
-                                <label class="block text-[11px] font-bold text-slate-700 uppercase font-fredoka flex items-center gap-1">
-                                    📌 Contexte / Détail (Partagé au CoDir)
-                                </label>
-                                <textarea oninput="updatePointContexte(${idx}, this.value)" rows="3" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-1 focus:ring-slate-400 preserve-format" placeholder="Éléments d'information et contexte transmis aux membres...">${p.contexte || ''}</textarea>
+                        <!-- Grille dynamique selon les couches actives -->
+                        <div class="grid grid-cols-1 ${visibleLayers.contexte && visibleLayers.prep ? 'lg:grid-cols-2' : ''} gap-4">
+                            
+                            <!-- 1. CONTEXTE PARTAGÉ AU CODIR -->
+                            <div class="${visibleLayers.contexte ? '' : 'hidden'} bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                                <div class="flex items-center justify-between flex-wrap gap-1">
+                                    <label class="text-[11px] font-bold text-slate-700 uppercase font-fredoka flex items-center gap-1.5">
+                                        📌 Contexte / Détail (Envoyé au CoDir)
+                                    </label>
+                                    <div class="mini-toolbar flex gap-1">
+                                        <button type="button" onclick="insertTagInTextarea('ctx-${idx}', '<strong>', '</strong>', ${idx}, 'contexte')" title="Gras"><b>G</b></button>
+                                        <button type="button" onclick="insertTagInTextarea('ctx-${idx}', '<ul>\\n  <li>', '</li>\\n</ul>', ${idx}, 'contexte')" title="Liste à puces">• Liste</button>
+                                    </div>
+                                </div>
+                                <textarea id="ctx-${idx}" oninput="updatePointContexte(${idx}, this.value)" rows="4" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-slate-400 leading-relaxed" placeholder="Expliquez ici le contexte pour que les membres du CoDir puissent y réfléchir avant la réunion...">${p.contexte || ''}</textarea>
                             </div>
 
-                            <div class="bg-amber-50/70 p-3.5 rounded-xl border border-amber-200 space-y-1">
-                                <label class="block text-[11px] font-bold text-amber-800 uppercase font-fredoka flex items-center gap-1">
-                                    💡 Ma Préparation / Avis Personnel (Privé)
-                                </label>
-                                <textarea oninput="updatePointPrep(${idx}, this.value)" rows="3" class="w-full p-2.5 bg-white border border-amber-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-1 focus:ring-amber-400 preserve-format" placeholder="Notes personnelles, chiffres à rappeler, questions à poser...">${p.prep || ''}</textarea>
+                            <!-- 2. PRÉPARATION PERSONNELLE (PRIVÉ JORDAN) -->
+                            <div class="${visibleLayers.prep ? '' : 'hidden'} bg-amber-50/70 p-3.5 rounded-xl border border-amber-200 space-y-2">
+                                <div class="flex items-center justify-between flex-wrap gap-1">
+                                    <label class="text-[11px] font-bold text-amber-900 uppercase font-fredoka flex items-center gap-1.5">
+                                        💡 Ma Préparation / Arguments (Privé - Non exporté au CoDir)
+                                    </label>
+                                    <div class="mini-toolbar flex gap-1">
+                                        <button type="button" onclick="insertTagInTextarea('prep-${idx}', '⚠️ Point de vigilance : ', '', ${idx}, 'prep')">⚠️ Vigilance</button>
+                                        <button type="button" onclick="insertTagInTextarea('prep-${idx}', '💶 Chiffre clé : ', '', ${idx}, 'prep')">💶 Chiffre</button>
+                                    </div>
+                                </div>
+                                <textarea id="prep-${idx}" oninput="updatePointPrep(${idx}, this.value)" rows="4" class="w-full p-2.5 bg-white border border-amber-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-amber-400 leading-relaxed" placeholder="Vos notes personnelles, scénarios, arguments ou questions à poser en séance...">${p.prep || ''}</textarea>
                             </div>
+                        </div>
 
-                            <div class="bg-sky-50/70 p-3.5 rounded-xl border border-sky-200 space-y-1">
-                                <label class="block text-[11px] font-bold text-sky-800 uppercase font-fredoka flex items-center gap-1">
-                                    🗣️ Échanges Réunion & Décisions Prises (Notes de Séance)
+                        <!-- 3. ÉCHANGES EN SÉANCE & DÉCISIONS PRISES -->
+                        <div class="${visibleLayers.notes ? '' : 'hidden'} bg-sky-50/70 p-3.5 rounded-xl border border-sky-200 space-y-2">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <label class="text-[11px] font-bold text-sky-900 uppercase font-fredoka flex items-center gap-1.5">
+                                    🗣️ Échanges en Réunion & Décisions Prises (Pour le Compte-Rendu)
                                 </label>
-                                <textarea oninput="updatePointNotes(${idx}, this.value)" rows="3" class="w-full p-2.5 bg-white border border-sky-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:ring-1 focus:ring-sky-400 preserve-format" placeholder="Interventions des membres, décisions arrêtées, votes...">${p.notes || ''}</textarea>
+                                <div class="mini-toolbar flex flex-wrap gap-1">
+                                    <button type="button" onclick="validerCommeContexte(${idx})" class="!bg-emerald-600 !text-white !border-emerald-600 hover:!bg-emerald-700">
+                                        ✅ Valider tel que proposé dans le contexte
+                                    </button>
+                                    <button type="button" onclick="insertTagInTextarea('notes-${idx}', '<strong>Décision validée :</strong> ', '', ${idx}, 'notes')">🗳️ Décision</button>
+                                    <button type="button" onclick="insertTagInTextarea('notes-${idx}', '👉 <strong>Action à suivre :</strong> ', '', ${idx}, 'notes')">🎯 Action</button>
+                                </div>
                             </div>
+                            <textarea id="notes-${idx}" oninput="updatePointNotes(${idx}, this.value)" rows="3" class="w-full p-2.5 bg-white border border-sky-300 rounded-lg text-xs font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-400 leading-relaxed" placeholder="Ce qui s'est dit pendant la réunion, les votes, les ajustements retenus...">${p.notes || ''}</textarea>
                         </div>
                     </div>
                 `;
@@ -495,6 +1241,396 @@
             });
         }
 
+        function insertTagInTextarea(textareaId, openTag, closeTag, pointIdx, field) {
+            const ta = document.getElementById(textareaId);
+            if (!ta) return;
+            const start = ta.selectionStart;
+            const end = ta.selectionEnd;
+            const selected = ta.value.substring(start, end);
+            const replacement = openTag + selected + closeTag;
+            ta.value = ta.value.substring(0, start) + replacement + ta.value.substring(end);
+            currentReunion.points[pointIdx][field] = ta.value;
+            autoSaveCurrent();
+            ta.focus();
+        }
+
+        function validerCommeContexte(idx) {
+            const p = currentReunion.points[idx];
+            const prefix = "✅ Proposition du dossier préparatoire validée à l'unanimité par le Comité Directeur.";
+            if (!p.notes || !p.notes.includes("validée")) {
+                p.notes = p.notes ? `${prefix}\nPrécisions / Ajouts : ${p.notes}` : `${prefix}\nPrécisions / Ajouts : `;
+            }
+            p.status = 'validated';
+            autoSaveCurrent();
+            renderPoints();
+            const ta = document.getElementById(`notes-${idx}`);
+            if (ta) ta.focus();
+            showToast("✅ Point marqué comme validé selon le contexte !");
+        }
+
+        /* ========================================================================= */
+        /* MODE SÉANCE LIVE (ONGLET 2)                                               */
+        /* ========================================================================= */
+        function openPointInLiveMode(idx) {
+            livePointIndex = idx;
+            switchTab('live');
+        }
+
+        function renderLiveMode() {
+            document.getElementById('live-reu-title').innerText = currentReunion.title || 'Réunion en cours';
+            const total = currentReunion.points.length;
+            if (total === 0) return;
+            if (livePointIndex < 0) livePointIndex = 0;
+            if (livePointIndex >= total) livePointIndex = total - 1;
+
+            const p = currentReunion.points[livePointIndex];
+            document.getElementById('live-point-counter').innerText = `Point ${livePointIndex + 1} sur ${total}`;
+            document.getElementById('live-point-title').innerText = p.title;
+            document.getElementById('live-point-status').value = p.status || 'todo';
+
+            const filesBadge = document.getElementById('live-files-badge');
+            if (p.files) {
+                filesBadge.innerText = '📎 ' + p.files;
+                filesBadge.classList.remove('hidden');
+            } else {
+                filesBadge.classList.add('hidden');
+            }
+
+            document.getElementById('live-contexte-view').innerHTML = p.contexte
+                ? p.contexte
+                : '<span class="italic text-slate-400">Aucun contexte rédigé pour ce point.</span>';
+
+            document.getElementById('live-prep-input').value = p.prep || '';
+            document.getElementById('live-notes-input').value = p.notes || '';
+
+            document.getElementById('btn-live-prev').disabled = (livePointIndex === 0);
+            document.getElementById('btn-live-next').disabled = (livePointIndex === total - 1);
+
+            // Liste latérale Live
+            const sideList = document.getElementById('live-sidebar-list');
+            sideList.innerHTML = '';
+            currentReunion.points.forEach((pt, i) => {
+                let dot = '⏳';
+                if (pt.status === 'validated') dot = '✅';
+                else if (pt.status === 'discussed') dot = '💬';
+                else if (pt.status === 'postponed') dot = '⏸️';
+
+                const div = document.createElement('div');
+                div.className = `toc-item ${i === livePointIndex ? 'active-toc' : ''}`;
+                div.onclick = () => {
+                    livePointIndex = i;
+                    renderLiveMode();
+                };
+                div.innerHTML = `
+                    <span class="truncate">${dot} ${escapeHtml(pt.title)}</span>
+                `;
+                sideList.appendChild(div);
+            });
+        }
+
+        function saveLivePointFields() {
+            const p = currentReunion.points[livePointIndex];
+            if (!p) return;
+            p.prep = document.getElementById('live-prep-input').value;
+            p.notes = document.getElementById('live-notes-input').value;
+            p.status = document.getElementById('live-point-status').value;
+            if (p.notes.trim().length > 5 && p.status === 'todo') {
+                p.status = 'validated';
+                document.getElementById('live-point-status').value = 'validated';
+            }
+            autoSaveCurrent();
+            updateProgressBar();
+        }
+
+        function navigateLivePoint(dir) {
+            saveLivePointFields();
+            const next = livePointIndex + dir;
+            if (next >= 0 && next < currentReunion.points.length) {
+                livePointIndex = next;
+                renderLiveMode();
+            }
+        }
+
+        function validerCommeContexteLive() {
+            const p = currentReunion.points[livePointIndex];
+            if (!p) return;
+            const prefix = "✅ Proposition du contexte validée à l'unanimité par le CoDir.\nPrécisions éventuelles : ";
+            const notesTa = document.getElementById('live-notes-input');
+            notesTa.value = notesTa.value ? `${prefix}${notesTa.value}` : prefix;
+            document.getElementById('live-point-status').value = 'validated';
+            saveLivePointFields();
+            renderLiveMode();
+            notesTa.focus();
+            showToast("✅ Point validé !");
+        }
+
+        function appendLiveSnippet(text) {
+            const ta = document.getElementById('live-notes-input');
+            ta.value = ta.value ? ta.value + '\n' + text : text;
+            saveLivePointFields();
+            ta.focus();
+        }
+
+        // Chronomètre
+        function toggleTimer() {
+            const btn = document.getElementById('btn-timer-toggle');
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                btn.innerText = 'Reprendre';
+                btn.className = 'px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 rounded text-xs font-bold';
+            } else {
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    const hrs = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+                    const mins = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+                    const secs = String(timerSeconds % 60).padStart(2, '0');
+                    document.getElementById('live-timer-display').innerText = `${hrs}:${mins}:${secs}`;
+                }, 1000);
+                btn.innerText = 'Pause';
+                btn.className = 'px-2.5 py-1 bg-amber-600 hover:bg-amber-500 rounded text-xs font-bold';
+            }
+        }
+
+        function resetTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+            timerSeconds = 0;
+            document.getElementById('live-timer-display').innerText = '00:00:00';
+            document.getElementById('btn-timer-toggle').innerText = 'Démarrer';
+        }
+
+        /* ========================================================================= */
+        /* ONGLET 3 : APERÇU A4 EN DIRECT & GÉNÉRATEUR DE MAIL CODIR                 */
+        /* ========================================================================= */
+        function setPreviewMode(mode) {
+            currentPreviewMode = mode;
+            ['codir', 'cr', 'complet', 'mail'].forEach(m => {
+                const btn = document.getElementById('btn-prev-' + m);
+                if (btn) {
+                    btn.className = (m === mode)
+                        ? 'px-3.5 py-2 rounded-xl text-xs font-bold bg-[#C41E3A] text-white transition shadow-sm'
+                        : 'px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+                }
+            });
+
+            document.getElementById('mail-generator-container').classList.toggle('hidden', mode !== 'mail');
+            document.getElementById('a4-preview-wrapper').classList.toggle('hidden', mode === 'mail');
+            document.getElementById('btn-print-apercu').classList.toggle('hidden', mode === 'mail');
+
+            if (mode === 'mail') {
+                renderMailPreview();
+            } else {
+                renderLiveA4Preview(mode);
+            }
+        }
+
+        function renderPreviewPane() {
+            setPreviewMode(currentPreviewMode);
+        }
+
+        function ouvrirApercuMail(type) {
+            document.getElementById('mail-type-select').value = type;
+            currentPreviewMode = 'mail';
+            switchTab('apercu');
+        }
+
+        function buildPrintableDocumentHtml(mode) {
+            let labelType = "Dossier de Préparation CoDir";
+            if (mode === 'cr') labelType = "Compte-Rendu Officiel de Réunion";
+            if (mode === 'complet') labelType = "Dossier Intégral de Réunion (Confidentiel)";
+
+            let rowsHtml = `
+                <tr>
+                    <td style="padding-top:12px; padding-bottom:12px;">
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px; text-align:left;">
+                            <h2 style="font-family:'Fredoka', sans-serif; color:#C41E3A; font-size:13pt; margin:0 0 4px 0;">${escapeHtml(currentReunion.title)}</h2>
+                            <div style="font-size:8.5pt; color:#475569; line-height:1.5;">
+                                <div><strong>📍 Lieu :</strong> ${escapeHtml(currentReunion.lieu || 'Dojo Dornois')}</div>
+                                <div><strong>👥 Participants / Présents :</strong> ${escapeHtml(currentReunion.participants || 'Non renseigné')}</div>
+                                <div><strong>🎗️ Excusés / Absents :</strong> ${escapeHtml(currentReunion.excuses || 'Aucun')}</div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            currentReunion.points.forEach(p => {
+                let pointContent = `
+                    <div class="print-point-card" style="border:1px solid #cbd5e1; border-left:4px solid #C41E3A; border-radius:8px; padding:11px 14px; background:#ffffff; text-align:justify;">
+                        <h3 style="font-family:'Fredoka', sans-serif; color:#C41E3A; font-size:11pt; margin:0 0 6px 0; border-bottom:1px solid #f1f5f9; padding-bottom:4px; text-align:left;">
+                            ${escapeHtml(p.title)}
+                        </h3>
+                `;
+
+                if (p.files) {
+                    pointContent += `<div style="font-size:8pt; color:#3730a3; background:#e0e7ff; padding:4px 8px; border-radius:4px; margin-bottom:6px; font-weight:bold; text-align:left;">📎 Pièces jointes : ${escapeHtml(p.files)}</div>`;
+                }
+
+                if (p.contexte) {
+                    pointContent += `<div class="preserve-format" style="font-size:8.8pt; color:#334155; background:#f8fafc; padding:7px 10px; border-radius:5px; margin-bottom:6px; border:1px solid #e2e8f0;"><strong>📌 Contexte :</strong>\n${p.contexte}</div>`;
+                }
+
+                if (mode === 'complet' && p.prep) {
+                    pointContent += `<div class="preserve-format" style="font-size:8.8pt; color:#92400e; background:#fef3c7; padding:7px 10px; border-radius:5px; margin-bottom:6px;"><strong>💡 Ma Préparation / Avis :</strong>\n${p.prep}</div>`;
+                }
+
+                if ((mode === 'cr' || mode === 'complet') && p.notes) {
+                    pointContent += `<div class="preserve-format" style="font-size:8.8pt; color:#0369a1; background:#f0f9ff; border-left:3px solid #0284c7; padding:7px 10px; border-radius:5px;"><strong>🗣️ Échanges & Décisions :</strong>\n${p.notes}</div>`;
+                }
+
+                pointContent += `</div>`;
+
+                rowsHtml += `
+                    <tr>
+                        <td style="padding-bottom:11px;">
+                            ${pointContent}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            return `
+                <table class="print-table" style="width:100%; border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <td style="padding-bottom:10px; border-bottom:2px solid #C41E3A;">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                    <div style="display:flex; gap:12px; align-items:center;">
+                                        <div style="background:#C41E3A; width:52px; height:50px; border-radius:9px; padding:4px; display:flex; align-items:center; justify-content:center;">
+                                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width:100%; height:100%; object-fit:contain;">
+                                        </div>
+                                        <div style="text-align:left;">
+                                            <h1 style="margin:0; font-size:14pt; color:#C41E3A; font-family:'Fredoka', sans-serif; font-weight:bold;">DOJO DORNOIS</h1>
+                                            <div style="font-size:7.5pt; color:#64748b; line-height:1.25;">
+                                                1 Place de la Mairie - 58390 DORNES • contact@dojodornois.fr<br>
+                                                FFJDA n° CE 08.58.067.0 • SIRET n° 451 928 410 00013 • RNA W583001220
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <strong style="font-size:9pt; text-transform:uppercase; font-family:'Fredoka', sans-serif; display:block; color:#1e293b;">${labelType}</strong>
+                                        <div style="color:#C41E3A; font-size:10.5pt; font-family:'Fredoka', sans-serif; font-weight:bold;">${escapeHtml(currentReunion.date)}</div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td style="border-top:1px solid #e2e8f0; padding-top:8px; font-size:7.5pt; color:#64748b; text-align:left;">
+                                <span style="font-style:italic;">Document édité depuis l'Intranet Officiel du Dojo Dornois le ${new Date().toLocaleDateString('fr-FR')}.</span>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+        }
+
+        function renderLiveA4Preview(mode) {
+            document.getElementById('a4-live-sheet').innerHTML = buildPrintableDocumentHtml(mode);
+        }
+
+        function imprimerDepuisApercu() {
+            imprimerReunion(currentPreviewMode);
+        }
+
+        function imprimerReunion(mode) {
+            autoSaveCurrent();
+            const printZone = document.getElementById('printable-reunion-area');
+            printZone.innerHTML = buildPrintableDocumentHtml(mode);
+            window.print();
+        }
+
+        /* ========================================================================= */
+        /* GÉNÉRATEUR DE MAIL CONVOCATION / COMPTE-RENDU CODIR                       */
+        /* ========================================================================= */
+        function buildCoDirMailHtml() {
+            const type = document.getElementById('mail-type-select').value;
+            const customNote = document.getElementById('mail-custom-note').value.trim();
+
+            const listItems = currentReunion.points.map(p => `<li style="margin-bottom:4px;"><strong>${escapeHtml(p.title)}</strong></li>`).join('');
+
+            let headerTitle = type === 'convocation' ? 'CONVOCATION & DOSSIER CODIR' : 'COMPTE-RENDU DU CODIR';
+            let introHtml = '';
+
+            if (type === 'convocation') {
+                introHtml = `
+                    <p style="margin:0 0 12px 0; text-align:justify;">Bonjour à toutes et à tous,</p>
+                    <p style="margin:0 0 12px 0; text-align:justify;">Nous tiendrons notre prochaine réunion (<strong>${escapeHtml(currentReunion.title)}</strong>) selon les modalités suivantes :</p>
+                    <div style="background:#FFEBEF; border-left:4px solid #C41E3A; padding:12px 15px; border-radius:6px; margin:14px 0; font-size:14px;">
+                        📅 <strong>Date & Heure :</strong> ${escapeHtml(currentReunion.date)}<br>
+                        📍 <strong>Lieu :</strong> ${escapeHtml(currentReunion.lieu)}
+                    </div>
+                    <p style="margin:0 0 12px 0; text-align:justify;">Afin de préparer au mieux nos échanges, vous trouverez en pièce jointe le <strong>Dossier de Préparation de la Réunion</strong> accompagné des documents de travail associés.</p>
+                    <p style="margin:0 0 12px 0; text-align:justify;"><strong>Pourquoi ce format ?</strong> Plutôt qu'un simple ordre du jour brut, ce document vous donne un peu de contexte sur chaque sujet. L'objectif est que chacun puisse prendre connaissance des éléments en amont, y réfléchir de son côté et commencer à se forger un avis. Une réunion est un espace de discussion collective : aucun sujet n'est arrêté à l'avance et toutes les décisions se prendront ensemble.</p>
+                `;
+            } else {
+                introHtml = `
+                    <p style="margin:0 0 12px 0; text-align:justify;">Bonjour à toutes et à tous,</p>
+                    <p style="margin:0 0 12px 0; text-align:justify;">Un grand merci pour votre présence, votre enthousiasme et la qualité de nos échanges lors de notre réunion (<strong>${escapeHtml(currentReunion.title)}</strong> du ${escapeHtml(currentReunion.date)}).</p>
+                    <p style="margin:0 0 12px 0; text-align:justify;">Vous trouverez en pièce jointe le <strong>Compte-Rendu officiel</strong> reprenant l'ensemble des points abordés et les décisions que nous avons validées ensemble.</p>
+                `;
+            }
+
+            const customBlock = customNote ? `
+                <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-left:4px solid #1A1A1A; padding:12px 15px; border-radius:6px; margin:14px 0; font-size:13.5px; white-space:pre-wrap; text-align:justify;">${escapeHtml(customNote)}</div>
+            ` : '';
+
+            return `<div style="max-width:650px; margin:0 auto; background:#ffffff; border-radius:10px; overflow:hidden; border:1px solid #e2e8f0; font-family:'Roboto', Arial, sans-serif; color:#333333;">
+    <div style="background:linear-gradient(135deg, #C41E3A 0%, #8B1429 100%); padding:22px 26px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <h1 style="color:#ffffff; font-size:20px; font-weight:700; margin:0; text-transform:uppercase; letter-spacing:0.5px;">${headerTitle}</h1>
+            <div style="color:#FFEBEF; font-size:12px; margin-top:4px;">Dojo Dornois • Comité Directeur</div>
+        </div>
+        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo Dojo Dornois" style="width:54px; height:54px; object-fit:contain;">
+    </div>
+    <div style="padding:24px 26px; font-size:14px; line-height:1.6;">
+        ${introHtml}
+        ${customBlock}
+        <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:14px 18px; margin:16px 0;">
+            <strong style="color:#C41E3A; display:block; margin-bottom:8px; text-transform:uppercase; font-size:12px;">🎯 Points à l'ordre du jour :</strong>
+            <ul style="margin:0; padding-left:18px; font-size:13px; color:#334155;">
+                ${listItems}
+            </ul>
+        </div>
+        <p style="margin:14px 0 0 0; text-align:justify;">${type === 'convocation' ? 'Si vous souhaitez ajouter un point spécifique à l\'ordre du jour, n\'hésitez pas à me répondre directement par mail. Merci de me confirmer votre présence !' : 'N\'hésitez pas à revenir vers moi si vous avez la moindre question.'}</p>
+    </div>
+    <div style="border-top:2px solid #f1f5f9; padding:16px 26px; background:#fafafa; font-size:12.5px; color:#475569;">
+        <strong style="color:#C41E3A; font-size:14px;">Jordan LOUDENOT</strong> — Président du Dojo Dornois<br>
+        📞 06 07 13 91 86 • ✉️ contact@dojodornois.fr • 🌐 dojodornois.fr
+    </div>
+</div>`;
+        }
+
+        function renderMailPreview() {
+            document.getElementById('mail-live-render').innerHTML = buildCoDirMailHtml();
+        }
+
+        function copierMailRichePourGmail() {
+            const el = document.getElementById('mail-live-render');
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            document.execCommand('copy');
+            sel.removeAllRanges();
+            showToast("✉️ Mail visuel copié ! Faites Ctrl+V directement dans Gmail.");
+        }
+
+        function copierMailHtmlCode() {
+            navigator.clipboard.writeText(buildCoDirMailHtml()).then(() => {
+                showToast("💻 Code HTML du mail copié !");
+            });
+        }
+
+        /* ========================================================================= */
+        /* OPÉRATIONS CRUD SUR LES POINTS & SAUVEGARDE                               */
+        /* ========================================================================= */
         function movePoint(idx, direction) {
             const targetIdx = idx + direction;
             if (targetIdx < 0 || targetIdx >= currentReunion.points.length) return;
@@ -512,33 +1648,75 @@
             renderPoints();
         }
 
+        function toggleAllCollapse(collapseState) {
+            currentReunion.points.forEach(p => p.collapsed = collapseState);
+            renderPoints();
+        }
+
         function addPoint() {
             const count = currentReunion.points.length + 1;
             currentReunion.points.push({
                 id: Date.now(),
-                title: `${count}. Nouveau point à l'ordre du jour`,
+                title: `📌 ${count}. Nouveau point à l'ordre du jour`,
                 contexte: "",
                 prep: "",
                 notes: "",
                 files: "",
+                status: "todo",
                 collapsed: false
             });
             autoSaveCurrent();
             renderPoints();
+            setTimeout(() => {
+                const lastIdx = currentReunion.points.length - 1;
+                const el = document.getElementById(`point-card-${lastIdx}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 60);
+        }
+
+        function duplicatePoint(idx) {
+            const copy = JSON.parse(JSON.stringify(currentReunion.points[idx]));
+            copy.id = Date.now();
+            copy.title = copy.title + " (Copie)";
+            currentReunion.points.splice(idx + 1, 0, copy);
+            autoSaveCurrent();
+            renderPoints();
+            showToast("📑 Point dupliqué !");
         }
 
         function deletePoint(idx) {
             if (currentReunion.points.length > 1) {
-                currentReunion.points.splice(idx, 1);
-                autoSaveCurrent();
-                renderPoints();
+                if (confirm("Supprimer ce point de l'ordre du jour ?")) {
+                    currentReunion.points.splice(idx, 1);
+                    autoSaveCurrent();
+                    renderPoints();
+                }
+            } else {
+                showToast("La réunion doit conserver au moins un point.", "error");
             }
         }
 
-        function updatePointTitle(idx, val) { currentReunion.points[idx].title = val; autoSaveCurrent(); }
+        function updatePointTitle(idx, val) {
+            currentReunion.points[idx].title = val;
+            autoSaveCurrent();
+            renderToc();
+        }
+        function updatePointStatus(idx, val) {
+            currentReunion.points[idx].status = val;
+            autoSaveCurrent();
+            renderPoints();
+        }
         function updatePointContexte(idx, val) { currentReunion.points[idx].contexte = val; autoSaveCurrent(); }
         function updatePointPrep(idx, val) { currentReunion.points[idx].prep = val; autoSaveCurrent(); }
-        function updatePointNotes(idx, val) { currentReunion.points[idx].notes = val; autoSaveCurrent(); }
+        function updatePointNotes(idx, val) {
+            currentReunion.points[idx].notes = val;
+            if (val.trim().length > 5 && currentReunion.points[idx].status === 'todo') {
+                currentReunion.points[idx].status = 'validated';
+                renderToc();
+                updateProgressBar();
+            }
+            autoSaveCurrent();
+        }
         function updatePointFiles(idx, val) { currentReunion.points[idx].files = val; autoSaveCurrent(); }
 
         function autoSaveCurrent() {
@@ -550,43 +1728,65 @@
 
             const idx = reunionsDB.findIndex(r => r.id === currentReunion.id);
             if (idx !== -1) {
-                reunionsDB[idx] = { ...currentReunion };
+                reunionsDB[idx] = JSON.parse(JSON.stringify(currentReunion));
             } else {
-                reunionsDB.unshift({ ...currentReunion });
+                reunionsDB.unshift(JSON.parse(JSON.stringify(currentReunion)));
             }
 
             localStorage.setItem('dojo_current_reunion_v5', JSON.stringify(currentReunion));
             localStorage.setItem('dojo_reunions_db_v5', JSON.stringify(reunionsDB));
+            populateQuickReunionSelect();
+        }
+
+        function populateQuickReunionSelect() {
+            const sel = document.getElementById('quick-reunion-select');
+            if (!sel) return;
+            sel.innerHTML = '';
+            reunionsDB.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.id;
+                opt.textContent = `${r.title} (${r.date || 'Sans date'})`;
+                if (r.id === currentReunion.id) opt.selected = true;
+                sel.appendChild(opt);
+            });
         }
 
         function nouvelleReunion() {
             autoSaveCurrent();
             currentReunion = {
                 id: 'reu_' + Date.now(),
-                title: "Nouvelle Réunion",
-                date: new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
-                lieu: "Dojo Dornois",
-                participants: "",
+                title: "Nouvelle Réunion du Comité Directeur",
+                date: new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + " - 18h30",
+                lieu: "Dojo Henri Pierrehumbert",
+                participants: "Jordan Loudenot, Romain Flammang, Laetitia Bernard, Fanny Thévenin, Hélène Chaussin, Régis D'Argent",
                 excuses: "",
-                points: [{ id: Date.now(), title: "1. Ordre du jour", contexte: "", prep: "", notes: "", files: "", collapsed: false }]
+                points: [
+                    { id: Date.now(), title: "📌 1. Point d'étape général", contexte: "", prep: "", notes: "", files: "", status: "todo", collapsed: false }
+                ]
             };
             loadCurrentToForm();
-            showToast("Nouvelle réunion créée !");
+            switchTab('editeur');
+            showToast("✨ Nouvelle réunion initialisée !");
         }
 
         function loadCurrentToForm() {
-            document.getElementById('reu-title').value = currentReunion.title;
-            document.getElementById('reu-date').value = currentReunion.date;
-            document.getElementById('reu-lieu').value = currentReunion.lieu;
-            document.getElementById('reu-participants').value = currentReunion.participants;
+            document.getElementById('reu-title').value = currentReunion.title || '';
+            document.getElementById('reu-date').value = currentReunion.date || '';
+            document.getElementById('reu-lieu').value = currentReunion.lieu || '';
+            document.getElementById('reu-participants').value = currentReunion.participants || '';
             document.getElementById('reu-excuses').value = currentReunion.excuses || '';
+            renderCoDirChips();
             renderPoints();
         }
 
+        /* ========================================================================= */
+        /* EXPORTS KALISPORT & PROMPT GEMINI                                         */
+        /* ========================================================================= */
         function copierPourGemini() {
             autoSaveCurrent();
             
-            let texteHtmlGemini = `COMPTE-RENDU DE RÉUNION - DOJO DORNOIS\n`;
+            let texteHtmlGemini = `Voici les données complètes de notre réunion du Dojo Dornois. Peux-tu m'en faire la synthèse et rédiger le Compte-Rendu officiel structuré en blocs (format charte Dojo Dornois) en mettant bien en valeur les décisions validées ?\n\n`;
+            texteHtmlGemini += `COMPTE-RENDU DE RÉUNION - DOJO DORNOIS\n`;
             texteHtmlGemini += `Titre : ${currentReunion.title}\n`;
             texteHtmlGemini += `Date : ${currentReunion.date}\n`;
             texteHtmlGemini += `Lieu : ${currentReunion.lieu}\n`;
@@ -596,14 +1796,14 @@
             currentReunion.points.forEach((p) => {
                 texteHtmlGemini += `<h2>${p.title}</h2>\n`;
                 if (p.files) texteHtmlGemini += `<p><strong>Fichiers joints :</strong> ${p.files}</p>\n`;
-                if (p.contexte) texteHtmlGemini += `<p><strong>Contexte initial :</strong> ${p.contexte}</p>\n`;
+                if (p.contexte) texteHtmlGemini += `<p><strong>Contexte initial présenté au CoDir :</strong> ${p.contexte}</p>\n`;
                 if (p.prep) texteHtmlGemini += `<p><strong>Préparation initiale (Jordan) :</strong> ${p.prep}</p>\n`;
-                if (p.notes) texteHtmlGemini += `<p><strong>Échanges & Décisions prises :</strong> ${p.notes}</p>\n`;
+                if (p.notes) texteHtmlGemini += `<p><strong>Échanges en séance & Décisions prises :</strong> ${p.notes}</p>\n`;
                 texteHtmlGemini += `\n`;
             });
 
             navigator.clipboard.writeText(texteHtmlGemini).then(() => {
-                showToast("📋 Contenu copié ! Prêt à coller dans notre chat pour générer le Compte-Rendu officiel.");
+                showToast("🤖 Prompt complet copié ! Collez-le dans Gemini pour générer le Compte-Rendu.");
             });
         }
 
@@ -638,25 +1838,15 @@
             currentReunion.points.forEach(p => {
                 codeHtml += `        <div class="ks-point-card">\n`;
                 codeHtml += `            <h3 class="ks-point-title">${escapeHtml(p.title)}</h3>\n`;
-
-                if (p.files) {
-                    codeHtml += `            <div class="ks-point-files">📎 Fichiers joints : ${escapeHtml(p.files)}</div>\n`;
-                }
-
-                if (p.contexte) {
-                    codeHtml += `            <div class="ks-block-contexte"><span class="ks-label">📌 Contexte :</span>${p.contexte}</div>\n`;
-                }
-
+                if (p.files) codeHtml += `            <div class="ks-point-files">📎 Fichiers joints : ${escapeHtml(p.files)}</div>\n`;
+                if (p.contexte) codeHtml += `            <div class="ks-block-contexte"><span class="ks-label">📌 Contexte :</span>${p.contexte}</div>\n`;
                 codeHtml += `        </div>\n`;
             });
 
-            codeHtml += `    </div>
-</div>`;
+            codeHtml += `    </div>\n</div>`;
 
             navigator.clipboard.writeText(codeHtml).then(() => {
-                showToast("🌐 Code HTML Kalisport (Ordre du jour) copié !");
-            }).catch(() => {
-                showToast("Erreur lors de la copie du code HTML", "error");
+                showToast("🌐 Code HTML Kalisport (Ordre du jour + Contexte) copié !");
             });
         }
 
@@ -692,90 +1882,22 @@
             currentReunion.points.forEach(p => {
                 codeHtml += `        <div class="ks-point-card">\n`;
                 codeHtml += `            <h3 class="ks-point-title">${escapeHtml(p.title)}</h3>\n`;
-
-                if (p.files) {
-                    codeHtml += `            <div class="ks-point-files">📎 Fichiers joints : ${escapeHtml(p.files)}</div>\n`;
-                }
-
-                if (p.contexte) {
-                    codeHtml += `            <div class="ks-block-contexte"><span class="ks-label">📌 Contexte :</span>${p.contexte}</div>\n`;
-                }
-
-                if (p.notes) {
-                    codeHtml += `            <div class="ks-block-notes"><span class="ks-label">🗣️ Échanges & Décisions :</span>${p.notes}</div>\n`;
-                }
-
+                if (p.files) codeHtml += `            <div class="ks-point-files">📎 Fichiers joints : ${escapeHtml(p.files)}</div>\n`;
+                if (p.contexte) codeHtml += `            <div class="ks-block-contexte"><span class="ks-label">📌 Contexte :</span>${p.contexte}</div>\n`;
+                if (p.notes) codeHtml += `            <div class="ks-block-notes"><span class="ks-label">🗣️ Échanges & Décisions :</span>${p.notes}</div>\n`;
                 codeHtml += `        </div>\n`;
             });
 
-            codeHtml += `    </div>
-</div>`;
+            codeHtml += `    </div>\n</div>`;
 
             navigator.clipboard.writeText(codeHtml).then(() => {
                 showToast("📄 Code HTML Kalisport (Compte-Rendu) copié !");
-            }).catch(() => {
-                showToast("Erreur lors de la copie du code HTML", "error");
             });
         }
 
-        function escapeHtml(text) {
-            return (text || '')
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        function imprimerReunion(mode) {
-            autoSaveCurrent();
-
-            document.getElementById('p-title').textContent = currentReunion.title;
-            document.getElementById('p-date').textContent = currentReunion.date;
-            document.getElementById('p-lieu').textContent = currentReunion.lieu;
-            document.getElementById('p-participants').textContent = currentReunion.participants || "Non renseigné";
-            document.getElementById('p-excuses').textContent = currentReunion.excuses || "Aucun";
-            document.getElementById('p-export-date').textContent = new Date().toLocaleDateString('fr-FR');
-
-            if (mode === 'codir') {
-                document.getElementById('p-label-type').textContent = "Dossier de Préparation CoDir";
-            } else {
-                document.getElementById('p-label-type').textContent = "Dossier Intégral de Réunion";
-            }
-
-            const body = document.getElementById('p-points-body');
-            body.innerHTML = '';
-
-            currentReunion.points.forEach(p => {
-                let htmlBlock = `
-                    <div class="print-point-card" style="margin-bottom:12px; border:1px solid #cbd5e1; border-radius:8px; padding:10px; background:#ffffff; text-align:justify;">
-                        <h3 style="font-family:'Fredoka', sans-serif; color:#C41E3A; font-size:11pt; margin:0 0 6px 0; border-bottom:1px solid #e2e8f0; padding-bottom:3px; text-align:left;">${escapeHtml(p.title)}</h3>
-                `;
-
-                if (p.files) {
-                    htmlBlock += `<div style="font-size:8pt; color:#3730a3; background:#e0e7ff; padding:4px 8px; border-radius:4px; margin-bottom:6px; font-weight:bold; text-align:left;">📎 Pièces jointes : ${escapeHtml(p.files)}</div>`;
-                }
-
-                if (p.contexte) {
-                    htmlBlock += `<div class="preserve-format" style="font-size:8.5pt; color:#334155; background:#f8fafc; padding:6px; border-radius:4px; margin-bottom:6px; border:1px solid #e2e8f0;"><strong>📌 Contexte :</strong>\n${p.contexte}</div>`;
-                }
-
-                if (mode === 'complet') {
-                    if (p.prep) {
-                        htmlBlock += `<div class="preserve-format" style="font-size:8.5pt; color:#92400e; background:#fef3c7; padding:6px; border-radius:4px; margin-bottom:6px;"><strong>💡 Ma Préparation / Avis :</strong>\n${p.prep}</div>`;
-                    }
-                    if (p.notes) {
-                        htmlBlock += `<div class="preserve-format" style="font-size:8.5pt; color:#0369a1; background:#f0f9ff; padding:6px; border-radius:4px;"><strong>🗣️ Décisions & Échanges :</strong>\n${p.notes}</div>`;
-                    }
-                }
-
-                htmlBlock += `</div>`;
-                body.innerHTML += htmlBlock;
-            });
-
-            window.print();
-        }
-
+        /* ========================================================================= */
+        /* ONGLET 4 : HISTORIQUE, DUPLICATION & SAUVEGARDE                           */
+        /* ========================================================================= */
         function renderHistorique() {
             const container = document.getElementById('reunions-list-container');
             container.innerHTML = '';
@@ -786,21 +1908,44 @@
             }
 
             reunionsDB.forEach((r, idx) => {
+                const isCurrent = (r.id === currentReunion.id);
+                const nbValidated = (r.points || []).filter(p => p.status === 'validated' || (p.notes && p.notes.trim().length > 5)).length;
+
                 container.innerHTML += `
-                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-fredoka font-bold text-slate-800 text-sm">${r.title}</h4>
-                                <span class="text-[10px] text-slate-500 font-bold">${r.date} • ${r.lieu}</span>
+                    <div class="p-5 bg-white border-2 ${isCurrent ? 'border-[#C41E3A] bg-rose-50/20' : 'border-slate-200'} rounded-2xl shadow-sm flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start gap-2">
+                                <h4 class="font-fredoka font-bold text-slate-800 text-base">${escapeHtml(r.title)}</h4>
+                                ${isCurrent ? '<span class="px-2 py-0.5 bg-[#C41E3A] text-white text-[10px] font-bold rounded-full shrink-0">Active</span>' : ''}
                             </div>
-                            <button onclick="chargerReunionArchive('${r.id}')" class="px-2.5 py-1 bg-[#C41E3A] hover:bg-[#A3182E] text-white font-bold text-[10px] rounded">Ouvrir</button>
+                            <div class="text-xs text-slate-500 font-semibold flex items-center gap-2">
+                                <span>📅 ${escapeHtml(r.date || 'Date non définie')}</span>
+                                <span>•</span>
+                                <span>📍 ${escapeHtml(r.lieu || 'Dojo')}</span>
+                            </div>
+                            <div class="flex items-center gap-2 pt-1">
+                                <span class="px-2.5 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-700">
+                                    🎯 ${(r.points || []).length} points
+                                </span>
+                                <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold">
+                                    ✅ ${nbValidated} actés
+                                </span>
+                            </div>
+                            <div class="text-[11px] text-slate-500 line-clamp-2 pt-1">
+                                <strong>Présents :</strong> ${escapeHtml(r.participants || 'Non renseigné')}
+                            </div>
                         </div>
-                        <div class="text-xs text-slate-600">
-                            <strong>Points à l'ordre du jour :</strong> ${r.points.length} points
-                        </div>
-                        <div class="pt-2 border-t border-slate-200 flex justify-between items-center text-xs">
-                            <span class="text-[10px] text-slate-400">Présents : ${r.participants || 'NC'}</span>
-                            <button onclick="deleteReunionArchive(${idx})" class="text-rose-600 hover:text-rose-800 font-bold text-xs"><i class="fa-solid fa-trash"></i></button>
+
+                        <div class="pt-3 border-t border-slate-100 flex justify-between items-center gap-2">
+                            <button onclick="chargerReunionArchive('${r.id}')" class="flex-1 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white font-bold text-xs rounded-xl transition">
+                                <i class="fa-solid fa-folder-open"></i> Ouvrir
+                            </button>
+                            <button onclick="dupliquerReunionArchive(${idx})" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition" title="Dupliquer cette réunion">
+                                <i class="fa-solid fa-clone"></i>
+                            </button>
+                            <button onclick="deleteReunionArchive(${idx})" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl transition" title="Supprimer">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -812,36 +1957,109 @@
             if (found) {
                 currentReunion = JSON.parse(JSON.stringify(found));
                 loadCurrentToForm();
-                switchTab('editeur');
-                showToast("Réunion chargée dans l'éditeur !");
+                if (activeTab === 'historique') switchTab('editeur');
+                else if (activeTab === 'live') renderLiveMode();
+                else if (activeTab === 'apercu') renderPreviewPane();
+                showToast("📂 Réunion chargée : " + currentReunion.title);
             }
         }
 
+        function dupliquerReunionArchive(idx) {
+            const orig = reunionsDB[idx];
+            const copy = JSON.parse(JSON.stringify(orig));
+            copy.id = 'reu_' + Date.now();
+            copy.title = orig.title + " (Copie)";
+            reunionsDB.unshift(copy);
+            currentReunion = copy;
+            loadCurrentToForm();
+            renderHistorique();
+            showToast("📑 Réunion dupliquée !");
+        }
+
         async function deleteReunionArchive(idx) {
-            if (confirm("Supprimer cette réunion de l'historique ?")) {
+            if (reunionsDB.length <= 1) {
+                showToast("Impossible de supprimer la dernière réunion.", "error");
+                return;
+            }
+            if (confirm("Supprimer définitivement cette réunion de l'historique ?")) {
+                const deletedId = reunionsDB[idx].id;
                 reunionsDB.splice(idx, 1);
+                if (currentReunion.id === deletedId) {
+                    currentReunion = JSON.parse(JSON.stringify(reunionsDB[0]));
+                    loadCurrentToForm();
+                }
                 localStorage.setItem('dojo_reunions_db_v5', JSON.stringify(reunionsDB));
                 renderHistorique();
+                updateProgressBar();
                 await saveReunionsToSupabase(true);
             }
         }
 
+        function exporterJsonReunions() {
+            autoSaveCurrent();
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reunionsDB, null, 2));
+            const a = document.createElement('a');
+            a.href = dataStr;
+            a.download = `reunions_dojo_dornois_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            showToast("💾 Sauvegarde JSON téléchargée !");
+        }
+
+        function importerJsonReunions(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        reunionsDB = parsed;
+                        currentReunion = JSON.parse(JSON.stringify(reunionsDB[0]));
+                        loadCurrentToForm();
+                        renderHistorique();
+                        await saveReunionsToSupabase(false);
+                        showToast("✅ Historique des réunions importé !");
+                    }
+                } catch(err) {
+                    showToast("Fichier JSON invalide", "error");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /* ========================================================================= */
+        /* SYNCHRONISATION SUPABASE & UTILITAIRES                                    */
+        /* ========================================================================= */
         async function saveReunionsToSupabase(silent = false) {
-            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            const badge = document.getElementById('sync-badge');
+            if (badge) {
+                badge.innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> Sync...';
+                badge.className = 'text-[11px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-semibold';
+            }
+            if (!silent) showToast("☁️ Synchronisation Supabase en cours...");
             autoSaveCurrent();
             
             try {
                 const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: reunionsDB });
                 if (error) throw error;
-                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
+                if (badge) {
+                    badge.innerHTML = '<i class="fa-solid fa-cloud-check"></i> Synchronisé';
+                    badge.className = 'text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-semibold';
+                }
+                if (!silent) showToast("✓ Réunions synchronisées sur Supabase !", "success");
             } catch (e) {
                 console.error("Erreur Supabase:", e);
-                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+                if (badge) {
+                    badge.innerHTML = '<i class="fa-solid fa-hard-drive"></i> Sauvegarde locale';
+                    badge.className = 'text-[11px] bg-slate-100 text-slate-600 border border-slate-300 px-2 py-0.5 rounded-full font-semibold';
+                }
+                if (!silent) showToast("⚠️ Sauvegardé en local (erreur Supabase)", "error");
             }
         }
 
         async function loadData() {
-            // 1. Chargement du cache local en premier
             const savedDb = localStorage.getItem('dojo_reunions_db_v5');
             if (savedDb) {
                 try { 
@@ -857,13 +2075,12 @@
             
             loadCurrentToForm();
 
-            // 2. Synchronisation en direct depuis Supabase
             try {
                 const { data, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
                 if (error) throw error;
                 if (data && Array.isArray(data.data) && data.data.length > 0) {
                     reunionsDB = data.data;
-                    currentReunion = reunionsDB[0];
+                    currentReunion = JSON.parse(JSON.stringify(reunionsDB[0]));
                     localStorage.setItem('dojo_reunions_db_v5', JSON.stringify(reunionsDB));
                     localStorage.setItem('dojo_current_reunion_v5', JSON.stringify(currentReunion));
                     loadCurrentToForm();
@@ -873,13 +2090,22 @@
             }
         }
 
+        function escapeHtml(text) {
+            return String(text || '')
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         function showToast(msg, type = "success") {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.innerText = msg;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3500);
+            setTimeout(() => toast.remove(), 3200);
         }
 
         window.onload = loadData;
