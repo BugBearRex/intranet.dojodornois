@@ -54,7 +54,7 @@
 
         .page-container {
             width: 100%;
-            max-width: 1060px;
+            max-width: 1120px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -94,15 +94,19 @@
 
         /* ONGLETS */
         .tabs-nav {
-            display: flex; gap: 10px; background: rgba(0,0,0,0.04); padding: 6px; border-radius: 12px; width: 100%; flex-wrap: wrap;
+            display: flex; gap: 8px; background: rgba(0,0,0,0.04); padding: 6px; border-radius: 12px; width: 100%; flex-wrap: wrap;
         }
         .tab-btn {
-            flex: 1; border: none; background: transparent; padding: 12px 14px; font-family: 'Fredoka', sans-serif;
-            font-size: 0.95rem; border-radius: 8px; cursor: pointer; color: var(--gris-moyen);
-            transition: all 0.25s ease; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 200px;
+            flex: 1; border: none; background: transparent; padding: 11px 12px; font-family: 'Fredoka', sans-serif;
+            font-size: 0.92rem; border-radius: 8px; cursor: pointer; color: var(--gris-moyen);
+            transition: all 0.25s ease; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 170px;
         }
         .tab-btn:hover { color: var(--rouge); background: rgba(255, 255, 255, 0.6); }
         .tab-btn.active { background: var(--blanc); color: var(--rouge); box-shadow: 0 4px 12px rgba(196, 30, 58, 0.12); }
+        .tab-btn-count {
+            background: rgba(196, 30, 58, 0.12); color: var(--rouge); font-size: 0.78rem;
+            padding: 2px 7px; border-radius: 10px; font-weight: 700;
+        }
 
         /* CONTENU ONGLETS */
         .tab-content {
@@ -118,6 +122,7 @@
         }
         .view-title-wrap h2 { font-family: 'Fredoka', sans-serif; font-size: 1.35rem; color: var(--rouge); }
         .view-title-wrap p { font-size: 0.85rem; color: var(--gris-moyen); margin-top: 3px; }
+        .view-header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
         /* BADGES */
         .badges-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
@@ -139,43 +144,116 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
         }
         .tatami-plan-container svg { width: 100%; height: auto; display: block; }
-        .legend-notice { margin-top: 14px; font-size: 0.82rem; color: var(--gris-moyen); text-align: center; line-height: 1.5; }
 
-        /* ACTIONS */
-        .footer-action {
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 10px; padding: 0 4px;
+        /* BOUTONS */
+        .print-btn, .action-btn {
+            background: var(--rouge); color: #FFF; border: none; padding: 9px 18px; font-family: 'Fredoka', sans-serif;
+            font-size: 0.88rem; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(196, 30, 58, 0.2);
+            transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;
         }
-        .print-btn {
-            background: var(--rouge); color: #FFF; border: none; padding: 9px 20px; font-family: 'Fredoka', sans-serif;
-            font-size: 0.9rem; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(196, 30, 58, 0.2); transition: all 0.2s ease;
+        .print-btn:hover, .action-btn:hover { background: var(--rouge-fonce); transform: translateY(-1px); }
+        .action-btn.secondary {
+            background: #FFF; color: var(--gris-fonce); border: 1px solid rgba(0,0,0,0.14);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
-        .print-btn:hover { background: var(--rouge-fonce); transform: translateY(-1px); }
+        .action-btn.secondary:hover { border-color: var(--rouge); color: var(--rouge); background: #FFF; }
+        .action-btn.dark {
+            background: #2D3748; box-shadow: 0 4px 10px rgba(45, 55, 72, 0.2);
+        }
+        .action-btn.dark:hover { background: #1A202C; }
+        .action-btn.danger {
+            background: #FFF; color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.3); box-shadow: none;
+        }
+        .action-btn.danger:hover { background: #FEF2F2; }
 
-        /* BUILDER INTERACTIF */
-        .builder-layout { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
-        .builder-palette { display: flex; flex-direction: column; gap: 12px; width: 220px; background: #FFF; padding: 16px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); }
+        /* BUILDER INTERACTIF (ONGLET 4) */
+        .builder-layout { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
+        .builder-sidebar {
+            display: flex; flex-direction: column; gap: 16px; width: 280px; flex-shrink: 0;
+        }
+        .builder-card {
+            background: #FFF; padding: 16px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08);
+            display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .builder-card h3 {
+            margin: 0; font-family: 'Fredoka', sans-serif; font-size: 1rem; color: var(--noir-doux);
+            border-bottom: 1px solid #EFEFEF; padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between;
+        }
         .btn-spawn {
-            width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 700; font-family: 'Fredoka', sans-serif;
+            width: 100%; padding: 10px 12px; border: none; border-radius: 8px; font-weight: 700; font-family: 'Fredoka', sans-serif;
             cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.1s ease, opacity 0.2s; font-size: 0.9rem;
         }
-        .btn-spawn[disabled] { opacity: 0.4; cursor: not-allowed; }
-        .builder-workspace { flex: 1; display: flex; justify-content: center; overflow: auto; }
+        .btn-spawn:active:not([disabled]) { transform: scale(0.98); }
+        .btn-spawn[disabled] { opacity: 0.38; cursor: not-allowed; }
+
+        .builder-select, .builder-input {
+            width: 100%; padding: 9px 11px; border: 1.5px solid #E2E8F0; border-radius: 8px;
+            font-family: 'Roboto', sans-serif; font-size: 0.86rem; color: var(--noir-doux); background: #FAFAFA;
+        }
+        .builder-select:focus, .builder-input:focus {
+            outline: none; border-color: var(--rouge); background: #FFF;
+        }
+
+        .builder-main {
+            flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; align-items: center;
+        }
+        .builder-status-bar {
+            width: 100%; max-width: 560px; display: flex; justify-content: space-between; align-items: center;
+            background: #FFF; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.08);
+            flex-wrap: wrap; gap: 8px; font-size: 0.85rem;
+        }
+        .builder-workspace { width: 100%; display: flex; justify-content: center; overflow: auto; }
         .builder-grid {
             width: 560px; height: 560px; background-color: #FAFAFA;
             background-image: linear-gradient(to right, rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.1) 1px, transparent 1px);
-            background-size: 35px 35px; border: 2px solid #1A1A1A; position: relative; touch-action: none;
+            background-size: 35px 35px; border: 2px solid #1A1A1A; position: relative; touch-action: none; flex-shrink: 0;
         }
         .tatami-drag {
-            position: absolute; width: 70px; height: 35px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 0 6px rgba(255,255,255,0.2);
-            border-radius: 2px; cursor: grab;
+            position: absolute; width: 70px; height: 35px;
+            box-shadow: inset 0 0 0 1.2px rgba(0,0,0,0.75), inset 0 0 6px rgba(255,255,255,0.2);
+            border-radius: 2px; cursor: grab; user-select: none;
         }
         .tatami-drag.vertical { width: 35px; height: 70px; }
-        .tatami-drag:active { cursor: grabbing; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; }
+        .tatami-drag:active { cursor: grabbing; box-shadow: 0 5px 15px rgba(0,0,0,0.35); z-index: 1000; }
         .bg-drag-rouge { background-color: var(--tatami-rouge); }
         .bg-drag-vert { background-color: var(--tatami-vert); }
         .bg-drag-bleu { background-color: var(--tatami-bleu); }
         .bg-drag-jaune { background-color: var(--tatami-jaune); }
         .bg-drag-ciel { background-color: var(--tatami-bleu-ciel); }
+
+        /* ONGLET 5 : GALERIE DES DISPOSITIONS ENREGISTRÉES */
+        .saved-layouts-bar {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-bottom: 22px;
+        }
+        .saved-layout-card {
+            background: #FFF; border: 1.5px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 14px;
+            cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; gap: 6px;
+        }
+        .saved-layout-card:hover { border-color: rgba(196, 30, 58, 0.4); transform: translateY(-2px); }
+        .saved-layout-card.active {
+            border-color: var(--rouge); background: rgba(196, 30, 58, 0.04);
+            box-shadow: 0 6px 16px rgba(196, 30, 58, 0.12);
+        }
+        .saved-layout-card-title {
+            font-family: 'Fredoka', sans-serif; font-size: 1rem; color: var(--noir-doux);
+            display: flex; align-items: center; justify-content: space-between; gap: 6px;
+        }
+        .saved-layout-card-meta { font-size: 0.78rem; color: var(--gris-moyen); }
+
+        .empty-saved-state {
+            text-align: center; padding: 48px 20px; background: #FAFAFA; border: 1.5px dashed rgba(0,0,0,0.12);
+            border-radius: 12px; color: var(--gris-moyen);
+        }
+
+        /* NOTIFICATION TOAST */
+        .toast-notif {
+            position: fixed; bottom: 24px; right: 24px; background: #1A1A1A; color: #FFF;
+            padding: 12px 20px; border-radius: 10px; font-family: 'Fredoka', sans-serif; font-size: 0.92rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25); border-left: 4px solid var(--rouge);
+            transform: translateY(80px); opacity: 0; transition: all 0.3s ease; z-index: 9999; pointer-events: none;
+        }
+        .toast-notif.show { transform: translateY(0); opacity: 1; }
 
         /* =======================================================
            RÈGLES D'IMPRESSION (DYNAMIQUES ET STRICTES 1 PAGE)
@@ -185,7 +263,7 @@
             body * { visibility: hidden; }
             
             .page-container, .page-container * { visibility: visible; }
-            .tabs-nav, .header-card, .footer-action { display: none !important; }
+            .tabs-nav, .header-card, .no-print, .toast-notif { display: none !important; }
             
             .page-container { margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: none !important; }
 
@@ -209,16 +287,18 @@
             /* REDIMENSIONNEMENT SELON L'ORIENTATION (1 PAGE STRICTE) */
             #tab1.active .tatami-plan-container svg,
             #tab2.active .tatami-plan-container svg {
-                max-height: 23cm !important; /* Limite pour le mode Portrait A4 */
+                max-height: 23cm !important;
                 width: auto !important;
             }
 
-            #tab3.active .tatami-plan-container svg {
-                max-height: 15cm !important; /* Limite pour le mode Paysage A4 */
+            #tab3.active .tatami-plan-container svg,
+            #tab5.active .tatami-plan-container svg {
+                max-height: 15cm !important;
                 width: auto !important;
             }
 
-            #tab4.active .builder-palette { display: none !important; }
+            #tab4.active .builder-sidebar,
+            #tab4.active .builder-status-bar { display: none !important; }
             #tab4.active .builder-workspace { width: 100%; justify-content: center; }
             #tab4.active .builder-grid { border: 2px solid #000; }
         }
@@ -244,10 +324,11 @@
 
         <!-- SÉLECTEUR D'ONGLETS -->
         <nav class="tabs-nav">
-            <button class="tab-btn active" onclick="openTab(1, this)">🥋 Disp. 1 (Portrait)</button>
-            <button class="tab-btn" onclick="openTab(2, this)">🏛️ Disp. 2 (Portrait)</button>
-            <button class="tab-btn" onclick="openTab(3, this)">✨ Disp. Propre (Paysage)</button>
-            <button class="tab-btn" onclick="openTab(4, this)" style="background:var(--rouge); color:#FFF;">🛠️ Mode Libre (Paysage)</button>
+            <button class="tab-btn active" id="tab-btn-1" onclick="openTab(1)">🥋 Disp. 1 (Portrait)</button>
+            <button class="tab-btn" id="tab-btn-2" onclick="openTab(2)">🏛️ Disp. 2 (Portrait)</button>
+            <button class="tab-btn" id="tab-btn-3" onclick="openTab(3)">✨ Vue 3 (Paysage)</button>
+            <button class="tab-btn" id="tab-btn-4" onclick="openTab(4)" style="background:var(--rouge); color:#FFF;">🛠️ Mode Libre (Éditeur)</button>
+            <button class="tab-btn" id="tab-btn-5" onclick="openTab(5)">📂 Mes Dispositions <span class="tab-btn-count" id="saved-count-badge">0</span></button>
         </nav>
 
         <!-- ================= ONGLET 1 : CLASSIQUE ================= -->
@@ -257,7 +338,10 @@
                     <h2>Disposition 1 • Configuration Officielle Dojo (7m × 16m)</h2>
                     <p>Surface de 112 m² avec couloirs de sécurité latéraux rouges</p>
                 </div>
-                <div class="t-badge bg-total">Total : <span class="count">56</span></div>
+                <div class="view-header-actions">
+                    <button class="action-btn secondary no-print" onclick="importIntoBuilder('vue1', true)">🛠️ Importer dans le Mode Libre</button>
+                    <div class="t-badge bg-total">Total : <span class="count">56</span></div>
+                </div>
             </div>
             <div class="badges-grid">
                 <div class="t-badge bg-rouge">Rouge : <span class="count">16</span></div>
@@ -296,7 +380,10 @@
                     <h2>Disposition 2 • Salle des Fêtes (7m × 14m)</h2>
                     <p>Surface de 98 m² numérotée pour un montage sans erreur</p>
                 </div>
-                <div class="t-badge bg-total">Total : <span class="count">49</span></div>
+                <div class="view-header-actions">
+                    <button class="action-btn secondary no-print" onclick="importIntoBuilder('vue2', true)">🛠️ Importer dans le Mode Libre</button>
+                    <div class="t-badge bg-total">Total : <span class="count">49</span></div>
+                </div>
             </div>
             <div class="badges-grid">
                 <div class="t-badge bg-ciel">Bleu Ciel : <span class="count">29</span></div>
@@ -362,158 +449,384 @@
             </div>
         </section>
 
-        <!-- ================= ONGLET 3 : GRANDE SURFACE (PROPRE, CONFORME SOURCE 6) ================= -->
+        <!-- ================= ONGLET 3 : GRANDE SURFACE (MODIFIABLE DEPUIS MODE LIBRE) ================= -->
         <section id="tab3" class="tab-content">
             <div class="view-header">
                 <div class="view-title-wrap">
-                    <h2>Disposition 3 • Grande disposition rectangulaire parfaite (12m × 14m)</h2>
-                    <p>Reproduction exacte de la structure harmonieuse : 100% plein, aucun espace blanc.</p>
+                    <h2 id="view3-title">Disposition 3 • Grande disposition rectangulaire parfaite (12m × 14m)</h2>
+                    <p id="view3-subtitle">Reproduction exacte de la structure harmonieuse : 100% plein, aucun espace blanc.</p>
                 </div>
-                <div class="t-badge bg-total">Total : <span class="count">84 / 85 Tatamis</span></div>
+                <div class="view-header-actions">
+                    <button class="action-btn secondary no-print" onclick="importIntoBuilder('vue3', true)">🛠️ Modifier dans le Mode Libre</button>
+                    <button class="action-btn secondary no-print" id="btn-reset-vue3" style="display:none;" onclick="resetVue3ToDefault()">🔄 Rétablir Vue 3 d'origine</button>
+                    <div class="t-badge bg-total">Total : <span class="count" id="view3-total">84 / 85 Tatamis</span></div>
+                </div>
             </div>
             
-            <div class="badges-grid">
-                <div class="t-badge bg-ciel">Bleu Ciel : <span class="count">28</span></div>
-                <div class="t-badge bg-rouge">Rouge : <span class="count">16</span></div>
-                <div class="t-badge bg-jaune">Jaune : <span class="count">20</span></div>
-                <div class="t-badge bg-bleu">Bleu : <span class="count">10</span></div>
-                <div class="t-badge bg-vert">Vert : <span class="count">10</span></div>
-            </div>
+            <div class="badges-grid" id="view3-badges"></div>
 
-            <div class="tatami-plan-container">
-                <svg viewBox="0 0 120 140" style="max-width: 520px;" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <style>
-                            .t3-rouge { fill: var(--tatami-rouge); stroke: #1A1A1A; stroke-width: 0.4; }
-                            .t3-vert { fill: var(--tatami-vert); stroke: #1A1A1A; stroke-width: 0.4; }
-                            .t3-jaune { fill: var(--tatami-jaune); stroke: #1A1A1A; stroke-width: 0.4; }
-                            .t3-bleu { fill: var(--tatami-bleu); stroke: #1A1A1A; stroke-width: 0.4; }
-                            .t3-ciel { fill: var(--tatami-bleu-ciel); stroke: #1A1A1A; stroke-width: 0.4; }
-                            .t3-lbl { font-family: 'Fredoka', sans-serif; font-size: 3.4px; font-weight: 700; fill: #1A1A1A; text-anchor: middle; dominant-baseline: central; opacity: 0.75; }
-                        </style>
-                    </defs>
-
-                    <!-- BLOCS BLEU CIEL (Couloirs Latéraux) -->
-                    <g class="t3-ciel">
-                        <!-- Colonnes Gauche (x=0 et x=10) -->
-                        <rect x="0" y="0" width="10" height="20" /><rect x="0" y="20" width="10" height="20" /><rect x="0" y="40" width="10" height="20" /><rect x="0" y="60" width="10" height="20" /><rect x="0" y="80" width="10" height="20" /><rect x="0" y="100" width="10" height="20" /><rect x="0" y="120" width="10" height="20" />
-                        <rect x="10" y="0" width="10" height="20" /><rect x="10" y="20" width="10" height="20" /><rect x="10" y="40" width="10" height="20" /><rect x="10" y="60" width="10" height="20" /><rect x="10" y="80" width="10" height="20" /><rect x="10" y="100" width="10" height="20" /><rect x="10" y="120" width="10" height="20" />
-                        <!-- Colonnes Droite (x=100 et x=110) -->
-                        <rect x="100" y="0" width="10" height="20" /><rect x="100" y="20" width="10" height="20" /><rect x="100" y="40" width="10" height="20" /><rect x="100" y="60" width="10" height="20" /><rect x="100" y="80" width="10" height="20" /><rect x="100" y="100" width="10" height="20" /><rect x="100" y="120" width="10" height="20" />
-                        <rect x="110" y="0" width="10" height="20" /><rect x="110" y="20" width="10" height="20" /><rect x="110" y="40" width="10" height="20" /><rect x="110" y="60" width="10" height="20" /><rect x="110" y="80" width="10" height="20" /><rect x="110" y="100" width="10" height="20" /><rect x="110" y="120" width="10" height="20" />
-                    </g>
-
-                    <!-- BLOCS ROUGES (Sécurités Haut & Bas) -->
-                    <g class="t3-rouge">
-                        <!-- Haut -->
-                        <rect x="20" y="0" width="10" height="20" /><rect x="30" y="0" width="10" height="20" /><rect x="40" y="0" width="10" height="20" /><rect x="50" y="0" width="10" height="20" /><rect x="60" y="0" width="10" height="20" /><rect x="70" y="0" width="10" height="20" /><rect x="80" y="0" width="10" height="20" /><rect x="90" y="0" width="10" height="20" />
-                        <!-- Bas -->
-                        <rect x="20" y="120" width="10" height="20" /><rect x="30" y="120" width="10" height="20" /><rect x="40" y="120" width="10" height="20" /><rect x="50" y="120" width="10" height="20" /><rect x="60" y="120" width="10" height="20" /><rect x="70" y="120" width="10" height="20" /><rect x="80" y="120" width="10" height="20" /><rect x="90" y="120" width="10" height="20" />
-                    </g>
-
-                    <!-- BLOCS JAUNES (La Grande Zone A & B) -->
-                    <g class="t3-jaune">
-                        <!-- Moitié Gauche (Zone A) -->
-                        <rect x="20" y="20" width="20" height="10" /><rect x="40" y="20" width="20" height="10" />
-                        <rect x="20" y="30" width="10" height="20" /><rect x="30" y="30" width="20" height="10" /><rect x="30" y="40" width="20" height="10" /><rect x="50" y="30" width="10" height="20" />
-                        <rect x="20" y="50" width="10" height="20" /><rect x="30" y="50" width="20" height="10" /><rect x="30" y="60" width="20" height="10" /><rect x="50" y="50" width="10" height="20" />
-                        
-                        <!-- Moitié Droite (Zone B) -->
-                        <rect x="60" y="20" width="20" height="10" /><rect x="80" y="20" width="20" height="10" />
-                        <rect x="60" y="30" width="10" height="20" /><rect x="70" y="30" width="20" height="10" /><rect x="70" y="40" width="20" height="10" /><rect x="90" y="30" width="10" height="20" />
-                        <rect x="60" y="50" width="10" height="20" /><rect x="70" y="50" width="20" height="10" /><rect x="70" y="60" width="20" height="10" /><rect x="90" y="50" width="10" height="20" />
-                    </g>
-
-                    <!-- BLOCS BLEUS (Les 2 zones latérales du bas) -->
-                    <g class="t3-bleu">
-                        <!-- Bleu Gauche -->
-                        <rect x="20" y="70" width="20" height="10" />
-                        <rect x="20" y="80" width="10" height="20" /><rect x="30" y="80" width="10" height="20" />
-                        <rect x="20" y="100" width="10" height="20" /><rect x="30" y="100" width="10" height="20" />
-                        
-                        <!-- Bleu Droite -->
-                        <rect x="80" y="70" width="20" height="10" />
-                        <rect x="80" y="80" width="10" height="20" /><rect x="90" y="80" width="10" height="20" />
-                        <rect x="80" y="100" width="10" height="20" /><rect x="90" y="100" width="10" height="20" />
-                    </g>
-
-                    <!-- BLOCS VERTS (La zone centrale du bas) -->
-                    <g class="t3-vert">
-                        <rect x="40" y="70" width="20" height="10" /><rect x="60" y="70" width="20" height="10" />
-                        <rect x="40" y="80" width="10" height="20" /><rect x="50" y="80" width="20" height="10" /><rect x="50" y="90" width="20" height="10" /><rect x="70" y="80" width="10" height="20" />
-                        <rect x="40" y="100" width="10" height="20" /><rect x="50" y="100" width="20" height="10" /><rect x="50" y="110" width="20" height="10" /><rect x="70" y="100" width="10" height="20" />
-                    </g>
-
-                    <!-- Labels Textuels (Super propres) -->
-                    <text x="40" y="45" class="t3-lbl">ZONE A</text>
-                    <text x="80" y="45" class="t3-lbl">ZONE B</text>
-                </svg>
-            </div>
+            <div class="tatami-plan-container" id="view3-svg-container"></div>
         </section>
 
-        <!-- ================= ONGLET 4 : MODE INTERACTIF ================= -->
+        <!-- ================= ONGLET 4 : MODE INTERACTIF (ÉDITEUR LIBRE) ================= -->
         <section id="tab4" class="tab-content">
             <div class="view-header">
                 <div class="view-title-wrap">
-                    <h2>🛠️ Disposition Libre (Créateur de plan interactif)</h2>
+                    <h2>🛠️ Disposition Libre (Créateur & Éditeur de plans)</h2>
                     <p>
-                        <strong>1. Clique</strong> sur une couleur pour ajouter • <strong>2. Glisse</strong> pour déplacer et aimanter • <strong>3. Double-clic</strong> pour pivoter • <strong>4. Glisse hors grille</strong> pour supprimer.
+                        <strong>1. Importe</strong> une vue ou <strong>clique</strong> sur une couleur • <strong>2. Glisse</strong> pour déplacer • <strong>3. Double-clic</strong> pour pivoter • <strong>4. Glisse hors grille</strong> pour retirer • <strong>5. Enregistre</strong> en Vue 3 ou dans tes dispositions.
                     </p>
                 </div>
             </div>
 
             <div class="builder-layout">
-                <!-- PALETTE (INVENTAIRE) -->
-                <div class="builder-palette">
-                    <h3 style="margin-top:0; font-family:'Fredoka'; font-size:1.1rem; color:var(--noir-doux); border-bottom:1px solid #EFEFEF; padding-bottom:8px;">Inventaire (85)</h3>
-                    <button class="btn-spawn bg-drag-rouge" style="color:#FFF;" onclick="spawnTatami('rouge')" id="btn-rouge">Rouge (16)</button>
-                    <button class="btn-spawn bg-drag-jaune" style="color:#1A1A1A;" onclick="spawnTatami('jaune')" id="btn-jaune">Jaune (20)</button>
-                    <button class="btn-spawn bg-drag-bleu" style="color:#FFF;" onclick="spawnTatami('bleu')" id="btn-bleu">Bleu (10)</button>
-                    <button class="btn-spawn bg-drag-vert" style="color:#FFF;" onclick="spawnTatami('vert')" id="btn-vert">Vert (10)</button>
-                    <button class="btn-spawn bg-drag-ciel" style="color:#FFF;" onclick="spawnTatami('ciel')" id="btn-ciel">Bleu Ciel (29)</button>
+                <!-- COLONNE GAUCHE : IMPORT, INVENTAIRE ET SAUVEGARDE -->
+                <div class="builder-sidebar">
+
+                    <!-- 1. IMPORTER UN MODÈLE -->
+                    <div class="builder-card">
+                        <h3>📥 1. Importer un plan</h3>
+                        <select id="import-preset-select" class="builder-select">
+                            <option value="vue3">✨ Vue 3 (Actuelle)</option>
+                            <option value="vue3_default">✨ Vue 3 (Origine - 84 tatamis)</option>
+                            <option value="vue1">🥋 Vue 1 (Officielle - 56 tatamis)</option>
+                            <option value="vue2">🏛️ Vue 2 (Salle des Fêtes - 49 tatamis)</option>
+                        </select>
+                        <button class="action-btn dark" style="width:100%; justify-content:center;" onclick="importSelectedIntoBuilder()">
+                            📥 Charger sur la grille
+                        </button>
+                        <div style="display:flex; gap:8px;">
+                            <button class="action-btn secondary" style="flex:1; justify-content:center; padding:7px 10px; font-size:0.8rem;" onclick="centerGridItems()">
+                                🎯 Centrer
+                            </button>
+                            <button class="action-btn danger" style="flex:1; justify-content:center; padding:7px 10px; font-size:0.8rem;" onclick="clearBuilderGrid(true)">
+                                🗑️ Vider
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. PALETTE (INVENTAIRE) -->
+                    <div class="builder-card">
+                        <h3>
+                            <span>🎨 2. Inventaire</span>
+                            <span id="palette-remaining-total" style="font-size:0.82rem; color:var(--gris-moyen);">85 restants</span>
+                        </h3>
+                        <button class="btn-spawn bg-drag-rouge" style="color:#FFF;" onclick="spawnTatami('rouge')" id="btn-rouge">Rouge (16)</button>
+                        <button class="btn-spawn bg-drag-jaune" style="color:#1A1A1A;" onclick="spawnTatami('jaune')" id="btn-jaune">Jaune (20)</button>
+                        <button class="btn-spawn bg-drag-bleu" style="color:#FFF;" onclick="spawnTatami('bleu')" id="btn-bleu">Bleu (10)</button>
+                        <button class="btn-spawn bg-drag-vert" style="color:#FFF;" onclick="spawnTatami('vert')" id="btn-vert">Vert (10)</button>
+                        <button class="btn-spawn bg-drag-ciel" style="color:#FFF;" onclick="spawnTatami('ciel')" id="btn-ciel">Bleu Ciel (29)</button>
+                    </div>
+
+                    <!-- 3. ENREGISTRER LA DISPOSITION -->
+                    <div class="builder-card">
+                        <h3>💾 3. Enregistrer</h3>
+                        <button class="action-btn" style="width:100%; justify-content:center; background:#2D6A4F;" onclick="saveBuilderAsVue3()">
+                            ✨ Enregistrer en Vue 3
+                        </button>
+                        <div style="border-top:1px dashed #E2E8F0; margin:4px 0;"></div>
+                        <input type="text" id="save-layout-name" class="builder-input" placeholder="Nom (ex: Stage Judo, Compétition...)">
+                        <input type="text" id="save-layout-desc" class="builder-input" placeholder="Note / Description (optionnel)">
+                        <button class="action-btn" style="width:100%; justify-content:center;" onclick="saveBuilderToCustomList()">
+                            📂 Enregistrer dans Mes Dispositions
+                        </button>
+                    </div>
+
                 </div>
 
                 <!-- ZONE DE DESSIN -->
-                <div class="builder-workspace">
-                    <div class="builder-grid" id="builder-grid"></div>
+                <div class="builder-main">
+                    <div class="builder-status-bar">
+                        <div><strong>Tatamis posés :</strong> <span id="builder-placed-count">0</span> / 85</div>
+                        <div><strong>Emprise :</strong> <span id="builder-dimensions">0m × 0m</span></div>
+                        <div><strong>Surface :</strong> <span id="builder-surface">0 m²</span></div>
+                    </div>
+                    <div class="builder-workspace">
+                        <div class="builder-grid" id="builder-grid"></div>
+                    </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ================= ONGLET 5 : MES DISPOSITIONS ENREGISTRÉES ================= -->
+        <section id="tab5" class="tab-content">
+            <div class="no-print">
+                <div class="view-header" style="border-bottom:none; padding-bottom:4px; margin-bottom:10px;">
+                    <div class="view-title-wrap">
+                        <h2>📂 Bibliothèque de Mes Dispositions</h2>
+                        <p>Sélectionne une disposition enregistrée pour l'afficher, l'imprimer ou la modifier dans le Mode Libre.</p>
+                    </div>
+                    <button class="action-btn secondary" onclick="openTab(4)">➕ Créer / Modifier dans le Mode Libre</button>
+                </div>
+
+                <!-- LISTE DES CARTES DE DISPOSITIONS -->
+                <div class="saved-layouts-bar" id="saved-layouts-list"></div>
+            </div>
+
+            <!-- ZONE D'AFFICHAGE DE LA DISPOSITION SÉLECTIONNÉE -->
+            <div id="saved-layout-viewer" style="display:none;">
+                <div class="view-header">
+                    <div class="view-title-wrap">
+                        <h2 id="saved-view-title">Nom de la disposition</h2>
+                        <p id="saved-view-subtitle">Description</p>
+                    </div>
+                    <div class="view-header-actions">
+                        <button class="action-btn secondary no-print" onclick="editActiveSavedLayout()">🛠️ Modifier dans le Mode Libre</button>
+                        <button class="action-btn secondary no-print" onclick="applyActiveSavedToVue3()">✨ Appliquer en Vue 3</button>
+                        <button class="action-btn secondary no-print" onclick="renameActiveSavedLayout()">✏️ Renommer</button>
+                        <button class="action-btn danger no-print" onclick="deleteActiveSavedLayout()">🗑️ Supprimer</button>
+                        <div class="t-badge bg-total">Total : <span class="count" id="saved-view-total">0</span></div>
+                    </div>
+                </div>
+
+                <div class="badges-grid" id="saved-view-badges"></div>
+
+                <div class="tatami-plan-container" id="saved-view-svg-container"></div>
+            </div>
+
+            <!-- ÉTAT VIDE -->
+            <div id="saved-empty-state" class="empty-saved-state">
+                <p style="font-family:'Fredoka', sans-serif; font-size:1.15rem; color:var(--noir-doux); margin-bottom:6px;">
+                    Aucune disposition personnalisée enregistrée pour le moment.
+                </p>
+                <p style="font-size:0.9rem; margin-bottom:16px;">
+                    Rends-toi dans l'onglet <strong>🛠️ Mode Libre</strong>, importe par exemple la Vue 3, modifie-la puis clique sur <strong>« 📂 Enregistrer dans Mes Dispositions »</strong> !
+                </p>
+                <button class="action-btn" onclick="importIntoBuilder('vue3', true)">🛠️ Ouvrir le Mode Libre avec la Vue 3</button>
             </div>
         </section>
 
     </div>
 
-    <!-- SCRIPT JS (Gestion des onglets, de l'impression Portrait/Paysage, et du mode libre) -->
+    <div class="toast-notif" id="toast-notif">Action effectuée !</div>
+
+    <!-- SCRIPT JS COMPLET -->
     <script>
-        function openTab(tabIndex, btn) {
-            // Nettoyage de l'interface
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            // Activation de l'onglet
-            document.getElementById('tab' + tabIndex).classList.add('active');
-            btn.classList.add('active');
-
-            // INJECTION DYNAMIQUE DE LA BALISE @page POUR L'IMPRESSION !
-            const printStyle = document.getElementById('dynamic-print-style');
-            if (tabIndex === 1 || tabIndex === 2) {
-                // Pour Vue 1 et Vue 2 => Forcer l'impression en PORTRAIT
-                printStyle.innerHTML = '@page { size: A4 portrait; margin: 10mm; }';
-            } else {
-                // Pour Vue 3 et Vue 4 => Forcer l'impression en PAYSAGE
-                printStyle.innerHTML = '@page { size: A4 landscape; margin: 10mm; }';
-            }
-        }
-
-        /* --- MOTEUR INTERACTIF (ONGLET 4) --- */
         const CELL_SIZE = 35; // 1 mètre = 35px
-        const GRID_MAX = 560; // 16 mètres * 35px = 560px
-        
-        let inventory = { rouge: 16, jaune: 20, bleu: 10, vert: 10, ciel: 29 };
+        const GRID_CELLS = 16; // Grille de 16m x 16m
+        const GRID_MAX = CELL_SIZE * GRID_CELLS; // 560px
+        const MAX_STOCK = { rouge: 16, jaune: 20, bleu: 10, vert: 10, ciel: 29 };
+
+        const STORAGE_KEY_VUE3 = 'dojo_dornois_custom_vue3_v1';
+        const STORAGE_KEY_SAVED = 'dojo_dornois_saved_layouts_v1';
+
+        /* --- MODÈLES DE RÉFÉRENCE (Coordonnées en mètres : x, y, vertical, color) --- */
+        const PRESET_VUE1 = [
+            // Rouge Gauche & Droite (16)
+            {x:0,y:0,v:true,c:'rouge'},{x:0,y:2,v:true,c:'rouge'},{x:0,y:4,v:true,c:'rouge'},{x:0,y:6,v:true,c:'rouge'},{x:0,y:8,v:true,c:'rouge'},{x:0,y:10,v:true,c:'rouge'},{x:0,y:12,v:true,c:'rouge'},{x:0,y:14,v:true,c:'rouge'},
+            {x:6,y:0,v:true,c:'rouge'},{x:6,y:2,v:true,c:'rouge'},{x:6,y:4,v:true,c:'rouge'},{x:6,y:6,v:true,c:'rouge'},{x:6,y:8,v:true,c:'rouge'},{x:6,y:10,v:true,c:'rouge'},{x:6,y:12,v:true,c:'rouge'},{x:6,y:14,v:true,c:'rouge'},
+            // Vert Haut & Bas (10)
+            {x:1,y:0,v:true,c:'vert'},{x:2,y:0,v:true,c:'vert'},{x:3,y:0,v:true,c:'vert'},{x:4,y:0,v:true,c:'vert'},{x:5,y:0,v:true,c:'vert'},
+            {x:1,y:14,v:true,c:'vert'},{x:2,y:14,v:true,c:'vert'},{x:3,y:14,v:true,c:'vert'},{x:4,y:14,v:true,c:'vert'},{x:5,y:14,v:true,c:'vert'},
+            // Jaune Haut (10)
+            {x:1,y:2,v:false,c:'jaune'},{x:1,y:3,v:false,c:'jaune'},{x:3,y:2,v:true,c:'jaune'},{x:4,y:2,v:false,c:'jaune'},{x:4,y:3,v:false,c:'jaune'},
+            {x:1,y:4,v:true,c:'jaune'},{x:2,y:4,v:true,c:'jaune'},{x:3,y:4,v:false,c:'jaune'},{x:3,y:5,v:false,c:'jaune'},{x:5,y:4,v:true,c:'jaune'},
+            // Bleu Milieu (10)
+            {x:1,y:6,v:false,c:'bleu'},{x:1,y:7,v:false,c:'bleu'},{x:3,y:6,v:true,c:'bleu'},{x:4,y:6,v:false,c:'bleu'},{x:4,y:7,v:false,c:'bleu'},
+            {x:1,y:8,v:true,c:'bleu'},{x:2,y:8,v:true,c:'bleu'},{x:3,y:8,v:false,c:'bleu'},{x:3,y:9,v:false,c:'bleu'},{x:5,y:8,v:true,c:'bleu'},
+            // Jaune Bas (10)
+            {x:1,y:10,v:false,c:'jaune'},{x:1,y:11,v:false,c:'jaune'},{x:3,y:10,v:true,c:'jaune'},{x:4,y:10,v:false,c:'jaune'},{x:4,y:11,v:false,c:'jaune'},
+            {x:1,y:12,v:true,c:'jaune'},{x:2,y:12,v:true,c:'jaune'},{x:3,y:12,v:false,c:'jaune'},{x:3,y:13,v:false,c:'jaune'},{x:5,y:12,v:true,c:'jaune'}
+        ];
+
+        const PRESET_VUE2 = [
+            // Bleu Ciel (29)
+            {x:0,y:0,v:true,c:'ciel'},{x:1,y:0,v:true,c:'ciel'},{x:2,y:0,v:true,c:'ciel'},{x:3,y:0,v:true,c:'ciel'},{x:4,y:0,v:true,c:'ciel'},{x:5,y:0,v:true,c:'ciel'},{x:6,y:0,v:true,c:'ciel'},
+            {x:0,y:2,v:true,c:'ciel'},{x:0,y:4,v:true,c:'ciel'},{x:6,y:2,v:true,c:'ciel'},{x:6,y:4,v:true,c:'ciel'},
+            {x:0,y:6,v:true,c:'ciel'},{x:1,y:6,v:true,c:'ciel'},{x:2,y:6,v:true,c:'ciel'},{x:3,y:6,v:true,c:'ciel'},{x:4,y:6,v:true,c:'ciel'},{x:5,y:6,v:true,c:'ciel'},{x:6,y:6,v:true,c:'ciel'},
+            {x:0,y:8,v:true,c:'ciel'},{x:0,y:10,v:true,c:'ciel'},{x:6,y:8,v:true,c:'ciel'},{x:6,y:10,v:true,c:'ciel'},
+            {x:0,y:12,v:true,c:'ciel'},{x:1,y:12,v:true,c:'ciel'},{x:2,y:12,v:true,c:'ciel'},{x:3,y:12,v:true,c:'ciel'},{x:4,y:12,v:true,c:'ciel'},{x:5,y:12,v:true,c:'ciel'},{x:6,y:12,v:true,c:'ciel'},
+            // Jaune (20)
+            {x:1,y:2,v:false,c:'jaune'},{x:1,y:3,v:false,c:'jaune'},{x:3,y:2,v:true,c:'jaune'},{x:4,y:2,v:false,c:'jaune'},{x:4,y:3,v:false,c:'jaune'},
+            {x:1,y:4,v:true,c:'jaune'},{x:2,y:4,v:true,c:'jaune'},{x:3,y:4,v:false,c:'jaune'},{x:3,y:5,v:false,c:'jaune'},{x:5,y:4,v:true,c:'jaune'},
+            {x:1,y:8,v:false,c:'jaune'},{x:1,y:9,v:false,c:'jaune'},{x:3,y:8,v:true,c:'jaune'},{x:4,y:8,v:false,c:'jaune'},{x:4,y:9,v:false,c:'jaune'},
+            {x:1,y:10,v:true,c:'jaune'},{x:2,y:10,v:true,c:'jaune'},{x:3,y:10,v:false,c:'jaune'},{x:3,y:11,v:false,c:'jaune'},{x:5,y:10,v:true,c:'jaune'}
+        ];
+
+        const PRESET_VUE3_DEFAULT = [
+            // Bleu Ciel (28 : 2 colonnes gauche x=0,1 et 2 colonnes droite x=10,11)
+            {x:0,y:0,v:true,c:'ciel'},{x:0,y:2,v:true,c:'ciel'},{x:0,y:4,v:true,c:'ciel'},{x:0,y:6,v:true,c:'ciel'},{x:0,y:8,v:true,c:'ciel'},{x:0,y:10,v:true,c:'ciel'},{x:0,y:12,v:true,c:'ciel'},
+            {x:1,y:0,v:true,c:'ciel'},{x:1,y:2,v:true,c:'ciel'},{x:1,y:4,v:true,c:'ciel'},{x:1,y:6,v:true,c:'ciel'},{x:1,y:8,v:true,c:'ciel'},{x:1,y:10,v:true,c:'ciel'},{x:1,y:12,v:true,c:'ciel'},
+            {x:10,y:0,v:true,c:'ciel'},{x:10,y:2,v:true,c:'ciel'},{x:10,y:4,v:true,c:'ciel'},{x:10,y:6,v:true,c:'ciel'},{x:10,y:8,v:true,c:'ciel'},{x:10,y:10,v:true,c:'ciel'},{x:10,y:12,v:true,c:'ciel'},
+            {x:11,y:0,v:true,c:'ciel'},{x:11,y:2,v:true,c:'ciel'},{x:11,y:4,v:true,c:'ciel'},{x:11,y:6,v:true,c:'ciel'},{x:11,y:8,v:true,c:'ciel'},{x:11,y:10,v:true,c:'ciel'},{x:11,y:12,v:true,c:'ciel'},
+            // Rouge Haut & Bas (16)
+            {x:2,y:0,v:true,c:'rouge'},{x:3,y:0,v:true,c:'rouge'},{x:4,y:0,v:true,c:'rouge'},{x:5,y:0,v:true,c:'rouge'},{x:6,y:0,v:true,c:'rouge'},{x:7,y:0,v:true,c:'rouge'},{x:8,y:0,v:true,c:'rouge'},{x:9,y:0,v:true,c:'rouge'},
+            {x:2,y:12,v:true,c:'rouge'},{x:3,y:12,v:true,c:'rouge'},{x:4,y:12,v:true,c:'rouge'},{x:5,y:12,v:true,c:'rouge'},{x:6,y:12,v:true,c:'rouge'},{x:7,y:12,v:true,c:'rouge'},{x:8,y:12,v:true,c:'rouge'},{x:9,y:12,v:true,c:'rouge'},
+            // Jaune Zone A & Zone B (20)
+            {x:2,y:2,v:false,c:'jaune'},{x:4,y:2,v:false,c:'jaune'},
+            {x:2,y:3,v:true,c:'jaune'},{x:3,y:3,v:false,c:'jaune'},{x:3,y:4,v:false,c:'jaune'},{x:5,y:3,v:true,c:'jaune'},
+            {x:2,y:5,v:true,c:'jaune'},{x:3,y:5,v:false,c:'jaune'},{x:3,y:6,v:false,c:'jaune'},{x:5,y:5,v:true,c:'jaune'},
+            {x:6,y:2,v:false,c:'jaune'},{x:8,y:2,v:false,c:'jaune'},
+            {x:6,y:3,v:true,c:'jaune'},{x:7,y:3,v:false,c:'jaune'},{x:7,y:4,v:false,c:'jaune'},{x:9,y:3,v:true,c:'jaune'},
+            {x:6,y:5,v:true,c:'jaune'},{x:7,y:5,v:false,c:'jaune'},{x:7,y:6,v:false,c:'jaune'},{x:9,y:5,v:true,c:'jaune'},
+            // Bleu Gauche & Droite (10)
+            {x:2,y:7,v:false,c:'bleu'},{x:2,y:8,v:true,c:'bleu'},{x:3,y:8,v:true,c:'bleu'},{x:2,y:10,v:true,c:'bleu'},{x:3,y:10,v:true,c:'bleu'},
+            {x:8,y:7,v:false,c:'bleu'},{x:8,y:8,v:true,c:'bleu'},{x:9,y:8,v:true,c:'bleu'},{x:8,y:10,v:true,c:'bleu'},{x:9,y:10,v:true,c:'bleu'},
+            // Vert Centre Bas (10)
+            {x:4,y:7,v:false,c:'vert'},{x:6,y:7,v:false,c:'vert'},
+            {x:4,y:8,v:true,c:'vert'},{x:5,y:8,v:false,c:'vert'},{x:5,y:9,v:false,c:'vert'},{x:7,y:8,v:true,c:'vert'},
+            {x:4,y:10,v:true,c:'vert'},{x:5,y:10,v:false,c:'vert'},{x:5,y:11,v:false,c:'vert'},{x:7,y:10,v:true,c:'vert'}
+        ];
+
+        let inventory = { ...MAX_STOCK };
+        let savedLayouts = [];
+        let activeSavedLayoutId = null;
+
         let activeDrag = null;
         let dragStartX = 0, dragStartY = 0;
         let initialLeft = 0, initialTop = 0;
 
+        /* --- NAVIGATION ONGLETS & ORIENTATION D'IMPRESSION --- */
+        function openTab(tabIndex) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab' + tabIndex).classList.add('active');
+            document.getElementById('tab-btn-' + tabIndex).classList.add('active');
+
+            const printStyle = document.getElementById('dynamic-print-style');
+            if (tabIndex === 1 || tabIndex === 2) {
+                printStyle.innerHTML = '@page { size: A4 portrait; margin: 10mm; }';
+            } else {
+                printStyle.innerHTML = '@page { size: A4 landscape; margin: 10mm; }';
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast-notif');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        /* --- GÉNÉRATEUR SVG ET BADGES POUR VUE 3 ET MES DISPOSITIONS --- */
+        function computeLayoutMetrics(items) {
+            const counts = { rouge: 0, jaune: 0, bleu: 0, vert: 0, ciel: 0 };
+            if (!items || items.length === 0) {
+                return { counts, total: 0, minX: 0, minY: 0, widthM: 0, heightM: 0, surface: 0 };
+            }
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            items.forEach(it => {
+                if (counts[it.c] !== undefined) counts[it.c]++;
+                const w = it.v ? 1 : 2;
+                const h = it.v ? 2 : 1;
+                if (it.x < minX) minX = it.x;
+                if (it.y < minY) minY = it.y;
+                if (it.x + w > maxX) maxX = it.x + w;
+                if (it.y + h > maxY) maxY = it.y + h;
+            });
+            const widthM = maxX - minX;
+            const heightM = maxY - minY;
+            return {
+                counts,
+                total: items.length,
+                minX,
+                minY,
+                widthM,
+                heightM,
+                surface: items.length * 2
+            };
+        }
+
+        function renderBadgesHTML(counts) {
+            const defs = [
+                { key: 'ciel', label: 'Bleu Ciel', cls: 'bg-ciel' },
+                { key: 'rouge', label: 'Rouge', cls: 'bg-rouge' },
+                { key: 'jaune', label: 'Jaune', cls: 'bg-jaune' },
+                { key: 'bleu', label: 'Bleu', cls: 'bg-bleu' },
+                { key: 'vert', label: 'Vert', cls: 'bg-vert' }
+            ];
+            return defs
+                .filter(d => counts[d.key] > 0)
+                .map(d => `<div class="t-badge ${d.cls}">${d.label} : <span class="count">${counts[d.key]}</span></div>`)
+                .join('');
+        }
+
+        function generateSVGFromItems(items, isDefaultVue3 = false) {
+            const metrics = computeLayoutMetrics(items);
+            if (metrics.total === 0) {
+                return '<p style="padding:20px; color:var(--gris-moyen);">Aucun tatami dans cette disposition.</p>';
+            }
+            const vbW = metrics.widthM * 10;
+            const vbH = metrics.heightM * 10;
+            const maxWidthPx = metrics.widthM >= metrics.heightM ? 580 : 440;
+
+            const colorVarMap = {
+                rouge: 'var(--tatami-rouge)',
+                vert: 'var(--tatami-vert)',
+                bleu: 'var(--tatami-bleu)',
+                jaune: 'var(--tatami-jaune)',
+                ciel: 'var(--tatami-bleu-ciel)'
+            };
+
+            let rectsHTML = '';
+            items.forEach(it => {
+                const rx = (it.x - metrics.minX) * 10;
+                const ry = (it.y - metrics.minY) * 10;
+                const rw = (it.v ? 1 : 2) * 10;
+                const rh = (it.v ? 2 : 1) * 10;
+                const fill = colorVarMap[it.c] || '#CCC';
+                rectsHTML += `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" style="fill:${fill}; stroke:#1A1A1A; stroke-width:0.4;" />`;
+            });
+
+            const labelsHTML = isDefaultVue3 ? `
+                <text x="40" y="45" style="font-family:'Fredoka',sans-serif; font-size:3.4px; font-weight:700; fill:#1A1A1A; text-anchor:middle; dominant-baseline:central; opacity:0.75;">ZONE A</text>
+                <text x="80" y="45" style="font-family:'Fredoka',sans-serif; font-size:3.4px; font-weight:700; fill:#1A1A1A; text-anchor:middle; dominant-baseline:central; opacity:0.75;">ZONE B</text>
+            ` : '';
+
+            return `
+                <svg viewBox="0 0 ${vbW} ${vbH}" style="max-width: ${maxWidthPx}px;" xmlns="http://www.w3.org/2000/svg">
+                    ${rectsHTML}
+                    ${labelsHTML}
+                </svg>
+            `;
+        }
+
+        /* --- GESTION DE LA VUE 3 (PAR DÉFAUT OU PERSONNALISÉE) --- */
+        function getActiveVue3Data() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY_VUE3);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && Array.isArray(parsed.items) && parsed.items.length > 0) {
+                        return { isCustom: true, ...parsed };
+                    }
+                }
+            } catch (e) { console.error(e); }
+            return {
+                isCustom: false,
+                title: 'Disposition 3 • Grande disposition rectangulaire parfaite (12m × 14m)',
+                subtitle: 'Reproduction exacte de la structure harmonieuse : 100% plein, aucun espace blanc.',
+                items: JSON.parse(JSON.stringify(PRESET_VUE3_DEFAULT))
+            };
+        }
+
+        function renderVue3() {
+            const data = getActiveVue3Data();
+            const metrics = computeLayoutMetrics(data.items);
+
+            document.getElementById('view3-title').innerText = data.isCustom
+                ? `${data.title} (${metrics.widthM}m × ${metrics.heightM}m)`
+                : data.title;
+            document.getElementById('view3-subtitle').innerText = data.isCustom
+                ? `${data.subtitle} • Surface de ${metrics.surface} m²`
+                : data.subtitle;
+            document.getElementById('view3-total').innerText = `${metrics.total} / 85 Tatamis`;
+            document.getElementById('view3-badges').innerHTML = renderBadgesHTML(metrics.counts);
+            document.getElementById('view3-svg-container').innerHTML = generateSVGFromItems(data.items, !data.isCustom);
+            document.getElementById('btn-reset-vue3').style.display = data.isCustom ? 'inline-flex' : 'none';
+        }
+
+        function resetVue3ToDefault() {
+            if (!confirm("Rétablir la Vue 3 d'origine (12m × 14m - 84 tatamis) ?")) return;
+            localStorage.removeItem(STORAGE_KEY_VUE3);
+            renderVue3();
+            showToast("🔄 Vue 3 d'origine rétablie !");
+        }
+
+        /* --- MOTEUR INTERACTIF (ONGLET 4 : MODE LIBRE) --- */
         function updatePalette() {
+            let remTotal = 0;
             ['rouge', 'jaune', 'bleu', 'vert', 'ciel'].forEach(c => {
                 const btn = document.getElementById('btn-' + c);
                 let label = c.charAt(0).toUpperCase() + c.slice(1);
@@ -521,24 +834,46 @@
                 
                 btn.innerText = `${label} (${inventory[c]})`;
                 btn.disabled = (inventory[c] <= 0);
+                remTotal += inventory[c];
             });
+            document.getElementById('palette-remaining-total').innerText = `${remTotal} restants`;
+            updateBuilderStatusBar();
         }
 
-        function spawnTatami(color) {
-            if (inventory[color] <= 0) return;
-            inventory[color]--;
-            updatePalette();
+        function getBuilderItems() {
+            const els = document.querySelectorAll('#builder-grid .tatami-drag');
+            const items = [];
+            els.forEach(el => {
+                const x = Math.round(parseInt(el.style.left || 0) / CELL_SIZE);
+                const y = Math.round(parseInt(el.style.top || 0) / CELL_SIZE);
+                const v = el.classList.contains('vertical');
+                const c = el.dataset.color;
+                items.push({ x, y, v, c });
+            });
+            return items;
+        }
 
+        function updateBuilderStatusBar() {
+            const items = getBuilderItems();
+            const metrics = computeLayoutMetrics(items);
+            document.getElementById('builder-placed-count').innerText = metrics.total;
+            document.getElementById('builder-dimensions').innerText = `${metrics.widthM}m × ${metrics.heightM}m`;
+            document.getElementById('builder-surface').innerText = `${metrics.surface} m²`;
+        }
+
+        function createTatamiElement(color, gridX, gridY, isVertical) {
             const t = document.createElement('div');
-            t.className = `tatami-drag bg-drag-${color}`;
+            t.className = `tatami-drag bg-drag-${color}` + (isVertical ? ' vertical' : '');
             t.dataset.color = color;
-            t.style.left = '245px'; 
-            t.style.top = '245px';
+            t.style.left = (gridX * CELL_SIZE) + 'px';
+            t.style.top = (gridY * CELL_SIZE) + 'px';
 
             t.onmousedown = (e) => {
                 activeDrag = t;
-                dragStartX = e.clientX; dragStartY = e.clientY;
-                initialLeft = parseInt(t.style.left || 0); initialTop = parseInt(t.style.top || 0);
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                initialLeft = parseInt(t.style.left || 0);
+                initialTop = parseInt(t.style.top || 0);
                 t.style.zIndex = '1000';
             };
 
@@ -549,21 +884,316 @@
                 const ch = t.classList.contains('vertical') ? (CELL_SIZE * 2) : CELL_SIZE;
                 if (cl + cw > GRID_MAX) t.style.left = (GRID_MAX - cw) + 'px';
                 if (ct + ch > GRID_MAX) t.style.top = (GRID_MAX - ch) + 'px';
+                updateBuilderStatusBar();
             };
 
-            document.getElementById('builder-grid').appendChild(t);
+            return t;
         }
 
+        function spawnTatami(color) {
+            if (inventory[color] <= 0) return;
+            inventory[color]--;
+
+            const t = createTatamiElement(color, 7, 7, false);
+            document.getElementById('builder-grid').appendChild(t);
+            updatePalette();
+        }
+
+        function clearBuilderGrid(confirmFirst = false) {
+            const grid = document.getElementById('builder-grid');
+            if (confirmFirst && grid.children.length > 0) {
+                if (!confirm("Vider toute la grille et remettre les tatamis dans l'inventaire ?")) return;
+            }
+            grid.innerHTML = '';
+            inventory = { ...MAX_STOCK };
+            updatePalette();
+        }
+
+        function loadItemsIntoBuilder(items, autoCenter = true) {
+            clearBuilderGrid(false);
+            if (!items || items.length === 0) return;
+
+            const metrics = computeLayoutMetrics(items);
+            const offsetX = autoCenter ? Math.max(0, Math.floor((GRID_CELLS - metrics.widthM) / 2) - metrics.minX) : 0;
+            const offsetY = autoCenter ? Math.max(0, Math.floor((GRID_CELLS - metrics.heightM) / 2) - metrics.minY) : 0;
+
+            const grid = document.getElementById('builder-grid');
+            items.forEach(it => {
+                if (inventory[it.c] > 0) {
+                    inventory[it.c]--;
+                    const gx = Math.min(GRID_CELLS - (it.v ? 1 : 2), Math.max(0, it.x + offsetX));
+                    const gy = Math.min(GRID_CELLS - (it.v ? 2 : 1), Math.max(0, it.y + offsetY));
+                    const el = createTatamiElement(it.c, gx, gy, !!it.v);
+                    grid.appendChild(el);
+                }
+            });
+            updatePalette();
+        }
+
+        function centerGridItems() {
+            const items = getBuilderItems();
+            if (items.length === 0) return;
+            loadItemsIntoBuilder(items, true);
+            showToast("🎯 Plan centré sur la grille !");
+        }
+
+        function importIntoBuilder(presetKey, switchToBuilderTab = false) {
+            let items = [];
+            let label = '';
+
+            if (presetKey === 'vue1') {
+                items = PRESET_VUE1;
+                label = 'Vue 1 (Officielle - 56 tatamis)';
+            } else if (presetKey === 'vue2') {
+                items = PRESET_VUE2;
+                label = 'Vue 2 (Salle des Fêtes - 49 tatamis)';
+            } else if (presetKey === 'vue3') {
+                items = getActiveVue3Data().items;
+                label = 'Vue 3';
+            } else if (presetKey === 'vue3_default') {
+                items = PRESET_VUE3_DEFAULT;
+                label = "Vue 3 d'origine (84 tatamis)";
+            } else if (presetKey.startsWith('saved_')) {
+                const id = presetKey.replace('saved_', '');
+                const found = savedLayouts.find(l => l.id === id);
+                if (found) {
+                    items = found.items;
+                    label = found.name;
+                    document.getElementById('save-layout-name').value = found.name;
+                    document.getElementById('save-layout-desc').value = found.desc || '';
+                }
+            }
+
+            loadItemsIntoBuilder(items, true);
+            if (switchToBuilderTab) openTab(4);
+            if (label) showToast(`📥 "${label}" chargée dans le Mode Libre !`);
+        }
+
+        function importSelectedIntoBuilder() {
+            const sel = document.getElementById('import-preset-select').value;
+            importIntoBuilder(sel, false);
+        }
+
+        /* --- SAUVEGARDE EN VUE 3 OU DANS L'ONGLET 5 (MES DISPOSITIONS) --- */
+        function saveBuilderAsVue3() {
+            const items = getBuilderItems();
+            if (items.length === 0) {
+                alert("Pose au moins un tatami sur la grille avant d'enregistrer en Vue 3.");
+                return;
+            }
+            const customName = document.getElementById('save-layout-name').value.trim();
+            const customDesc = document.getElementById('save-layout-desc').value.trim();
+
+            const payload = {
+                title: customName ? `Disposition 3 • ${customName}` : 'Disposition 3 • Configuration Personnalisée',
+                subtitle: customDesc || 'Disposition personnalisée enregistrée depuis le Mode Libre',
+                items
+            };
+            localStorage.setItem(STORAGE_KEY_VUE3, JSON.stringify(payload));
+            renderVue3();
+            openTab(3);
+            showToast("✨ Vue 3 mise à jour avec ta nouvelle disposition !");
+        }
+
+        function loadSavedLayoutsFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY_SAVED);
+                savedLayouts = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(savedLayouts)) savedLayouts = [];
+            } catch (e) {
+                savedLayouts = [];
+            }
+            refreshSavedLayoutsUI();
+        }
+
+        function saveLayoutsToStorage() {
+            localStorage.setItem(STORAGE_KEY_SAVED, JSON.stringify(savedLayouts));
+            refreshSavedLayoutsUI();
+        }
+
+        function saveBuilderToCustomList() {
+            const items = getBuilderItems();
+            if (items.length === 0) {
+                alert("Pose au moins un tatami sur la grille avant d'enregistrer.");
+                return;
+            }
+            let name = document.getElementById('save-layout-name').value.trim();
+            if (!name) {
+                name = prompt("Donne un nom à cette disposition de tatamis :", `Disposition perso ${savedLayouts.length + 1}`);
+                if (!name) return;
+                name = name.trim();
+            }
+            const desc = document.getElementById('save-layout-desc').value.trim() || 'Disposition créée dans le Mode Libre';
+
+            // Si une disposition porte déjà ce nom, proposer de la mettre à jour
+            const existingIdx = savedLayouts.findIndex(l => l.name.toLowerCase() === name.toLowerCase());
+            if (existingIdx !== -1) {
+                if (!confirm(`Une disposition nommée "${name}" existe déjà. Veux-tu la mettre à jour ?`)) return;
+                savedLayouts[existingIdx].items = items;
+                savedLayouts[existingIdx].desc = desc;
+                savedLayouts[existingIdx].updatedAt = new Date().toLocaleDateString('fr-FR');
+                activeSavedLayoutId = savedLayouts[existingIdx].id;
+            } else {
+                const newLayout = {
+                    id: 'lay_' + Date.now(),
+                    name,
+                    desc,
+                    updatedAt: new Date().toLocaleDateString('fr-FR'),
+                    items
+                };
+                savedLayouts.unshift(newLayout);
+                activeSavedLayoutId = newLayout.id;
+            }
+
+            saveLayoutsToStorage();
+            openTab(5);
+            showToast(`📂 Disposition "${name}" enregistrée !`);
+        }
+
+        function refreshSavedLayoutsUI() {
+            // Badge onglet 5
+            document.getElementById('saved-count-badge').innerText = savedLayouts.length;
+
+            // Mise à jour du menu déroulant d'import dans le Mode Libre
+            const select = document.getElementById('import-preset-select');
+            const prevVal = select.value;
+            select.innerHTML = `
+                <option value="vue3">✨ Vue 3 (Actuelle)</option>
+                <option value="vue3_default">✨ Vue 3 (Origine - 84 tatamis)</option>
+                <option value="vue1">🥋 Vue 1 (Officielle - 56 tatamis)</option>
+                <option value="vue2">🏛️ Vue 2 (Salle des Fêtes - 49 tatamis)</option>
+            `;
+            if (savedLayouts.length > 0) {
+                const optGroup = document.createElement('optgroup');
+                optGroup.label = '📂 Mes Dispositions enregistrées';
+                savedLayouts.forEach(l => {
+                    const opt = document.createElement('option');
+                    opt.value = 'saved_' + l.id;
+                    opt.innerText = `📂 ${l.name} (${l.items.length} tatamis)`;
+                    optGroup.appendChild(opt);
+                });
+                select.appendChild(optGroup);
+            }
+            if ([...select.options].some(o => o.value === prevVal)) {
+                select.value = prevVal;
+            }
+
+            // Galerie Onglet 5
+            const listEl = document.getElementById('saved-layouts-list');
+            const viewerEl = document.getElementById('saved-layout-viewer');
+            const emptyEl = document.getElementById('saved-empty-state');
+
+            if (savedLayouts.length === 0) {
+                listEl.innerHTML = '';
+                viewerEl.style.display = 'none';
+                emptyEl.style.display = 'block';
+                activeSavedLayoutId = null;
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+            viewerEl.style.display = 'block';
+
+            if (!activeSavedLayoutId || !savedLayouts.some(l => l.id === activeSavedLayoutId)) {
+                activeSavedLayoutId = savedLayouts[0].id;
+            }
+
+            listEl.innerHTML = savedLayouts.map(l => {
+                const m = computeLayoutMetrics(l.items);
+                const isActive = l.id === activeSavedLayoutId;
+                return `
+                    <div class="saved-layout-card ${isActive ? 'active' : ''}" onclick="selectSavedLayout('${l.id}')">
+                        <div class="saved-layout-card-title">
+                            <span>🥋 ${escapeHtml(l.name)}</span>
+                            <span class="tab-btn-count">${m.total} tatamis</span>
+                        </div>
+                        <div class="saved-layout-card-meta">
+                            Dimensions : <strong>${m.widthM}m × ${m.heightM}m</strong> (${m.surface} m²) • ${l.updatedAt || ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            renderActiveSavedLayoutViewer();
+        }
+
+        function selectSavedLayout(id) {
+            activeSavedLayoutId = id;
+            refreshSavedLayoutsUI();
+        }
+
+        function renderActiveSavedLayoutViewer() {
+            const layout = savedLayouts.find(l => l.id === activeSavedLayoutId);
+            if (!layout) return;
+
+            const metrics = computeLayoutMetrics(layout.items);
+            document.getElementById('saved-view-title').innerText = `${layout.name} (${metrics.widthM}m × ${metrics.heightM}m)`;
+            document.getElementById('saved-view-subtitle').innerText = `${layout.desc || 'Disposition personnalisée'} • Surface totale de ${metrics.surface} m²`;
+            document.getElementById('saved-view-total').innerText = `${metrics.total} / 85 Tatamis`;
+            document.getElementById('saved-view-badges').innerHTML = renderBadgesHTML(metrics.counts);
+            document.getElementById('saved-view-svg-container').innerHTML = generateSVGFromItems(layout.items, false);
+        }
+
+        function editActiveSavedLayout() {
+            if (!activeSavedLayoutId) return;
+            importIntoBuilder('saved_' + activeSavedLayoutId, true);
+        }
+
+        function applyActiveSavedToVue3() {
+            const layout = savedLayouts.find(l => l.id === activeSavedLayoutId);
+            if (!layout) return;
+            const payload = {
+                title: `Disposition 3 • ${layout.name}`,
+                subtitle: layout.desc || 'Disposition personnalisée',
+                items: layout.items
+            };
+            localStorage.setItem(STORAGE_KEY_VUE3, JSON.stringify(payload));
+            renderVue3();
+            openTab(3);
+            showToast(`✨ "${layout.name}" est maintenant affichée en Vue 3 !`);
+        }
+
+        function renameActiveSavedLayout() {
+            const layout = savedLayouts.find(l => l.id === activeSavedLayoutId);
+            if (!layout) return;
+            const newName = prompt("Nouveau nom de la disposition :", layout.name);
+            if (!newName || !newName.trim()) return;
+            const newDesc = prompt("Description / Note :", layout.desc || '');
+            layout.name = newName.trim();
+            if (newDesc !== null) layout.desc = newDesc.trim();
+            saveLayoutsToStorage();
+            showToast("✏️ Disposition renommée !");
+        }
+
+        function deleteActiveSavedLayout() {
+            const layout = savedLayouts.find(l => l.id === activeSavedLayoutId);
+            if (!layout) return;
+            if (!confirm(`Supprimer définitivement la disposition "${layout.name}" ?`)) return;
+            savedLayouts = savedLayouts.filter(l => l.id !== activeSavedLayoutId);
+            activeSavedLayoutId = savedLayouts[0] ? savedLayouts[0].id : null;
+            saveLayoutsToStorage();
+            showToast("🗑️ Disposition supprimée.");
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        /* --- ÉVÉNEMENTS SOURIS GLOBAUX POUR LE DRAG & DROP --- */
         window.addEventListener('mousemove', (e) => {
             if (!activeDrag) return;
-            const dx = e.clientX - dragStartX; const dy = e.clientY - dragStartY;
+            const dx = e.clientX - dragStartX;
+            const dy = e.clientY - dragStartY;
             activeDrag.style.left = (initialLeft + dx) + 'px';
             activeDrag.style.top = (initialTop + dy) + 'px';
         });
 
-        window.addEventListener('mouseup', (e) => {
+        window.addEventListener('mouseup', () => {
             if (!activeDrag) return;
-            const t = activeDrag; activeDrag = null; t.style.zIndex = '';
+            const t = activeDrag;
+            activeDrag = null;
+            t.style.zIndex = '';
+
             let finalLeft = Math.round(parseInt(t.style.left) / CELL_SIZE) * CELL_SIZE;
             let finalTop = Math.round(parseInt(t.style.top) / CELL_SIZE) * CELL_SIZE;
             const w = t.classList.contains('vertical') ? CELL_SIZE : (CELL_SIZE * 2);
@@ -574,14 +1204,23 @@
                 t.remove();
                 updatePalette();
             } else {
-                if (finalLeft < 0) finalLeft = 0; if (finalTop < 0) finalTop = 0;
+                if (finalLeft < 0) finalLeft = 0;
+                if (finalTop < 0) finalTop = 0;
                 if (finalLeft + w > GRID_MAX) finalLeft = GRID_MAX - w;
                 if (finalTop + h > GRID_MAX) finalTop = GRID_MAX - h;
-                t.style.left = finalLeft + 'px'; t.style.top = finalTop + 'px';
+                t.style.left = finalLeft + 'px';
+                t.style.top = finalTop + 'px';
+                updateBuilderStatusBar();
             }
         });
 
-        updatePalette();
+        /* --- INITIALISATION AU CHARGEMENT --- */
+        window.addEventListener('DOMContentLoaded', () => {
+            renderVue3();
+            loadSavedLayoutsFromStorage();
+            // Pré-charge la Vue 3 dans le Mode Libre à l'ouverture pour pouvoir la modifier tout de suite
+            importIntoBuilder('vue3', false);
+        });
     </script>
 </body>
 </html>
