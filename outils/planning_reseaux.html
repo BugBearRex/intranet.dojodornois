@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Centre de Planification & Publications - Dojo Dornois</title>
+    <title>Studio Éditorial & Planification - Dojo Dornois</title>
+    <link rel="icon" type="image/png" href="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
     
     <!-- Polices officielles Dojo Dornois -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -14,6 +15,7 @@
         :root {
             --dojo-red: #C41E3A;
             --dojo-dark-red: #8B1429;
+            --dojo-red-soft: #FFEBEF;
             --dojo-bg: #F4F6F9;
             --dojo-card-bg: #FFFFFF;
             --text-color: #1A1A1A;
@@ -31,6 +33,20 @@
             --gmail-bg: #FCE8E6;
             --kali-color: #0284C7;
             --kali-bg: #E0F2FE;
+
+            /* Statuts */
+            --st-todo-bg: #FEF3C7;
+            --st-todo-txt: #92400E;
+            --st-todo-border: #F59E0B;
+            --st-draft-bg: #E0F2FE;
+            --st-draft-txt: #0369A1;
+            --st-draft-border: #0284C7;
+            --st-ready-bg: #EDE9FE;
+            --st-ready-txt: #5B21B6;
+            --st-ready-border: #7C3AED;
+            --st-pub-bg: #D1FAE5;
+            --st-pub-txt: #065F46;
+            --st-pub-border: #10B981;
         }
 
         * {
@@ -50,19 +66,22 @@
 
         .main-content {
             flex: 1;
-            padding: 24px;
-            max-width: 1440px;
+            padding: 20px 26px;
+            max-width: 1650px;
             margin: 0 auto;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
         }
 
-        /* En-tête */
+        /* ================= EN-TÊTE STUDIO ================= */
         .page-header {
             background: var(--dojo-card-bg);
-            padding: 20px 24px;
-            border-radius: 12px;
+            padding: 18px 24px;
+            border-radius: 14px;
             border-left: 6px solid var(--dojo-red);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -70,98 +89,141 @@
             gap: 16px;
         }
 
-        .page-header h1 {
+        .header-title-block h1 {
             font-family: 'Fredoka', sans-serif;
-            font-size: 1.7rem;
+            font-size: 1.6rem;
             color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .page-header p {
+        .header-title-block p {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            margin-top: 2px;
         }
 
         .header-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
-        /* Onglets d'affichage principaux */
+        /* ================= RACCOURCIS & KPIs ================= */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 1200px) {
+            .kpi-row { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .kpi-row { grid-template-columns: 1fr 1fr; }
+        }
+
+        .kpi-card {
+            background: var(--dojo-card-bg);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+            border-color: #CBD5E1;
+        }
+
+        .kpi-card.active-kpi {
+            border: 2px solid var(--dojo-red);
+            background: #FFF9FA;
+        }
+
+        .kpi-info span {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .kpi-info strong {
+            display: block;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.55rem;
+            color: var(--text-color);
+            line-height: 1.2;
+            margin-top: 2px;
+        }
+
+        .kpi-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        /* ================= BARRE D'OUTILS & VUES ================= */
+        .studio-toolbar {
+            background: var(--dojo-card-bg);
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
         .view-tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            background: #E2E8F0;
+            gap: 6px;
+            background: #F1F5F9;
             padding: 4px;
             border-radius: 10px;
-            width: fit-content;
         }
 
         .view-tab-btn {
-            padding: 8px 18px;
-            border-radius: 8px;
+            padding: 8px 15px;
+            border-radius: 7px;
             border: none;
             background: transparent;
             font-family: 'Fredoka', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             font-weight: 600;
             color: #475569;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
             transition: all 0.2s ease;
         }
 
         .view-tab-btn.active {
             background: white;
             color: var(--dojo-red);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-        }
-
-        /* Boutons */
-        .btn {
-            font-family: 'Fredoka', sans-serif;
-            padding: 9px 16px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-        .btn-primary { background-color: var(--dojo-red); color: white; }
-        .btn-primary:hover { background-color: var(--dojo-dark-red); }
-        .btn-success { background-color: #10B981; color: white; }
-        .btn-success:hover { background-color: #059669; }
-        .btn-secondary { background-color: #E2E8F0; color: #334155; }
-        .btn-secondary:hover { background-color: #CBD5E1; }
-        .btn-outline { background: white; border: 1px solid var(--border-color); color: #334155; }
-        .btn-outline:hover { background: #F8FAFC; border-color: #CBD5E1; }
-
-        /* Barre de filtres */
-        .filter-bar {
-            background: var(--dojo-card-bg);
-            padding: 12px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.07);
         }
 
         .filter-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
@@ -170,10 +232,20 @@
             border-radius: 20px;
             border: 1px solid var(--border-color);
             background: white;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             cursor: pointer;
             font-family: 'Fredoka', sans-serif;
+            font-weight: 500;
+            color: #475569;
             transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-btn:hover {
+            background: #F8FAFC;
+            border-color: #CBD5E1;
         }
 
         .filter-btn.active {
@@ -182,159 +254,110 @@
             border-color: var(--dojo-red);
         }
 
-        /* Tableau */
-        .table-card {
-            background: var(--dojo-card-bg);
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-            overflow: hidden;
-            border: 1px solid var(--border-color);
+        .search-box {
+            position: relative;
+            min-width: 230px;
         }
 
-        .table-responsive {
-            overflow-x: auto;
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+            font-size: 0.85rem;
         }
 
-        table {
+        .search-box input {
             width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th {
-            background-color: #F8FAFC;
-            color: #475569;
-            font-family: 'Fredoka', sans-serif;
-            font-weight: 600;
-            padding: 14px 16px;
-            font-size: 0.9rem;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
-            font-size: 0.9rem;
-        }
-
-        tr:hover {
-            background-color: #FAFAFA;
-        }
-
-        /* Badges Canaux */
-        .badge-net {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.76rem;
-            font-weight: 700;
-            margin-right: 4px;
-            margin-bottom: 3px;
-            white-space: nowrap;
-        }
-
-        .badge-fb { background: var(--fb-bg); color: var(--fb-color); }
-        .badge-ig { background: var(--ig-bg); color: var(--ig-color); }
-        .badge-wa { background: var(--wa-bg); color: var(--wa-color); }
-        .badge-gmail { background: var(--gmail-bg); color: var(--gmail-color); }
-        .badge-kali { background: var(--kali-bg); color: var(--kali-color); }
-
-        /* Statuts */
-        .status-select {
-            padding: 6px 10px;
+            padding: 7px 12px 7px 34px;
+            border: 1px solid var(--border-color);
             border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: 1px solid transparent;
-            cursor: pointer;
+            font-size: 0.85rem;
             outline: none;
-            width: 100%;
+            transition: border-color 0.2s;
         }
 
-        .status-todo { background: #FEF3C7; color: #92400E; }
-        .status-draft { background: #E0F2FE; color: #0369A1; }
-        .status-ready { background: #E0E7FF; color: #3730A3; }
-        .status-published { background: #D1FAE5; color: #065F46; }
-
-        /* Miniature visuelle */
-        .media-preview-mini {
-            width: 48px;
-            height: 48px;
-            border-radius: 6px;
-            object-fit: cover;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: transform 0.2s;
+        .search-box input:focus {
+            border-color: var(--dojo-red);
         }
 
-        .media-preview-mini:hover {
-            transform: scale(1.1);
-        }
-
-        /* Actions de ligne */
-        .row-actions {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-icon {
-            background: #F1F5F9;
+        /* ================= BOUTONS ================= */
+        .btn {
+            font-family: 'Fredoka', sans-serif;
+            padding: 9px 15px;
+            border-radius: 8px;
             border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
             cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            font-size: 0.88rem;
-            color: #475569;
-            transition: all 0.15s ease;
+            gap: 7px;
+            transition: all 0.2s ease;
+            text-decoration: none;
         }
 
-        .btn-icon:hover { background: #E2E8F0; color: #0F172A; }
-        .btn-copy:hover { background: #FEF3C7; color: #B45309; }
-        .btn-download:hover { background: #E0F2FE; color: #0284C7; }
-        .btn-edit:hover { background: #DBEAFE; color: #2563EB; }
-        .btn-delete:hover { background: #FEE2E2; color: #DC2626; }
+        .btn-primary { background-color: var(--dojo-red); color: white; box-shadow: 0 2px 8px rgba(196, 30, 58, 0.25); }
+        .btn-primary:hover { background-color: var(--dojo-dark-red); transform: translateY(-1px); }
+        .btn-success { background-color: #10B981; color: white; }
+        .btn-success:hover { background-color: #059669; }
+        .btn-secondary { background-color: #E2E8F0; color: #334155; }
+        .btn-secondary:hover { background-color: #CBD5E1; }
+        .btn-outline { background: white; border: 1px solid var(--border-color); color: #334155; }
+        .btn-outline:hover { background: #F8FAFC; border-color: #CBD5E1; color: var(--dojo-red); }
+        .btn-sm { padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; }
 
-        /* ================= VUE CALENDRIER ================= */
+        /* ================= VUE 1 : STUDIO CALENDRIER + BAC À BROUILLONS ================= */
+        .calendar-studio-layout {
+            display: grid;
+            grid-template-columns: 1fr 330px;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .calendar-studio-layout.backlog-Collapsed {
+            grid-template-columns: 1fr;
+        }
+
+        @media (max-width: 1150px) {
+            .calendar-studio-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .calendar-card {
             background: var(--dojo-card-bg);
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
             border: 1px solid var(--border-color);
             padding: 20px;
-            display: none;
         }
 
         .cal-header-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             flex-wrap: wrap;
             gap: 12px;
         }
 
         .cal-title {
             font-family: 'Fredoka', sans-serif;
-            font-size: 1.35rem;
+            font-size: 1.4rem;
             color: var(--text-color);
             display: flex;
             align-items: center;
             gap: 10px;
+            text-transform: capitalize;
         }
 
         .cal-nav-group {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .cal-sub-tabs {
@@ -345,11 +368,11 @@
         }
 
         .cal-sub-tab {
-            padding: 6px 14px;
+            padding: 6px 13px;
             border: none;
             background: transparent;
             font-family: 'Fredoka', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
             border-radius: 6px;
             cursor: pointer;
@@ -371,52 +394,99 @@
 
         .cal-day-header {
             font-family: 'Fredoka', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
-            color: #64748B;
+            color: #475569;
             text-align: center;
             padding: 8px 0;
             background: #F8FAFC;
             border-radius: 6px;
+            border: 1px solid var(--border-color);
         }
 
         .cal-day-cell {
-            min-height: 120px;
+            min-height: 132px;
             background: #FAFAFA;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 8px;
+            border-radius: 10px;
+            padding: 7px;
             display: flex;
             flex-direction: column;
             gap: 6px;
-            transition: background 0.15s;
+            transition: all 0.15s ease;
+            position: relative;
         }
 
         .cal-day-cell:hover {
             background: #FFFFFF;
+            border-color: #CBD5E1;
+        }
+
+        .cal-day-cell.drag-over-cell {
+            background: #FFF1F2 !important;
+            border: 2px dashed var(--dojo-red) !important;
+            transform: scale(1.01);
         }
 
         .cal-day-cell.other-month {
             background: #F1F5F9;
-            opacity: 0.55;
+            opacity: 0.5;
         }
 
         .cal-day-cell.today {
-            border-color: var(--dojo-red);
-            background: #FFF9FA;
+            border: 2px solid var(--dojo-red);
+            background: #FFFDFD;
         }
 
-        .cal-day-num {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #475569;
+        .cal-day-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .cal-day-num {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #475569;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
         }
 
         .cal-day-cell.today .cal-day-num {
-            color: var(--dojo-red);
+            background: var(--dojo-red);
+            color: white;
+        }
+
+        .btn-add-day {
+            opacity: 0;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: none;
+            background: #E2E8F0;
+            color: #334155;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .cal-day-cell:hover .btn-add-day,
+        .cal-week-col:hover .btn-add-day {
+            opacity: 1;
+        }
+
+        .btn-add-day:hover {
+            background: var(--dojo-red);
+            color: white;
         }
 
         /* Grille Semaine */
@@ -426,38 +496,50 @@
             gap: 10px;
         }
 
+        @media (max-width: 1024px) {
+            .cal-grid-week { grid-template-columns: repeat(2, 1fr); }
+        }
+
         .cal-week-col {
             background: #FAFAFA;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            min-height: 480px;
+            border-radius: 10px;
+            min-height: 460px;
             display: flex;
             flex-direction: column;
+            transition: all 0.15s;
+        }
+
+        .cal-week-col.drag-over-cell {
+            background: #FFF1F2 !important;
+            border: 2px dashed var(--dojo-red) !important;
         }
 
         .cal-week-col.today {
-            border-color: var(--dojo-red);
-            background: #FFF9FA;
+            border: 2px solid var(--dojo-red);
+            background: #FFFDFD;
         }
 
         .cal-week-header {
             padding: 10px;
-            text-align: center;
             border-bottom: 1px solid var(--border-color);
             background: #F8FAFC;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .cal-week-header-day {
             font-family: 'Fredoka', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             font-weight: 600;
             color: #334155;
         }
 
         .cal-week-header-date {
-            font-size: 0.8rem;
+            font-size: 0.76rem;
             color: #64748B;
         }
 
@@ -469,66 +551,407 @@
             flex: 1;
         }
 
-        /* Éléments / Cartes de publication dans le calendrier */
+        /* Cartes dans le calendrier */
         .cal-item {
             background: white;
-            border-radius: 6px;
-            padding: 6px 8px;
+            border-radius: 7px;
+            padding: 7px 8px;
+            border: 1px solid #E2E8F0;
             border-left: 4px solid var(--dojo-red);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-            font-size: 0.78rem;
-            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            font-size: 0.76rem;
+            cursor: grab;
             transition: all 0.15s ease;
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 4px;
+            position: relative;
         }
+
+        .cal-item:active { cursor: grabbing; }
 
         .cal-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.09);
+        }
+
+        .cal-item.st-border-À-rédiger { border-left-color: var(--st-todo-border); }
+        .cal-item.st-border-Brouillon { border-left-color: var(--st-draft-border); }
+        .cal-item.st-border-Prêt { border-left-color: var(--st-ready-border); }
+        .cal-item.st-border-Publié { border-left-color: var(--st-pub-border); opacity: 0.85; }
+
+        .cal-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .cal-item-time {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: #64748B;
+            background: #F1F5F9;
+            padding: 1px 5px;
+            border-radius: 4px;
         }
 
         .cal-item-title {
             font-weight: 700;
             color: #1E293B;
-            white-space: nowrap;
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        .cal-item-meta {
+        .cal-item-thumb {
+            width: 100%;
+            height: 46px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-top: 2px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .cal-item-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.72rem;
-            color: #64748B;
+            margin-top: 2px;
         }
 
-        .cal-item-badges {
+        .cal-net-dots {
             display: flex;
             gap: 3px;
             flex-wrap: wrap;
         }
 
-        .cal-mini-badge {
-            font-size: 0.68rem;
-            padding: 1px 4px;
+        .net-dot-mini {
+            width: 18px;
+            height: 18px;
             border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+        }
+
+        .cal-quick-copy {
+            background: none;
+            border: none;
+            color: #94A3B8;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+        }
+        .cal-quick-copy:hover {
+            background: #FEF3C7;
+            color: #B45309;
+        }
+
+        /* ================= VOLET DROIT : BAC À BROUILLONS / RÉSERVE ================= */
+        .backlog-panel {
+            background: var(--dojo-card-bg);
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 780px;
+        }
+
+        .backlog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .backlog-header h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.02rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .backlog-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #F1F5F9;
+            padding: 3px;
+            border-radius: 8px;
+        }
+
+        .backlog-tab {
+            border: none;
+            background: transparent;
+            padding: 6px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #64748B;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .backlog-tab.active {
+            background: white;
+            color: var(--dojo-red);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .backlog-list {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+            min-height: 220px;
+        }
+
+        .backlog-dropzone {
+            border: 1.5px dashed #CBD5E1;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.76rem;
+            color: #64748B;
+            background: #F8FAFC;
+            transition: all 0.2s;
+        }
+
+        .backlog-dropzone.drag-over-cell {
+            border-color: var(--dojo-red);
+            background: #FFF1F2;
+            color: var(--dojo-red);
+        }
+
+        /* ================= VUE 2 : TABLEAU PRO ================= */
+        .table-card {
+            background: var(--dojo-card-bg);
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .table-top-actions {
+            padding: 12px 18px;
+            background: #F8FAFC;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #F8FAFC;
+            color: #475569;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            padding: 13px 14px;
+            font-size: 0.86rem;
+            border-bottom: 2px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+            font-size: 0.88rem;
+        }
+
+        tbody tr {
+            transition: background 0.15s;
+        }
+
+        tbody tr:hover {
+            background-color: #F8FAFC;
+        }
+
+        tbody tr.dragging-row {
+            opacity: 0.4;
+            background: #FFEBEF;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            color: #94A3B8;
+            font-size: 1rem;
+            padding: 4px 6px;
+            user-select: none;
+        }
+        .drag-handle:active { cursor: grabbing; }
+
+        /* Badges Canaux */
+        .badge-net {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            margin-right: 4px;
+            margin-bottom: 3px;
+            white-space: nowrap;
+        }
+
+        .badge-fb { background: var(--fb-bg); color: var(--fb-color); }
+        .badge-ig { background: var(--ig-bg); color: var(--ig-color); }
+        .badge-wa { background: var(--wa-bg); color: var(--wa-color); }
+        .badge-gmail { background: var(--gmail-bg); color: var(--gmail-color); }
+        .badge-kali { background: var(--kali-bg); color: var(--kali-color); }
+
+        /* Statuts */
+        .status-select {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border: 1px solid transparent;
+            cursor: pointer;
+            outline: none;
+            width: 100%;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .status-todo { background: var(--st-todo-bg); color: var(--st-todo-txt); }
+        .status-draft { background: var(--st-draft-bg); color: var(--st-draft-txt); }
+        .status-ready { background: var(--st-ready-bg); color: var(--st-ready-txt); }
+        .status-published { background: var(--st-pub-bg); color: var(--st-pub-txt); }
+
+        .media-preview-mini {
+            width: 46px;
+            height: 46px;
+            border-radius: 7px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .media-preview-mini:hover { transform: scale(1.12); }
+
+        .row-actions {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon {
+            background: #F1F5F9;
+            border: none;
+            width: 31px;
+            height: 31px;
+            border-radius: 7px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.84rem;
+            color: #475569;
+            transition: all 0.15s ease;
+        }
+
+        .btn-icon:hover { background: #E2E8F0; color: #0F172A; }
+        .btn-copy:hover { background: #FEF3C7; color: #B45309; }
+        .btn-html:hover { background: #E0F2FE; color: #0284C7; }
+        .btn-dup:hover { background: #EDE9FE; color: #6D28D9; }
+        .btn-edit:hover { background: #DBEAFE; color: #2563EB; }
+        .btn-delete:hover { background: #FEE2E2; color: #DC2626; }
+
+        /* ================= VUE 3 : KANBAN PIPELINE ================= */
+        .kanban-container {
+            display: none;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            align-items: start;
+        }
+
+        @media (max-width: 1100px) {
+            .kanban-container { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .kanban-container { grid-template-columns: 1fr; }
+        }
+
+        .kanban-col {
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .kanban-col.drag-over-cell {
+            background: #FFF1F2;
+            border: 2px dashed var(--dojo-red);
+        }
+
+        .kanban-col-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
             font-weight: 600;
         }
 
-        /* Modale */
+        .kanban-count {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+        }
+
+        .kanban-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        /* ================= MODALE STUDIO (CRÉATION / ÉDITION + APERÇU HTML) ================= */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.55);
+            background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(4px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            padding: 20px;
+            padding: 18px;
         }
 
         .modal-overlay.active {
@@ -537,65 +960,101 @@
 
         .modal-card {
             background: white;
-            border-radius: 14px;
+            border-radius: 16px;
             width: 100%;
-            max-width: 760px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            max-width: 1120px;
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             border: 1px solid var(--border-color);
+            overflow: hidden;
         }
 
         .modal-header {
-            padding: 18px 24px;
+            padding: 16px 24px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: #F8FAFC;
         }
 
         .modal-header h2 {
             font-family: 'Fredoka', sans-serif;
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             color: var(--dojo-red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .modal-body {
-            padding: 24px;
+        .modal-body-split {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        @media (max-width: 960px) {
+            .modal-body-split { grid-template-columns: 1fr; }
+        }
+
+        .modal-form-col {
+            padding: 22px 24px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 15px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .modal-preview-col {
+            padding: 22px 24px;
+            background: #F8FAFC;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: 1.2fr 0.9fr 1fr;
+            gap: 12px;
         }
 
         .form-grid-2 {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 14px;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
         @media (max-width: 640px) {
-            .form-grid-2 { grid-template-columns: 1fr; }
+            .form-grid-3, .form-grid-2 { grid-template-columns: 1fr; }
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
         }
 
         .form-group label {
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: #475569;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .form-control {
-            padding: 10px 12px;
+            padding: 9px 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             font-family: 'Roboto', sans-serif;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             background: white;
+            transition: border-color 0.2s;
         }
 
         .form-control:focus {
@@ -606,10 +1065,11 @@
 
         textarea.form-control {
             resize: vertical;
-            min-height: 110px;
+            min-height: 150px;
+            line-height: 1.5;
         }
 
-        /* Sélecteurs de canaux en pastilles */
+        /* Sélecteurs de canaux */
         .channel-selector {
             display: flex;
             gap: 8px;
@@ -617,77 +1077,140 @@
         }
 
         .channel-pill {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 7px 12px;
-            border-radius: 20px;
             cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
             user-select: none;
-            border: 1px solid transparent;
-            transition: all 0.2s ease;
         }
 
         .channel-pill input { display: none; }
 
-        .pill-fb { background: var(--fb-bg); color: var(--fb-color); border-color: rgba(24,119,242,0.2); }
-        .channel-pill input:checked + .pill-label-fb { background: var(--fb-color); color: white; border-radius: 16px; padding: 4px 10px; }
+        .pill-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 13px;
+            border-radius: 20px;
+            font-size: 0.83rem;
+            font-weight: 700;
+            border: 1.5px solid transparent;
+            transition: all 0.15s ease;
+        }
 
-        .pill-ig { background: var(--ig-bg); color: var(--ig-color); border-color: rgba(228,64,95,0.2); }
-        .channel-pill input:checked + .pill-label-ig { background: var(--ig-color); color: white; border-radius: 16px; padding: 4px 10px; }
+        .pill-fb { background: var(--fb-bg); color: var(--fb-color); border-color: rgba(24,119,242,0.25); }
+        .channel-pill input:checked + .pill-fb { background: var(--fb-color); color: white; box-shadow: 0 3px 8px rgba(24,119,242,0.3); }
 
-        .pill-wa { background: var(--wa-bg); color: var(--wa-color); border-color: rgba(37,211,102,0.2); }
-        .channel-pill input:checked + .pill-label-wa { background: var(--wa-color); color: white; border-radius: 16px; padding: 4px 10px; }
+        .pill-ig { background: var(--ig-bg); color: var(--ig-color); border-color: rgba(228,64,95,0.25); }
+        .channel-pill input:checked + .pill-ig { background: var(--ig-color); color: white; box-shadow: 0 3px 8px rgba(228,64,95,0.3); }
 
-        .pill-gmail { background: var(--gmail-bg); color: var(--gmail-color); border-color: rgba(234,67,53,0.2); }
-        .channel-pill input:checked + .pill-label-gmail { background: var(--gmail-color); color: white; border-radius: 16px; padding: 4px 10px; }
+        .pill-wa { background: var(--wa-bg); color: var(--wa-color); border-color: rgba(37,211,102,0.25); }
+        .channel-pill input:checked + .pill-wa { background: var(--wa-color); color: white; box-shadow: 0 3px 8px rgba(37,211,102,0.3); }
 
-        .pill-kali { background: var(--kali-bg); color: var(--kali-color); border-color: rgba(2,132,199,0.2); }
-        .channel-pill input:checked + .pill-label-kali { background: var(--kali-color); color: white; border-radius: 16px; padding: 4px 10px; }
+        .pill-gmail { background: var(--gmail-bg); color: var(--gmail-color); border-color: rgba(234,67,53,0.25); }
+        .channel-pill input:checked + .pill-gmail { background: var(--gmail-color); color: white; box-shadow: 0 3px 8px rgba(234,67,53,0.3); }
 
-        /* Zone d'import de visuel */
+        .pill-kali { background: var(--kali-bg); color: var(--kali-color); border-color: rgba(2,132,199,0.25); }
+        .channel-pill input:checked + .pill-kali { background: var(--kali-color); color: white; box-shadow: 0 3px 8px rgba(2,132,199,0.3); }
+
+        /* Barre d'assistants d'insertion rapide */
+        .snippet-bar {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            background: #F8FAFC;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .snippet-btn {
+            background: white;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            padding: 4px 9px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .snippet-btn:hover {
+            border-color: var(--dojo-red);
+            color: var(--dojo-red);
+            background: #FFF9FA;
+        }
+
+        /* Options spécifiques Newsletter / Mail */
+        .newsletter-options-box {
+            background: #F0F9FF;
+            border: 1px solid #BAE6FD;
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .newsletter-options-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.85rem;
+            color: #0369A1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Aperçu en direct (Réseaux ou Newsletter HTML) */
+        .preview-box-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 500px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
         .image-drop-area {
             border: 2px dashed var(--border-color);
             border-radius: 8px;
-            padding: 14px;
+            padding: 11px;
             text-align: center;
             background: #F8FAFC;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
         }
-
         .image-drop-area:hover { border-color: var(--dojo-red); }
 
         .modal-footer {
-            padding: 16px 24px;
+            padding: 14px 24px;
             border-top: 1px solid var(--border-color);
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
             gap: 10px;
             background: #F8FAFC;
-            border-bottom-left-radius: 14px;
-            border-bottom-right-radius: 14px;
         }
 
         /* Notif Toast */
         .toast {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 22px;
+            right: 22px;
             background: #1E293B;
             color: white;
             padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             display: none;
-            z-index: 2000;
+            z-index: 3000;
             font-family: 'Fredoka', sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
+            border-left: 4px solid var(--dojo-red);
         }
     </style>
 </head>
@@ -696,32 +1219,89 @@
     <div id="sidebar-container"></div>
 
     <div class="main-content">
+        <!-- EN-TÊTE -->
         <div class="page-header">
-            <div>
-                <h1>📅 Hub de Planification & Publications</h1>
-                <p>Centralisation complète : Facebook, Instagram, WhatsApp, Mails Gmail & Newsletters Kalisport.</p>
+            <div class="header-title-block">
+                <h1>📅 Studio Éditorial & Hub de Planification</h1>
+                <p>Pilotage centralisé : Réseaux Sociaux (Facebook, Instagram, WhatsApp), Courriels Gmail & Newsletters Kalisport.</p>
             </div>
             <div class="header-actions">
-                <button class="btn btn-outline" onclick="exportJSON()"><i class="fa-solid fa-download"></i> Sauvegarde JSON</button>
-                <button class="btn btn-success" onclick="syncToSupabase(false)"><i class="fa-solid fa-cloud-arrow-up"></i> Synchroniser</button>
-                <button class="btn btn-primary" onclick="openCreateModal()"><i class="fa-solid fa-plus"></i> Nouvelle Publication</button>
+                <a href="https://business.facebook.com/latest/content_calendar" target="_blank" class="btn btn-outline btn-sm" title="Ouvrir Meta Business Suite">
+                    <i class="fa-brands fa-meta" style="color:#1877F2;"></i> Meta Suite
+                </a>
+                <a href="https://dojodornois.fr" target="_blank" class="btn btn-outline btn-sm" title="Ouvrir l'administration Kalisport">
+                    <i class="fa-solid fa-newspaper" style="color:#0284C7;"></i> Kalisport
+                </a>
+                <button class="btn btn-outline btn-sm" onclick="exportJSON()" title="Exporter une sauvegarde JSON">
+                    <i class="fa-solid fa-download"></i> JSON
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('importJsonInput').click()" title="Restaurer un fichier JSON">
+                    <i class="fa-solid fa-upload"></i> Importer
+                </button>
+                <input type="file" id="importJsonInput" accept=".json" style="display:none;" onchange="importJSON(event)">
+                <button class="btn btn-success btn-sm" onclick="syncToSupabase(false)">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Synchroniser
+                </button>
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                    <i class="fa-solid fa-plus"></i> Nouvelle Publication / Newsletter
+                </button>
             </div>
         </div>
 
-        <!-- BASCULE DES VUES (TABLEAU VS CALENDRIER) -->
-        <div class="view-tabs">
-            <button class="view-tab-btn active" id="tabViewTable" onclick="switchView('table')">
-                <i class="fa-solid fa-table-list"></i> Vue Tableau / Liste
-            </button>
-            <button class="view-tab-btn" id="tabViewCalendar" onclick="switchView('calendar')">
-                <i class="fa-solid fa-calendar-days"></i> Vue Calendrier
-            </button>
+        <!-- BANDEAU KPIs (Cliquables pour filtrer par statut) -->
+        <div class="kpi-row">
+            <div class="kpi-card" id="kpiAll" onclick="setStatusFilter('ALL')">
+                <div class="kpi-info">
+                    <span>Total Planifié</span>
+                    <strong id="kpiTotalCount">0</strong>
+                </div>
+                <div class="kpi-icon" style="background:#F1F5F9; color:#334155;"><i class="fa-solid fa-layer-group"></i></div>
+            </div>
+            <div class="kpi-card" id="kpiDrafts" onclick="setStatusFilter('BROUILLONS')">
+                <div class="kpi-info">
+                    <span>Idées & Brouillons</span>
+                    <strong id="kpiDraftCount">0</strong>
+                </div>
+                <div class="kpi-icon" style="background:var(--st-draft-bg); color:var(--st-draft-txt);"><i class="fa-solid fa-pen-ruler"></i></div>
+            </div>
+            <div class="kpi-card" id="kpiReady" onclick="setStatusFilter('Prêt / Programmé')">
+                <div class="kpi-info">
+                    <span>Programmés</span>
+                    <strong id="kpiReadyCount">0</strong>
+                </div>
+                <div class="kpi-icon" style="background:var(--st-ready-bg); color:var(--st-ready-txt);"><i class="fa-solid fa-clock"></i></div>
+            </div>
+            <div class="kpi-card" id="kpiMetaWindow" onclick="setStatusFilter('META29')" title="Brouillons entrant dans la fenêtre des 29 jours de Meta Business Suite">
+                <div class="kpi-info">
+                    <span>Prêts pour Meta (&lt;29j)</span>
+                    <strong id="kpiMetaCount">0</strong>
+                </div>
+                <div class="kpi-icon" style="background:#FEF3C7; color:#B45309;"><i class="fa-solid fa-bolt"></i></div>
+            </div>
+            <div class="kpi-card" id="kpiPublished" onclick="setStatusFilter('Publié')">
+                <div class="kpi-info">
+                    <span>Publiés / Envoyés</span>
+                    <strong id="kpiPubCount">0</strong>
+                </div>
+                <div class="kpi-icon" style="background:var(--st-pub-bg); color:var(--st-pub-txt);"><i class="fa-solid fa-circle-check"></i></div>
+            </div>
         </div>
 
-        <!-- Filtres par réseau -->
-        <div class="filter-bar">
+        <!-- BARRE DE PILOTAGE : VUES, FILTRES CANAUX & RECHERCHE -->
+        <div class="studio-toolbar">
+            <div class="view-tabs">
+                <button class="view-tab-btn active" id="tabViewCalendar" onclick="switchView('calendar')">
+                    <i class="fa-solid fa-calendar-days"></i> Calendrier & Brouillons
+                </button>
+                <button class="view-tab-btn" id="tabViewTable" onclick="switchView('table')">
+                    <i class="fa-solid fa-table-list"></i> Tableau & Ordre
+                </button>
+                <button class="view-tab-btn" id="tabViewKanban" onclick="switchView('kanban')">
+                    <i class="fa-solid fa-table-columns"></i> Kanban Statuts
+                </button>
+            </div>
+
             <div class="filter-group">
-                <span style="font-weight:600; font-size:0.85rem; color:#64748B;">Filtrer par canal :</span>
                 <button class="filter-btn active" onclick="setFilter('ALL', this)">Tous</button>
                 <button class="filter-btn" onclick="setFilter('Facebook', this)">📘 Facebook</button>
                 <button class="filter-btn" onclick="setFilter('Instagram', this)">📸 Instagram</button>
@@ -729,25 +1309,99 @@
                 <button class="filter-btn" onclick="setFilter('Gmail', this)">✉️ Gmail</button>
                 <button class="filter-btn" onclick="setFilter('Kalisport', this)">📰 Kalisport</button>
             </div>
-            <div style="font-size:0.85rem; color:#64748B;">
-                Total : <strong id="totalCount" style="color:var(--text-color);">0</strong> entrée(s)
+
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Rechercher un titre, texte, date..." oninput="refreshDisplay()">
             </div>
         </div>
 
-        <!-- 1. VUE TABLEAU DES CONTENUS -->
+        <!-- ================= 1. VUE STUDIO CALENDRIER + BAC À BROUILLONS ================= -->
+        <div class="calendar-studio-layout" id="viewCalendarContainer">
+            <!-- Calendrier principal -->
+            <div class="calendar-card">
+                <div class="cal-header-bar">
+                    <div class="cal-title" id="calCurrentLabel">Octobre 2026</div>
+                    <div class="cal-nav-group">
+                        <button class="btn btn-outline btn-sm" onclick="navigateCalendar(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button class="btn btn-outline btn-sm" onclick="goToToday()">Aujourd'hui</button>
+                        <button class="btn btn-outline btn-sm" onclick="navigateCalendar(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                        
+                        <div class="cal-sub-tabs">
+                            <button class="cal-sub-tab active" id="subTabMonth" onclick="setCalendarMode('month')">Mois</button>
+                            <button class="cal-sub-tab" id="subTabWeek" onclick="setCalendarMode('week')">Semaine</button>
+                        </div>
+
+                        <button class="btn btn-outline btn-sm" onclick="toggleBacklogPanel()" id="btnToggleBacklog" title="Afficher/Masquer le volet des brouillons">
+                            <i class="fa-solid fa-box-archive"></i> Volet Brouillons
+                        </button>
+                    </div>
+                </div>
+
+                <div style="font-size:0.78rem; color:#64748B; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <span>💡 <strong>Astuce :</strong> Glissez-déposez n'importe quelle carte d'un jour à l'autre pour la déplacer, ou cliquez sur <strong>+</strong> dans une case pour créer à cette date.</span>
+                    <div style="display:flex; gap:10px; font-weight:600;">
+                        <span style="color:var(--st-todo-border);">● À rédiger</span>
+                        <span style="color:var(--st-draft-border);">● Brouillon</span>
+                        <span style="color:var(--st-ready-border);">● Programmé</span>
+                        <span style="color:var(--st-pub-border);">● Publié</span>
+                    </div>
+                </div>
+
+                <div id="calendarRenderContainer"></div>
+            </div>
+
+            <!-- Volet latéral : Réserve de Brouillons & Prochaines échéances -->
+            <div class="backlog-panel" id="backlogPanel">
+                <div class="backlog-header">
+                    <h3><i class="fa-solid fa-inbox" style="color:var(--dojo-red);"></i> Réserve & Brouillons</h3>
+                    <button class="btn btn-primary btn-sm" onclick="openCreateModal('')">+ Brouillon</button>
+                </div>
+
+                <div class="backlog-tabs">
+                    <button class="backlog-tab active" id="tabBacklogUnscheduled" onclick="setBacklogTab('unscheduled')">
+                        Sans date (<span id="countUnscheduled">0</span>)
+                    </button>
+                    <button class="backlog-tab" id="tabBacklogDrafts" onclick="setBacklogTab('all_drafts')">
+                        Tous les brouillons (<span id="countAllDrafts">0</span>)
+                    </button>
+                </div>
+
+                <div class="backlog-dropzone"
+                     ondragover="allowDrop(event)"
+                     ondragleave="leaveDrop(event)"
+                     ondrop="dropToUnscheduled(event)">
+                    <i class="fa-solid fa-arrow-down-up-across-line"></i> Glisser une carte ici pour retirer sa date (mettre en réserve)
+                </div>
+
+                <div class="backlog-list" id="backlogListContainer"></div>
+            </div>
+        </div>
+
+        <!-- ================= 2. VUE TABLEAU PRO ================= -->
         <div class="table-card" id="viewTableContainer">
+            <div class="table-top-actions">
+                <div style="font-size:0.85rem; color:#475569;">
+                    Affichage : <strong id="totalCount">0</strong> publication(s) • <em>Glissez la poignée ⠿ ou utilisez ⬆️⬇️ pour réordonner</em>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-outline btn-sm" onclick="sortPublicationsByDate()">
+                        <i class="fa-solid fa-arrow-down-short-wide"></i> Trier par ordre chronologique
+                    </button>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 70px; text-align: center;">Ordre</th>
-                            <th style="width: 140px;">Date & Heure</th>
-                            <th style="width: 220px;">Titre / Sujet</th>
-                            <th style="width: 160px;">Canaux cibles</th>
-                            <th style="width: 80px; text-align: center;">Visuel</th>
-                            <th>Contenu & Rédaction</th>
-                            <th style="width: 160px;">Statut</th>
-                            <th style="width: 130px; text-align: center;">Actions</th>
+                            <th style="width: 85px; text-align: center;">Ordre</th>
+                            <th style="width: 155px;">Date & Horaire</th>
+                            <th style="width: 230px;">Titre / Sujet</th>
+                            <th style="width: 165px;">Canaux cibles</th>
+                            <th style="width: 75px; text-align: center;">Visuel</th>
+                            <th>Aperçu du Contenu / Brouillon</th>
+                            <th style="width: 165px;">Statut</th>
+                            <th style="width: 170px; text-align: center;">Actions rapides</th>
                         </tr>
                     </thead>
                     <tbody id="pubTableBody"></tbody>
@@ -755,98 +1409,207 @@
             </div>
         </div>
 
-        <!-- 2. VUE CALENDRIER (MOIS / SEMAINE) -->
-        <div class="calendar-card" id="viewCalendarContainer">
-            <div class="cal-header-bar">
-                <div class="cal-title" id="calCurrentLabel">Mois Année</div>
-                <div class="cal-nav-group">
-                    <button class="btn btn-outline" style="padding: 6px 12px;" onclick="navigateCalendar(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                    <button class="btn btn-outline" style="padding: 6px 12px;" onclick="goToToday()">Aujourd'hui</button>
-                    <button class="btn btn-outline" style="padding: 6px 12px;" onclick="navigateCalendar(1)"><i class="fa-solid fa-chevron-right"></i></button>
-                    
-                    <div class="cal-sub-tabs" style="margin-left: 10px;">
-                        <button class="cal-sub-tab active" id="subTabMonth" onclick="setCalendarMode('month')">Mois</button>
-                        <button class="cal-sub-tab" id="subTabWeek" onclick="setCalendarMode('week')">Semaine</button>
-                    </div>
+        <!-- ================= 3. VUE KANBAN STATUTS ================= -->
+        <div class="kanban-container" id="viewKanbanContainer">
+            <div class="kanban-col" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="dropOnKanbanStatus(event, 'À rédiger')">
+                <div class="kanban-col-header" style="color:var(--st-todo-txt); border-bottom-color:var(--st-todo-border);">
+                    <span>⏳ 1. À rédiger / Idées</span>
+                    <span class="kanban-count" id="kbCountTodo">0</span>
                 </div>
+                <div class="kanban-cards" id="kbColTodo"></div>
             </div>
 
-            <!-- Conteneur rendu dynamique calendrier -->
-            <div id="calendarRenderContainer"></div>
+            <div class="kanban-col" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="dropOnKanbanStatus(event, 'Brouillon')">
+                <div class="kanban-col-header" style="color:var(--st-draft-txt); border-bottom-color:var(--st-draft-border);">
+                    <span>📝 2. Brouillon prêt</span>
+                    <span class="kanban-count" id="kbCountDraft">0</span>
+                </div>
+                <div class="kanban-cards" id="kbColDraft"></div>
+            </div>
+
+            <div class="kanban-col" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="dropOnKanbanStatus(event, 'Prêt / Programmé')">
+                <div class="kanban-col-header" style="color:var(--st-ready-txt); border-bottom-color:var(--st-ready-border);">
+                    <span>📌 3. Programmé</span>
+                    <span class="kanban-count" id="kbCountReady">0</span>
+                </div>
+                <div class="kanban-cards" id="kbColReady"></div>
+            </div>
+
+            <div class="kanban-col" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="dropOnKanbanStatus(event, 'Publié')">
+                <div class="kanban-col-header" style="color:var(--st-pub-txt); border-bottom-color:var(--st-pub-border);">
+                    <span>✅ 4. Publié / Envoyé</span>
+                    <span class="kanban-count" id="kbCountPub">0</span>
+                </div>
+                <div class="kanban-cards" id="kbColPub"></div>
+            </div>
         </div>
     </div>
 
-    <!-- MODALE CRÉATION / ÉDITION -->
+    <!-- ================= MODALE STUDIO : ÉDITEUR + PRÉVISUALISATION EN DIRECT ================= -->
     <div class="modal-overlay" id="pubModal">
         <div class="modal-card">
             <div class="modal-header">
-                <h2 id="modalTitle">➕ Planifier une publication ou un envoi</h2>
+                <h2 id="modalTitle"><i class="fa-solid fa-pen-to-square"></i> Studio de Rédaction & Planification</h2>
                 <button class="btn-icon" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <form id="pubModalForm" onsubmit="savePublication(event)">
-                <div class="modal-body">
-                    <div class="form-grid-2">
-                        <div class="form-group">
-                            <label for="pubTitle">Titre du sujet / Thème interne *</label>
-                            <input type="text" id="pubTitle" class="form-control" placeholder="ex: Séance Sophrologie N°3 ou Stage Toussaint" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="pubDate">Date / Période cible *</label>
-                            <input type="text" id="pubDate" class="form-control" placeholder="ex: 2026-10-24 ou Samedi 24 Octobre 14h00" required>
-                        </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Canaux de diffusion concernés *</label>
-                        <div class="channel-selector">
-                            <label class="channel-pill pill-fb">
-                                <input type="checkbox" id="netFB" value="Facebook">
-                                <span class="pill-label-fb">📘 Facebook</span>
-                            </label>
-                            <label class="channel-pill pill-ig">
-                                <input type="checkbox" id="netIG" value="Instagram">
-                                <span class="pill-label-ig">📸 Instagram</span>
-                            </label>
-                            <label class="channel-pill pill-wa">
-                                <input type="checkbox" id="netWA" value="WhatsApp">
-                                <span class="pill-label-wa">💬 WhatsApp</span>
-                            </label>
-                            <label class="channel-pill pill-gmail">
-                                <input type="checkbox" id="netGmail" value="Gmail">
-                                <span class="pill-label-gmail">✉️ Gmail</span>
-                            </label>
-                            <label class="channel-pill pill-kali">
-                                <input type="checkbox" id="netKali" value="Kalisport">
-                                <span class="pill-label-kali">📰 Kalisport</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="pubDesc">Texte rédigé / Légende complète / Corps du message (prêt à copier) *</label>
-                        <textarea id="pubDesc" class="form-control" style="min-height: 140px;" placeholder="Écris ici ton texte exact avec émojis, dates, détails... prêt à être copié dans Meta Business Suite, Gmail ou Kalisport." required></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Visuel / Affiche attachée (facultatif)</label>
-                        <div class="image-drop-area" onclick="document.getElementById('fileInput').click()">
-                            <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400"></i>
-                            <div style="text-align: left;">
-                                <div style="font-weight: 600; font-size: 0.85rem;" id="fileNameDisplay">Choisir une image depuis l'ordinateur</div>
-                                <div style="font-size: 0.75rem; color: #64748B;">PNG, JPG ou WEBP (automatiquement compressé pour la rapidité)</div>
+            <form id="pubModalForm" onsubmit="savePublication(event)" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+                <div class="modal-body-split">
+                    <!-- COLONNE GAUCHE : SAISIE & PARAMÈTRES -->
+                    <div class="modal-form-col">
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label for="pubTitle">Titre interne / Sujet *</label>
+                                <input type="text" id="pubTitle" class="form-control" placeholder="ex: Newsletter N°4 Reprise ou Séance Sophrologie" oninput="updateLivePreview()" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="pubStatus">Statut d'avancement</label>
+                                <select id="pubStatus" class="form-control">
+                                    <option value="À rédiger">⏳ À rédiger (Idée)</option>
+                                    <option value="Brouillon" selected>📝 Brouillon (Rédigé)</option>
+                                    <option value="Prêt / Programmé">📌 Prêt / Programmé</option>
+                                    <option value="Publié">✅ Publié / Envoyé</option>
+                                </select>
                             </div>
                         </div>
-                        <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
-                        <div id="imagePreviewContainer" style="display: none; align-items: center; gap: 10px; margin-top: 8px;">
-                            <img id="previewImg" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color);">
-                            <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem; color: #DC2626;" onclick="removeImage()">Retirer le visuel</button>
+
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label for="pubIsoDate">
+                                    <span>Date calendrier</span>
+                                    <a href="javascript:void(0)" onclick="document.getElementById('pubIsoDate').value='';" style="color:var(--dojo-red); font-size:0.72rem; text-decoration:none;">Mettre sans date</a>
+                                </label>
+                                <input type="date" id="pubIsoDate" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="pubTime">Heure prévue</label>
+                                <input type="time" id="pubTime" class="form-control" value="09:00">
+                            </div>
+                            <div class="form-group">
+                                <label for="pubDateNote">Note / Période libre (facultatif)</label>
+                                <input type="text" id="pubDateNote" class="form-control" placeholder="ex: Semaine S44 ou Matin">
+                            </div>
                         </div>
+
+                        <div class="form-group">
+                            <label>Canaux de diffusion cibles * <span style="font-weight:400; color:#64748B;">(Cochez un ou plusieurs réseaux)</span></label>
+                            <div class="channel-selector">
+                                <label class="channel-pill">
+                                    <input type="checkbox" id="netFB" value="Facebook" onchange="updateLivePreview()">
+                                    <span class="pill-box pill-fb">📘 Facebook</span>
+                                </label>
+                                <label class="channel-pill">
+                                    <input type="checkbox" id="netIG" value="Instagram" onchange="updateLivePreview()">
+                                    <span class="pill-box pill-ig">📸 Instagram</span>
+                                </label>
+                                <label class="channel-pill">
+                                    <input type="checkbox" id="netWA" value="WhatsApp" onchange="updateLivePreview()">
+                                    <span class="pill-box pill-wa">💬 WhatsApp</span>
+                                </label>
+                                <label class="channel-pill">
+                                    <input type="checkbox" id="netGmail" value="Gmail" onchange="updateLivePreview()">
+                                    <span class="pill-box pill-gmail">✉️ Mail Gmail</span>
+                                </label>
+                                <label class="channel-pill">
+                                    <input type="checkbox" id="netKali" value="Kalisport" onchange="updateLivePreview()">
+                                    <span class="pill-box pill-kali">📰 Newsletter Kalisport</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- OPTIONS SUPPLÉMENTAIRES SI KALISPORT OU GMAIL EST COCHÉ -->
+                        <div class="newsletter-options-box" id="newsletterExtraFields" style="display:none;">
+                            <div class="newsletter-options-title">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Options d'habillage Mail / Newsletter Officielle Dojo Dornois
+                            </div>
+                            <div class="form-grid-2">
+                                <div class="form-group">
+                                    <label for="pubMailSubject">Objet du mail / Grand Titre En-tête</label>
+                                    <input type="text" id="pubMailSubject" class="form-control" placeholder="ex: PLANNING DES VACANCES DE LA TOUSSAINT" oninput="updateLivePreview()">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pubMailHighlight">Encadré d'alerte rose (facultatif)</label>
+                                    <input type="text" id="pubMailHighlight" class="form-control" placeholder="ex: REPRISE OFFICIELLE : Mardi 3 novembre !" oninput="updateLivePreview()">
+                                </div>
+                            </div>
+                            <div class="form-grid-2">
+                                <div class="form-group">
+                                    <label for="pubCtaText">Texte du bouton d'action (facultatif)</label>
+                                    <input type="text" id="pubCtaText" class="form-control" placeholder="ex: CONSULTER LE PLANNING SUR LE SITE" oninput="updateLivePreview()">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pubCtaUrl">Lien du bouton (URL)</label>
+                                    <input type="text" id="pubCtaUrl" class="form-control" value="https://dojodornois.fr" oninput="updateLivePreview()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BARRE D'INSERTION RAPIDE -->
+                        <div class="form-group">
+                            <label>
+                                <span>Contenu rédigé / Légende / Corps du message *</span>
+                                <span id="charCountLabel" style="font-weight:400; color:#64748B;">0 caractère</span>
+                            </label>
+                            <div class="snippet-bar">
+                                <button type="button" class="snippet-btn" onclick="insertSnippet('signature')">📍 Signature Dojo</button>
+                                <button type="button" class="snippet-btn" onclick="insertSnippet('kalisport')">📲 Code Kalisport (U3AMYA)</button>
+                                <button type="button" class="snippet-btn" onclick="insertSnippet('hashtags')">#️⃣ Hashtags Club</button>
+                                <button type="button" class="snippet-btn" onclick="insertSnippet('sophro')">🧘 Gabarit Sophrologie</button>
+                                <button type="button" class="snippet-btn" onclick="insertSnippet('emojis')">🥋🔥💪✨📅</button>
+                            </div>
+                            <textarea id="pubDesc" class="form-control" placeholder="Rédigez votre publication, votre brouillon ou les paragraphes de votre newsletter..." oninput="updateLivePreview()" required></textarea>
+                        </div>
+
+                        <!-- VISUEL / AFFICHE -->
+                        <div class="form-group">
+                            <label>Visuel / Affiche attachée (conservé pour téléchargement rapide)</label>
+                            <div class="image-drop-area" onclick="document.getElementById('fileInput').click()">
+                                <i class="fa-solid fa-image" style="font-size:1.3rem; color:var(--dojo-red);"></i>
+                                <div style="text-align: left;">
+                                    <div style="font-weight: 600; font-size: 0.84rem;" id="fileNameDisplay">Sélectionner une affiche ou photo depuis le PC</div>
+                                    <div style="font-size: 0.73rem; color: #64748B;">Téléchargeable en 1 clic le jour où vous programmez sur Meta</div>
+                                </div>
+                            </div>
+                            <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+                            <div id="imagePreviewContainer" style="display: none; align-items: center; gap: 10px; margin-top: 6px;">
+                                <img id="previewImg" src="" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color);">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="downloadImageDirect(currentImageData, 'visuel_dojo')"><i class="fa-solid fa-download"></i> Télécharger</button>
+                                <button type="button" class="btn btn-outline btn-sm" style="color: #DC2626;" onclick="removeImage()"><i class="fa-solid fa-trash"></i> Retirer</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLONNE DROITE : APERÇU EN DIRECT & COPIE RAPIDE -->
+                    <div class="modal-preview-col">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                            <span style="font-family:'Fredoka',sans-serif; font-weight:600; font-size:0.95rem; color:#334155;">
+                                <i class="fa-solid fa-eye" style="color:var(--dojo-red);"></i> Aperçu & Export en 1 clic
+                            </span>
+                            <div style="display:flex; gap:6px;">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="copyCurrentModalText()">
+                                    <i class="fa-solid fa-copy"></i> Copier Texte
+                                </button>
+                                <button type="button" class="btn btn-outline btn-sm" id="btnCopyHtmlModal" onclick="copyCurrentModalHtml()" style="display:none; color:#0284C7; border-color:#BAE6FD;">
+                                    <i class="fa-solid fa-code"></i> Copier HTML Kalisport
+                                </button>
+                                <button type="button" class="btn btn-outline btn-sm" id="btnCopyRichGmail" onclick="copyCurrentModalRich()" style="display:none; color:#EA4335; border-color:#FECACA;">
+                                    <i class="fa-solid fa-envelope-open-text"></i> Copier pour Gmail
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="preview-box-card" id="livePreviewContainer"></div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>
-                    <button type="submit" class="btn btn-primary" id="btnSubmitModal">💾 Enregistrer</button>
+                    <div style="font-size:0.8rem; color:#64748B;">
+                        <i class="fa-solid fa-shield-halved" style="color:#10B981;"></i> Sauvegarde locale instantanée + Synchronisation Supabase automatique
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                        <button type="submit" class="btn btn-primary" id="btnSubmitModal"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -857,30 +1620,36 @@
     <script src="../js/sidebar.js" default-active="planning_reseaux"></script>
 
     <script>
+        /* ================= CONFIGURATION SUPABASE ================= */
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
         const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
         const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
         const SUPABASE_TABLE = 'planning_reseaux';
 
-        let editingIndex = null;
         let publications = [];
+        let editingIndex = null;
         let currentFilter = 'ALL';
+        let currentStatusFilter = 'ALL';
         let currentImageData = '';
-        let currentView = 'table'; // 'table' ou 'calendar'
-        let calendarMode = 'month'; // 'month' ou 'week'
+        let currentView = 'calendar'; // 'calendar', 'table', 'kanban'
+        let calendarMode = 'month';   // 'month' ou 'week'
+        let backlogTab = 'unscheduled'; // 'unscheduled' ou 'all_drafts'
         let calendarRefDate = new Date();
+        let draggedPubId = null;
+        let draggedTableIndex = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             loadInitialData();
         });
 
+        /* ================= CHARGEMENT & MIGRATION DOUCE DES DONNÉES ================= */
         async function loadInitialData() {
             const saved = localStorage.getItem('dojo_pub_planning');
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
                     if (Array.isArray(data) && data.length > 0) {
-                        publications = data;
+                        publications = normalizePublications(data);
                         refreshDisplay();
                     }
                 } catch(e) {
@@ -892,30 +1661,38 @@
                 const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
                 if (error && error.code !== 'PGRST116') throw error;
                 if (result && result.data && Array.isArray(result.data) && result.data.length > 0) {
-                    publications = result.data;
+                    publications = normalizePublications(result.data);
                     saveLocal();
                     refreshDisplay();
                 } else if (publications.length === 0) {
-                    publications = [
+                    publications = normalizePublications([
                         {
                             id: 1,
+                            isoDate: "2026-10-24",
+                            time: "14:00",
                             date: "Samedi 24 Octobre 14h00",
                             title: "Séance Sophrologie Adhérents",
                             networks: ["Facebook", "Instagram"],
-                            desc: "🧘‍♀️ Nouvelle séance de sophrologie au Dojo Dornois ! Prenez un temps pour vous et votre respiration. Inscription préalable requise.",
+                            desc: "🧘‍♀️ Nouvelle séance de sophrologie au Dojo Dornois ! Prenez un temps pour vous et votre respiration. Inscription préalable requise.\n\n📍 Dojo Dornois 🌐 dojodornois.fr 📞 06 07 13 91 86",
                             image: "",
                             status: "Brouillon"
                         },
                         {
                             id: 2,
-                            date: "Jeudi 15 Octobre 09h00",
-                            title: "Convocation AG Mixte - Mairie & Partenaires",
-                            networks: ["Gmail"],
-                            desc: "Courriel officiel d'invitation avec envoi du PDF de convocation en pièce jointe.",
+                            isoDate: "2026-10-29",
+                            time: "08:00",
+                            date: "Jeudi 29 Octobre 08h00",
+                            title: "Newsletter N°4 - Reprise & Rappel AG",
+                            networks: ["Kalisport"],
+                            mailSubject: "C'EST LA REPRISE AU DOJO & RAPPEL AG DU 14/11",
+                            mailHighlight: "REPRISE DES COURS : Mardi 3 novembre 2026 aux horaires habituels !",
+                            ctaText: "CONSULTER LE SITE DU DOJO",
+                            ctaUrl: "https://dojodornois.fr",
+                            desc: "Bonjour à toutes et à tous,\n\nNous espérons que vous avez passé d'excellentes vacances de la Toussaint !\n\nLes cours reprennent dès ce mardi 3 novembre aux horaires habituels. Nous vous rappelons également notre Assemblée Générale Mixte suivie des démonstrations le samedi 14 novembre de 10h à 12h.",
                             image: "",
-                            status: "Prêt / Programmé"
+                            status: "Brouillon"
                         }
-                    ];
+                    ]);
                     refreshDisplay();
                     await syncToSupabase(true);
                 }
@@ -925,31 +1702,260 @@
             }
         }
 
-        function switchView(view) {
-            currentView = view;
-            if (view === 'table') {
-                document.getElementById('tabViewTable').classList.add('active');
-                document.getElementById('tabViewCalendar').classList.remove('active');
-                document.getElementById('viewTableContainer').style.display = 'block';
-                document.getElementById('viewCalendarContainer').style.display = 'none';
-            } else {
-                document.getElementById('tabViewTable').classList.remove('active');
-                document.getElementById('tabViewCalendar').classList.add('active');
-                document.getElementById('viewTableContainer').style.display = 'none';
-                document.getElementById('viewCalendarContainer').style.display = 'block';
-                renderCalendar();
-            }
+        // Assure la rétrocompatibilité avec toutes les anciennes publications
+        function normalizePublications(list) {
+            return list.map((p, idx) => {
+                let isoDate = p.isoDate || '';
+                let time = p.time || '09:00';
+                let dateNote = p.dateNote || '';
+
+                if (!isoDate && p.date) {
+                    const parsed = parsePublicationDate(p.date);
+                    if (parsed) {
+                        isoDate = formatDateISO(parsed);
+                    } else {
+                        dateNote = p.date;
+                    }
+                    const timeMatch = p.date.match(/(\d{1,2})[h:](\d{2})?/i);
+                    if (timeMatch) {
+                        time = String(timeMatch[1]).padStart(2, '0') + ':' + String(timeMatch[2] || '00').padStart(2, '0');
+                    }
+                }
+
+                return {
+                    id: p.id || (Date.now() + idx),
+                    title: p.title || 'Sans titre',
+                    isoDate: isoDate,
+                    time: time,
+                    dateNote: dateNote,
+                    date: formatHumanDate(isoDate, time, dateNote),
+                    networks: Array.isArray(p.networks) ? p.networks : ['Facebook'],
+                    desc: p.desc || '',
+                    image: p.image || '',
+                    status: p.status || 'Brouillon',
+                    mailSubject: p.mailSubject || '',
+                    mailHighlight: p.mailHighlight || '',
+                    ctaText: p.ctaText || '',
+                    ctaUrl: p.ctaUrl || 'https://dojodornois.fr'
+                };
+            });
         }
 
+        function formatDateISO(d) {
+            if (!d || isNaN(d.getTime())) return '';
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function formatHumanDate(isoDate, time, dateNote) {
+            if (!isoDate) return dateNote ? dateNote : 'Sans date (Réserve)';
+            const parts = isoDate.split('-');
+            if (parts.length !== 3) return dateNote || isoDate;
+            const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            const daysFr = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'];
+            const monthsFr = ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'];
+            let label = `${daysFr[d.getDay()]} ${d.getDate()} ${monthsFr[d.getMonth()]} ${d.getFullYear()}`;
+            if (time) label += ` • ${time.replace(':', 'h')}`;
+            if (dateNote) label += ` (${dateNote})`;
+            return label;
+        }
+
+        function parsePublicationDate(dateStr) {
+            if (!dateStr) return null;
+            const str = dateStr.trim().toLowerCase();
+
+            const isoMatch = str.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+            if (isoMatch) {
+                return new Date(parseInt(isoMatch[1]), parseInt(isoMatch[2]) - 1, parseInt(isoMatch[3]));
+            }
+
+            const slashMatch = str.match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
+            if (slashMatch) {
+                const day = parseInt(slashMatch[1]);
+                const month = parseInt(slashMatch[2]) - 1;
+                const year = slashMatch[3] ? (slashMatch[3].length === 2 ? 2000 + parseInt(slashMatch[3]) : parseInt(slashMatch[3])) : calendarRefDate.getFullYear();
+                return new Date(year, month, day);
+            }
+
+            const monthsMap = {
+                'janvier': 0, 'janv': 0, 'février': 1, 'fevrier': 1, 'févr': 1, 'mars': 2,
+                'avril': 3, 'mai': 4, 'juin': 5, 'juillet': 6, 'juil': 6, 'août': 7, 'aout': 7,
+                'septembre': 8, 'sept': 8, 'octobre': 9, 'oct': 9, 'novembre': 10, 'nov': 10,
+                'décembre': 11, 'decembre': 11, 'déc': 11
+            };
+
+            for (const [mName, mIdx] of Object.entries(monthsMap)) {
+                if (str.includes(mName)) {
+                    const dayMatch = str.match(/(\d{1,2})/);
+                    const day = dayMatch ? parseInt(dayMatch[1]) : 1;
+                    const yearMatch = str.match(/\b(20\d{2})\b/);
+                    const year = yearMatch ? parseInt(yearMatch[1]) : calendarRefDate.getFullYear();
+                    return new Date(year, mIdx, day);
+                }
+            }
+            return null;
+        }
+
+        /* ================= NAVIGATION & FILTRES ================= */
+        function switchView(view) {
+            currentView = view;
+            document.getElementById('tabViewCalendar').classList.toggle('active', view === 'calendar');
+            document.getElementById('tabViewTable').classList.toggle('active', view === 'table');
+            document.getElementById('tabViewKanban').classList.toggle('active', view === 'kanban');
+
+            document.getElementById('viewCalendarContainer').style.display = (view === 'calendar') ? 'grid' : 'none';
+            document.getElementById('viewTableContainer').style.display = (view === 'table') ? 'block' : 'none';
+            document.getElementById('viewKanbanContainer').style.display = (view === 'kanban') ? 'grid' : 'none';
+
+            refreshDisplay();
+        }
+
+        function toggleBacklogPanel() {
+            const layout = document.getElementById('viewCalendarContainer');
+            const panel = document.getElementById('backlogPanel');
+            const isHidden = panel.style.display === 'none';
+            panel.style.display = isHidden ? 'flex' : 'none';
+            layout.classList.toggle('backlog-Collapsed', !isHidden);
+        }
+
+        function setBacklogTab(tab) {
+            backlogTab = tab;
+            document.getElementById('tabBacklogUnscheduled').classList.toggle('active', tab === 'unscheduled');
+            document.getElementById('tabBacklogDrafts').classList.toggle('active', tab === 'all_drafts');
+            renderBacklog();
+        }
+
+        function setFilter(channel, btnElement) {
+            currentFilter = channel;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+            refreshDisplay();
+        }
+
+        function setStatusFilter(statusType) {
+            if (currentStatusFilter === statusType && statusType !== 'ALL') {
+                currentStatusFilter = 'ALL';
+            } else {
+                currentStatusFilter = statusType;
+            }
+
+            document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active-kpi'));
+            if (currentStatusFilter === 'ALL') document.getElementById('kpiAll').classList.add('active-kpi');
+            if (currentStatusFilter === 'BROUILLONS') document.getElementById('kpiDrafts').classList.add('active-kpi');
+            if (currentStatusFilter === 'Prêt / Programmé') document.getElementById('kpiReady').classList.add('active-kpi');
+            if (currentStatusFilter === 'META29') document.getElementById('kpiMetaWindow').classList.add('active-kpi');
+            if (currentStatusFilter === 'Publié') document.getElementById('kpiPublished').classList.add('active-kpi');
+
+            refreshDisplay();
+        }
+
+        function isInsideMeta29Days(pub) {
+            if (pub.status === 'Prêt / Programmé' || pub.status === 'Publié') return false;
+            if (!pub.isoDate) return false;
+            const hasMeta = pub.networks && (pub.networks.includes('Facebook') || pub.networks.includes('Instagram'));
+            if (!hasMeta) return false;
+
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const target = parsePublicationDate(pub.isoDate);
+            if (!target) return false;
+            const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+            return diffDays >= 0 && diffDays <= 29;
+        }
+
+        function getFilteredPublications() {
+            const query = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+
+            return publications.filter(p => {
+                if (currentFilter !== 'ALL') {
+                    if (!Array.isArray(p.networks) || !p.networks.includes(currentFilter)) return false;
+                }
+                if (currentStatusFilter === 'BROUILLONS') {
+                    if (p.status !== 'À rédiger' && p.status !== 'Brouillon') return false;
+                } else if (currentStatusFilter === 'META29') {
+                    if (!isInsideMeta29Days(p)) return false;
+                } else if (currentStatusFilter !== 'ALL') {
+                    if (p.status !== currentStatusFilter) return false;
+                }
+                if (query) {
+                    const hay = `${p.title} ${p.desc} ${p.date} ${p.mailSubject || ''}`.toLowerCase();
+                    if (!hay.includes(query)) return false;
+                }
+                return true;
+            });
+        }
+
+        function updateKpiCounters() {
+            document.getElementById('kpiTotalCount').innerText = publications.length;
+            document.getElementById('kpiDraftCount').innerText = publications.filter(p => p.status === 'À rédiger' || p.status === 'Brouillon').length;
+            document.getElementById('kpiReadyCount').innerText = publications.filter(p => p.status === 'Prêt / Programmé').length;
+            document.getElementById('kpiMetaCount').innerText = publications.filter(p => isInsideMeta29Days(p)).length;
+            document.getElementById('kpiPubCount').innerText = publications.filter(p => p.status === 'Publié').length;
+        }
+
+        function refreshDisplay() {
+            updateKpiCounters();
+            renderTable();
+            renderCalendar();
+            renderBacklog();
+            renderKanban();
+        }
+
+        /* ================= RENDU DES CARTES MINIATURES (CALENDRIER / BACKLOG / KANBAN) ================= */
+        function buildCardHtml(pub, showDateBadge = false) {
+            const realIndex = publications.findIndex(p => p.id === pub.id);
+            let stClass = 'st-border-Brouillon';
+            if (pub.status === 'À rédiger') stClass = 'st-border-À-rédiger';
+            if (pub.status === 'Prêt / Programmé') stClass = 'st-border-Prêt';
+            if (pub.status === 'Publié') stClass = 'st-border-Publié';
+
+            let netDots = '';
+            if (pub.networks) {
+                if (pub.networks.includes('Facebook')) netDots += `<span class="net-dot-mini badge-fb" title="Facebook">📘</span>`;
+                if (pub.networks.includes('Instagram')) netDots += `<span class="net-dot-mini badge-ig" title="Instagram">📸</span>`;
+                if (pub.networks.includes('WhatsApp')) netDots += `<span class="net-dot-mini badge-wa" title="WhatsApp">💬</span>`;
+                if (pub.networks.includes('Gmail')) netDots += `<span class="net-dot-mini badge-gmail" title="Gmail">✉️</span>`;
+                if (pub.networks.includes('Kalisport')) netDots += `<span class="net-dot-mini badge-kali" title="Newsletter Kalisport">📰</span>`;
+            }
+
+            const timeOrDate = showDateBadge
+                ? (pub.isoDate ? pub.date : 'Sans date')
+                : (pub.time ? pub.time.replace(':', 'h') : '');
+
+            const metaAlert = isInsideMeta29Days(pub)
+                ? `<span title="Prêt à programmer dans Meta (< 29 jours)" style="color:#D97706; font-weight:700; font-size:0.68rem;">⚡ Meta &lt;29j</span>`
+                : `<span style="font-size:0.68rem; color:#64748B;">${escapeHtml(pub.status)}</span>`;
+
+            return `
+                <div class="cal-item ${stClass}"
+                     draggable="true"
+                     ondragstart="onCardDragStart(event, ${pub.id})"
+                     onclick="openEditModal(${realIndex})">
+                    <div class="cal-item-top">
+                        <div class="cal-net-dots">${netDots}</div>
+                        ${timeOrDate ? `<span class="cal-item-time">${escapeHtml(timeOrDate)}</span>` : ''}
+                    </div>
+                    <div class="cal-item-title">${escapeHtml(pub.title)}</div>
+                    ${pub.image ? `<img src="${pub.image}" class="cal-item-thumb" alt="Visuel">` : ''}
+                    <div class="cal-item-footer">
+                        ${metaAlert}
+                        <div style="display:flex; gap:2px;" onclick="event.stopPropagation();">
+                            <button class="cal-quick-copy" onclick="copyContent(${realIndex})" title="Copier le texte"><i class="fa-solid fa-copy"></i></button>
+                            ${(pub.networks.includes('Kalisport') || pub.networks.includes('Gmail')) ? `<button class="cal-quick-copy" onclick="copyGeneratedHtmlByIndex(${realIndex})" title="Copier le code HTML"><i class="fa-solid fa-code"></i></button>` : ''}
+                            <button class="cal-quick-copy" onclick="duplicatePub(${realIndex})" title="Dupliquer"><i class="fa-solid fa-clone"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ================= LOGIQUE DU CALENDRIER INTERACTIF (AVEC DRAG & DROP) ================= */
         function setCalendarMode(mode) {
             calendarMode = mode;
-            if (mode === 'month') {
-                document.getElementById('subTabMonth').classList.add('active');
-                document.getElementById('subTabWeek').classList.remove('active');
-            } else {
-                document.getElementById('subTabMonth').classList.remove('active');
-                document.getElementById('subTabWeek').classList.add('active');
-            }
+            document.getElementById('subTabMonth').classList.toggle('active', mode === 'month');
+            document.getElementById('subTabWeek').classList.toggle('active', mode === 'week');
             renderCalendar();
         }
 
@@ -965,135 +1971,6 @@
         function goToToday() {
             calendarRefDate = new Date();
             renderCalendar();
-        }
-
-        function refreshDisplay() {
-            renderTable();
-            if (currentView === 'calendar') {
-                renderCalendar();
-            }
-        }
-
-        function setFilter(channel, btnElement) {
-            currentFilter = channel;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            if (btnElement) {
-                btnElement.classList.add('active');
-            } else if (window.event && window.event.target) {
-                window.event.target.classList.add('active');
-            }
-            refreshDisplay();
-        }
-
-        function getFilteredPublications() {
-            return publications.filter(p => {
-                if (currentFilter === 'ALL') return true;
-                return Array.isArray(p.networks) && p.networks.includes(currentFilter);
-            });
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('pubTableBody');
-            tbody.innerHTML = '';
-
-            const filtered = getFilteredPublications();
-            document.getElementById('totalCount').innerText = filtered.length;
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 35px; color: #94A3B8;">Aucune entrée pour ce canal. Cliquez sur "+ Nouvelle Publication" pour en ajouter une.</td></tr>`;
-                return;
-            }
-
-            filtered.forEach((pub) => {
-                const realIndex = publications.findIndex(p => p.id === pub.id);
-                const tr = document.createElement('tr');
-
-                let netBadges = '';
-                if (pub.networks && Array.isArray(pub.networks)) {
-                    if (pub.networks.includes('Facebook')) netBadges += `<span class="badge-net badge-fb"><i class="fa-brands fa-facebook"></i> Facebook</span>`;
-                    if (pub.networks.includes('Instagram')) netBadges += `<span class="badge-net badge-ig"><i class="fa-brands fa-instagram"></i> Instagram</span>`;
-                    if (pub.networks.includes('WhatsApp')) netBadges += `<span class="badge-net badge-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</span>`;
-                    if (pub.networks.includes('Gmail')) netBadges += `<span class="badge-net badge-gmail"><i class="fa-solid fa-envelope"></i> Gmail</span>`;
-                    if (pub.networks.includes('Kalisport')) netBadges += `<span class="badge-net badge-kali"><i class="fa-solid fa-newspaper"></i> Kalisport</span>`;
-                }
-
-                let statusClass = 'status-todo';
-                if (pub.status === 'Brouillon') statusClass = 'status-draft';
-                if (pub.status === 'Prêt / Programmé') statusClass = 'status-ready';
-                if (pub.status === 'Publié') statusClass = 'status-published';
-
-                let mediaCell = '<span style="color:#CBD5E1; font-size:0.8rem;">Aucun</span>';
-                if (pub.image) {
-                    mediaCell = `<img src="${pub.image}" class="media-preview-mini" title="Cliquer pour télécharger" onclick="downloadImageDirect('${pub.image}', 'visuel_${pub.id}')">`;
-                }
-
-                tr.innerHTML = `
-                    <td style="text-align: center;">
-                        <button class="btn-icon" onclick="moveRow(${realIndex}, -1)" ${realIndex === 0 ? 'disabled style="opacity:0.3;"' : ''}>⬆️</button>
-                        <button class="btn-icon" onclick="moveRow(${realIndex}, 1)" ${realIndex === publications.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>⬇️</button>
-                    </td>
-                    <td><strong>${escapeHtml(pub.date)}</strong></td>
-                    <td style="font-weight: 600; color: var(--dojo-red);">${escapeHtml(pub.title)}</td>
-                    <td>${netBadges || '<span style="color:#94A3B8;">Aucun</span>'}</td>
-                    <td style="text-align: center;">${mediaCell}</td>
-                    <td style="color: #334155; white-space: pre-wrap; font-size: 0.85rem; max-width: 380px;">${escapeHtml(pub.desc)}</td>
-                    <td>
-                        <select class="status-select ${statusClass}" onchange="updateStatus(${realIndex}, this.value)">
-                            <option value="À rédiger" ${pub.status === 'À rédiger' ? 'selected' : ''}>⏳ À rédiger</option>
-                            <option value="Brouillon" ${pub.status === 'Brouillon' ? 'selected' : ''}>📝 Brouillon (Prêt)</option>
-                            <option value="Prêt / Programmé" ${pub.status === 'Prêt / Programmé' ? 'selected' : ''}>📌 Programmé</option>
-                            <option value="Publié" ${pub.status === 'Publié' ? 'selected' : ''}>✅ Publié / Envoyé</option>
-                        </select>
-                    </td>
-                    <td style="text-align: center;">
-                        <div class="row-actions">
-                            <button class="btn-icon btn-copy" onclick="copyContent(${realIndex})" title="Copier le texte"><i class="fa-solid fa-copy"></i></button>
-                            ${pub.image ? `<button class="btn-icon btn-download" onclick="downloadImageDirect('${pub.image}', 'visuel_${pub.id}')" title="Télécharger l'image"><i class="fa-solid fa-download"></i></button>` : ''}
-                            <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})" title="Modifier"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-icon btn-delete" onclick="deleteRow(${realIndex})" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        /* ================= LOGIQUE DU CALENDRIER ================= */
-        // Convertisseur intelligent de date textuelle libre vers objet Date
-        function parsePublicationDate(dateStr) {
-            if (!dateStr) return null;
-            const str = dateStr.trim().toLowerCase();
-
-            // 1. Format ISO YYYY-MM-DD
-            const isoMatch = str.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
-            if (isoMatch) {
-                return new Date(parseInt(isoMatch[1]), parseInt(isoMatch[2]) - 1, parseInt(isoMatch[3]));
-            }
-
-            // 2. Format DD/MM/YYYY ou DD/MM
-            const slashMatch = str.match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
-            if (slashMatch) {
-                const day = parseInt(slashMatch[1]);
-                const month = parseInt(slashMatch[2]) - 1;
-                const year = slashMatch[3] ? (slashMatch[3].length === 2 ? 2000 + parseInt(slashMatch[3]) : parseInt(slashMatch[3])) : calendarRefDate.getFullYear();
-                return new Date(year, month, day);
-            }
-
-            // 3. Détection de mois en français : "24 Octobre" ou "Samedi 24 Octobre 14h"
-            const monthsFr = ['janvier', 'février', 'fevrier', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'aout', 'septembre', 'octobre', 'novembre', 'décembre', 'decembre'];
-            for (let m = 0; m < monthsFr.length; m++) {
-                const mName = monthsFr[m];
-                if (str.includes(mName)) {
-                    const normalizedMonth = (m === 2) ? 1 : (m === 7) ? 6 : (m === 12) ? 11 : m;
-                    const dayMatch = str.match(/(\d{1,2})/);
-                    const day = dayMatch ? parseInt(dayMatch[1]) : 1;
-                    const yearMatch = str.match(/\b(20\d{2})\b/);
-                    const year = yearMatch ? parseInt(yearMatch[1]) : calendarRefDate.getFullYear();
-                    return new Date(year, normalizedMonth, day);
-                }
-            }
-
-            return null;
         }
 
         function isSameDay(d1, d2) {
@@ -1113,9 +1990,7 @@
                 const month = calendarRefDate.getMonth();
                 document.getElementById('calCurrentLabel').innerText = `${monthsNames[month]} ${year}`;
 
-                // Premier jour du mois
                 const firstDay = new Date(year, month, 1);
-                // Décalage lundi = 0 (Dimanche = 6)
                 let startOffset = firstDay.getDay() - 1;
                 if (startOffset === -1) startOffset = 6;
 
@@ -1124,74 +1999,53 @@
 
                 let html = `
                     <div class="cal-grid-month">
-                        <div class="cal-day-header">Lun</div>
-                        <div class="cal-day-header">Mar</div>
-                        <div class="cal-day-header">Mer</div>
-                        <div class="cal-day-header">Jeu</div>
-                        <div class="cal-day-header">Ven</div>
-                        <div class="cal-day-header">Sam</div>
-                        <div class="cal-day-header">Dim</div>
+                        <div class="cal-day-header">Lundi</div>
+                        <div class="cal-day-header">Mardi</div>
+                        <div class="cal-day-header">Mercredi</div>
+                        <div class="cal-day-header">Jeudi</div>
+                        <div class="cal-day-header">Vendredi</div>
+                        <div class="cal-day-header">Samedi</div>
+                        <div class="cal-day-header">Dimanche</div>
                 `;
 
-                // Jours du mois précédent
                 for (let i = startOffset - 1; i >= 0; i--) {
                     const prevDayNum = daysInPrevMonth - i;
-                    html += `
-                        <div class="cal-day-cell other-month">
-                            <div class="cal-day-num">${prevDayNum}</div>
-                        </div>
-                    `;
+                    html += `<div class="cal-day-cell other-month"><div class="cal-day-top"><span class="cal-day-num">${prevDayNum}</span></div></div>`;
                 }
 
-                // Jours du mois en cours
                 for (let d = 1; d <= daysInMonth; d++) {
                     const currentCellDate = new Date(year, month, d);
+                    const cellIso = formatDateISO(currentCellDate);
                     const isToday = isSameDay(currentCellDate, today);
 
-                    // Trouver les publications pour ce jour
                     const dayPubs = filtered.filter(p => {
-                        const parsed = parsePublicationDate(p.date);
+                        if (p.isoDate === cellIso) return true;
+                        const parsed = parsePublicationDate(p.isoDate || p.date);
                         return parsed && isSameDay(parsed, currentCellDate);
                     });
 
-                    let itemsHtml = '';
-                    dayPubs.forEach(pub => {
-                        const realIndex = publications.findIndex(p => p.id === pub.id);
-                        let badgeIcon = '📘';
-                        if (pub.networks && pub.networks.includes('Instagram')) badgeIcon = '📸';
-                        if (pub.networks && pub.networks.includes('Gmail')) badgeIcon = '✉️';
-                        if (pub.networks && pub.networks.includes('Kalisport')) badgeIcon = '📰';
+                    dayPubs.sort((a, b) => (a.time || '09:00').localeCompare(b.time || '09:00'));
 
-                        itemsHtml += `
-                            <div class="cal-item" onclick="openEditModal(${realIndex})" title="${escapeHtml(pub.desc)}">
-                                <div class="cal-item-title">${badgeIcon} ${escapeHtml(pub.title)}</div>
-                                <div class="cal-item-meta">
-                                    <span>${escapeHtml(pub.status)}</span>
-                                </div>
-                            </div>
-                        `;
-                    });
+                    let itemsHtml = dayPubs.map(pub => buildCardHtml(pub, false)).join('');
 
                     html += `
-                        <div class="cal-day-cell ${isToday ? 'today' : ''}">
-                            <div class="cal-day-num">
-                                <span>${d}</span>
-                                ${isToday ? '<span style="font-size:0.7rem; color:var(--dojo-red);">Auj.</span>' : ''}
+                        <div class="cal-day-cell ${isToday ? 'today' : ''}"
+                             ondragover="allowDrop(event)"
+                             ondragleave="leaveDrop(event)"
+                             ondrop="dropOnCalendarDate(event, '${cellIso}')">
+                            <div class="cal-day-top">
+                                <span class="cal-day-num">${d}</span>
+                                <button class="btn-add-day" onclick="openCreateModal('${cellIso}')" title="Ajouter une publication le ${d}/${month+1}">+</button>
                             </div>
                             ${itemsHtml}
                         </div>
                     `;
                 }
 
-                // Compléter la dernière semaine
                 const totalCells = startOffset + daysInMonth;
                 const nextDaysCount = (7 - (totalCells % 7)) % 7;
                 for (let n = 1; n <= nextDaysCount; n++) {
-                    html += `
-                        <div class="cal-day-cell other-month">
-                            <div class="cal-day-num">${n}</div>
-                        </div>
-                    `;
+                    html += `<div class="cal-day-cell other-month"><div class="cal-day-top"><span class="cal-day-num">${n}</span></div></div>`;
                 }
 
                 html += `</div>`;
@@ -1215,45 +2069,33 @@
                 for (let i = 0; i < 7; i++) {
                     const dayDate = new Date(startOfWeek);
                     dayDate.setDate(dayDate.getDate() + i);
+                    const cellIso = formatDateISO(dayDate);
                     const isToday = isSameDay(dayDate, today);
 
                     const dayPubs = filtered.filter(p => {
-                        const parsed = parsePublicationDate(p.date);
+                        if (p.isoDate === cellIso) return true;
+                        const parsed = parsePublicationDate(p.isoDate || p.date);
                         return parsed && isSameDay(parsed, dayDate);
                     });
 
-                    let itemsHtml = '';
-                    dayPubs.forEach(pub => {
-                        const realIndex = publications.findIndex(p => p.id === pub.id);
-                        let badgeTags = '';
-                        if (pub.networks) {
-                            if (pub.networks.includes('Facebook')) badgeTags += `<span class="badge-net badge-fb" style="font-size:0.65rem; padding:1px 5px;">FB</span>`;
-                            if (pub.networks.includes('Instagram')) badgeTags += `<span class="badge-net badge-ig" style="font-size:0.65rem; padding:1px 5px;">IG</span>`;
-                            if (pub.networks.includes('WhatsApp')) badgeTags += `<span class="badge-net badge-wa" style="font-size:0.65rem; padding:1px 5px;">WA</span>`;
-                            if (pub.networks.includes('Gmail')) badgeTags += `<span class="badge-net badge-gmail" style="font-size:0.65rem; padding:1px 5px;">Mail</span>`;
-                            if (pub.networks.includes('Kalisport')) badgeTags += `<span class="badge-net badge-kali" style="font-size:0.65rem; padding:1px 5px;">Kali</span>`;
-                        }
+                    dayPubs.sort((a, b) => (a.time || '09:00').localeCompare(b.time || '09:00'));
 
-                        itemsHtml += `
-                            <div class="cal-item" onclick="openEditModal(${realIndex})">
-                                <div class="cal-item-title">${escapeHtml(pub.title)}</div>
-                                <div style="font-size:0.75rem; color:#475569; margin: 2px 0;">${escapeHtml(pub.desc).slice(0, 60)}...</div>
-                                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-                                    <div class="cal-item-badges">${badgeTags}</div>
-                                    <span style="font-size:0.7rem; font-weight:700; color:#334155;">${escapeHtml(pub.status)}</span>
-                                </div>
-                            </div>
-                        `;
-                    });
+                    let itemsHtml = dayPubs.map(pub => buildCardHtml(pub, false)).join('');
 
                     html += `
-                        <div class="cal-week-col ${isToday ? 'today' : ''}">
+                        <div class="cal-week-col ${isToday ? 'today' : ''}"
+                             ondragover="allowDrop(event)"
+                             ondragleave="leaveDrop(event)"
+                             ondrop="dropOnCalendarDate(event, '${cellIso}')">
                             <div class="cal-week-header">
-                                <div class="cal-week-header-day">${weekDaysLabels[i]}</div>
-                                <div class="cal-week-header-date">${dayDate.getDate()} ${monthsNames[dayDate.getMonth()]}</div>
+                                <div>
+                                    <div class="cal-week-header-day">${weekDaysLabels[i]}</div>
+                                    <div class="cal-week-header-date">${dayDate.getDate()} ${monthsNames[dayDate.getMonth()]}</div>
+                                </div>
+                                <button class="btn-add-day" style="opacity:1;" onclick="openCreateModal('${cellIso}')" title="Ajouter ce jour">+</button>
                             </div>
                             <div class="cal-week-items">
-                                ${itemsHtml || '<span style="color:#CBD5E1; font-size:0.75rem; text-align:center; margin-top:10px;">Rien de prévu</span>'}
+                                ${itemsHtml || '<span style="color:#CBD5E1; font-size:0.75rem; text-align:center; margin-top:16px;">Glisser une carte ou cliquer sur +</span>'}
                             </div>
                         </div>
                     `;
@@ -1264,14 +2106,405 @@
             }
         }
 
-        /* ================= GESTION DES MODALES ================= */
-        function openCreateModal() {
+        /* ================= RENDU DU BAC À BROUILLONS (VOLET DROIT) ================= */
+        function renderBacklog() {
+            const unscheduled = publications.filter(p => !p.isoDate);
+            const allDrafts = publications.filter(p => p.status === 'À rédiger' || p.status === 'Brouillon');
+
+            document.getElementById('countUnscheduled').innerText = unscheduled.length;
+            document.getElementById('countAllDrafts').innerText = allDrafts.length;
+
+            const targetList = (backlogTab === 'unscheduled') ? unscheduled : allDrafts;
+            const container = document.getElementById('backlogListContainer');
+
+            if (targetList.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:25px 10px; color:#94A3B8; font-size:0.8rem;">
+                        Aucun élément dans cette réserve.<br>Préparez vos idées ou newsletters d'avance ici, puis glissez-les sur le calendrier !
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = targetList.map(pub => buildCardHtml(pub, true)).join('');
+        }
+
+        /* ================= RENDU DU KANBAN ================= */
+        function renderKanban() {
+            const filtered = getFilteredPublications();
+            const todo = filtered.filter(p => p.status === 'À rédiger');
+            const draft = filtered.filter(p => p.status === 'Brouillon');
+            const ready = filtered.filter(p => p.status === 'Prêt / Programmé');
+            const pub = filtered.filter(p => p.status === 'Publié');
+
+            document.getElementById('kbCountTodo').innerText = todo.length;
+            document.getElementById('kbCountDraft').innerText = draft.length;
+            document.getElementById('kbCountReady').innerText = ready.length;
+            document.getElementById('kbCountPub').innerText = pub.length;
+
+            document.getElementById('kbColTodo').innerHTML = todo.map(p => buildCardHtml(p, true)).join('');
+            document.getElementById('kbColDraft').innerHTML = draft.map(p => buildCardHtml(p, true)).join('');
+            document.getElementById('kbColReady').innerHTML = ready.map(p => buildCardHtml(p, true)).join('');
+            document.getElementById('kbColPub').innerHTML = pub.map(p => buildCardHtml(p, true)).join('');
+        }
+
+        /* ================= DRAG & DROP UNIVERSEL (CALENDRIER, RÉSERVE, KANBAN) ================= */
+        function onCardDragStart(e, pubId) {
+            draggedPubId = pubId;
+            e.dataTransfer.setData('text/plain', String(pubId));
+        }
+
+        function allowDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over-cell');
+        }
+
+        function leaveDrop(e) {
+            e.currentTarget.classList.remove('drag-over-cell');
+        }
+
+        async function dropOnCalendarDate(e, targetIsoDate) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over-cell');
+            if (!draggedPubId) return;
+
+            const idx = publications.findIndex(p => p.id === draggedPubId);
+            if (idx === -1) return;
+
+            publications[idx].isoDate = targetIsoDate;
+            publications[idx].date = formatHumanDate(targetIsoDate, publications[idx].time, publications[idx].dateNote);
+
+            draggedPubId = null;
+            saveLocal();
+            refreshDisplay();
+            showToast(`📅 Déplacé au ${publications[idx].date}`);
+            await syncToSupabase(true);
+        }
+
+        async function dropToUnscheduled(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over-cell');
+            if (!draggedPubId) return;
+
+            const idx = publications.findIndex(p => p.id === draggedPubId);
+            if (idx === -1) return;
+
+            publications[idx].isoDate = '';
+            publications[idx].date = formatHumanDate('', publications[idx].time, publications[idx].dateNote);
+
+            draggedPubId = null;
+            saveLocal();
+            refreshDisplay();
+            showToast("📥 Placé dans la réserve sans date");
+            await syncToSupabase(true);
+        }
+
+        async function dropOnKanbanStatus(e, newStatus) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over-cell');
+            if (!draggedPubId) return;
+
+            const idx = publications.findIndex(p => p.id === draggedPubId);
+            if (idx === -1) return;
+
+            publications[idx].status = newStatus;
+            draggedPubId = null;
+            saveLocal();
+            refreshDisplay();
+            showToast(`📌 Statut passé à : ${newStatus}`);
+            await syncToSupabase(true);
+        }
+
+        /* ================= RENDU DU TABLEAU PRO ================= */
+        function renderTable() {
+            const tbody = document.getElementById('pubTableBody');
+            tbody.innerHTML = '';
+
+            const filtered = getFilteredPublications();
+            document.getElementById('totalCount').innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 38px; color: #94A3B8;">Aucune entrée pour ce filtre. Cliquez sur "+ Nouvelle Publication / Newsletter" pour commencer.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((pub) => {
+                const realIndex = publications.findIndex(p => p.id === pub.id);
+                const tr = document.createElement('tr');
+                tr.draggable = true;
+
+                tr.ondragstart = () => {
+                    draggedTableIndex = realIndex;
+                    tr.classList.add('dragging-row');
+                };
+                tr.ondragend = () => {
+                    tr.classList.remove('dragging-row');
+                };
+                tr.ondragover = (e) => e.preventDefault();
+                tr.ondrop = async (e) => {
+                    e.preventDefault();
+                    if (draggedTableIndex === null || draggedTableIndex === realIndex) return;
+                    const moved = publications.splice(draggedTableIndex, 1)[0];
+                    publications.splice(realIndex, 0, moved);
+                    draggedTableIndex = null;
+                    saveLocal();
+                    refreshDisplay();
+                    await syncToSupabase(true);
+                };
+
+                let netBadges = '';
+                if (pub.networks && Array.isArray(pub.networks)) {
+                    if (pub.networks.includes('Facebook')) netBadges += `<span class="badge-net badge-fb"><i class="fa-brands fa-facebook"></i> Facebook</span>`;
+                    if (pub.networks.includes('Instagram')) netBadges += `<span class="badge-net badge-ig"><i class="fa-brands fa-instagram"></i> Instagram</span>`;
+                    if (pub.networks.includes('WhatsApp')) netBadges += `<span class="badge-net badge-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</span>`;
+                    if (pub.networks.includes('Gmail')) netBadges += `<span class="badge-net badge-gmail"><i class="fa-solid fa-envelope"></i> Gmail</span>`;
+                    if (pub.networks.includes('Kalisport')) netBadges += `<span class="badge-net badge-kali"><i class="fa-solid fa-newspaper"></i> Kalisport</span>`;
+                }
+
+                let statusClass = 'status-todo';
+                if (pub.status === 'Brouillon') statusClass = 'status-draft';
+                if (pub.status === 'Prêt / Programmé') statusClass = 'status-ready';
+                if (pub.status === 'Publié') statusClass = 'status-published';
+
+                let mediaCell = '<span style="color:#CBD5E1; font-size:0.78rem;">Aucun</span>';
+                if (pub.image) {
+                    mediaCell = `<img src="${pub.image}" class="media-preview-mini" title="Cliquer pour télécharger l'image" onclick="downloadImageDirect('${pub.image}', 'visuel_${pub.id}')">`;
+                }
+
+                const hasHtmlMode = pub.networks && (pub.networks.includes('Kalisport') || pub.networks.includes('Gmail'));
+
+                tr.innerHTML = `
+                    <td style="text-align: center; white-space: nowrap;">
+                        <span class="drag-handle" title="Glisser pour déplacer">⠿</span>
+                        <button class="btn-icon" style="width:24px;height:24px;font-size:0.7rem;" onclick="moveRow(${realIndex}, -1)" ${realIndex === 0 ? 'disabled style="opacity:0.3;"' : ''}>⬆️</button>
+                        <button class="btn-icon" style="width:24px;height:24px;font-size:0.7rem;" onclick="moveRow(${realIndex}, 1)" ${realIndex === publications.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>⬇️</button>
+                    </td>
+                    <td>
+                        <div style="font-weight:700; color:#1E293B;">${escapeHtml(pub.date)}</div>
+                        ${isInsideMeta29Days(pub) ? `<span style="font-size:0.7rem; color:#B45309; background:#FEF3C7; padding:1px 6px; border-radius:6px; font-weight:700;">⚡ Prêt pour Meta (&lt;29j)</span>` : ''}
+                    </td>
+                    <td>
+                        <div style="font-weight: 700; color: var(--dojo-red); cursor:pointer;" onclick="openEditModal(${realIndex})">${escapeHtml(pub.title)}</div>
+                        ${pub.mailSubject ? `<div style="font-size:0.75rem; color:#0369A1;">Objet : ${escapeHtml(pub.mailSubject)}</div>` : ''}
+                    </td>
+                    <td>${netBadges || '<span style="color:#94A3B8;">Aucun</span>'}</td>
+                    <td style="text-align: center;">${mediaCell}</td>
+                    <td style="color: #334155; white-space: pre-wrap; font-size: 0.83rem; max-width: 390px;">${escapeHtml(pub.desc.length > 180 ? pub.desc.slice(0, 180) + '...' : pub.desc)}</td>
+                    <td>
+                        <select class="status-select ${statusClass}" onchange="updateStatus(${realIndex}, this.value)">
+                            <option value="À rédiger" ${pub.status === 'À rédiger' ? 'selected' : ''}>⏳ À rédiger</option>
+                            <option value="Brouillon" ${pub.status === 'Brouillon' ? 'selected' : ''}>📝 Brouillon</option>
+                            <option value="Prêt / Programmé" ${pub.status === 'Prêt / Programmé' ? 'selected' : ''}>📌 Programmé</option>
+                            <option value="Publié" ${pub.status === 'Publié' ? 'selected' : ''}>✅ Publié / Envoyé</option>
+                        </select>
+                    </td>
+                    <td style="text-align: center;">
+                        <div class="row-actions">
+                            <button class="btn-icon btn-copy" onclick="copyContent(${realIndex})" title="Copier le texte brut"><i class="fa-solid fa-copy"></i></button>
+                            ${hasHtmlMode ? `<button class="btn-icon btn-html" onclick="copyGeneratedHtmlByIndex(${realIndex})" title="Copier le code HTML Kalisport/Mail"><i class="fa-solid fa-code"></i></button>` : ''}
+                            ${pub.image ? `<button class="btn-icon btn-html" onclick="downloadImageDirect('${pub.image}', 'visuel_${pub.id}')" title="Télécharger l'affiche"><i class="fa-solid fa-download"></i></button>` : ''}
+                            <button class="btn-icon btn-dup" onclick="duplicatePub(${realIndex})" title="Dupliquer cette entrée"><i class="fa-solid fa-clone"></i></button>
+                            <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})" title="Ouvrir dans le studio"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn-icon btn-delete" onclick="deleteRow(${realIndex})" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function sortPublicationsByDate() {
+            publications.sort((a, b) => {
+                if (!a.isoDate && !b.isoDate) return 0;
+                if (!a.isoDate) return 1;
+                if (!b.isoDate) return -1;
+                const cmp = a.isoDate.localeCompare(b.isoDate);
+                if (cmp !== 0) return cmp;
+                return (a.time || '09:00').localeCompare(b.time || '09:00');
+            });
+            saveLocal();
+            refreshDisplay();
+            showToast("📅 Planning trié par ordre chronologique !");
+            await syncToSupabase(true);
+        }
+
+        /* ================= STUDIO DE RÉDACTION & GÉNÉRATEUR HTML KALISPORT / GMAIL ================= */
+        function buildOfficialDojoNewsletterHtml(data, isKalisport) {
+            const mainTitle = escapeHtml(data.mailSubject || data.title || 'ACTUALITÉ DU DOJO DORNOIS');
+            const highlight = escapeHtml(data.mailHighlight || '');
+            const ctaText = escapeHtml(data.ctaText || '');
+            const ctaUrl = escapeHtml(data.ctaUrl || 'https://dojodornois.fr');
+
+            const paragraphs = (data.desc || '')
+                .split(/\n\s*\n/)
+                .map(p => `<p style="margin-top: 0; margin-bottom: 12px;">${escapeHtml(p.trim()).replace(/\n/g, '<br>')}</p>`)
+                .join('');
+
+            const highlightBlock = highlight ? `
+<table border="0" cellpadding="0" cellspacing="0" style="background-color: #FFEBEF; border-left: 4px solid #C41E3A; margin: 15px 0; width: 100%; border-radius: 0 6px 6px 0;" width="100%">
+    <tbody>
+        <tr>
+            <td style="padding: 15px; font-size: 14px; color: #8B1429 !important; font-family: 'Roboto', Arial, sans-serif; line-height: 1.5;">
+                <strong style="color: #C41E3A !important; font-family: 'Fredoka', sans-serif;">INFO IMPORTANTE :</strong> ${highlight}
+            </td>
+        </tr>
+    </tbody>
+</table>` : '';
+
+            const ctaBlock = ctaText ? `
+<table border="0" cellpadding="0" cellspacing="0" style="margin: 25px 0; width: 100%;" width="100%">
+    <tbody>
+        <tr>
+            <td align="center">
+                <a href="${ctaUrl}" style="background-color: #C41E3A; color: #FFFFFF !important; padding: 12px 28px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 6px; display: inline-block; box-shadow: 0 2px 4px rgba(196,30,58,0.2);">
+                    <span style="color: #FFFFFF !important;">${ctaText}</span>
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>` : '';
+
+            return `<table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 25px; border-bottom: 2px solid #C41E3A; width: 100%;" width="100%">
+    <tbody>
+        <tr>
+            <td style="padding-bottom: 16px;" valign="middle">
+                <h1 style="font-family: 'Fredoka', 'Roboto', Arial, sans-serif; font-size: 22px; font-weight: bold; color: #C41E3A !important; margin: 0; text-transform: uppercase; line-height: 1.2;">
+                    <span style="color: #C41E3A !important;">${mainTitle}</span>
+                </h1>
+                <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #6B6B6B !important; margin: 6px 0 0 0;">
+                    <span style="color: #6B6B6B !important;">Dojo Dornois • Saison 2026-2027</span>
+                </p>
+            </td>
+        </tr>
+    </tbody>
+</table>
+${highlightBlock}
+<table border="0" cellpadding="0" cellspacing="0" style="background-color: #F8FAFC; border: 1px solid #E8E8E8; border-radius: 6px; margin: 20px 0; width: 100%;" width="100%">
+    <tbody>
+        <tr>
+            <td style="padding: 20px; font-size: 14px; text-align: left; color: #3D3D3D !important; font-family: 'Roboto', Arial, sans-serif; line-height: 1.6;">
+                ${paragraphs}
+            </td>
+        </tr>
+    </tbody>
+</table>
+${ctaBlock}
+<table border="0" cellpadding="0" cellspacing="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px; width: 100%;" width="100%">
+    <tbody>
+        <tr>
+            <td align="center" style="padding-top: 20px; padding-bottom: 12px;">
+                <table border="0" cellpadding="0" cellspacing="0" style="background-color: #C41E3A; width: 56px; height: 56px; border-radius: 10px; margin: 0 auto;">
+                    <tbody>
+                        <tr>
+                            <td align="center" style="padding: 4px;" valign="middle">
+                                <img alt="Logo Dojo" src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 46px; height: 46px; display: block; border: 0;">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td align="center" style="font-size: 12px; color: #6B6B6B !important; line-height: 1.6; text-align: center; font-family: 'Roboto', Arial, sans-serif; padding-bottom: 15px;">
+                <strong style="color: #1A1A1A !important; font-size: 14px; font-family: 'Fredoka', sans-serif; letter-spacing: 0.5px;">DOJO DORNOIS</strong><br>
+                1 Place de la Mairie, 58390 Dornes<br>
+                contact@dojodornois.fr | 06.07.13.91.86 | dojodornois.fr<br>
+                <span style="font-size: 10px; color: #B8B8B8 !important;">SIRET 45192841000013 • RNA W583001220</span>
+            </td>
+        </tr>
+    </tbody>
+</table>`;
+        }
+
+        function getModalCurrentData() {
+            return {
+                title: document.getElementById('pubTitle').value.trim(),
+                desc: document.getElementById('pubDesc').value,
+                mailSubject: document.getElementById('pubMailSubject').value.trim(),
+                mailHighlight: document.getElementById('pubMailHighlight').value.trim(),
+                ctaText: document.getElementById('pubCtaText').value.trim(),
+                ctaUrl: document.getElementById('pubCtaUrl').value.trim()
+            };
+        }
+
+        function updateLivePreview() {
+            const desc = document.getElementById('pubDesc').value || '';
+            document.getElementById('charCountLabel').innerText = `${desc.length} caractère(s)`;
+
+            const isGmail = document.getElementById('netGmail').checked;
+            const isKali = document.getElementById('netKali').checked;
+            const extraBox = document.getElementById('newsletterExtraFields');
+            const btnHtml = document.getElementById('btnCopyHtmlModal');
+            const btnRich = document.getElementById('btnCopyRichGmail');
+
+            extraBox.style.display = (isGmail || isKali) ? 'flex' : 'none';
+            btnHtml.style.display = (isGmail || isKali) ? 'inline-flex' : 'none';
+            btnRich.style.display = (isGmail || isKali) ? 'inline-flex' : 'none';
+
+            const previewContainer = document.getElementById('livePreviewContainer');
+            const data = getModalCurrentData();
+
+            if (isKali || isGmail) {
+                previewContainer.innerHTML = buildOfficialDojoNewsletterHtml(data, isKali);
+            } else {
+                // Aperçu Post Réseaux Sociaux
+                previewContainer.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #F1F5F9;">
+                        <div style="width:38px; height:38px; border-radius:50%; background:#C41E3A; display:flex; align-items:center; justify-content:center;">
+                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width:28px; height:28px;">
+                        </div>
+                        <div>
+                            <div style="font-weight:700; font-size:0.88rem; color:#1E293B;">Dojo Dornois</div>
+                            <div style="font-size:0.74rem; color:#64748B;">Aperçu publication réseaux sociaux</div>
+                        </div>
+                    </div>
+                    <div style="white-space:pre-wrap; font-size:0.88rem; color:#1E293B; line-height:1.55;">${escapeHtml(data.desc || 'Votre texte apparaîtra ici en temps réel...')}</div>
+                    ${currentImageData ? `<img src="${currentImageData}" style="width:100%; max-height:240px; object-fit:cover; border-radius:8px; margin-top:12px; border:1px solid #E2E8F0;">` : ''}
+                `;
+            }
+        }
+
+        function insertSnippet(type) {
+            const ta = document.getElementById('pubDesc');
+            let snippet = '';
+            if (type === 'signature') {
+                snippet = "\n\n📍 Dojo Dornois – Dojo Henri Pierrehumbert, 38 route de Decize, Dornes\n🌐 dojodornois.fr | 📞 06 07 13 91 86 | ✉️ contact@dojodornois.fr";
+            } else if (type === 'kalisport') {
+                snippet = "\n\n📲 Inscriptions et confirmations directement sur votre application Kalisport (Code club : U3AMYA).";
+            } else if (type === 'hashtags') {
+                snippet = "\n\n#DojoDornois #Judo #Taïso #SelfDefense #Jujitsu #Dornes #VieAssociative #SportPourTous #Nièvre";
+            } else if (type === 'sophro') {
+                snippet = "🌿✨ SOPHROLOGIE AU DOJO DORNOIS : PRENEZ UN TEMPS POUR VOUS ! ✨🌿\n\nEnvie de relâcher les tensions et de vous reconnecter à votre respiration ? 🧘‍♀️\nNotre prochain atelier de sophrologie aura lieu au dojo avec Philippe Flammang.\n\n🎯 Infos pratiques :\n• Public : Ouvert à toutes et à tous\n• Tarifs : 2 € pour les adhérents licenciés / 5 € pour les extérieurs\n• Tenue : Vêtements confortables et souples\n• Lieu : Dojo Henri Pierrehumbert – 38 route de Decize, Dornes\n\nℹ️ Inscriptions par message privé ou au 06 07 13 91 86.";
+            } else if (type === 'emojis') {
+                snippet = " 🥋🔥💪✨📅📍📲 ";
+            }
+
+            const start = ta.selectionStart;
+            const end = ta.selectionEnd;
+            ta.value = ta.value.substring(0, start) + snippet + ta.value.substring(end);
+            ta.focus();
+            updateLivePreview();
+        }
+
+        /* ================= OUVERTURE / FERMETURE MODALE ================= */
+        function openCreateModal(prefillIsoDate = null) {
             editingIndex = null;
             currentImageData = '';
             document.getElementById('pubModalForm').reset();
-            document.getElementById('modalTitle').innerText = "➕ Planifier une publication ou un envoi";
-            document.getElementById('btnSubmitModal').innerText = "Ajouter au planning";
+
+            if (prefillIsoDate !== null) {
+                document.getElementById('pubIsoDate').value = prefillIsoDate;
+            } else {
+                document.getElementById('pubIsoDate').value = formatDateISO(new Date());
+            }
+            document.getElementById('pubTime').value = '09:00';
+            document.getElementById('pubStatus').value = 'Brouillon';
+            document.getElementById('netFB').checked = true;
+
+            document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-plus-circle"></i> Planifier une publication ou une newsletter`;
+            document.getElementById('btnSubmitModal').innerHTML = `<i class="fa-solid fa-check"></i> Enregistrer au planning`;
             removeImage();
+            updateLivePreview();
             document.getElementById('pubModal').classList.add('active');
         }
 
@@ -1279,9 +2512,17 @@
             editingIndex = index;
             const pub = publications[index];
 
-            document.getElementById('pubTitle').value = pub.title;
-            document.getElementById('pubDate').value = pub.date;
-            document.getElementById('pubDesc').value = pub.desc;
+            document.getElementById('pubTitle').value = pub.title || '';
+            document.getElementById('pubStatus').value = pub.status || 'Brouillon';
+            document.getElementById('pubIsoDate').value = pub.isoDate || '';
+            document.getElementById('pubTime').value = pub.time || '09:00';
+            document.getElementById('pubDateNote').value = pub.dateNote || '';
+            document.getElementById('pubDesc').value = pub.desc || '';
+
+            document.getElementById('pubMailSubject').value = pub.mailSubject || '';
+            document.getElementById('pubMailHighlight').value = pub.mailHighlight || '';
+            document.getElementById('pubCtaText').value = pub.ctaText || '';
+            document.getElementById('pubCtaUrl').value = pub.ctaUrl || 'https://dojodornois.fr';
 
             document.getElementById('netFB').checked = pub.networks && pub.networks.includes('Facebook');
             document.getElementById('netIG').checked = pub.networks && pub.networks.includes('Instagram');
@@ -1293,13 +2534,14 @@
                 currentImageData = pub.image;
                 document.getElementById('previewImg').src = pub.image;
                 document.getElementById('imagePreviewContainer').style.display = 'flex';
-                document.getElementById('fileNameDisplay').innerText = "Visuel chargé ✓";
+                document.getElementById('fileNameDisplay').innerText = "Visuel attaché ✓";
             } else {
                 removeImage();
             }
 
-            document.getElementById('modalTitle').innerText = "✏️ Modifier : " + pub.title;
-            document.getElementById('btnSubmitModal').innerText = "Enregistrer les modifications";
+            document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Modifier : ${escapeHtml(pub.title)}`;
+            document.getElementById('btnSubmitModal').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications`;
+            updateLivePreview();
             document.getElementById('pubModal').classList.add('active');
         }
 
@@ -1307,6 +2549,7 @@
             document.getElementById('pubModal').classList.remove('active');
         }
 
+        /* ================= GESTION DES IMAGES & COPIES ================= */
         function handleFileSelect(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1316,7 +2559,7 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const maxDim = 800;
+                    const maxDim = 850;
                     let width = img.width;
                     let height = img.height;
 
@@ -1333,10 +2576,11 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    currentImageData = canvas.toDataURL('image/jpeg', 0.8);
+                    currentImageData = canvas.toDataURL('image/jpeg', 0.82);
                     document.getElementById('previewImg').src = currentImageData;
                     document.getElementById('imagePreviewContainer').style.display = 'flex';
                     document.getElementById('fileNameDisplay').innerText = file.name + " (optimisé)";
+                    updateLivePreview();
                 };
                 img.src = evt.target.result;
             };
@@ -1348,42 +2592,85 @@
             document.getElementById('fileInput').value = '';
             document.getElementById('previewImg').src = '';
             document.getElementById('imagePreviewContainer').style.display = 'none';
-            document.getElementById('fileNameDisplay').innerText = "Choisir une image depuis l'ordinateur";
+            document.getElementById('fileNameDisplay').innerText = "Sélectionner une affiche ou photo depuis le PC";
+            updateLivePreview();
         }
 
         function downloadImageDirect(dataUrl, name) {
+            if (!dataUrl) return;
             const a = document.createElement('a');
             a.href = dataUrl;
             a.download = `${name}.jpg`;
             document.body.appendChild(a);
             a.click();
             a.remove();
-            showToast("📥 Visuel téléchargé !");
+            showToast("📥 Visuel téléchargé ! Prêt à glisser dans Meta.");
         }
 
-        function copyContent(index) {
-            const pub = publications[index];
+        function copyTextToClipboard(text, message) {
             if (navigator.clipboard) {
-                navigator.clipboard.writeText(pub.desc).then(() => {
-                    showToast("📋 Texte copié ! Prêt à coller.");
-                });
+                navigator.clipboard.writeText(text).then(() => showToast(message));
             } else {
                 const ta = document.createElement('textarea');
-                ta.value = pub.desc;
+                ta.value = text;
                 document.body.appendChild(ta);
                 ta.select();
                 document.execCommand('copy');
                 document.body.removeChild(ta);
-                showToast("📋 Texte copié !");
+                showToast(message);
             }
         }
 
+        function copyContent(index) {
+            const pub = publications[index];
+            copyTextToClipboard(pub.desc, "📋 Texte copié ! Prêt à coller.");
+        }
+
+        function copyGeneratedHtmlByIndex(index) {
+            const pub = publications[index];
+            const html = buildOfficialDojoNewsletterHtml(pub, pub.networks.includes('Kalisport'));
+            copyTextToClipboard(html, "💻 Code HTML Kalisport copié !");
+        }
+
+        function copyCurrentModalText() {
+            const txt = document.getElementById('pubDesc').value;
+            copyTextToClipboard(txt, "📋 Texte copié dans le presse-papiers !");
+        }
+
+        function copyCurrentModalHtml() {
+            const data = getModalCurrentData();
+            const isKali = document.getElementById('netKali').checked;
+            const html = buildOfficialDojoNewsletterHtml(data, isKali);
+            copyTextToClipboard(html, "💻 Code HTML Kalisport copié !");
+        }
+
+        function copyCurrentModalRich() {
+            const previewEl = document.getElementById('livePreviewContainer');
+            const range = document.createRange();
+            range.selectNodeContents(previewEl);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            document.execCommand('copy');
+            sel.removeAllRanges();
+            showToast("✉️ Design copié ! Faites Ctrl+V directement dans Gmail.");
+        }
+
+        /* ================= SAUVEGARDE, DUPLICATION & ACTIONS CRUD ================= */
         async function savePublication(e) {
             e.preventDefault();
 
             const title = document.getElementById('pubTitle').value.trim();
-            const date = document.getElementById('pubDate').value.trim();
+            const status = document.getElementById('pubStatus').value;
+            const isoDate = document.getElementById('pubIsoDate').value;
+            const time = document.getElementById('pubTime').value || '09:00';
+            const dateNote = document.getElementById('pubDateNote').value.trim();
             const desc = document.getElementById('pubDesc').value.trim();
+
+            const mailSubject = document.getElementById('pubMailSubject').value.trim();
+            const mailHighlight = document.getElementById('pubMailHighlight').value.trim();
+            const ctaText = document.getElementById('pubCtaText').value.trim();
+            const ctaUrl = document.getElementById('pubCtaUrl').value.trim();
 
             const networks = [];
             if (document.getElementById('netFB').checked) networks.push('Facebook');
@@ -1393,34 +2680,53 @@
             if (document.getElementById('netKali').checked) networks.push('Kalisport');
 
             if (networks.length === 0) {
-                alert('Veuillez cocher au moins un canal de diffusion.');
+                alert('Veuillez sélectionner au moins un canal de diffusion.');
                 return;
             }
 
+            const humanDate = formatHumanDate(isoDate, time, dateNote);
+
+            const payload = {
+                id: (editingIndex !== null) ? publications[editingIndex].id : Date.now(),
+                title,
+                status,
+                isoDate,
+                time,
+                dateNote,
+                date: humanDate,
+                networks,
+                desc,
+                image: currentImageData,
+                mailSubject,
+                mailHighlight,
+                ctaText,
+                ctaUrl
+            };
+
             if (editingIndex !== null) {
-                publications[editingIndex].title = title;
-                publications[editingIndex].date = date;
-                publications[editingIndex].networks = networks;
-                publications[editingIndex].desc = desc;
-                publications[editingIndex].image = currentImageData;
-                showToast('Élément mis à jour !');
+                publications[editingIndex] = payload;
+                showToast('✏️ Publication mise à jour !');
             } else {
-                const newPub = {
-                    id: Date.now(),
-                    title,
-                    date,
-                    networks,
-                    desc,
-                    image: currentImageData,
-                    status: 'Brouillon'
-                };
-                publications.push(newPub);
-                showToast('Ajouté avec succès !');
+                publications.push(payload);
+                showToast('✅ Ajouté au planning !');
             }
 
             closeModal();
             saveLocal();
             refreshDisplay();
+            await syncToSupabase(true);
+        }
+
+        async function duplicatePub(index) {
+            const orig = publications[index];
+            const copy = JSON.parse(JSON.stringify(orig));
+            copy.id = Date.now();
+            copy.title = orig.title + " (Copie)";
+            copy.status = "Brouillon";
+            publications.splice(index + 1, 0, copy);
+            saveLocal();
+            refreshDisplay();
+            showToast("📑 Publication dupliquée en Brouillon !");
             await syncToSupabase(true);
         }
 
@@ -1441,16 +2747,16 @@
             publications[index].status = newStatus;
             saveLocal();
             refreshDisplay();
-            showToast('Statut mis à jour !');
+            showToast(`Statut : ${newStatus}`);
             await syncToSupabase(true);
         }
 
         async function deleteRow(index) {
-            if (confirm('Voulez-vous vraiment supprimer cet élément ?')) {
+            if (confirm('Voulez-vous vraiment supprimer cet élément du planning ?')) {
                 publications.splice(index, 1);
                 saveLocal();
                 refreshDisplay();
-                showToast('Élément supprimé.');
+                showToast('🗑️ Élément supprimé.');
                 await syncToSupabase(true);
             }
         }
@@ -1464,7 +2770,7 @@
         }
 
         async function syncToSupabase(silent = false) {
-            if (!silent) showToast("Synchronisation Supabase...");
+            if (!silent) showToast("☁️ Synchronisation Supabase en cours...");
             try {
                 saveLocal();
                 const { error } = await sbClient
@@ -1472,10 +2778,10 @@
                     .upsert({ id: 1, data: publications });
 
                 if (error) throw error;
-                if (!silent) showToast("✓ Données synchronisées sur Supabase !");
+                if (!silent) showToast("✓ Synchronisé avec succès sur Supabase !");
             } catch (err) {
                 console.error("Erreur Supabase:", err);
-                if (!silent) showToast("⚠ Sauvegardé en local (erreur Supabase)");
+                if (!silent) showToast("⚠ Sauvegardé en local sur cet ordinateur");
             }
         }
 
@@ -1487,22 +2793,46 @@
             document.body.appendChild(a);
             a.click();
             a.remove();
+            showToast("💾 Sauvegarde JSON téléchargée !");
+        }
+
+        function importJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                try {
+                    const imported = JSON.parse(evt.target.result);
+                    if (Array.isArray(imported)) {
+                        publications = normalizePublications(imported);
+                        saveLocal();
+                        refreshDisplay();
+                        await syncToSupabase(false);
+                        showToast("✅ Planning restauré avec succès !");
+                    }
+                } catch(err) {
+                    alert("Fichier JSON invalide.");
+                }
+            };
+            reader.readAsText(file);
         }
 
         function escapeHtml(str) {
             if (!str) return '';
-            return str.replace(/&/g, "&amp;")
-                      .replace(/</g, "&lt;")
-                      .replace(/>/g, "&gt;")
-                      .replace(/\"/g, "&quot;")
-                      .replace(/'/g, "&#039;");
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
             toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 2400);
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => { toast.style.display = 'none'; }, 2600);
         }
     </script>
 </body>
