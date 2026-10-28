@@ -2,26 +2,31 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Intranet Dojo Dornois</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Central - Intranet Dojo Dornois</title>
     <link rel="icon" type="image/png" href="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Polices Officielles Dojo Dornois -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --rouge: #C41E3A;
             --rouge-hover: #A3182E;
-            --rouge-clair: rgba(196, 30, 58, 0.1);
+            --rouge-clair: #FFEBEF;
+            --rouge-bordure: rgba(196, 30, 58, 0.22);
             --noir-doux: #1A1A1A;
-            --gris-fonce: #3D3D3D;
-            --gris-moyen: #6B6B6B;
-            --gris-clair: #B8B8B8;
-            --gris-tres-clair: #E8E8E8;
+            --gris-fonce: #2D3748;
+            --gris-moyen: #64748B;
+            --gris-clair: #94A3B8;
+            --gris-tres-clair: #E2E8F0;
             --fond: #F4F6F9;
             --blanc: #FFFFFF;
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.5);
-            --topbar-height: 75px;
+            --topbar-height: 74px;
 
-            /* Nuances sobres Tatamis */
+            /* Nuances Officielles Tatamis */
             --tatami-rouge: #C41E3A;
             --tatami-vert: #2D6A4F;
             --tatami-bleu: #2B6CB0;
@@ -34,8 +39,9 @@
         body {
             font-family: 'Roboto', sans-serif;
             background-color: var(--fond);
-            background-image: url("data:image/svg+xml,%3Csvg width='56' height='100' viewBox='0 0 56 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 68L28 84L56 68L56 84L28 100Z' fill='none' stroke='%23C41E3A' stroke-opacity='0.18' stroke-width='1.8'/%3E%3C/svg%3E");
-            margin: 0; padding: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='56' height='100' viewBox='0 0 56 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 68L28 84L56 68L56 84L28 100Z' fill='none' stroke='%23C41E3A' stroke-opacity='0.06' stroke-width='1.5'/%3E%3C/svg%3E");
+            margin: 0;
+            padding: 0;
             color: var(--gris-fonce);
             display: flex;
             height: 100vh;
@@ -53,291 +59,1084 @@
             min-width: 0;
         }
 
+        /* ================= TOPBAR PRO ================= */
         .topbar {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            height: var(--topbar-height);
-            padding: 0 28px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            min-height: var(--topbar-height);
+            padding: 10px 28px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border-bottom: 1px solid var(--gris-tres-clair);
+            box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
             flex-shrink: 0;
-            z-index: 10;
+            z-index: 20;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        .topbar-left { display: flex; align-items: center; gap: 20px; }
-        .topbar h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.4rem; color: var(--noir-doux); text-shadow: 0 1px 2px rgba(255,255,255,0.8); }
-        .topbar p { margin: 2px 0 0 0; font-size: 0.8rem; color: var(--gris-moyen); font-weight: 500; }
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand-pill {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--rouge), #8B1429);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.25);
+        }
+
+        .topbar h2 {
+            font-family: 'Fredoka', sans-serif;
+            margin: 0;
+            font-size: 1.35rem;
+            color: var(--noir-doux);
+            letter-spacing: -0.2px;
+        }
+
+        .topbar p {
+            margin: 2px 0 0 0;
+            font-size: 0.78rem;
+            color: var(--gris-moyen);
+            font-weight: 500;
+        }
 
         .jarvis-status {
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(196, 30, 58, 0.08);
-            padding: 6px 12px; border-radius: 20px;
-            font-size: 0.75rem; font-weight: 700; color: var(--rouge);
-            border: 1px solid rgba(196, 30, 58, 0.2);
-            box-shadow: 0 0 10px rgba(196, 30, 58, 0.1) inset;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--rouge-clair);
+            padding: 6px 13px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--rouge);
+            border: 1px solid var(--rouge-bordure);
         }
+
         .pulse-dot {
-            width: 8px; height: 8px; background: var(--rouge); border-radius: 50%;
-            box-shadow: 0 0 8px var(--rouge);
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10B981;
             animation: pulse 2s infinite;
         }
-        @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.5; transform: scale(0.8); } }
 
-        .search-container { position: relative; width: 320px; }
-        .search-input { 
-            width: 100%; padding: 10px 14px 10px 40px; 
-            border: 1px solid var(--glass-border); border-radius: 25px; 
-            font-size: 0.875rem; background: rgba(255,255,255,0.6); 
-            transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        @keyframes pulse {
+            0% { opacity: 0.6; transform: scale(0.85); }
+            50% { opacity: 1; transform: scale(1.15); }
+            100% { opacity: 0.6; transform: scale(0.85); }
         }
-        .search-input:focus { outline: none; background: #FFF; border-color: var(--rouge); box-shadow: 0 0 10px rgba(196, 30, 58, 0.15); }
-        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--rouge); opacity: 0.7; }
 
-        .dashboard-body { flex: 1; padding: 20px 28px; overflow-y: auto; }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quick-ext-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-right: 1px solid var(--gris-tres-clair);
+            padding-right: 12px;
+        }
+
+        .ext-btn {
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: #F8FAFC;
+            border: 1px solid var(--gris-tres-clair);
+            color: var(--gris-fonce);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .ext-btn:hover {
+            background: white;
+            border-color: var(--rouge);
+            color: var(--rouge);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+
+        .search-container {
+            position: relative;
+            width: 290px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 9px 60px 9px 36px;
+            border: 1.5px solid var(--gris-tres-clair);
+            border-radius: 22px;
+            font-size: 0.84rem;
+            background: #F8FAFC;
+            color: var(--noir-doux);
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: #FFFFFF;
+            border-color: var(--rouge);
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gris-moyen);
+            font-size: 0.82rem;
+        }
+
+        .search-kbd {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #E2E8F0;
+            color: #475569;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 5px;
+            pointer-events: none;
+        }
+
+        /* ================= CORPS DU DASHBOARD ================= */
+        .dashboard-body {
+            flex: 1;
+            padding: 22px 28px 36px 28px;
+            overflow-y: auto;
+        }
 
         /* BANDEAU KPI */
         .kpi-banner {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             margin-bottom: 20px;
         }
+
+        @media (max-width: 1100px) {
+            .kpi-banner { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .kpi-banner { grid-template-columns: 1fr; }
+        }
+
         .kpi-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-            padding: 14px 18px;
+            background: var(--blanc);
+            border-radius: 14px;
+            border: 1px solid var(--gris-tres-clair);
+            padding: 15px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.025);
+            transition: all 0.2s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+            border-color: #CBD5E1;
+        }
+
+        .kpi-left {
             display: flex;
             align-items: center;
             gap: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(196,30,58,0.08); }
+
         .kpi-icon {
-            width: 44px; height: 44px;
-            border-radius: 10px;
-            background: rgba(196, 30, 58, 0.1);
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: var(--rouge-clair);
             color: var(--rouge);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
             flex-shrink: 0;
         }
+
         .kpi-details { display: flex; flex-direction: column; }
-        .kpi-val { font-family: 'Fredoka', sans-serif; font-size: 1.4rem; color: var(--rouge); line-height: 1.1; font-weight: 600; }
-        .kpi-label { font-size: 0.75rem; color: var(--gris-moyen); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
-
-        .catalog-controls { display: flex; gap: 12px; margin-bottom: 20px; }
-
-        .main-grid { display: grid; grid-template-columns: 1fr 390px; gap: 24px; }
-        
-        .catalog-card, .info-card, .tatamis-card { 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border-radius: 12px; border: 1px solid var(--glass-border); 
-            padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-bottom: 20px;
+        .kpi-val {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.5rem;
+            color: var(--noir-doux);
+            line-height: 1.1;
+            font-weight: 700;
         }
-        .catalog-card:hover, .tatamis-card:hover { box-shadow: 0 15px 40px rgba(196, 30, 58, 0.08); }
+        .kpi-label {
+            font-size: 0.72rem;
+            color: var(--gris-moyen);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 3px;
+        }
 
-        .catalog-section { margin-bottom: 28px; }
-        .catalog-category-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px dashed rgba(196, 30, 58, 0.2); padding-bottom: 8px; margin-bottom: 14px; }
-        .catalog-category-title-wrap { display: flex; align-items: center; gap: 8px; }
-        .catalog-category-title { font-family: 'Fredoka', sans-serif; font-size: 1.15rem; color: var(--rouge); margin: 0; text-shadow: 0 1px 1px rgba(255,255,255,0.8); }
-        .category-counter-badge {
-            background: rgba(196, 30, 58, 0.1);
+        .kpi-sub {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: #F1F5F9;
+            color: #475569;
+        }
+
+        /* ================= BARRE D'OUTILS & FILTRES RAPIDES ================= */
+        .control-bar {
+            background: var(--blanc);
+            border: 1px solid var(--gris-tres-clair);
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+        }
+
+        .cat-filter-pills {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .cat-pill {
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--gris-tres-clair);
+            background: #F8FAFC;
+            color: var(--gris-fonce);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cat-pill:hover {
+            border-color: #CBD5E1;
+            background: white;
+        }
+
+        .cat-pill.active {
+            background: var(--rouge);
+            color: white;
+            border-color: var(--rouge);
+            box-shadow: 0 2px 8px rgba(196, 30, 58, 0.25);
+        }
+
+        .admin-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--rouge);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--rouge-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #F8FAFC;
+            color: var(--gris-fonce);
+            border: 1px solid var(--gris-tres-clair);
+        }
+
+        .btn-secondary:hover {
+            background: #FFFFFF;
             color: var(--rouge);
+            border-color: var(--rouge-bordure);
+        }
+
+        .btn-active-edit {
+            background: #D97706 !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+        }
+
+        /* ================= ACCÈS RAPIDE / FAVORIS ÉPINGLÉS ================= */
+        .favorites-strip {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D3748 100%);
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 22px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+        }
+
+        .fav-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #F8FAFC;
+            white-space: nowrap;
+        }
+
+        .fav-label i { color: #FBBF24; }
+
+        .fav-list {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .fav-chip {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: white;
+            padding: 6px 13px;
+            border-radius: 9px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.15s ease;
+        }
+
+        .fav-chip:hover {
+            background: var(--rouge);
+            border-color: var(--rouge);
+            transform: translateY(-1px);
+        }
+
+        /* ================= GRILLE PRINCIPALE (OUTILS + COCKPIT DROIT) ================= */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        @media (max-width: 1280px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        /* SECTIONS DE CATÉGORIES */
+        .categories-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .catalog-section {
+            background: var(--blanc);
+            border-radius: 14px;
+            border: 1px solid var(--gris-tres-clair);
+            padding: 18px 20px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.025);
+            transition: all 0.2s ease;
+        }
+
+        .catalog-section:hover {
+            border-color: #CBD5E1;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.045);
+        }
+
+        .catalog-category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1.5px solid #F1F5F9;
+            padding-bottom: 12px;
+            margin-bottom: 14px;
+            gap: 10px;
+        }
+
+        .catalog-category-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .catalog-category-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.08rem;
+            color: var(--noir-doux);
+            margin: 0;
+            font-weight: 600;
+        }
+
+        body.edit-mode .catalog-category-title {
+            background: #FFFBEB;
+            padding: 2px 8px;
+            border-radius: 6px;
+            border: 1px dashed #D97706;
+        }
+
+        .category-counter-badge {
+            background: var(--rouge-clair);
+            color: var(--rouge);
+            font-family: 'Fredoka', sans-serif;
             font-size: 0.72rem;
             font-weight: 700;
-            padding: 2px 8px;
+            padding: 2px 9px;
             border-radius: 12px;
-            border: 1px solid rgba(196, 30, 58, 0.2);
+            border: 1px solid var(--rouge-bordure);
         }
 
-        .catalog-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; min-height: 50px; padding: 8px; border: 1.5px transparent dashed; border-radius: 8px; transition: all 0.3s ease; }
-        body.edit-mode .catalog-list { border-color: rgba(196, 30, 58, 0.3); background: rgba(196,30,58,0.03); }
+        .catalog-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+            gap: 11px;
+            min-height: 44px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
 
+        body.edit-mode .catalog-list {
+            padding: 10px;
+            border: 1.5px dashed rgba(196, 30, 58, 0.35);
+            background: rgba(196, 30, 58, 0.02);
+        }
+
+        /* CARTE D'OUTIL INDIVIDUELLE */
         .app-tool-link {
-            display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 8px;
-            text-decoration: none; color: var(--gris-fonce); font-size: 0.875rem; font-weight: 500; 
-            background: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.4);
-            border-left: 4px solid transparent; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); user-select: none;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 13px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--gris-fonce);
+            font-size: 0.86rem;
+            font-weight: 600;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-left: 4px solid transparent;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            user-select: none;
+            position: relative;
+            gap: 10px;
         }
-        .app-tool-link:hover { 
-            background: #FFF; color: var(--rouge); border-left-color: var(--rouge); 
-            transform: translateY(-2px); box-shadow: 0 6px 15px rgba(196, 30, 58, 0.1); 
+
+        .app-tool-link:hover {
+            background: #FFFFFF;
+            color: var(--rouge);
+            border-color: #CBD5E1;
+            border-left-color: var(--rouge);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
         }
 
-        body.edit-mode .app-tool-link { cursor: grab; border: 1px dashed var(--rouge); }
-        body.edit-mode .app-tool-link.drag-over { border-color: var(--rouge); background: var(--rouge-clair); transform: scale(1.03); }
+        .tool-left-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1;
+        }
 
-        .btn-delete-tool { display: none; background: #e74c3c; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; cursor: pointer; box-shadow: 0 2px 5px rgba(231, 76, 60, 0.4); }
-        body.edit-mode .btn-delete-tool { display: inline-flex; align-items: center; justify-content: center; }
+        .tool-emoji-box {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.18s ease;
+        }
 
-        .btn { background: var(--rouge); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(196, 30, 58, 0.2); }
-        .btn:hover { background: var(--rouge-hover); transform: translateY(-1px); box-shadow: 0 6px 15px rgba(196, 30, 58, 0.3); }
-        .btn-secondary { background: rgba(255,255,255,0.9); color: var(--gris-fonce); border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-        .btn-secondary:hover { background: #FFF; color: var(--rouge); border-color: rgba(196, 30, 58, 0.3); }
-        .btn-active-edit { background: #e67e22; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3); }
+        .app-tool-link:hover .tool-emoji-box {
+            background: var(--rouge-clair);
+            border-color: var(--rouge-bordure);
+            transform: scale(1.05);
+        }
 
-        /* MODULE PLAN TATAMIS */
-        .tatamis-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-        .tatamis-title { font-family: 'Fredoka', sans-serif; margin: 0; color: var(--rouge); font-size: 1.15rem; }
-        .tatami-tabs { display: flex; gap: 6px; background: rgba(0,0,0,0.04); padding: 4px; border-radius: 8px; margin-bottom: 14px; }
-        .tatami-tab-btn { flex: 1; border: none; background: transparent; padding: 6px 8px; font-size: 0.75rem; font-weight: 600; border-radius: 6px; cursor: pointer; color: var(--gris-moyen); transition: all 0.2s; }
-        .tatami-tab-btn.active { background: #FFF; color: var(--rouge); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+        .tool-title-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        .tatamis-badges { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
-        .tatami-badge { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .tatami-badge span.count { font-size: 0.95rem; font-weight: 700; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 6px; }
+        .tool-right-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .btn-star-fav {
+            background: transparent;
+            border: none;
+            color: #CBD5E1;
+            cursor: pointer;
+            font-size: 0.82rem;
+            padding: 3px;
+            opacity: 0;
+            transition: all 0.15s ease;
+        }
+
+        .app-tool-link:hover .btn-star-fav,
+        .btn-star-fav.is-fav {
+            opacity: 1;
+        }
+
+        .btn-star-fav.is-fav {
+            color: #F59E0B;
+        }
+
+        .btn-star-fav:hover {
+            transform: scale(1.2);
+            color: #F59E0B;
+        }
+
+        .tool-arrow {
+            font-size: 0.7rem;
+            color: #CBD5E1;
+            transition: transform 0.18s ease, color 0.18s ease;
+        }
+
+        .app-tool-link:hover .tool-arrow {
+            color: var(--rouge);
+            transform: translateX(2px);
+        }
+
+        /* Contrôles Mode Édition sur chaque carte */
+        body.edit-mode .app-tool-link {
+            cursor: grab;
+            border: 1px dashed var(--rouge);
+            background: #FFFFFF;
+        }
+
+        body.edit-mode .app-tool-link.drag-over {
+            background: var(--rouge-clair);
+            transform: scale(1.02);
+        }
+
+        .edit-tool-btns {
+            display: none;
+            gap: 4px;
+        }
+
+        body.edit-mode .edit-tool-btns {
+            display: inline-flex;
+        }
+
+        body.edit-mode .tool-arrow,
+        body.edit-mode .btn-star-fav {
+            display: none;
+        }
+
+        .btn-mini-edit, .btn-mini-del {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: none;
+            color: white;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-mini-edit { background: #3B82F6; }
+        .btn-mini-edit:hover { background: #2563EB; }
+        .btn-mini-del { background: #EF4444; }
+        .btn-mini-del:hover { background: #DC2626; }
+
+        /* ================= COLONNE DROITE : COCKPIT CLUB ================= */
+        .right-cockpit {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .cockpit-card {
+            background: var(--blanc);
+            border-radius: 14px;
+            border: 1px solid var(--gris-tres-clair);
+            padding: 18px 20px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.025);
+        }
+
+        .cockpit-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .cockpit-card-title {
+            font-family: 'Fredoka', sans-serif;
+            margin: 0;
+            color: var(--rouge);
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* MÉMO IDENTITÉ & COPIE 1-CLIC */
+        .id-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .id-copy-box {
+            background: #F8FAFC;
+            border: 1px solid var(--gris-tres-clair);
+            border-radius: 9px;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .id-copy-box:hover {
+            border-color: var(--rouge);
+            background: #FFF9FA;
+            transform: translateY(-1px);
+        }
+
+        .id-copy-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--gris-moyen);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .id-copy-val {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--noir-doux);
+        }
+
+        /* PLAN DES TATAMIS */
+        .tatami-tabs {
+            display: flex;
+            gap: 6px;
+            background: #F1F5F9;
+            padding: 4px;
+            border-radius: 9px;
+            margin-bottom: 12px;
+        }
+
+        .tatami-tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 7px 8px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--gris-moyen);
+            transition: all 0.2s;
+        }
+
+        .tatami-tab-btn.active {
+            background: #FFFFFF;
+            color: var(--rouge);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .tatamis-badges {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tatami-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 7px 11px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .tatami-badge span.count {
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: rgba(255,255,255,0.25);
+            padding: 1px 7px;
+            border-radius: 5px;
+        }
 
         .tatami-badge-rouge { background: #C41E3A; color: #FFF; }
         .tatami-badge-vert { background: #2D6A4F; color: #FFF; }
         .tatami-badge-bleu { background: #2B6CB0; color: #FFF; }
-        .tatami-badge-jaune { background: #E5C347; color: #333; }
+        .tatami-badge-jaune { background: #E5C347; color: #1A1A1A; }
         .tatami-badge-bleu-ciel { background: #5B9BD5; color: #FFF; }
 
         .tatami-svg-container {
-            background: #FAFAFA;
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 8px;
+            background: #F8FAFC;
+            border: 1px solid var(--gris-tres-clair);
+            border-radius: 10px;
             padding: 12px;
             display: flex;
             justify-content: center;
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
-        }
-        .tatami-svg-container svg {
-            width: 100%;
-            max-width: 320px;
-            height: auto;
-            display: block;
         }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; transition: opacity 0.3s; }
+        .tatami-svg-container svg {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* MODALES */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
         .modal-overlay.open { display: flex; }
-        .modal-box { background: rgba(255,255,255,0.95); border-radius: 14px; padding: 28px; max-width: 500px; width: 95%; box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.4); }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--gris-fonce); }
-        .form-control { width: 100%; padding: 10px 14px; border: 1.5px solid var(--gris-tres-clair); border-radius: 8px; font-size: 0.9rem; transition: border-color 0.2s; }
-        .form-control:focus { outline: none; border-color: var(--rouge); box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1); }
+
+        .modal-box {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 24px 26px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.2);
+            border: 1px solid var(--gris-tres-clair);
+        }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--gris-fonce);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid var(--gris-tres-clair);
+            border-radius: 8px;
+            font-size: 0.88rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--rouge);
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast-notif {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            background: #1E293B;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.86rem;
+            border-left: 4px solid var(--rouge);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 3000;
+        }
     </style>
 </head>
 <body>
 
-    <!-- SIDEBAR DYNAMIQUE -->
+    <!-- SIDEBAR DYNAMIQUE UNIFIÉE -->
     <div class="sidebar"></div>
 
+    <!-- MODALE CRÉER / MODIFIER UN OUTIL -->
     <div class="modal-overlay" id="toolModal">
         <div class="modal-box">
-            <h2 style="font-family:'Fredoka',sans-serif; margin-top:0;">➕ Ajouter un Outil</h2>
+            <h2 id="toolModalTitle" style="font-family:'Fredoka',sans-serif; margin-top:0; font-size:1.25rem; color:var(--rouge);">➕ Ajouter un Outil</h2>
             <div class="form-group">
                 <label>Nom du module (avec Émoji au début)</label>
                 <input type="text" id="new-tool-name" class="form-control" placeholder="Ex: 🥋 Suivi Licences">
             </div>
             <div class="form-group">
-                <label>Nom du fichier HTML (dans outils/)</label>
-                <input type="text" id="new-tool-filename" class="form-control" placeholder="Ex: licences.html">
+                <label>Chemin ou fichier HTML (dans outils/)</label>
+                <input type="text" id="new-tool-filename" class="form-control" placeholder="Ex: outils/licences.html">
             </div>
             <div class="form-group">
                 <label>Catégorie Cible</label>
                 <select id="new-tool-category" class="form-control"></select>
             </div>
-            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px;">
                 <button class="btn btn-secondary" onclick="closeModal('toolModal')">Annuler</button>
-                <button class="btn" onclick="saveNewTool()">Enregistrer</button>
+                <button class="btn" onclick="saveToolModal()">Enregistrer</button>
             </div>
         </div>
     </div>
 
+    <!-- MODALE AJOUTER UNE CATÉGORIE -->
     <div class="modal-overlay" id="catModal">
         <div class="modal-box">
-            <h2 style="font-family:'Fredoka',sans-serif; margin-top:0;">📁 Créer une Catégorie</h2>
+            <h2 style="font-family:'Fredoka',sans-serif; margin-top:0; font-size:1.25rem; color:var(--rouge);">📁 Créer une Catégorie</h2>
             <div class="form-group">
                 <label>Titre de la catégorie (avec Émoji au début)</label>
                 <input type="text" id="new-cat-title" class="form-control" placeholder="Ex: 📊 Statistiques & Analyses">
             </div>
-            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px;">
                 <button class="btn btn-secondary" onclick="closeModal('catModal')">Annuler</button>
                 <button class="btn" onclick="saveNewCategory()">Créer</button>
             </div>
         </div>
     </div>
 
+    <!-- CONTENU PRINCIPAL -->
     <div class="main-content">
+        
+        <!-- TOPBAR -->
         <div class="topbar">
             <div class="topbar-left">
+                <div class="brand-pill">🥋</div>
                 <div>
                     <h2>Dashboard Central</h2>
-                    <p>Intranet Officiel du Dojo Dornois</p>
+                    <p id="live-date-subtitle">Intranet Officiel du Dojo Dornois</p>
                 </div>
                 <div class="jarvis-status">
                     <div class="pulse-dot"></div>
-                    Système en ligne. Bonjour Jordan.
+                    <span>Système en ligne • Bonjour Jordan</span>
                 </div>
             </div>
-            <div class="search-container">
-                <span class="search-icon">🔍</span>
-                <input type="text" class="search-input" id="searchTool" placeholder="Rechercher un outil..." oninput="filterTools()">
+
+            <div class="topbar-right">
+                <!-- Raccourcis externes -->
+                <div class="quick-ext-links">
+                    <a href="https://dojodornois.fr" target="_blank" class="ext-btn" title="Ouvrir le site Kalisport du Dojo">
+                        <i class="fa-solid fa-globe" style="color:#0284C7;"></i> Kalisport
+                    </a>
+                    <a href="https://mail.google.com" target="_blank" class="ext-btn" title="Ouvrir Gmail">
+                        <i class="fa-solid fa-envelope" style="color:#EA4335;"></i> Gmail
+                    </a>
+                    <a href="https://business.facebook.com/latest/content_calendar" target="_blank" class="ext-btn" title="Ouvrir Meta Business Suite">
+                        <i class="fa-brands fa-meta" style="color:#1877F2;"></i> Meta
+                    </a>
+                </div>
+
+                <!-- Recherche instantanée -->
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" class="search-input" id="searchTool" placeholder="Rechercher un outil..." oninput="filterTools()">
+                    <span class="search-kbd">Ctrl+K</span>
+                </div>
             </div>
         </div>
 
+        <!-- CORPS DU DASHBOARD -->
         <div class="dashboard-body">
 
-            <!-- BANDEAU KPI DYNAMIQUE -->
+            <!-- 1. BANDEAU KPI DYNAMIQUE -->
             <div class="kpi-banner">
                 <div class="kpi-card">
-                    <div class="kpi-icon">🛠️</div>
-                    <div class="kpi-details">
-                        <span class="kpi-val" id="kpi-total-tools">0</span>
-                        <span class="kpi-label">Outils Disponibles</span>
+                    <div class="kpi-left">
+                        <div class="kpi-icon">🛠️</div>
+                        <div class="kpi-details">
+                            <span class="kpi-val" id="kpi-total-tools">32</span>
+                            <span class="kpi-label">Outils Disponibles</span>
+                        </div>
                     </div>
+                    <span class="kpi-sub">Actifs</span>
                 </div>
+
                 <div class="kpi-card">
-                    <div class="kpi-icon">📁</div>
-                    <div class="kpi-details">
-                        <span class="kpi-val" id="kpi-total-cats">0</span>
-                        <span class="kpi-label">Catégories Actives</span>
+                    <div class="kpi-left">
+                        <div class="kpi-icon">📁</div>
+                        <div class="kpi-details">
+                            <span class="kpi-val" id="kpi-total-cats">6</span>
+                            <span class="kpi-label">Catégories Actives</span>
+                        </div>
                     </div>
+                    <span class="kpi-sub">Pôles</span>
                 </div>
+
                 <div class="kpi-card">
-                    <div class="kpi-icon">🥋</div>
-                    <div class="kpi-details">
-                        <span class="kpi-val" id="kpi-tatamis-count">56</span>
-                        <span class="kpi-label">Tatamis Installés</span>
+                    <div class="kpi-left">
+                        <div class="kpi-icon">🥋</div>
+                        <div class="kpi-details">
+                            <span class="kpi-val" id="kpi-tatamis-count">56</span>
+                            <span class="kpi-label">Tatamis Installés</span>
+                        </div>
                     </div>
+                    <span class="kpi-sub" id="kpi-tatamis-surface">112 m²</span>
                 </div>
+
                 <div class="kpi-card">
-                    <div class="kpi-icon">⚡</div>
-                    <div class="kpi-details">
-                        <span class="kpi-val" style="color:#27ae60;">100%</span>
-                        <span class="kpi-label">Services Opérationnels</span>
+                    <div class="kpi-left">
+                        <div class="kpi-icon" style="background:#DCFCE7; color:#16A34A;">⚡</div>
+                        <div class="kpi-details">
+                            <span class="kpi-val" style="color:#16A34A;">100%</span>
+                            <span class="kpi-label">Services Opérationnels</span>
+                        </div>
                     </div>
+                    <span class="kpi-sub" style="background:#DCFCE7; color:#166534;">Cloud OK</span>
                 </div>
             </div>
 
-            <div class="catalog-controls">
-                <button class="btn" id="btnToggleEdit" onclick="toggleEditMode()">⚙️ Mode Édition / Organiser</button>
-                <button class="btn btn-secondary" onclick="openNewToolModal()">➕ Créer un outil</button>
-                <button class="btn btn-secondary" onclick="openModal('catModal')">📁 Ajouter une catégorie</button>
-                <button class="btn btn-secondary" style="margin-left:auto; color:#e74c3c;" id="btnResetTools" onclick="resetToDefault()">🔄 Réinitialiser les Outils</button>
+            <!-- 2. ACCÈS RAPIDE QUOTIDIEN (OUTILS ÉPINGLÉS) -->
+            <div class="favorites-strip" id="favoritesStrip">
+                <div class="fav-label">
+                    <i class="fa-solid fa-star"></i>
+                    <span>Accès Rapide Quotidien :</span>
+                </div>
+                <div class="fav-list" id="favoritesList">
+                    <!-- Généré dynamiquement en JS -->
+                </div>
             </div>
 
+            <!-- 3. BARRE DE FILTRES PAR CATÉGORIE & CONTRÔLES D'ÉDITION -->
+            <div class="control-bar">
+                <div class="cat-filter-pills" id="catFilterPills">
+                    <!-- Pastilles de filtre générées en JS -->
+                </div>
+
+                <div class="admin-actions">
+                    <button class="btn" id="btnToggleEdit" onclick="toggleEditMode()">
+                        <i class="fa-solid fa-sliders"></i> Mode Édition / Organiser
+                    </button>
+                    <button class="btn btn-secondary" onclick="openCreateToolModal()">
+                        <i class="fa-solid fa-plus"></i> Créer un outil
+                    </button>
+                    <button class="btn btn-secondary" onclick="openModal('catModal')">
+                        <i class="fa-solid fa-folder-plus"></i> Catégorie
+                    </button>
+                    <button class="btn btn-secondary" style="color:var(--rouge);" id="btnResetTools" onclick="resetToDefault()">
+                        <i class="fa-solid fa-rotate-right"></i> Réinitialiser les 32 Outils
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. GRILLE PRINCIPALE : CATALOGUE À GAUCHE + COCKPIT À DROITE -->
             <div class="main-grid">
-                <div class="catalog-card" id="catalogCard"></div>
                 
-                <!-- COLONNE DE DROITE : PLAN TATAMIS -->
-                <div>
-                    <div class="tatamis-card">
-                        <div class="tatamis-header">
-                            <h3 class="tatamis-title">🥋 Plan des Tatamis</h3>
+                <!-- CATALOGUE DES 6 CATÉGORIES & 32 OUTILS -->
+                <div class="categories-wrapper" id="catalogCard"></div>
+                
+                <!-- COLONNE DE DROITE : COCKPIT CLUB & PLAN TATAMIS -->
+                <div class="right-cockpit">
+                    
+                    <!-- CARTE 1 : IDENTITÉ & CODES OFFICIELS (COPIE EN 1 CLIC) -->
+                    <div class="cockpit-card">
+                        <div class="cockpit-card-header">
+                            <h3 class="cockpit-card-title"><i class="fa-solid fa-id-card"></i> Mémo Codes & Identité Club</h3>
+                            <span style="font-size:0.68rem; color:var(--gris-moyen); font-weight:600;">Clic = Copier</span>
+                        </div>
+                        <div class="id-grid">
+                            <div class="id-copy-box" onclick="copyClubInfo('451 928 410 00013', 'N° SIRET')">
+                                <span class="id-copy-label">SIRET <i class="fa-regular fa-copy"></i></span>
+                                <span class="id-copy-val">451 928 410 00013</span>
+                            </div>
+                            <div class="id-copy-box" onclick="copyClubInfo('W583001220', 'N° RNA')">
+                                <span class="id-copy-label">RNA Préfecture <i class="fa-regular fa-copy"></i></span>
+                                <span class="id-copy-val">W583001220</span>
+                            </div>
+                            <div class="id-copy-box" onclick="copyClubInfo('CE 08.58.067.0', 'Affiliation FFJDA')">
+                                <span class="id-copy-label">Affiliation FFJDA <i class="fa-regular fa-copy"></i></span>
+                                <span class="id-copy-val">CE 08.58.067.0</span>
+                            </div>
+                            <div class="id-copy-box" onclick="copyClubInfo('U3AMYA', 'Code App Kalisport')">
+                                <span class="id-copy-label">Code Kalisport <i class="fa-regular fa-copy"></i></span>
+                                <span class="id-copy-val" style="color:var(--rouge);">U3AMYA</span>
+                            </div>
+                            <div class="id-copy-box" style="grid-column: span 2;" onclick="copyClubInfo('contact@dojodornois.fr', 'Email Officiel')">
+                                <span class="id-copy-label">Courriel Officiel <i class="fa-regular fa-copy"></i></span>
+                                <span class="id-copy-val">contact@dojodornois.fr</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARTE 2 : PLAN DES TATAMIS -->
+                    <div class="cockpit-card">
+                        <div class="cockpit-card-header">
+                            <h3 class="cockpit-card-title">🥋 Plan des Tatamis</h3>
+                            <a href="outils/plan_tatamis.html" style="font-size:0.75rem; font-weight:700; color:var(--rouge); text-decoration:none;">Ouvrir l'outil →</a>
                         </div>
 
                         <!-- SÉLECTEUR DISPOSITION -->
@@ -365,92 +1164,49 @@
                                             .t-j { fill: var(--tatami-jaune); stroke: #222; stroke-width: 0.4; }
                                         </style>
                                     </defs>
-
-                                    <!-- BORDURES GAUCHE ET DROITE (16 Rouges verticaux) -->
                                     <g class="t-r">
-                                        <rect x="0" y="0" width="10" height="20" />
-                                        <rect x="0" y="20" width="10" height="20" />
-                                        <rect x="0" y="40" width="10" height="20" />
-                                        <rect x="0" y="60" width="10" height="20" />
-                                        <rect x="0" y="80" width="10" height="20" />
-                                        <rect x="0" y="100" width="10" height="20" />
-                                        <rect x="0" y="120" width="10" height="20" />
-                                        <rect x="0" y="140" width="10" height="20" />
-
-                                        <rect x="60" y="0" width="10" height="20" />
-                                        <rect x="60" y="20" width="10" height="20" />
-                                        <rect x="60" y="40" width="10" height="20" />
-                                        <rect x="60" y="60" width="10" height="20" />
-                                        <rect x="60" y="80" width="10" height="20" />
-                                        <rect x="60" y="100" width="10" height="20" />
-                                        <rect x="60" y="120" width="10" height="20" />
-                                        <rect x="60" y="140" width="10" height="20" />
+                                        <rect x="0" y="0" width="10" height="20" /><rect x="0" y="20" width="10" height="20" />
+                                        <rect x="0" y="40" width="10" height="20" /><rect x="0" y="60" width="10" height="20" />
+                                        <rect x="0" y="80" width="10" height="20" /><rect x="0" y="100" width="10" height="20" />
+                                        <rect x="0" y="120" width="10" height="20" /><rect x="0" y="140" width="10" height="20" />
+                                        <rect x="60" y="0" width="10" height="20" /><rect x="60" y="20" width="10" height="20" />
+                                        <rect x="60" y="40" width="10" height="20" /><rect x="60" y="60" width="10" height="20" />
+                                        <rect x="60" y="80" width="10" height="20" /><rect x="60" y="100" width="10" height="20" />
+                                        <rect x="60" y="120" width="10" height="20" /><rect x="60" y="140" width="10" height="20" />
                                     </g>
-
-                                    <!-- BORDURES HAUT ET BAS (10 Verts verticaux) -->
                                     <g class="t-v">
-                                        <rect x="10" y="0" width="10" height="20" />
-                                        <rect x="20" y="0" width="10" height="20" />
-                                        <rect x="30" y="0" width="10" height="20" />
-                                        <rect x="40" y="0" width="10" height="20" />
-                                        <rect x="50" y="0" width="10" height="20" />
-
-                                        <rect x="10" y="140" width="10" height="20" />
-                                        <rect x="20" y="140" width="10" height="20" />
-                                        <rect x="30" y="140" width="10" height="20" />
-                                        <rect x="40" y="140" width="10" height="20" />
-                                        <rect x="50" y="140" width="10" height="20" />
+                                        <rect x="10" y="0" width="10" height="20" /><rect x="20" y="0" width="10" height="20" />
+                                        <rect x="30" y="0" width="10" height="20" /><rect x="40" y="0" width="10" height="20" />
+                                        <rect x="50" y="0" width="10" height="20" /><rect x="10" y="140" width="10" height="20" />
+                                        <rect x="20" y="140" width="10" height="20" /><rect x="30" y="140" width="10" height="20" />
+                                        <rect x="40" y="140" width="10" height="20" /><rect x="50" y="140" width="10" height="20" />
                                     </g>
-
-                                    <!-- BLOC HAUT : JAUNE (10 tatamis) -->
                                     <g class="t-j">
-                                        <rect x="10" y="20" width="20" height="10" />
-                                        <rect x="10" y="30" width="20" height="10" />
-                                        <rect x="30" y="20" width="10" height="20" />
-                                        <rect x="40" y="20" width="20" height="10" />
-                                        <rect x="40" y="30" width="20" height="10" />
-
-                                        <rect x="10" y="40" width="10" height="20" />
-                                        <rect x="20" y="40" width="10" height="20" />
-                                        <rect x="30" y="40" width="20" height="10" />
-                                        <rect x="30" y="50" width="20" height="10" />
-                                        <rect x="50" y="40" width="10" height="20" />
+                                        <rect x="10" y="20" width="20" height="10" /><rect x="10" y="30" width="20" height="10" />
+                                        <rect x="30" y="20" width="10" height="20" /><rect x="40" y="20" width="20" height="10" />
+                                        <rect x="40" y="30" width="20" height="10" /><rect x="10" y="40" width="10" height="20" />
+                                        <rect x="20" y="40" width="10" height="20" /><rect x="30" y="40" width="20" height="10" />
+                                        <rect x="30" y="50" width="20" height="10" /><rect x="50" y="40" width="10" height="20" />
                                     </g>
-
-                                    <!-- BLOC MILIEU : BLEU (10 tatamis) -->
                                     <g class="t-b">
-                                        <rect x="10" y="60" width="20" height="10" />
-                                        <rect x="10" y="70" width="20" height="10" />
-                                        <rect x="30" y="60" width="10" height="20" />
-                                        <rect x="40" y="60" width="20" height="10" />
-                                        <rect x="40" y="70" width="20" height="10" />
-
-                                        <rect x="10" y="80" width="10" height="20" />
-                                        <rect x="20" y="80" width="10" height="20" />
-                                        <rect x="30" y="80" width="20" height="10" />
-                                        <rect x="30" y="90" width="20" height="10" />
-                                        <rect x="50" y="80" width="10" height="20" />
+                                        <rect x="10" y="60" width="20" height="10" /><rect x="10" y="70" width="20" height="10" />
+                                        <rect x="30" y="60" width="10" height="20" /><rect x="40" y="60" width="20" height="10" />
+                                        <rect x="40" y="70" width="20" height="10" /><rect x="10" y="80" width="10" height="20" />
+                                        <rect x="20" y="80" width="10" height="20" /><rect x="30" y="80" width="20" height="10" />
+                                        <rect x="30" y="90" width="20" height="10" /><rect x="50" y="80" width="10" height="20" />
                                     </g>
-
-                                    <!-- BLOC BAS : JAUNE (10 tatamis) -->
                                     <g class="t-j">
-                                        <rect x="10" y="100" width="20" height="10" />
-                                        <rect x="10" y="110" width="20" height="10" />
-                                        <rect x="30" y="100" width="10" height="20" />
-                                        <rect x="40" y="100" width="20" height="10" />
-                                        <rect x="40" y="110" width="20" height="10" />
-
-                                        <rect x="10" y="120" width="10" height="20" />
-                                        <rect x="20" y="120" width="10" height="20" />
-                                        <rect x="30" y="120" width="20" height="10" />
-                                        <rect x="30" y="130" width="20" height="10" />
-                                        <rect x="50" y="120" width="10" height="20" />
+                                        <rect x="10" y="100" width="20" height="10" /><rect x="10" y="110" width="20" height="10" />
+                                        <rect x="30" y="100" width="10" height="20" /><rect x="40" y="100" width="20" height="10" />
+                                        <rect x="40" y="110" width="20" height="10" /><rect x="10" y="120" width="10" height="20" />
+                                        <rect x="20" y="120" width="10" height="20" /><rect x="30" y="120" width="20" height="10" />
+                                        <rect x="30" y="130" width="20" height="10" /><rect x="50" y="120" width="10" height="20" />
                                     </g>
                                 </svg>
                             </div>
                         </div>
 
-                        <!-- VUE 2 : DISPOSITION 2 (BLEU CIEL & JAUNE) -->
+                        <!-- VUE 2 : DISPOSITION 2 (BLEU CIEL & JAUNE - 49 TATAMIS) -->
                         <div id="tatamiView2" style="display:none;">
                             <div class="tatamis-badges">
                                 <div class="tatami-badge tatami-badge-bleu-ciel">Bleu Ciel <span class="count">29</span></div>
@@ -466,8 +1222,6 @@
                                             .lbl { font-family: 'Roboto', sans-serif; font-size: 3.5px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: #1A1A1A; }
                                         </style>
                                     </defs>
-
-                                    <!-- 1. BANDE HAUTE BLEU CIEL (1 à 7) -->
                                     <g class="t-ciel">
                                         <rect x="0" y="0" width="10" height="20" /><text x="5" y="10" class="lbl">1</text>
                                         <rect x="10" y="0" width="10" height="20" /><text x="15" y="10" class="lbl">2</text>
@@ -477,31 +1231,24 @@
                                         <rect x="50" y="0" width="10" height="20" /><text x="55" y="10" class="lbl">6</text>
                                         <rect x="60" y="0" width="10" height="20" /><text x="65" y="10" class="lbl">7</text>
                                     </g>
-
-                                    <!-- 2. BORDURES HAUTES BLEU CIEL (8, 9 / 18, 17) -->
                                     <g class="t-ciel">
                                         <rect x="0" y="20" width="10" height="20" /><text x="5" y="30" class="lbl">8</text>
                                         <rect x="0" y="40" width="10" height="20" /><text x="5" y="50" class="lbl">9</text>
                                         <rect x="60" y="20" width="10" height="20" /><text x="65" y="30" class="lbl">18</text>
                                         <rect x="60" y="40" width="10" height="20" /><text x="65" y="50" class="lbl">17</text>
                                     </g>
-
-                                    <!-- 3. ZONE JAUNE 1 (1 à 10) -->
                                     <g class="t-j2">
                                         <rect x="10" y="20" width="20" height="10" /><text x="20" y="25" class="lbl">1</text>
                                         <rect x="10" y="30" width="20" height="10" /><text x="20" y="35" class="lbl">2</text>
                                         <rect x="30" y="20" width="10" height="20" /><text x="35" y="30" class="lbl">3</text>
                                         <rect x="40" y="20" width="20" height="10" /><text x="50" y="25" class="lbl">4</text>
                                         <rect x="40" y="30" width="20" height="10" /><text x="50" y="35" class="lbl">5</text>
-                                        
                                         <rect x="10" y="40" width="10" height="20" /><text x="15" y="50" class="lbl">6</text>
                                         <rect x="20" y="40" width="10" height="20" /><text x="25" y="50" class="lbl">7</text>
                                         <rect x="30" y="40" width="20" height="10" /><text x="40" y="45" class="lbl">8</text>
                                         <rect x="30" y="50" width="20" height="10" /><text x="40" y="55" class="lbl">9</text>
                                         <rect x="50" y="40" width="10" height="20" /><text x="55" y="50" class="lbl">10</text>
                                     </g>
-
-                                    <!-- 4. BANDE MILIEU BLEU CIEL (10 à 16) -->
                                     <g class="t-ciel">
                                         <rect x="0" y="60" width="10" height="20" /><text x="5" y="70" class="lbl">10</text>
                                         <rect x="10" y="60" width="10" height="20" /><text x="15" y="70" class="lbl">11</text>
@@ -511,31 +1258,24 @@
                                         <rect x="50" y="60" width="10" height="20" /><text x="55" y="70" class="lbl">15</text>
                                         <rect x="60" y="60" width="10" height="20" /><text x="65" y="70" class="lbl">16</text>
                                     </g>
-
-                                    <!-- 5. BORDURES BASSES BLEU CIEL (19, 20 / 29, 28) -->
                                     <g class="t-ciel">
                                         <rect x="0" y="80" width="10" height="20" /><text x="5" y="90" class="lbl">19</text>
                                         <rect x="0" y="100" width="10" height="20" /><text x="5" y="110" class="lbl">20</text>
                                         <rect x="60" y="80" width="10" height="20" /><text x="65" y="90" class="lbl">29</text>
                                         <rect x="60" y="100" width="10" height="20" /><text x="65" y="110" class="lbl">28</text>
                                     </g>
-
-                                    <!-- 6. ZONE JAUNE 2 (11 à 20) -->
                                     <g class="t-j2">
                                         <rect x="10" y="80" width="20" height="10" /><text x="20" y="85" class="lbl">11</text>
                                         <rect x="10" y="90" width="20" height="10" /><text x="20" y="95" class="lbl">12</text>
                                         <rect x="30" y="80" width="10" height="20" /><text x="35" y="90" class="lbl">13</text>
                                         <rect x="40" y="80" width="20" height="10" /><text x="50" y="85" class="lbl">14</text>
                                         <rect x="40" y="90" width="20" height="10" /><text x="50" y="95" class="lbl">15</text>
-                                        
                                         <rect x="10" y="100" width="10" height="20" /><text x="15" y="110" class="lbl">16</text>
                                         <rect x="20" y="100" width="10" height="20" /><text x="25" y="110" class="lbl">17</text>
                                         <rect x="30" y="100" width="20" height="10" /><text x="40" y="105" class="lbl">18</text>
                                         <rect x="30" y="110" width="20" height="10" /><text x="40" y="115" class="lbl">19</text>
                                         <rect x="50" y="100" width="10" height="20" /><text x="55" y="110" class="lbl">20</text>
                                     </g>
-
-                                    <!-- 7. BANDE BASSE BLEU CIEL (21 à 27) -->
                                     <g class="t-ciel">
                                         <rect x="0" y="120" width="10" height="20" /><text x="5" y="130" class="lbl">21</text>
                                         <rect x="10" y="120" width="10" height="20" /><text x="15" y="130" class="lbl">22</text>
@@ -550,32 +1290,47 @@
                         </div>
                     </div>
 
-                    <div class="info-card">
-                        <h3 style="font-family:'Fredoka',sans-serif; margin-top:0; color:var(--rouge);">📌 Mode d'emploi</h3>
-                        <p style="font-size:0.85rem; color:var(--gris-moyen); line-height: 1.6; margin:0;">
-                            • Clique sur <strong>Mode Édition</strong> pour renommer une catégorie, glisser un outil sur un autre pour réordonner ou changer de catégorie.<br>
-                            • Si un outil n'apparaît pas immédiatement, clique sur <strong>Réinitialiser les Outils</strong> en haut à droite pour rafraîchir le cache local.
+                    <!-- CARTE 3 : GUIDE & SAUVEGARDE -->
+                    <div class="cockpit-card">
+                        <div class="cockpit-card-header">
+                            <h3 class="cockpit-card-title">📌 Guide & Sauvegarde</h3>
+                        </div>
+                        <p style="font-size:0.8rem; color:var(--gris-moyen); line-height: 1.55; margin:0 0 12px 0;">
+                            • Cliquez sur l'étoile <strong>★</strong> d'un outil pour l'ajouter à votre barre d'<strong>Accès Rapide</strong> en haut.<br>
+                            • Activez le <strong>Mode Édition</strong> pour déplacer, modifier (✏️) ou renommer vos outils et catégories.
                         </p>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn btn-secondary" style="flex:1; justify-content:center; font-size:0.75rem;" onclick="exportDashboardJSON()">
+                                <i class="fa-solid fa-download"></i> Exporter Config
+                            </button>
+                            <button class="btn btn-secondary" style="flex:1; justify-content:center; font-size:0.75rem;" onclick="document.getElementById('importConfigInput').click()">
+                                <i class="fa-solid fa-upload"></i> Importer
+                            </button>
+                            <input type="file" id="importConfigInput" accept=".json" style="display:none;" onchange="importDashboardJSON(event)">
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
 
+    <div id="toastNotif" class="toast-notif">Action effectuée !</div>
+
     <script src="js/sidebar.js"></script>
 
     <script>
+    /* ========================================================================= */
+    /* LES 32 OUTILS OFFICIELS EXACTS & 6 CATÉGORIES DU DOJO DORNOIS             */
+    /* ========================================================================= */
     const tousLesOutilsDojoDefaut = [
         {
             id: "compta",
             titre: "💰 Comptabilité & Finances",
             outils: [
-                { name: "💰 Caisse & Budget", url: "outils/compta.html" },
-                { name: "📊 Suivi Budget", url: "outils/budget.html" },
-                { name: "🚗 Notes de Frais", url: "outils/generateur_frais.html" },
+                { name: "💰 Trésorerie & Compta", url: "outils/compta.html" },
                 { name: "🪙 Mécénat", url: "outils/mecenat.html" },
-                { name: "🖨️ Devis & Facturation", url: "outils/facturation.html" },
-                { name: "🏷️ Achats Publicitaires", url: "outils/achats_pub.html" }
+                { name: "🖨️ Facturation", url: "outils/facturation.html" }
             ]
         },
         {
@@ -583,13 +1338,9 @@
             titre: "📑 Administration, Devis & Documents",
             outils: [
                 { name: "📝 Éditeur Documents", url: "outils/generateur_documents.html" },
-                { name: "💼 Générateur de Devis", url: "outils/generateur_devis.html" },
-                { name: "📜 Justifs & Reçus", url: "outils/generateur_recus.html" },
-                { name: "✉️ Courriers Officiels", url: "outils/generateur_courriers.html" },
-                { name: "📨 Convocations Club", url: "outils/generateur_convocations.html" },
-                { name: "📑 Comptes-Rendus", url: "outils/generateur_cr.html" },
+                { name: "📜 Attestations & Reçus", url: "outils/generateur_recus.html" },
                 { name: "📖 Livret Accueil", url: "outils/livretaccueil.html" },
-                { name: "🛠️ Charte Création Outils", url: "outils/charte_creation_outils.html" }
+                { name: "✉️ Newsletter Club", url: "outils/newsletter.html" }
             ]
         },
         {
@@ -601,7 +1352,8 @@
                 { name: "📦 Stocks & Logistique", url: "outils/logistique.html" },
                 { name: "🛍️ Boutique & Ventes", url: "outils/boutique.html" },
                 { name: "🎟️ Tombola Club", url: "outils/tombola.html" },
-                { name: "⏱️ Heures Romain", url: "outils/heures_romain.html" }
+                { name: "📅 Planning Réseaux", url: "outils/planning_reseaux.html" },
+                { name: "🟦 Plan Tatamis", url: "outils/plan_tatamis.html" }
             ]
         },
         {
@@ -609,28 +1361,26 @@
             titre: "🎨 Communication, Studio & Visuels",
             outils: [
                 { name: "📜 Charte Graphique", url: "outils/chartegraphique.html" },
+                { name: "🛠️ Charte Création Outils", url: "outils/charte_creation_outils.html" },
                 { name: "🖊️ Studio Tampon", url: "outils/studio_tampon.html" },
                 { name: "🎨 Studio Icônes Dojo", url: "outils/studio_icones_dojo.html" },
-                { name: "📁 Studio SumUp", url: "outils/icones_dossiers_dojo.html" },
-                { name: "✉️ Newsletter Club", url: "outils/newsletter.html" },
-                { name: "🖼️ Générateur Affiches", url: "outils/generateur_affiches.html" },
-                { name: "🎬 Étiquettes", url: "outils/studio_vignettes.html" },
+                { name: "📁 Icônes Dossiers Dojo", url: "outils/icones_dossiers_dojo.html" },
+                { name: "🎬 Studio Vignettes", url: "outils/studio_vignettes.html" },
                 { name: "📱 Générateur QR Code", url: "outils/generateur_qr_code.html" },
-                { name: "✍️ Signature Gmail", url: "outils/studio_signature_gmail.html" },
-                { name: "📅 Planning Réseaux", url: "outils/planning_reseaux.html" }
+                { name: "✍️ Signature Gmail", url: "outils/studio_signature_gmail.html" }
             ]
         },
         {
             id: "activites",
             titre: "🥋 Activités, Écoles & Événements",
             outils: [
-                { name: "🥋 Relevé Presta Romain", url: "outils/suivi_romain.html" },
-                { name: "🎈 Événements Club", url: "outils/evenements.html" },
-                { name: "🎟️ Compta Événements", url: "outils/compta_evenements.html" },
+                { name: "🥋 Suivi Romain", url: "outils/suivi_romain.html" },
+                { name: "⏱️ Heures Romain", url: "outils/heures_romain.html" },
                 { name: "🏫 Suivi Écoles", url: "outils/suivi_ecoles.html" },
-                { name: "🌼 Suivi Événements Été", url: "outils/suivi_evenements_ete.html" },
                 { name: "🧘 Sophrologie", url: "outils/sophrologie.html" },
-                { name: "🌐 Éditeur Kalisport", url: "outils/editeur_kalisport.html" }
+                { name: "🏆 Calendrier des Tournois", url: "outils/calendrier_tournois.html" },
+                { name: "🎈 Événements Club", url: "outils/evenements.html" },
+                { name: "🚸 École Mardi", url: "outils/ecole_mardi.html" }
             ]
         },
         {
@@ -638,32 +1388,180 @@
             titre: "⚙️ Pilotage, Projets & Organisation",
             outils: [
                 { name: "📓 Workspace Notes", url: "outils/notion_board.html" },
-                { name: "🚀 Futur Dojo / Projets", url: "outils/futur_dojo.html" },
                 { name: "📅 Réunions & ODJ", url: "outils/reunions.html" },
-                { name: "📊 Logistique & Planning", url: "outils/logistique.html" },
-                { name: "📝 Générateur Kalisport", url: "outils/generateur_kalisport.html" }
+                { name: "🌐 Éditeur Kalisport", url: "outils/editeur_kalisport.html" }
             ]
         }
     ];
 
+    const FAVORIS_DEFAUT = [
+        "outils/newsletter.html",
+        "outils/reunions.html",
+        "outils/planning_reseaux.html",
+        "outils/compta.html",
+        "outils/notion_board.html"
+    ];
+
     let structureCategories = [];
+    let favoriteUrls = [];
+    let activeCategoryFilter = 'ALL';
     let isEditMode = false;
     let draggedInfo = null;
+    let editingToolCoords = null; // { catIdx, toolIdx } ou null si création
 
+    /* ========================================================================= */
+    /* INITIALISATION & CHARGEMENT                                               */
+    /* ========================================================================= */
     function chargerInitialisation() {
+        updateLiveDateHeader();
+
+        // Favoris
+        try {
+            const savedFavs = localStorage.getItem('dd_favorite_tools_v1');
+            favoriteUrls = savedFavs ? JSON.parse(savedFavs) : [...FAVORIS_DEFAUT];
+        } catch(e) {
+            favoriteUrls = [...FAVORIS_DEFAUT];
+        }
+
+        // Catalogue des 32 outils
         try {
             const saved = localStorage.getItem('dd_catalog_structure_v7');
             if (saved) {
-                structureCategories = JSON.parse(saved);
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    structureCategories = parsed;
+                } else {
+                    structureCategories = JSON.parse(JSON.stringify(tousLesOutilsDojoDefaut));
+                }
             } else {
                 structureCategories = JSON.parse(JSON.stringify(tousLesOutilsDojoDefaut));
                 saveState();
             }
         } catch (e) {
-            console.error("Erreur lecture storage :", e);
             structureCategories = JSON.parse(JSON.stringify(tousLesOutilsDojoDefaut));
         }
+
+        renderCategoryPills();
+        renderFavoritesStrip();
         renderCatalog();
+
+        // Raccourci clavier Ctrl+K pour la recherche
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                document.getElementById('searchTool').focus();
+            } else if (e.key === 'Escape') {
+                const searchInput = document.getElementById('searchTool');
+                if (document.activeElement === searchInput && searchInput.value !== '') {
+                    searchInput.value = '';
+                    filterTools();
+                }
+            }
+        });
+    }
+
+    function updateLiveDateHeader() {
+        const now = new Date();
+        const opts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        const formatted = now.toLocaleDateString('fr-FR', opts);
+        const cap = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+        const el = document.getElementById('live-date-subtitle');
+        if (el) el.innerText = `Intranet Officiel du Dojo Dornois • ${cap}`;
+    }
+
+    /* ========================================================================= */
+    /* GESTION DES FAVORIS (ACCÈS RAPIDE QUOTIDIEN)                              */
+    /* ========================================================================= */
+    function toggleFavoriteTool(url, event) {
+        if (event) event.stopPropagation();
+        const idx = favoriteUrls.indexOf(url);
+        if (idx > -1) {
+            favoriteUrls.splice(idx, 1);
+            showToast("☆ Retiré de l'Accès Rapide");
+        } else {
+            favoriteUrls.push(url);
+            showToast("⭐ Ajouté à l'Accès Rapide !");
+        }
+        localStorage.setItem('dd_favorite_tools_v1', JSON.stringify(favoriteUrls));
+        renderFavoritesStrip();
+        renderCatalog();
+    }
+
+    function renderFavoritesStrip() {
+        const strip = document.getElementById('favoritesStrip');
+        const list = document.getElementById('favoritesList');
+        if (!strip || !list) return;
+
+        const allTools = [];
+        structureCategories.forEach(cat => {
+            (cat.outils || []).forEach(t => allTools.push(t));
+        });
+
+        const favTools = favoriteUrls
+            .map(url => allTools.find(t => t.url === url))
+            .filter(Boolean);
+
+        if (favTools.length === 0) {
+            strip.style.display = 'none';
+            return;
+        }
+
+        strip.style.display = 'flex';
+        list.innerHTML = favTools.map(t => `
+            <a href="${t.url}" class="fav-chip">
+                <span>${t.name}</span>
+            </a>
+        `).join('');
+    }
+
+    /* ========================================================================= */
+    /* FILTRES RAPIDES PAR CATÉGORIE                                             */
+    /* ========================================================================= */
+    function renderCategoryPills() {
+        const container = document.getElementById('catFilterPills');
+        if (!container) return;
+
+        let totalTools = 0;
+        structureCategories.forEach(c => totalTools += (c.outils || []).length);
+
+        let html = `
+            <button class="cat-pill ${activeCategoryFilter === 'ALL' ? 'active' : ''}" onclick="setCategoryFilter('ALL')">
+                Tous (${totalTools})
+            </button>
+        `;
+
+        structureCategories.forEach((cat, idx) => {
+            const shortName = cat.titre.split(',')[0];
+            const count = (cat.outils || []).length;
+            html += `
+                <button class="cat-pill ${activeCategoryFilter === idx ? 'active' : ''}" onclick="setCategoryFilter(${idx})">
+                    ${shortName} (${count})
+                </button>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function setCategoryFilter(filterVal) {
+        activeCategoryFilter = filterVal;
+        renderCategoryPills();
+        renderCatalog();
+    }
+
+    /* ========================================================================= */
+    /* RENDU DU CATALOGUE & EXTRACTION ÉMOJI / TITRE                             */
+    /* ========================================================================= */
+    function splitEmojiAndName(rawName) {
+        const str = (rawName || '').trim();
+        const spaceIdx = str.indexOf(' ');
+        if (spaceIdx > 0 && spaceIdx <= 5) {
+            return {
+                emoji: str.slice(0, spaceIdx),
+                label: str.slice(spaceIdx + 1)
+            };
+        }
+        return { emoji: '🛠️', label: str };
     }
 
     function updateKPIs() {
@@ -678,27 +1576,7 @@
 
         if (kpiTools) kpiTools.innerText = totalTools;
         if (kpiCats) kpiCats.innerText = structureCategories.length;
-        if (btnReset) btnReset.innerText = `🔄 Réinitialiser les ${totalTools} Outils`;
-    }
-
-    function resetToDefault() {
-        if (confirm("Réinitialiser le Dashboard pour afficher tous les outils par défaut ?")) {
-            localStorage.removeItem('dd_catalog_structure_v7');
-            localStorage.removeItem('dd_catalog_structure_v6');
-            localStorage.removeItem('dd_catalog_structure_v5');
-            structureCategories = JSON.parse(JSON.stringify(tousLesOutilsDojoDefaut));
-            saveState();
-            renderCatalog();
-        }
-    }
-
-    function saveState() {
-        localStorage.setItem('dd_catalog_structure_v7', JSON.stringify(structureCategories));
-        if (window.switchSidebarCat) {
-            const active = localStorage.getItem('dd_sidebar_active_cat') || 0;
-            window.switchSidebarCat(parseInt(active));
-        }
-        updateKPIs();
+        if (btnReset) btnReset.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Réinitialiser les ${totalTools} Outils`;
     }
 
     function renderCatalog() {
@@ -706,8 +1584,19 @@
         if (!container) return;
         container.innerHTML = '';
 
+        const searchQuery = (document.getElementById('searchTool')?.value || '').trim().toLowerCase();
+
         structureCategories.forEach((cat, catIdx) => {
-            const count = (cat.outils || []).length;
+            if (activeCategoryFilter !== 'ALL' && activeCategoryFilter !== catIdx) return;
+
+            const filteredTools = (cat.outils || []).map((t, tIdx) => ({ ...t, origIdx: tIdx })).filter(t => {
+                if (!searchQuery) return true;
+                return t.name.toLowerCase().includes(searchQuery) || t.url.toLowerCase().includes(searchQuery);
+            });
+
+            if (searchQuery && filteredTools.length === 0) return;
+
+            const count = filteredTools.length;
             const section = document.createElement('div');
             section.className = 'catalog-section';
 
@@ -717,14 +1606,18 @@
                         <h3 class="catalog-category-title" contenteditable="${isEditMode}" onblur="updateCatTitle(${catIdx}, this)">${cat.titre}</h3>
                         <span class="category-counter-badge">${count} ${count > 1 ? 'outils' : 'outil'}</span>
                     </div>
-                    ${isEditMode ? `<button style="background:none; border:none; color:#e74c3c; cursor:pointer; font-size:0.8rem;" onclick="deleteCategory(${catIdx})">🗑️ Supprimer</button>` : ''}
+                    ${isEditMode ? `<button class="btn btn-secondary" style="padding:4px 10px; font-size:0.74rem; color:#EF4444;" onclick="deleteCategory(${catIdx})"><i class="fa-solid fa-trash"></i> Supprimer catégorie</button>` : ''}
                 </div>
                 <div class="catalog-list" data-cat-idx="${catIdx}" ondragover="allowDrop(event)" ondrop="dropOnContainer(event, ${catIdx})"></div>
             `;
 
             const listEl = section.querySelector('.catalog-list');
 
-            (cat.outils || []).forEach((tool, toolIdx) => {
+            filteredTools.forEach((tool) => {
+                const toolIdx = tool.origIdx;
+                const { emoji, label } = splitEmojiAndName(tool.name);
+                const isFav = favoriteUrls.includes(tool.url);
+
                 const item = document.createElement('div');
                 item.className = 'app-tool-link';
                 item.draggable = isEditMode;
@@ -742,9 +1635,7 @@
                     item.classList.add('drag-over');
                 };
 
-                item.ondragleave = () => {
-                    item.classList.remove('drag-over');
-                };
+                item.ondragleave = () => item.classList.remove('drag-over');
 
                 item.ondrop = (e) => {
                     if (!isEditMode) return;
@@ -759,8 +1650,24 @@
                 };
 
                 item.innerHTML = `
-                    <span>${tool.name}</span>
-                    <button class="btn-delete-tool" onclick="event.stopPropagation(); deleteTool(${catIdx}, ${toolIdx})">✕</button>
+                    <div class="tool-left-content">
+                        <div class="tool-emoji-box">${emoji}</div>
+                        <span class="tool-title-text" title="${tool.name}">${label}</span>
+                    </div>
+                    <div class="tool-right-actions">
+                        <button class="btn-star-fav ${isFav ? 'is-fav' : ''}" onclick="toggleFavoriteTool('${tool.url}', event)" title="${isFav ? 'Retirer des favoris' : 'Épingler en Accès Rapide'}">
+                            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i>
+                        </button>
+                        <i class="fa-solid fa-chevron-right tool-arrow"></i>
+                        <div class="edit-tool-btns">
+                            <button class="btn-mini-edit" onclick="event.stopPropagation(); openEditToolModal(${catIdx}, ${toolIdx})" title="Modifier cet outil">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="btn-mini-del" onclick="event.stopPropagation(); deleteTool(${catIdx}, ${toolIdx})" title="Supprimer cet outil">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
                 `;
 
                 listEl.appendChild(item);
@@ -772,23 +1679,48 @@
         updateKPIs();
     }
 
-    function switchTatamiDisp(dispNum) {
-        document.getElementById('tabDisp1').classList.toggle('active', dispNum === 1);
-        document.getElementById('tabDisp2').classList.toggle('active', dispNum === 2);
-        document.getElementById('tatamiView1').style.display = (dispNum === 1) ? 'block' : 'none';
-        document.getElementById('tatamiView2').style.display = (dispNum === 2) ? 'block' : 'none';
-        document.getElementById('kpi-tatamis-count').innerText = (dispNum === 1) ? '56' : '49';
-    }
-
+    /* ========================================================================= */
+    /* MODE ÉDITION, DRAG & DROP & GESTION DES OUTILS                            */
+    /* ========================================================================= */
     function toggleEditMode() {
         isEditMode = !isEditMode;
         document.body.classList.toggle('edit-mode', isEditMode);
         const btn = document.getElementById('btnToggleEdit');
-        btn.innerText = isEditMode ? "💾 Sauvegarder" : "⚙️ Mode Édition / Organiser";
+        btn.innerHTML = isEditMode
+            ? '<i class="fa-solid fa-check"></i> Terminer & Sauvegarder'
+            : '<i class="fa-solid fa-sliders"></i> Mode Édition / Organiser';
         btn.classList.toggle('btn-active-edit', isEditMode);
 
-        if (!isEditMode) saveState();
+        if (!isEditMode) {
+            saveState();
+            showToast("✓ Organisation sauvegardée !");
+        }
         renderCatalog();
+    }
+
+    function saveState() {
+        localStorage.setItem('dd_catalog_structure_v7', JSON.stringify(structureCategories));
+        localStorage.setItem('dd_catalog_structure_v6', JSON.stringify(structureCategories));
+        if (window.switchSidebarCat) {
+            const active = localStorage.getItem('dd_sidebar_active_cat') || 0;
+            window.switchSidebarCat(parseInt(active));
+        }
+        renderCategoryPills();
+        renderFavoritesStrip();
+        updateKPIs();
+    }
+
+    function resetToDefault() {
+        if (confirm("Réinitialiser le Dashboard pour afficher les 32 outils officiels par défaut ?")) {
+            localStorage.removeItem('dd_catalog_structure_v7');
+            localStorage.removeItem('dd_catalog_structure_v6');
+            localStorage.removeItem('dd_catalog_structure_v5');
+            structureCategories = JSON.parse(JSON.stringify(tousLesOutilsDojoDefaut));
+            activeCategoryFilter = 'ALL';
+            saveState();
+            renderCatalog();
+            showToast("🔄 Les 32 outils officiels ont été restaurés !");
+        }
     }
 
     function updateCatTitle(catIdx, el) {
@@ -797,16 +1729,18 @@
     }
 
     function deleteTool(catIdx, toolIdx) {
-        if (confirm("Supprimer cet outil ?")) {
+        if (confirm("Supprimer cet outil du Dashboard ?")) {
             structureCategories[catIdx].outils.splice(toolIdx, 1);
             saveState();
             renderCatalog();
+            showToast("🗑️ Outil supprimé");
         }
     }
 
     function deleteCategory(catIdx) {
-        if (confirm("Supprimer cette catégorie et ses outils ?")) {
+        if (confirm("Supprimer cette catégorie et tous ses outils ?")) {
             structureCategories.splice(catIdx, 1);
+            activeCategoryFilter = 'ALL';
             saveState();
             renderCatalog();
         }
@@ -817,10 +1751,8 @@
     function dropOnItem(targetCatIdx, targetToolIdx) {
         if (!draggedInfo) return;
         const { catIdx, toolIdx } = draggedInfo;
-        
         const movedTool = structureCategories[catIdx].outils.splice(toolIdx, 1)[0];
         structureCategories[targetCatIdx].outils.splice(targetToolIdx, 0, movedTool);
-
         draggedInfo = null;
         saveState();
         renderCatalog();
@@ -829,34 +1761,69 @@
     function dropOnContainer(e, targetCatIdx) {
         e.preventDefault();
         if (!draggedInfo) return;
-
         const { catIdx, toolIdx } = draggedInfo;
         const movedTool = structureCategories[catIdx].outils.splice(toolIdx, 1)[0];
         structureCategories[targetCatIdx].outils.push(movedTool);
-
         draggedInfo = null;
         saveState();
         renderCatalog();
     }
 
-    function openNewToolModal() {
+    /* ========================================================================= */
+    /* MODALES CRÉATION / ÉDITION D'OUTIL & CATÉGORIE                            */
+    /* ========================================================================= */
+    function populateCatSelect(selectedIdx = 0) {
         const select = document.getElementById('new-tool-category');
         select.innerHTML = '';
         structureCategories.forEach((cat, idx) => {
-            select.innerHTML += `<option value="${idx}">${cat.titre}</option>`;
+            select.innerHTML += `<option value="${idx}" ${idx === selectedIdx ? 'selected' : ''}>${cat.titre}</option>`;
         });
+    }
+
+    function openCreateToolModal() {
+        editingToolCoords = null;
+        document.getElementById('toolModalTitle').innerText = "➕ Ajouter un Outil";
+        document.getElementById('new-tool-name').value = '';
+        document.getElementById('new-tool-filename').value = '';
+        populateCatSelect(0);
         openModal('toolModal');
     }
 
-    function saveNewTool() {
+    function openEditToolModal(catIdx, toolIdx) {
+        editingToolCoords = { catIdx, toolIdx };
+        const tool = structureCategories[catIdx].outils[toolIdx];
+        document.getElementById('toolModalTitle').innerText = "✏️ Modifier l'Outil";
+        document.getElementById('new-tool-name').value = tool.name;
+        document.getElementById('new-tool-filename').value = tool.url;
+        populateCatSelect(catIdx);
+        openModal('toolModal');
+    }
+
+    function saveToolModal() {
         const name = document.getElementById('new-tool-name').value.trim();
         let filename = document.getElementById('new-tool-filename').value.trim();
-        const catIdx = document.getElementById('new-tool-category').value;
+        const targetCatIdx = parseInt(document.getElementById('new-tool-category').value);
 
         if (!name || !filename) return;
-        if (!filename.endsWith('.html')) filename += '.html';
+        if (!filename.endsWith('.html') && !filename.startsWith('http')) filename += '.html';
+        if (!filename.startsWith('outils/') && !filename.startsWith('http') && !filename.startsWith('/')) {
+            filename = `outils/${filename}`;
+        }
 
-        structureCategories[catIdx].outils.push({ name, url: `outils/${filename}` });
+        if (editingToolCoords) {
+            const { catIdx, toolIdx } = editingToolCoords;
+            if (catIdx === targetCatIdx) {
+                structureCategories[catIdx].outils[toolIdx] = { name, url: filename };
+            } else {
+                structureCategories[catIdx].outils.splice(toolIdx, 1);
+                structureCategories[targetCatIdx].outils.push({ name, url: filename });
+            }
+            showToast("✏️ Outil mis à jour !");
+        } else {
+            structureCategories[targetCatIdx].outils.push({ name, url: filename });
+            showToast("➕ Nouvel outil ajouté !");
+        }
+
         saveState();
         closeModal('toolModal');
         renderCatalog();
@@ -865,26 +1832,90 @@
     function saveNewCategory() {
         const title = document.getElementById('new-cat-title').value.trim();
         if (!title) return;
-
         structureCategories.push({
             id: 'cat_' + Date.now(),
             titre: title,
             outils: []
         });
-
+        document.getElementById('new-cat-title').value = '';
         saveState();
         closeModal('catModal');
         renderCatalog();
+        showToast("📁 Catégorie créée !");
     }
 
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
     function filterTools() {
-        const q = document.getElementById('searchTool').value.toLowerCase();
-        document.querySelectorAll('.app-tool-link').forEach(el => {
-            el.style.display = el.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
+        renderCatalog();
+    }
+
+    /* ========================================================================= */
+    /* PLAN DES TATAMIS & UTILITAIRES COCKPIT                                    */
+    /* ========================================================================= */
+    function switchTatamiDisp(dispNum) {
+        document.getElementById('tabDisp1').classList.toggle('active', dispNum === 1);
+        document.getElementById('tabDisp2').classList.toggle('active', dispNum === 2);
+        document.getElementById('tatamiView1').style.display = (dispNum === 1) ? 'block' : 'none';
+        document.getElementById('tatamiView2').style.display = (dispNum === 2) ? 'block' : 'none';
+        document.getElementById('kpi-tatamis-count').innerText = (dispNum === 1) ? '56' : '49';
+        document.getElementById('kpi-tatamis-surface').innerText = (dispNum === 1) ? '112 m²' : '98 m²';
+    }
+
+    function copyClubInfo(val, label) {
+        navigator.clipboard.writeText(val).then(() => {
+            showToast(`📋 ${label} copié : ${val}`);
         });
+    }
+
+    function exportDashboardJSON() {
+        const payload = {
+            version: 7,
+            date: new Date().toISOString(),
+            favorites: favoriteUrls,
+            categories: structureCategories
+        };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+        const a = document.createElement('a');
+        a.href = dataStr;
+        a.download = `dashboard_dojo_dornois_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        showToast("💾 Configuration exportée en JSON !");
+    }
+
+    function importDashboardJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if (parsed.categories && Array.isArray(parsed.categories)) {
+                    structureCategories = parsed.categories;
+                    if (Array.isArray(parsed.favorites)) {
+                        favoriteUrls = parsed.favorites;
+                        localStorage.setItem('dd_favorite_tools_v1', JSON.stringify(favoriteUrls));
+                    }
+                    saveState();
+                    renderCatalog();
+                    showToast("✅ Configuration importée avec succès !");
+                }
+            } catch(err) {
+                alert("Fichier JSON invalide.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toastNotif');
+        t.innerText = msg;
+        t.style.display = 'block';
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => { t.style.display = 'none'; }, 2500);
     }
 
     window.addEventListener('DOMContentLoaded', chargerInitialisation);
