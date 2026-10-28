@@ -1,24 +1,31 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <title>Base de Connaissances & Dossiers — Dojo Dornois</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace Tâches & Notes - Dojo Dornois</title>
+    <link rel="icon" type="image/png" href="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
+
+    <!-- POLICES OFFICIELLES CHARTE DOJO DORNOIS -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- TAILWIND CSS & FONTAWESOME -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --rouge: #C41E3A;
             --rouge-hover: #A3182E;
             --rouge-clair: #FFEBEF;
-            --rouge-deep: #8B1429;
             --noir-doux: #1A1A1A;
-            --gris-fonce: #3D3D3D;
-            --gris-moyen: #6B6B6B;
-            --gris-clair: #B8B8B8;
-            --gris-tres-clair: #E8E8E8;
+            --gris-fonce: #2D3748;
+            --gris-moyen: #64748B;
+            --gris-clair: #94A3B8;
+            --gris-tres-clair: #E2E8F0;
             --fond: #F4F6F9;
             --blanc: #FFFFFF;
-            --sidebar-width: 280px;
-            --topbar-height: 68px;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -26,250 +33,1168 @@
         body {
             font-family: 'Roboto', sans-serif;
             background-color: var(--fond);
-            margin: 0; padding: 0;
             color: var(--gris-fonce);
+            margin: 0;
+            padding: 0;
             display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* --- FIX SIDEBAR DÉBORDEMENT --- */
-        .sidebar { 
-            width: var(--sidebar-width); 
-            min-width: var(--sidebar-width);
-            max-width: var(--sidebar-width);
-            background: var(--noir-doux); 
-            color: var(--blanc); 
-            display: flex; 
-            flex-direction: column; 
-            height: 100%; 
-            position: relative; 
-            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
-            flex-shrink: 0; 
-            box-sizing: border-box;
-            overflow-x: hidden;
-            z-index: 100;
-        }
+        h1, h2, h3, h4, .font-fredoka { font-family: 'Fredoka', sans-serif; }
 
-        .sidebar * {
-            max-width: 100%;
-            box-sizing: border-box;
-        }
+        .sidebar { flex-shrink: 0; z-index: 50; }
 
-        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
-        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
-        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
-
-        /* ===== MAIN CONTENT ===== */
         .main-content {
-            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-width: 0;
         }
 
-        .topbar {
-            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; z-index: 50;
+        /* Bascule Principale : TÂCHES vs NOTES */
+        .space-switch-btn {
+            padding: 9px 18px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            color: #64748B;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .space-switch-btn:hover { color: #1E293B; }
+        .space-switch-btn.active {
+            background: var(--rouge);
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.25);
         }
 
-        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); }
-        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
-
-        .app-body {
-            flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
+        /* Sous-onglets de vue */
+        .subview-btn {
+            padding: 6px 13px;
+            border-radius: 8px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #475569;
+            background: transparent;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .subview-btn.active {
+            background: #1A1A1A;
+            color: #FFFFFF;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
-        .btn { font-family: 'Roboto', sans-serif; font-weight: 500; padding: 9px 15px; border-radius: 6px; border: none; cursor: pointer; transition: background 0.2s; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
-        .btn-dark { background: var(--noir-doux); color: white; }
-        .btn-dark:hover { background: #333; }
+        /* ================= STYLES ESPACE 1 : TÂCHES ================= */
+        .keep-board-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 18px;
+            align-items: start;
+        }
 
-        .notion-layout { display: grid; grid-template-columns: 300px 1fr; gap: 25px; align-items: start; }
-        @media(max-width: 900px) { .notion-layout { grid-template-columns: 1fr; } }
-        
-        /* SIDEBAR - DOSSIERS NOTION EN INTERNE */
-        .folders-panel { background: var(--blanc); padding: 20px; border-radius: 8px; border: 1px solid var(--gris-tres-clair); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
-        .folders-panel h3 { font-family: 'Fredoka', sans-serif; margin-top: 0; font-size: 1.1rem; color: var(--noir-doux); border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 8px; margin-bottom: 15px; }
-        
-        .folder-group-title { font-size: 0.75rem; font-weight: bold; color: var(--gris-moyen); text-transform: uppercase; letter-spacing: 0.5px; margin: 15px 0 8px 5px; }
-        .nav-list { list-style: none; padding: 0; margin: 0; }
-        .nav-list li { margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between; }
-        
-        .nav-list button.folder-btn { width: 100%; border: none; background: none; text-align: left; display: flex; align-items: center; gap: 10px; color: var(--gris-fonce); font-size: 0.88rem; padding: 9px 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-family: 'Roboto', sans-serif; }
-        .nav-list button.folder-btn:hover { background: #f0f0f0; color: var(--rouge); }
-        .nav-list button.folder-btn.active { background: var(--rouge-clair); color: var(--rouge); font-weight: bold; border-left: 4px solid var(--rouge); padding-left: 6px; }
+        .keep-list-card {
+            background: #FFFFFF;
+            border-radius: 14px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.2s ease;
+        }
+        .keep-list-card:hover {
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
+        }
 
-        .btn-delete-folder { background: transparent; border: none; color: var(--gris-moyen); cursor: pointer; padding: 5px; display: none; font-size: 0.85rem; border-radius: 4px; }
-        .nav-list li:hover .btn-delete-folder { display: block; }
-        .btn-delete-folder:hover { background: var(--rouge-clair); color: var(--rouge); }
+        .task-row {
+            padding: 10px 12px;
+            border-bottom: 1px solid #F1F5F9;
+            transition: background 0.15s ease;
+            cursor: pointer;
+        }
+        .task-row:last-child { border-bottom: none; }
+        .task-row:hover { background: #F8FAFC; }
+        .task-row.task-done .task-title-text {
+            text-decoration: line-through;
+            color: #94A3B8;
+        }
+        .task-row.task-waiting { background: #FFFBEB; }
 
-        .btn-new-folder { width: 100%; margin-top: 20px; background: #fafafa; border: 1px dashed var(--gris-clair); padding: 10px; border-radius: 6px; cursor: pointer; font-family: 'Roboto', sans-serif; font-size: 0.85rem; font-weight: 500; color: var(--gris-fonce); transition: all 0.2s; text-align: center; }
-        .btn-new-folder:hover { background: var(--rouge-clair); border-color: var(--rouge); color: var(--rouge); }
+        .custom-chk {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 2px solid #CBD5E1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+            background: white;
+        }
+        .custom-chk:hover { border-color: var(--rouge); }
+        .custom-chk.checked {
+            background: #10B981;
+            border-color: #10B981;
+            color: white;
+        }
 
-        /* ESPACE DE TRAVAIL CENTRAL */
-        .workspace { background: var(--blanc); padding: 25px; border-radius: 8px; border: 1px solid var(--gris-tres-clair); box-shadow: 0 4px 12px rgba(0,0,0,0.02); min-height: 500px; position: relative; }
-        .workspace-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gris-tres-clair); padding-bottom: 15px; margin-bottom: 25px; }
-        .workspace-header h2 { font-family: 'Fredoka', sans-serif; margin: 0; color: var(--noir-doux); font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
-        
-        .btn-add-block { background: var(--rouge); color: white; border: none; padding: 9px 14px; border-radius: 6px; cursor: pointer; font-weight: 500; font-family: 'Roboto', sans-serif; font-size: 0.85rem; }
-        .btn-add-block:hover { background: var(--rouge-hover); }
+        .kanban-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            align-items: start;
+        }
+        @media (max-width: 1200px) { .kanban-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 640px) { .kanban-grid { grid-template-columns: 1fr; } }
 
-        /* BLOCS D'INFORMATIONS ACCORDÉONS */
-        .info-block { background: #fafafa; border: 1px solid var(--gris-tres-clair); border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.01); overflow: hidden; transition: all 0.2s ease-in-out; }
-        .block-header { background: #f1f1f1; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); }
-        .block-title { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); font-size: 1.05rem; border: none; background: transparent; width: 70%; font-weight: bold; }
-        .block-title:focus { background: white; outline: 1px solid var(--gris-clair); padding: 2px 5px; border-radius: 4px; }
-        
-        .block-actions { display: flex; gap: 8px; align-items: center; }
-        .btn-block-action { border: none; background: none; cursor: pointer; font-size: 0.95rem; padding: 5px; border-radius: 4px; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
-        .btn-block-action:hover { background: var(--gris-tres-clair); }
-        .btn-toggle-collapse { font-size: 0.85rem; color: var(--gris-moyen); width: 28px; height: 28px; }
+        .kanban-col {
+            background: #EEF2F6;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 12px;
+            min-height: 540px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+        .kanban-col.drag-over {
+            background: #FFEBEF;
+            border: 2px dashed var(--rouge);
+        }
 
-        .block-body { padding: 18px; transition: max-height 0.3s ease; }
-        
-        /* ZONE DE TEXTE ENRICHIE MULTI-FORMATS */
-        .block-editable-text { width: 100%; min-height: 120px; border: 1px solid transparent; background: transparent; font-family: 'Roboto', sans-serif; font-size: 0.92rem; line-height: 1.5; color: var(--gris-fonce); box-sizing: border-box; padding: 10px; }
-        .block-editable-text:focus { outline: none; background: #ffffff; box-shadow: inset 0 0 5px rgba(0,0,0,0.05); padding: 10px; border-radius: 4px; border: 1px solid var(--gris-tres-clair); }
-        .block-editable-text ul, .block-editable-text ol { margin: 5px 0; padding-left: 20px; }
-        .block-editable-text li { margin-bottom: 3px; }
+        .kanban-task-card {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            cursor: grab;
+            transition: all 0.15s ease;
+        }
+        .kanban-task-card:active { cursor: grabbing; }
+        .kanban-task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.07);
+        }
 
-        /* --- TOAST NOTIFICATIONS SYNC CLOUD --- */
-        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
-        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
-        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        /* ================= STYLES ESPACE 2 : STUDIO NOTION PRO ================= */
+        .notion-page-card {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: #FFFFFF;
+        }
+        .notion-page-card:hover {
+            background: #F8FAFC;
+            border-color: #E2E8F0;
+        }
+        .notion-page-card.active {
+            background: #FFF5F6;
+            border-color: #FECDD3;
+            border-left: 4px solid var(--rouge);
+        }
+
+        /* Barre d'outils d'insertion Notion */
+        .notion-toolbar-btn {
+            padding: 5px 9px;
+            border-radius: 7px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: #334155;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .notion-toolbar-btn:hover {
+            background: #F8FAFC;
+            border-color: var(--rouge);
+            color: var(--rouge);
+            transform: translateY(-1px);
+        }
+
+        /* Grande feuille d'écriture Notion */
+        .notion-editor-canvas {
+            width: 100%;
+            min-height: 520px;
+            outline: none;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.96rem;
+            line-height: 1.75;
+            color: #1E293B;
+            padding: 8px 4px 60px 4px;
+        }
+        .notion-editor-canvas:empty:before {
+            content: attr(placeholder);
+            color: #94A3B8;
+            pointer-events: none;
+            display: block;
+        }
+        .notion-editor-canvas h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #C41E3A;
+            margin: 18px 0 8px 0;
+            border-bottom: 2px solid #FFEBEF;
+            padding-bottom: 4px;
+        }
+        .notion-editor-canvas h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.22rem;
+            font-weight: 600;
+            color: #1E293B;
+            margin: 16px 0 6px 0;
+        }
+        .notion-editor-canvas h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #475569;
+            margin: 12px 0 4px 0;
+        }
+        .notion-editor-canvas ul { list-style-type: disc; padding-left: 24px; margin: 8px 0; }
+        .notion-editor-canvas ol { list-style-type: decimal; padding-left: 24px; margin: 8px 0; }
+        .notion-editor-canvas li { margin-bottom: 4px; }
+        .notion-editor-canvas blockquote {
+            border-left: 4px solid #C41E3A;
+            padding-left: 14px;
+            color: #475569;
+            font-style: italic;
+            margin: 12px 0;
+        }
+        .notion-editor-canvas details {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin: 10px 0;
+        }
+        .notion-editor-canvas summary {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            color: #1E293B;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* Pastilles de Tags sur les notes */
+        .note-tag-pill {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Modale */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(3px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .modal-backdrop.open { display: flex; }
+
+        /* Toast Notifications */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
+        .toast {
+            background: #1E293B;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.86rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border-left: 4px solid #10B981;
+        }
+        .toast.error { border-left-color: var(--rouge); background: #7F1D1D; }
 
         @media print {
-            body { background: white; padding: 0; color: black; display: block !important; }
-            .no-print, .sidebar, .topbar { display: none !important; }
-            .main-content { padding: 0 !important; overflow: visible !important; }
-            .app-body { display: block !important; margin: 0 !important; padding: 0 !important; }
+            .no-print, .sidebar, header { display: none !important; }
+            body, .main-content { height: auto !important; overflow: visible !important; background: white !important; display: block !important; }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+<body class="text-slate-800 antialiased">
 
-    <div class="toast-container" id="toastContainer"></div>
+    <div class="toast-container no-print" id="toastContainer"></div>
 
-    <!-- SIDEBAR DYNAMIQUE -->
-    <div class="sidebar"></div>
+    <!-- SIDEBAR UNIFIÉE -->
+    <div class="sidebar no-print"></div>
 
-    <!-- MAIN CONTENT -->
+    <!-- CONTENU PRINCIPAL -->
     <div class="main-content">
-        <div class="topbar no-print">
-            <div class="page-title-area">
-                <h2>📓 Base de Connaissances & Dossiers</h2>
-                <p>Espace d'organisation style Notion pour consigner les procédures et projets du club</p>
+        
+        <!-- ================= TOPBAR STUDIO ================= -->
+        <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0 no-print flex-wrap gap-3">
+            <div class="flex items-center gap-5 flex-wrap">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-[#C41E3A] text-white flex items-center justify-center font-bold font-fredoka text-xl shadow-sm">
+                        📓
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-fredoka text-lg font-bold text-[#1A1A1A] leading-tight">Workspace : Tâches & Studio Notes</h1>
+                            <span id="sync-status-badge" class="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-semibold">
+                                <i class="fa-solid fa-cloud-check"></i> Synchronisé
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500">1. Pilotage des Tâches (Google Tasks / Keep / Trello) • 2. Carnets de Notes (Studio Notion)</p>
+                    </div>
+                </div>
+
+                <!-- SÉLECTEUR DES 2 ESPACES : 1. TÂCHES À FAIRE | 2. NOTES & DOSSIERS -->
+                <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    <button id="btn-space-tasks" onclick="switchMainSpace('tasks')" class="space-switch-btn active">
+                        <i class="fa-solid fa-list-check"></i> 1. Mes Tâches & Actions
+                        <span id="badge-open-tasks" class="px-2 py-0.5 text-xs rounded-full bg-white/20 font-bold">0</span>
+                    </button>
+                    <button id="btn-space-notes" onclick="switchMainSpace('notes')" class="space-switch-btn">
+                        <i class="fa-solid fa-book-open"></i> 2. Mes Notes & Dossiers Notion
+                        <span id="badge-total-notes" class="px-2 py-0.5 text-xs rounded-full bg-slate-200 text-slate-700 font-bold">0</span>
+                    </button>
+                </div>
             </div>
-            <a href="../index.html" class="btn btn-dark">🏠 Central</a>
-        </div>
 
-        <div class="app-body">
-            <div class="notion-layout">
+            <!-- RECHERCHE GLOBALE & ACTIONS CLOUD -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="relative w-60">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="global-search-input" oninput="handleGlobalSearch()" placeholder="Rechercher partout..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-full text-xs outline-none focus:bg-white focus:border-[#C41E3A]">
+                </div>
+
+                <button onclick="openBulkAddModal()" id="btn-top-bulk" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-sm" title="Coller plusieurs lignes d'un coup pour créer des tâches en série">
+                    <i class="fa-solid fa-bolt"></i> Ajout Multiple
+                </button>
+
+                <button onclick="restaurerTachesGoogleTasks()" id="btn-restore-gtasks" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition" title="Recharger les 6 listes officielles Google Tasks">
+                    <i class="fa-solid fa-rotate-right text-[#C41E3A]"></i> Reset Google Tasks
+                </button>
+
+                <button onclick="syncToSupabase(false)" class="px-3.5 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-sm">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Sync Cloud
+                </button>
+            </div>
+        </header>
+
+        <!-- ================= CORPS DE L'APPLICATION ================= -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-5">
+
+            <!-- ========================================================================= -->
+            <!-- ESPACE 1 : PILOTAGE DES TÂCHES (GOOGLE KEEP + GOOGLE TASKS + TRELLO)      -->
+            <!-- ========================================================================= -->
+            <div id="space-tasks" class="max-w-[1680px] mx-auto space-y-5">
                 
-                <aside class="folders-panel no-print">
-                    <h3>📁 Vos Dossiers</h3>
+                <!-- BANDEAU KPIs TÂCHES -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+                    <div onclick="setTaskQuickFilter('ALL')" id="kpi-filter-ALL" class="bg-white p-3.5 rounded-2xl border-2 border-[#C41E3A] shadow-sm cursor-pointer flex items-center justify-between transition hover:-translate-y-0.5">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-slate-400">Reste à faire</span>
+                            <strong id="kpi-count-open" class="block font-fredoka text-2xl text-slate-800 leading-tight">0</strong>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-rose-50 text-[#C41E3A] flex items-center justify-center text-lg"><i class="fa-solid fa-layer-group"></i></div>
+                    </div>
+
+                    <div onclick="setTaskQuickFilter('HIGH')" id="kpi-filter-HIGH" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer flex items-center justify-between transition hover:-translate-y-0.5">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-rose-600">Prioritaires / Dates</span>
+                            <strong id="kpi-count-high" class="block font-fredoka text-2xl text-rose-600 leading-tight">0</strong>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg"><i class="fa-solid fa-fire"></i></div>
+                    </div>
+
+                    <div onclick="setTaskQuickFilter('IN_PROGRESS')" id="kpi-filter-IN_PROGRESS" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer flex items-center justify-between transition hover:-translate-y-0.5">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-sky-600">En cours d'action</span>
+                            <strong id="kpi-count-progress" class="block font-fredoka text-2xl text-sky-600 leading-tight">0</strong>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-lg"><i class="fa-solid fa-bolt"></i></div>
+                    </div>
+
+                    <div onclick="setTaskQuickFilter('WAITING')" id="kpi-filter-WAITING" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer flex items-center justify-between transition hover:-translate-y-0.5">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-amber-600">En attente / Bloqués</span>
+                            <strong id="kpi-count-waiting" class="block font-fredoka text-2xl text-amber-600 leading-tight">0</strong>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg"><i class="fa-solid fa-hourglass-half"></i></div>
+                    </div>
+
+                    <div onclick="setTaskQuickFilter('DONE')" id="kpi-filter-DONE" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer flex items-center justify-between transition hover:-translate-y-0.5">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-emerald-600">Terminées</span>
+                            <strong id="kpi-count-done" class="block font-fredoka text-2xl text-emerald-600 leading-tight">0</strong>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"><i class="fa-solid fa-circle-check"></i></div>
+                    </div>
+                </div>
+
+                <!-- BARRE DE PILOTAGE DES TÂCHES -->
+                <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                        <button onclick="setTaskViewMode('board')" id="btn-view-board" class="subview-btn active">
+                            <i class="fa-solid fa-grip"></i> Vue Coup d'œil (6 Listes Keep)
+                        </button>
+                        <button onclick="setTaskViewMode('kanban')" id="btn-view-kanban" class="subview-btn">
+                            <i class="fa-solid fa-table-columns"></i> Vue Kanban (Statuts Trello)
+                        </button>
+                        <button onclick="setTaskViewMode('focus')" id="btn-view-focus" class="subview-btn">
+                            <i class="fa-solid fa-list-ul"></i> Vue Focus & Sous-tâches
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 cursor-pointer bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                            <input type="checkbox" id="chk-show-completed" onchange="renderTasksWorkspace()" class="rounded text-[#C41E3A]">
+                            <span>Afficher les tâches terminées</span>
+                        </label>
+
+                        <button onclick="openListModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-folder-plus text-[#C41E3A]"></i> Nouvelle Liste
+                        </button>
+
+                        <button onclick="openTaskModal(null)" class="px-4 py-1.5 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-sm">
+                            <i class="fa-solid fa-plus"></i> Nouvelle Tâche Détaillée
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTENEUR DYNAMIQUE DES TÂCHES -->
+                <div id="tasks-render-area"></div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- ESPACE 2 : STUDIO NOTION PRO (DOSSIERS + LISTE TRIÉE + GRANDE PAGE)       -->
+            <!-- ========================================================================= -->
+            <div id="space-notes" class="hidden max-w-[1680px] mx-auto space-y-4">
+                
+                <!-- BARRE SUPÉRIEURE DU STUDIO NOTES : MODE D'AFFICHAGE + FILTRE TAGS + TRI -->
+                <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                            <button onclick="setNotesViewMode('split')" id="btn-nview-split" class="subview-btn active">
+                                <i class="fa-solid fa-columns"></i> 1. Studio Page Notion (Éditeur)
+                            </button>
+                            <button onclick="setNotesViewMode('gallery')" id="btn-nview-gallery" class="subview-btn">
+                                <i class="fa-solid fa-table-cells-large"></i> 2. Galerie de Fiches
+                            </button>
+                            <button onclick="setNotesViewMode('stream')" id="btn-nview-stream" class="subview-btn">
+                                <i class="fa-solid fa-bars-staggered"></i> 3. Lecture Continue du Dossier
+                            </button>
+                        </div>
+
+                        <!-- Filtre rapide par Tag -->
+                        <div class="flex items-center gap-1 pl-2 border-l border-slate-200 flex-wrap" id="notes-tag-filters">
+                            <button onclick="setNoteTagFilter('ALL')" id="ntag-ALL" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-800 text-white">Toutes</button>
+                            <button onclick="setNoteTagFilter('PINNED')" id="ntag-PINNED" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100">⭐ Épinglées</button>
+                            <button onclick="setNoteTagFilter('Important')" id="ntag-Important" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">#Important</button>
+                            <button onclick="setNoteTagFilter('Procédure')" id="ntag-Procédure" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100">#Procédure</button>
+                            <button onclick="setNoteTagFilter('Mairie')" id="ntag-Mairie" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100">#Mairie</button>
+                            <button onclick="setNoteTagFilter('Idée')" id="ntag-Idée" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">#Idée</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-400">Trier par :</span>
+                        <select id="notes-sort-select" onchange="renderNotesWorkspace()" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none">
+                            <option value="pinned_recent">⭐ Épinglées puis Récentes</option>
+                            <option value="recent">🕒 Modifiées récemment</option>
+                            <option value="alpha">🔤 Ordre Alphabétique (A → Z)</option>
+                            <option value="manual">✋ Ordre Manuel (↑/↓)</option>
+                        </select>
+
+                        <button onclick="createNewNotePage()" class="px-4 py-1.5 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
+                            <i class="fa-solid fa-plus"></i> Nouvelle Page de Note
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GRILLE PRINCIPALE DU STUDIO NOTION -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                     
-                    <div class="folder-group-title">Dossiers Fixes</div>
-                    <ul class="nav-list" id="fixed-folders-list"></ul>
+                    <!-- COLONNE 1 (2.5/12) : ARBORESCENCE DES DOSSIERS -->
+                    <aside class="lg:col-span-3 xl:col-span-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                            <h3 class="font-fredoka text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                                <i class="fa-solid fa-folder-tree text-[#C41E3A]"></i> Dossiers
+                            </h3>
+                            <button onclick="createNewFolder()" class="px-2 py-0.5 bg-slate-100 hover:bg-rose-50 hover:text-[#C41E3A] text-slate-700 rounded-lg text-[11px] font-bold transition" title="Créer un dossier">
+                                + Dossier
+                            </button>
+                        </div>
 
-                    <div class="folder-group-title">Dossiers Personnalisés</div>
-                    <ul class="nav-list" id="custom-folders-list"></ul>
+                        <!-- Vue Globale Toutes les notes -->
+                        <button onclick="selectFolder('ALL_NOTES')" id="f-ALL_NOTES" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition">
+                            <span>🗂️ Toutes mes notes</span>
+                            <span id="count-all-notes" class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600">0</span>
+                        </button>
 
-                    <button class="btn-new-folder" onclick="createNewFolder()">➕ Ajouter un Dossier</button>
-                </aside>
+                        <div>
+                            <div class="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-1 px-1">Pôles du Dojo</div>
+                            <ul class="space-y-1 max-h-[380px] overflow-y-auto pr-1" id="fixed-folders-list"></ul>
+                        </div>
 
-                <main class="workspace">
-                    <div class="workspace-header">
-                        <h2 id="current-folder-title">📂 Sélectionner un dossier</h2>
-                        <button class="btn-add-block no-print" id="add-block-btn" style="display: none;" onclick="createNewBlock()">➕ Ajouter un sous-bloc d'information</button>
+                        <div id="custom-folders-wrapper">
+                            <div class="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-1 px-1">Dossiers Perso</div>
+                            <ul class="space-y-1" id="custom-folders-list"></ul>
+                        </div>
+                    </aside>
+
+                    <!-- ZONE DYNAMIQUE DROITE (9.5/12) : SOIT SPLIT ÉDITEUR (LISTE + PAGE), SOIT GALERIE, SOIT LECTURE CONTINUE -->
+                    <div class="lg:col-span-9 xl:col-span-10" id="notes-main-stage">
+                        <!-- Injecté dynamiquement en JS selon le mode ('split', 'gallery', 'stream') -->
                     </div>
 
-                    <div id="blocks-container">
-                        <p style="text-align: center; color: var(--gris-moyen); margin-top: 50px;">Sélectionnez une catégorie dans le menu de gauche pour afficher et éditer ses notes sous forme de blocs.</p>
-                    </div>
-                </main>
+                </div>
+            </div>
 
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODALE 1 : CRÉATION / ÉDITION COMPLÈTE D'UNE TÂCHE (+ SOUS-TÂCHES)        -->
+    <!-- ========================================================================= -->
+    <div id="task-modal" class="modal-backdrop">
+        <div class="bg-white rounded-2xl max-w-2xl w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+            <div class="bg-[#1A1A1A] text-white px-6 py-4 flex items-center justify-between">
+                <h3 id="task-modal-header" class="font-fredoka font-bold text-base flex items-center gap-2">
+                    <i class="fa-solid fa-square-check text-[#C41E3A]"></i> Détails de la Tâche & Sous-tâches
+                </h3>
+                <button onclick="closeTaskModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4 flex-1">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                    <div class="md:col-span-8">
+                        <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Intitulé de la tâche *</label>
+                        <input type="text" id="tm-title" placeholder="Ex: 🥋 Valider les inscriptions Interclub Gerzat" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-bold outline-none focus:border-[#C41E3A]">
+                    </div>
+                    <div class="md:col-span-4">
+                        <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Liste / Catégorie *</label>
+                        <select id="tm-list" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold outline-none focus:border-[#C41E3A]"></select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Statut d'avancement</label>
+                        <select id="tm-status" onchange="toggleWaitingReasonBox()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold outline-none">
+                            <option value="todo">🔥 À faire</option>
+                            <option value="in_progress">⚡ En cours</option>
+                            <option value="waiting">⏳ En attente / Bloqué</option>
+                            <option value="done">✅ Terminé</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Niveau de priorité</label>
+                        <select id="tm-priority" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold outline-none">
+                            <option value="normal">🔵 Normale</option>
+                            <option value="medium">🟠 Moyenne / À suivre</option>
+                            <option value="high">🔴 Haute / Urgent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Échéance / Date cible</label>
+                        <input type="date" id="tm-due" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-semibold outline-none">
+                    </div>
+                </div>
+
+                <div id="tm-waiting-box" class="hidden bg-amber-50 border border-amber-300 rounded-xl p-3">
+                    <label class="block text-[11px] font-bold uppercase text-amber-800 mb-1">
+                        ⏳ Pourquoi cette tâche est-elle en attente / bloquée ?
+                    </label>
+                    <input type="text" id="tm-waiting-reason" placeholder="Ex: Attente retour mail Mairie / Bloqué jusqu'au 1er décembre..." class="w-full px-3 py-1.5 bg-white border border-amber-300 rounded-lg text-xs font-medium text-amber-900 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Détails / Notes de la tâche</label>
+                    <textarea id="tm-notes" rows="3" placeholder="Précisions, numéros de téléphone, historique d'envoi..." class="w-full p-3 border border-slate-300 rounded-xl text-xs outline-none focus:border-[#C41E3A]"></textarea>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-fredoka font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-list-check text-[#C41E3A]"></i> Sous-tâches / Étapes à cocher
+                        </label>
+                        <span class="text-[11px] text-slate-400">Entrée pour ajouter (ou collez plusieurs lignes)</span>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <input type="text" id="tm-subtask-input" onkeydown="if(event.key==='Enter'){event.preventDefault();addSubtaskInModal();}" placeholder="Ajouter une sous-tâche..." class="flex-1 px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-[#C41E3A]">
+                        <button type="button" onclick="addSubtaskInModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-bold">+ Ajouter</button>
+                    </div>
+
+                    <div id="tm-subtasks-list" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 border-t border-slate-200 px-6 py-3.5 flex items-center justify-between">
+                <button type="button" id="btn-delete-task-modal" onclick="deleteTaskFromModal()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-xs font-bold hidden">
+                    <i class="fa-solid fa-trash"></i> Supprimer
+                </button>
+                <div class="flex gap-2 ml-auto">
+                    <button type="button" onclick="closeTaskModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold">Annuler</button>
+                    <button type="button" onclick="saveTaskModal()" class="px-5 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl text-xs font-bold shadow-sm">
+                        <i class="fa-solid fa-check"></i> Enregistrer
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <script type="text/javascript">
-        const defaultFolders = {
-            proj: { title: "Projets Dojo Dornois", icon: "📂", isFixed: true, blocks: [] },
-            ter: { 
-                title: "TER & Écoles", 
-                icon: "🏫", 
-                isFixed: true,
-                blocks: [
-                    { id: 1, title: "TER Dornes", content: "Vos notes ici...", isCollapsed: false },
-                    { id: 2, title: "Écoles Dornes Lucenay Cossaye", content: "Planification...", isCollapsed: false },
-                    { id: 3, title: "École Chantenay", content: "Déplacement...", isCollapsed: false }
-                ] 
-            },
-            sais: { title: "Saison 2026-2027", icon: "🗓️", isFixed: true, blocks: [] },
-            kali: { title: "Kalisport Club", icon: "🌐", isFixed: true, blocks: [{ id: 4, title: "Gestion Adhérents", content: "Cotisations...", isCollapsed: false }] },
-            web: { title: "Site Web", icon: "🖥️", isFixed: true, blocks: [] },
-            soc: { title: "Réseaux Sociaux", icon: "📱", isFixed: true, blocks: [] },
-            trav: { title: "Travaux Dojo", icon: "🧱", isFixed: true, blocks: [] },
-            admin: { title: "Administratif", icon: "📄", isFixed: true, blocks: [] },
-            reun: { title: "Réunions", icon: "🗣️", isFixed: true, blocks: [] },
-            aven: { title: "À venir", icon: "⏳", isFixed: true, blocks: [] },
-            idee: { title: "Idées", icon: "💡", isFixed: true, blocks: [] }
-        };
+    <!-- ========================================================================= -->
+    <!-- MODALE 2 : CRÉER / MODIFIER UNE LISTE DE TÂCHES                           -->
+    <!-- ========================================================================= -->
+    <div id="list-modal" class="modal-backdrop">
+        <div class="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden">
+            <div class="bg-[#C41E3A] text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 class="font-fredoka font-bold text-sm">📁 Configurer une Liste de Tâches</h3>
+                <button onclick="closeListModal()" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div class="grid grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Émoji</label>
+                        <input type="text" id="lm-icon" value="🥋" class="w-full p-2 border border-slate-300 rounded-xl text-center text-base font-bold">
+                    </div>
+                    <div class="col-span-3">
+                        <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Nom de la liste *</label>
+                        <input type="text" id="lm-title" placeholder="Ex: 01 - Interne & Dojo" class="w-full p-2 border border-slate-300 rounded-xl text-xs font-bold">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1.5">Couleur du bandeau</label>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <input type="color" id="lm-color" value="#C41E3A" class="w-10 h-9 rounded cursor-pointer border border-slate-300">
+                        <button type="button" onclick="document.getElementById('lm-color').value='#C41E3A'" class="w-6 h-6 rounded-full bg-[#C41E3A]"></button>
+                        <button type="button" onclick="document.getElementById('lm-color').value='#334155'" class="w-6 h-6 rounded-full bg-[#334155]"></button>
+                        <button type="button" onclick="document.getElementById('lm-color').value='#0D9488'" class="w-6 h-6 rounded-full bg-[#0D9488]"></button>
+                        <button type="button" onclick="document.getElementById('lm-color').value='#2563EB'" class="w-6 h-6 rounded-full bg-[#2563EB]"></button>
+                        <button type="button" onclick="document.getElementById('lm-color').value='#7C3AED'" class="w-6 h-6 rounded-full bg-[#7C3AED]"></button>
+                        <button type="button" onclick="document.getElementById('lm-color').value='#D97706'" class="w-6 h-6 rounded-full bg-[#D97706]"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-50 border-t px-5 py-3 flex justify-end gap-2">
+                <button onclick="closeListModal()" class="px-3 py-1.5 bg-slate-200 rounded-lg text-xs font-bold">Annuler</button>
+                <button onclick="saveListModal()" class="px-4 py-1.5 bg-[#C41E3A] text-white rounded-lg text-xs font-bold">Enregistrer</button>
+            </div>
+        </div>
+    </div>
 
-        let notionData = {};
-        let currentFolderKey = null;
-        let syncTimeout = null;
+    <!-- ========================================================================= -->
+    <!-- MODALE 3 : AJOUT MULTIPLE EN SÉRIE                                        -->
+    <!-- ========================================================================= -->
+    <div id="bulk-modal" class="modal-backdrop">
+        <div class="bg-white rounded-2xl max-w-xl w-full border border-slate-200 shadow-2xl overflow-hidden">
+            <div class="bg-indigo-600 text-white px-6 py-4 flex items-center justify-between">
+                <div>
+                    <h3 class="font-fredoka font-bold text-base">⚡ Ajout Multiple de Tâches (1 ligne = 1 tâche)</h3>
+                    <p class="text-[11px] text-indigo-100">Collez une liste de noms ou d'actions pour tout créer en un clic</p>
+                </div>
+                <button onclick="closeBulkAddModal()" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Dans quelle liste ajouter ces tâches ?</label>
+                    <select id="bulk-list-select" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Collez ou écrivez vos lignes ci-dessous :</label>
+                    <textarea id="bulk-lines-input" rows="7" placeholder="Johan Lachaise&#10;Pauline Mameri&#10;Damien Mollet..." class="w-full p-3 border border-slate-300 rounded-xl text-xs outline-none focus:border-indigo-600"></textarea>
+                </div>
+            </div>
+            <div class="bg-slate-50 border-t px-6 py-3.5 flex justify-end gap-2">
+                <button onclick="closeBulkAddModal()" class="px-4 py-2 bg-slate-200 rounded-xl text-xs font-bold">Annuler</button>
+                <button onclick="confirmBulkAdd()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold">Créer toutes les tâches</button>
+            </div>
+        </div>
+    </div>
 
+    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <script src="../js/sidebar.js"></script>
+
+    <script>
+        /* ========================================================================= */
+        /* CONFIGURATION SUPABASE & VOS 6 LISTES GOOGLE TASKS INTÉGRALES             */
+        /* ========================================================================= */
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
         const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
         const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
         const SUPABASE_TABLE = 'notion_board';
 
-        function showToast(message, type = "success") {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerText = message;
-            if (type === "error") {
-                toast.style.background = "#8B1429";
-                toast.style.borderLeft = "4px solid #C41E3A";
-            }
-            container.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 3500);
-        }
+        // 1. Dossiers Notion par défaut (Base de connaissances)
+        const defaultFolders = {
+            proj: {
+                title: "Projets Dojo Dornois",
+                icon: "📂",
+                isFixed: true,
+                blocks: [
+                    {
+                        id: 101,
+                        icon: "🚀",
+                        title: "Feuille de route & Projets structurants 2026-2027",
+                        pinned: true,
+                        tags: ["Important", "CoDir"],
+                        updatedAt: "2026-10-28T18:00:00.000Z",
+                        content: `<h1>Vision & Développement du Dojo Dornois</h1><p>Ce document centralise les pistes de développement à moyen terme pour le club (antennes, partenariats écoles, événements majeurs et structuration matérielle).</p><div style="background:#FFF5F5; border-left:4px solid #C41E3A; padding:12px 16px; border-radius:8px; margin:12px 0; color:#742A2A;"><strong>📌 Point d'attention :</strong> Utilisez les étiquettes en haut de page et le bouton <strong>⭐ Épingler</strong> pour garder vos notes prioritaires tout en haut de la liste.</div>`
+                    }
+                ]
+            },
+            ter: { 
+                title: "TER & Écoles", 
+                icon: "🏫", 
+                isFixed: true,
+                blocks: [
+                    { id: 1, icon: "🏫", title: "TER Dornes", pinned: true, tags: ["Procédure"], updatedAt: "2026-10-28T10:00:00.000Z", content: "<p>Suivi du projet éducatif territorial et conventions écoles.</p>" },
+                    { id: 2, icon: "🥋", title: "Écoles Dornes, Lucenay, Cossaye", pinned: false, tags: [], updatedAt: "2026-10-27T10:00:00.000Z", content: "<p>Planification des cycles d'interventions scolaires et préparation de la rencontre interclasse de mai 2027.</p>" },
+                    { id: 3, icon: "📍", title: "Antenne Chantenay-Saint-Imbert", pinned: false, tags: ["Idée"], updatedAt: "2026-10-26T10:00:00.000Z", content: "<p>Étude de faisabilité avec la mairie et créneaux de Romain.</p>" }
+                ] 
+            },
+            sais: { title: "Saison 2026-2027", icon: "🗓️", isFixed: true, blocks: [] },
+            kali: {
+                title: "Kalisport Club",
+                icon: "🌐",
+                isFixed: true,
+                blocks: [
+                    { id: 4, icon: "📲", title: "Gestion Adhérents & Code Application Mobile", pinned: true, tags: ["Procédure", "Important"], updatedAt: "2026-10-28T12:00:00.000Z", content: "<p>Code d'accès application mobile Kalisport pour les adhérents du Dojo Dornois : <strong>U3AMYA</strong>.</p>" }
+                ]
+            },
+            web: { title: "Site Web", icon: "🖥️", isFixed: true, blocks: [] },
+            soc: { title: "Réseaux Sociaux", icon: "📱", isFixed: true, blocks: [] },
+            trav: { title: "Travaux Dojo", icon: "🧱", isFixed: true, blocks: [] },
+            admin: { title: "Administratif & Mairie", icon: "📄", isFixed: true, blocks: [] },
+            reun: { title: "Réunions & Synthèses", icon: "🗣️", isFixed: true, blocks: [] },
+            aven: { title: "À venir", icon: "⏳", isFixed: true, blocks: [] },
+            idee: { title: "Idées & Boîte à projets", icon: "💡", isFixed: true, blocks: [] }
+        };
 
-        async function syncToSupabase(silent = false) {
-            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
-            try {
-                const payload = notionData;
-                localStorage.setItem('dojo_notion_v2', JSON.stringify(payload)); 
+        // 2. VOS 6 LISTES GOOGLE TASKS EXACTES EXTRAITES DE VOS PDF
+        const defaultWorkspaceTasks = {
+            lists: [
+                { id: "lst_01", title: "01 - Interne & Dojo", icon: "🥋", color: "#C41E3A" },
+                { id: "lst_02", title: "02 - Administratif & AG", icon: "🏛️", color: "#334155" },
+                { id: "lst_03", title: "03 - Communication & Réseaux", icon: "📢", color: "#0D9488" },
+                { id: "lst_04", title: "04 - Outils, Fédé & Kalisport", icon: "🌐", color: "#2563EB" },
+                { id: "lst_05", title: "05 - Événements & Projets", icon: "🎉", color: "#7C3AED" },
+                { id: "lst_06", title: "06 - Travaux & Matériel", icon: "🔨", color: "#D97706" }
+            ],
+            tasks: [
+                /* === LISTE 01 : INTERNE & DOJO === */
+                {
+                    id: 2001,
+                    listId: "lst_01",
+                    title: "01/11/26 Interclub Gerzat - Inscriptions & Intendance",
+                    status: "in_progress",
+                    priority: "high",
+                    dueDate: "2026-11-01",
+                    waitingReason: "",
+                    notes: "Fin de semaine : valider le nombre de participants pour l'échange interclub avec Gerzat et dresser la liste des courses pour le repas offert par le dojo.",
+                    subtasks: []
+                },
+                {
+                    id: 2002,
+                    listId: "lst_01",
+                    title: "Commencer à parler de la soirée du 23/01 repas détail...",
+                    status: "in_progress",
+                    priority: "medium",
+                    dueDate: "2027-01-23",
+                    waitingReason: "",
+                    notes: "Préparation de la soirée club du 23 janvier (repas, animation DJ).",
+                    subtasks: [
+                        { id: 201, text: "Message envoyé à Thierry pour DJ le 27/10 - Réponse reçue le 28/10 - Prix 550€ et dispo", done: true },
+                        { id: 202, text: "Message CODIR le 28/10", done: true }
+                    ]
+                },
+                {
+                    id: 2003,
+                    listId: "lst_01",
+                    title: "Calendrier - Hajime 2027",
+                    status: "in_progress",
+                    priority: "high",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Commandé le 25/10",
+                    subtasks: [
+                        { id: 203, text: "Réaliser les diplômes de petits ambassadeurs", done: false },
+                        { id: 204, text: "Commander petits sachets chocolats", done: false },
+                        { id: 205, text: "Récompenses : 1er Kodomo Plus / 2ème : Sac Sport Erima Six Wings 49.5L / 3ème : Zoories", done: false }
+                    ]
+                },
+                {
+                    id: 2004,
+                    listId: "lst_01",
+                    title: "Acter date de commande gourdes Noël vers le 04/11",
+                    status: "todo",
+                    priority: "high",
+                    dueDate: "2026-11-04",
+                    waitingReason: "",
+                    notes: "Bon de commande à retravailler mais réalisé dans outil intranet",
+                    subtasks: []
+                },
+                {
+                    id: 2005,
+                    listId: "lst_01",
+                    title: "Parler avec Philippe de sa rétribution",
+                    status: "todo",
+                    priority: "medium",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "",
+                    subtasks: []
+                },
+                {
+                    id: 2006,
+                    listId: "lst_01",
+                    title: "28/11/26 Trackday japonais à Magny-Cours",
+                    status: "waiting",
+                    priority: "medium",
+                    dueDate: "2026-11-28",
+                    waitingReason: "Appel téléphonique prévu le 30/10 matin",
+                    notes: "Proposition de EMOS, École d'ingénieurs automobile reçue le 17/10",
+                    subtasks: [
+                        { id: 206, text: "Appel Téléphonique prévu le 30/10 matin", done: false }
+                    ]
+                },
+                {
+                    id: 2007,
+                    listId: "lst_01",
+                    title: "Foyer des Marizys - Mr CHAMBONNIER Patrick",
+                    status: "todo",
+                    priority: "normal",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Voir avec Romain pour trouver une compétition adulte pas trop loin de La Machine pour Mr Chambonnier qui a été au club de Dornes et qui souhaiterait revoir une compétition adulte (pas enfants).",
+                    subtasks: [
+                        { id: 207, text: "St Pourçain en Février", done: false },
+                        { id: 208, text: "06 95 64 32 43 - Mme Lebrun du Foyer des Marizys", done: false }
+                    ]
+                },
+                {
+                    id: 2008,
+                    listId: "lst_01",
+                    title: "MAI 2027 - Rencontre interclasse de Dornes",
+                    status: "todo",
+                    priority: "normal",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Préparer la rencontre interclasse avec l'école en fin d'année scolaire (besoin d'anticiper le stock de judogis complets pour tous les élèves).",
+                    subtasks: []
+                },
 
-                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
-                if (error) throw error;
-                
-                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
-            } catch (err) {
-                console.error("Erreur Supabase:", err);
-                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
-            }
-        }
+                /* === LISTE 02 : ADMINISTRATIF & AG === */
+                {
+                    id: 2009,
+                    listId: "lst_02",
+                    title: "AG - Rapport Moral",
+                    status: "in_progress",
+                    priority: "high",
+                    dueDate: "2026-11-14",
+                    waitingReason: "",
+                    notes: "Rajouter la plaque signalétique.",
+                    subtasks: []
+                },
+                {
+                    id: 2010,
+                    listId: "lst_02",
+                    title: "APRÈS AG - Imprimer & faire signer anciens + nouveaux statuts AG Dojo Dornois",
+                    status: "todo",
+                    priority: "high",
+                    dueDate: "2026-11-14",
+                    waitingReason: "",
+                    notes: "",
+                    subtasks: [
+                        { id: 209, text: "Imprimer 2 exemplaires complets des anciens statuts 2025 pour la table du Bureau (consultables).", done: false },
+                        { id: 210, text: "Imprimer 2 exemplaires complets des nouveaux statuts 2026 adoptés en AGE.", done: false },
+                        { id: 211, text: "Faire parapher et signer les nouveaux statuts par Jordan (Président) et Hélène (Secrétaire) pour dépôt au greffe avec le PV et l'attestation de domiciliation de Fanny", done: false }
+                    ]
+                },
+                {
+                    id: 2011,
+                    listId: "lst_02",
+                    title: "Pass'Sport 2026-2027",
+                    status: "todo",
+                    priority: "medium",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "4 saisis (3 D'ARGENT et VARLET Noé) plus Garance (au 29/09) ainsi que Jules.",
+                    subtasks: [
+                        { id: 212, text: "Valider Garance (au 29/09)", done: false },
+                        { id: 213, text: "Valider Jules", done: false }
+                    ]
+                },
+                {
+                    id: 2012,
+                    listId: "lst_02",
+                    title: "Déclaration Jeunesse et Sport Gerzat",
+                    status: "waiting",
+                    priority: "normal",
+                    dueDate: "",
+                    waitingReason: "À préparer au cours du mois de décembre",
+                    notes: "Dossier de déclaration pour Gerzat (à préparer au cours du mois de décembre).",
+                    subtasks: []
+                },
+                {
+                    id: 2013,
+                    listId: "lst_02",
+                    title: "Revoir Règlement Intérieur",
+                    status: "todo",
+                    priority: "normal",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Préparer en Codir et valider à l'AG 2027 mais possible de le rendre applicable sans validation AG juste valider Codir",
+                    subtasks: []
+                },
 
+                /* === LISTE 03 : COMMUNICATION & RÉSEAUX === */
+                {
+                    id: 2014,
+                    listId: "lst_03",
+                    title: "Publication en même temps publi boutique pour partenariat RDS",
+                    status: "todo",
+                    priority: "medium",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "",
+                    subtasks: []
+                },
+                {
+                    id: 2015,
+                    listId: "lst_03",
+                    title: "Réaliser des Mèmes du Dojo Dornois",
+                    status: "todo",
+                    priority: "normal",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Prendre des vidéos de nos adhérents, mettre du texte pour réaliser des mèmes du Dojo Dornois",
+                    subtasks: []
+                },
+                {
+                    id: 2016,
+                    listId: "lst_03",
+                    title: "Suivi du calendrier éditorial",
+                    status: "in_progress",
+                    priority: "normal",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Voir le calendrier des publications et des mails pour vérifier l'état d'avancement et les parutions à venir.",
+                    subtasks: []
+                },
+
+                /* === LISTE 04 : OUTILS, FÉDÉ & KALISPORT === */
+                {
+                    id: 2017,
+                    listId: "lst_04",
+                    title: "Finir la boutique Kalisport et réaliser un catalogue",
+                    status: "in_progress",
+                    priority: "medium",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "",
+                    subtasks: []
+                },
+                {
+                    id: 2018,
+                    listId: "lst_04",
+                    title: "Inscriptions en attente de traitement",
+                    status: "waiting",
+                    priority: "high",
+                    dueDate: "",
+                    waitingReason: "Attente validation ou pièces complémentaires des familles",
+                    notes: "Dossiers d'inscriptions en attente de validation ou de pièces complémentaires :",
+                    subtasks: [
+                        { id: 214, text: "Johan Lachaise", done: false },
+                        { id: 215, text: "Pauline Mameri", done: false },
+                        { id: 216, text: "Salomé (Dossier envoyé)", done: false },
+                        { id: 217, text: "Damien Mollet", done: false },
+                        { id: 218, text: "Marley", done: false }
+                    ]
+                },
+                {
+                    id: 2019,
+                    listId: "lst_04",
+                    title: "Extranet France Judo - Règlements",
+                    status: "todo",
+                    priority: "high",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Régler les tournois du mois de novembre sur l'extranet fédéral.",
+                    subtasks: []
+                },
+                {
+                    id: 2020,
+                    listId: "lst_04",
+                    title: "Bon de commande RDS",
+                    status: "todo",
+                    priority: "normal",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Revoir l'outil de génération / envoi de mail pour le bon de commande RDS.",
+                    subtasks: []
+                },
+
+                /* === LISTE 05 : ÉVÉNEMENTS & PROJETS === */
+                {
+                    id: 2021,
+                    listId: "lst_05",
+                    title: "Sortie de fin de saison du club",
+                    status: "todo",
+                    priority: "normal",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Organiser la sortie club (option Paintball ou Parc d'attraction). Financement : 50% pris en charge par le club / 50% par les familles.",
+                    subtasks: []
+                },
+                {
+                    id: 2022,
+                    listId: "lst_05",
+                    title: "Sensibilisation Colosse aux pieds d'argile",
+                    status: "in_progress",
+                    priority: "medium",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Préparer et coordonner la session de sensibilisation pour les jeunes, les encadrants et les parents.",
+                    subtasks: [
+                        { id: 219, text: "Mail envoyé le 27/10/2026", done: true }
+                    ]
+                },
+                {
+                    id: 2023,
+                    listId: "lst_05",
+                    title: "Déplacement & Logistique Gerzat",
+                    status: "todo",
+                    priority: "medium",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Commencer à se renseigner pour qui vient/qui part à Gerzat et contacter l'auberge de jeunesse pour l'hébergement.",
+                    subtasks: []
+                },
+
+                /* === LISTE 06 : TRAVAUX & MATÉRIEL === */
+                {
+                    id: 2024,
+                    listId: "lst_06",
+                    title: "Rouleaux de peinture et ponceuse",
+                    status: "todo",
+                    priority: "normal",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "",
+                    subtasks: []
+                },
+                {
+                    id: 2025,
+                    listId: "lst_06",
+                    title: "Bagues de paumelle 17mm",
+                    status: "todo",
+                    priority: "normal",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Bagues de paumelle de portes",
+                    subtasks: []
+                },
+                {
+                    id: 2026,
+                    listId: "lst_06",
+                    title: "Sécurisation électrique",
+                    status: "todo",
+                    priority: "high",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "Poser les goulottes de protection pour sécuriser le passage de la rallonge électrique.",
+                    subtasks: []
+                },
+                {
+                    id: 2027,
+                    listId: "lst_06",
+                    title: "Vestiaires femmes",
+                    status: "in_progress",
+                    priority: "medium",
+                    dueDate: "",
+                    waitingReason: "",
+                    notes: "",
+                    subtasks: []
+                }
+            ]
+        };
+
+        // État global
+        let notionData = {};
+        let workspaceTasks = { lists: [], tasks: [] };
+        let activeMainSpace = 'tasks';
+        let taskViewMode = 'board';
+        let taskQuickFilter = 'ALL';
+        let focusSelectedListId = 'ALL';
+
+        // État Studio Notion (Espace 2)
+        let currentFolderKey = 'proj'; // ou 'ALL_NOTES'
+        let activeNoteId = null;
+        let notesViewMode = 'split'; // 'split' (Éditeur Page Notion), 'gallery' (Cartes), 'stream' (Lecture continue)
+        let activeNoteTagFilter = 'ALL';
+
+        // État Modales Tâches
+        let editingTaskId = null;
+        let modalSubtasksTemp = [];
+        let editingListId = null;
+        let draggedTaskId = null;
+        let syncTimeout = null;
+
+        /* ========================================================================= */
+        /* CHARGEMENT & SYNCHRONISATION SUPABASE + LOCALSTORAGE                      */
+        /* ========================================================================= */
         async function loadData() {
             const saved = localStorage.getItem('dojo_notion_v2');
             if (saved) {
                 try {
                     notionData = JSON.parse(saved);
-                    finalizeInitialization();
-                } catch(e) {}
+                } catch(e) {
+                    notionData = JSON.parse(JSON.stringify(defaultFolders));
+                }
             } else {
-                notionData = defaultFolders;
-                finalizeInitialization();
+                notionData = JSON.parse(JSON.stringify(defaultFolders));
             }
-            
+
+            ensureDataStructures();
+            finalizeInitialization();
+
             try {
                 const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
-                if (error) throw error;
+                if (error && error.code !== 'PGRST116') throw error;
                 if (result && result.data) {
-                    notionData = result.data;
+                    const cloudData = result.data;
+                    // Si le cloud n'avait pas encore la v2 des tâches Google Tasks, on préserve nos 6 listes Google Tasks
+                    if (!cloudData._workspace_tasks_v2) {
+                        cloudData._workspace_tasks_v2 = workspaceTasks;
+                    }
+                    notionData = cloudData;
+                    ensureDataStructures();
                     localStorage.setItem('dojo_notion_v2', JSON.stringify(notionData));
                     finalizeInitialization();
                 }
@@ -278,170 +1203,1264 @@
             }
         }
 
-        function finalizeInitialization() {
-            renderSidebar();
-            if (currentFolderKey) renderBlocks();
+        function ensureDataStructures() {
+            if (!notionData || typeof notionData !== 'object') {
+                notionData = JSON.parse(JSON.stringify(defaultFolders));
+            }
+            Object.keys(defaultFolders).forEach(k => {
+                if (!notionData[k]) notionData[k] = JSON.parse(JSON.stringify(defaultFolders[k]));
+                // Normaliser chaque bloc en Page Notion complète
+                if (Array.isArray(notionData[k].blocks)) {
+                    notionData[k].blocks.forEach((b, idx) => {
+                        if (!b.id) b.id = Date.now() + idx;
+                        if (!b.icon) b.icon = "📄";
+                        if (typeof b.pinned !== 'boolean') b.pinned = false;
+                        if (!Array.isArray(b.tags)) b.tags = [];
+                        if (!b.updatedAt) b.updatedAt = new Date().toISOString();
+                    });
+                }
+            });
+
+            if (notionData._workspace_tasks_v2 && Array.isArray(notionData._workspace_tasks_v2.lists)) {
+                workspaceTasks = notionData._workspace_tasks_v2;
+            } else {
+                workspaceTasks = JSON.parse(JSON.stringify(defaultWorkspaceTasks));
+                notionData._workspace_tasks_v2 = workspaceTasks;
+            }
         }
 
-        function renderSidebar() {
+        function restaurerTachesGoogleTasks() {
+            if (confirm("Recharger les 6 listes et 27 tâches officielles Google Tasks ?")) {
+                workspaceTasks = JSON.parse(JSON.stringify(defaultWorkspaceTasks));
+                notionData._workspace_tasks_v2 = workspaceTasks;
+                triggerAutoSave();
+                renderTasksWorkspace();
+                showToast("✅ Vos 6 listes Google Tasks ont été restaurées !");
+            }
+        }
+
+        async function syncToSupabase(silent = false) {
+            const badge = document.getElementById('sync-status-badge');
+            if (badge) {
+                badge.innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> Sync...';
+                badge.className = 'text-[11px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-semibold';
+            }
+
+            try {
+                notionData._workspace_tasks_v2 = workspaceTasks;
+                localStorage.setItem('dojo_notion_v2', JSON.stringify(notionData));
+
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: notionData });
+                if (error) throw error;
+
+                if (badge) {
+                    badge.innerHTML = '<i class="fa-solid fa-cloud-check"></i> Synchronisé';
+                    badge.className = 'text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-semibold';
+                }
+                if (!silent) showToast("✓ Workspace synchronisé sur Supabase !");
+            } catch (err) {
+                console.error("Erreur Supabase:", err);
+                if (badge) {
+                    badge.innerHTML = '<i class="fa-solid fa-hard-drive"></i> Sauvegardé en local';
+                    badge.className = 'text-[11px] bg-slate-100 text-slate-600 border border-slate-300 px-2 py-0.5 rounded-full font-semibold';
+                }
+                if (!silent) showToast("⚠️ Sauvegardé en local (erreur Supabase)", "error");
+            }
+        }
+
+        function triggerAutoSave() {
+            notionData._workspace_tasks_v2 = workspaceTasks;
+            localStorage.setItem('dojo_notion_v2', JSON.stringify(notionData));
+            clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(() => syncToSupabase(true), 900);
+        }
+
+        function finalizeInitialization() {
+            renderTasksWorkspace();
+            renderNotesWorkspace();
+        }
+
+        /* ========================================================================= */
+        /* BASCULE ENTRE ESPACE 1 (TÂCHES) ET ESPACE 2 (STUDIO NOTES NOTION)         */
+        /* ========================================================================= */
+        function switchMainSpace(space) {
+            activeMainSpace = space;
+            document.getElementById('space-tasks').classList.toggle('hidden', space !== 'tasks');
+            document.getElementById('space-notes').classList.toggle('hidden', space !== 'notes');
+            document.getElementById('btn-space-tasks').classList.toggle('active', space === 'tasks');
+            document.getElementById('btn-space-notes').classList.toggle('active', space === 'notes');
+            document.getElementById('btn-top-bulk').classList.toggle('hidden', space !== 'tasks');
+            document.getElementById('btn-restore-gtasks').classList.toggle('hidden', space !== 'tasks');
+
+            if (space === 'tasks') renderTasksWorkspace();
+            else renderNotesWorkspace();
+        }
+
+        function handleGlobalSearch() {
+            if (activeMainSpace === 'tasks') renderTasksWorkspace();
+            else renderNotesWorkspace();
+        }
+
+        /* ========================================================================= */
+        /* LOGIQUE DE L'ESPACE 1 : TÂCHES (KEEP + GOOGLE TASKS + TRELLO)             */
+        /* ========================================================================= */
+        function setTaskViewMode(mode) {
+            taskViewMode = mode;
+            ['board', 'kanban', 'focus'].forEach(m => {
+                document.getElementById('btn-view-' + m).classList.toggle('active', m === mode);
+            });
+            renderTasksWorkspace();
+        }
+
+        function setTaskQuickFilter(filter) {
+            if (taskQuickFilter === filter && filter !== 'ALL') {
+                taskQuickFilter = 'ALL';
+            } else {
+                taskQuickFilter = filter;
+            }
+
+            ['ALL', 'HIGH', 'IN_PROGRESS', 'WAITING', 'DONE'].forEach(f => {
+                const el = document.getElementById('kpi-filter-' + f);
+                if (el) {
+                    el.className = (f === taskQuickFilter)
+                        ? "bg-white p-3.5 rounded-2xl border-2 border-[#C41E3A] shadow-md cursor-pointer flex items-center justify-between transition"
+                        : "bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer flex items-center justify-between transition hover:-translate-y-0.5";
+                }
+            });
+
+            if (filter === 'DONE') {
+                document.getElementById('chk-show-completed').checked = true;
+            }
+            renderTasksWorkspace();
+        }
+
+        function updateTaskKpis() {
+            const all = workspaceTasks.tasks || [];
+            const open = all.filter(t => t.status !== 'done');
+            const high = open.filter(t => t.priority === 'high');
+            const progress = open.filter(t => t.status === 'in_progress');
+            const waiting = open.filter(t => t.status === 'waiting');
+            const done = all.filter(t => t.status === 'done');
+
+            document.getElementById('kpi-count-open').innerText = open.length;
+            document.getElementById('kpi-count-high').innerText = high.length;
+            document.getElementById('kpi-count-progress').innerText = progress.length;
+            document.getElementById('kpi-count-waiting').innerText = waiting.length;
+            document.getElementById('kpi-count-done').innerText = done.length;
+            document.getElementById('badge-open-tasks').innerText = open.length;
+        }
+
+        function getFilteredTasks() {
+            const q = (document.getElementById('global-search-input')?.value || '').trim().toLowerCase();
+            const showDone = document.getElementById('chk-show-completed')?.checked || taskQuickFilter === 'DONE';
+
+            return (workspaceTasks.tasks || []).filter(t => {
+                if (!showDone && t.status === 'done') return false;
+                if (taskQuickFilter === 'HIGH' && (t.priority !== 'high' || t.status === 'done')) return false;
+                if (taskQuickFilter === 'IN_PROGRESS' && t.status !== 'in_progress') return false;
+                if (taskQuickFilter === 'WAITING' && t.status !== 'waiting') return false;
+                if (taskQuickFilter === 'DONE' && t.status !== 'done') return false;
+
+                if (q) {
+                    const subText = (t.subtasks || []).map(s => s.text).join(' ');
+                    const hay = `${t.title} ${t.notes || ''} ${t.waitingReason || ''} ${subText}`.toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                return true;
+            });
+        }
+
+        function renderTasksWorkspace() {
+            updateTaskKpis();
+            const container = document.getElementById('tasks-render-area');
+            const filtered = getFilteredTasks();
+
+            if (taskViewMode === 'board') {
+                renderKeepBoardView(container, filtered);
+            } else if (taskViewMode === 'kanban') {
+                renderTrelloKanbanView(container, filtered);
+            } else {
+                renderGoogleTasksFocusView(container, filtered);
+            }
+        }
+
+        function renderKeepBoardView(container, filteredTasks) {
+            let html = `<div class="keep-board-grid">`;
+
+            workspaceTasks.lists.forEach(lst => {
+                const listTasks = filteredTasks.filter(t => t.listId === lst.id);
+                const openCount = (workspaceTasks.tasks || []).filter(t => t.listId === lst.id && t.status !== 'done').length;
+
+                const tasksRowsHtml = listTasks.length > 0
+                    ? listTasks.map(t => buildTaskRowHtml(t)).join('')
+                    : `<div class="p-6 text-center text-xs text-slate-400 italic">Aucune tâche active dans cette liste.</div>`;
+
+                html += `
+                    <div class="keep-list-card">
+                        <div class="px-4 py-3 flex items-center justify-between text-white" style="background-color: ${lst.color || '#C41E3A'};">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="text-base">${lst.icon || '📋'}</span>
+                                <h3 class="font-fredoka font-bold text-sm truncate">${escapeHtml(lst.title)}</h3>
+                                <span class="px-2 py-0.5 bg-black/25 rounded-full text-[11px] font-bold">${openCount}</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button onclick="openTaskModal(null, '${lst.id}')" class="w-6 h-6 rounded hover:bg-white/20 flex items-center justify-center text-xs" title="Créer une tâche détaillée dans cette liste">
+                                    <i class="fa-solid fa-expand"></i>
+                                </button>
+                                <button onclick="openListModal('${lst.id}')" class="w-6 h-6 rounded hover:bg-white/20 flex items-center justify-center text-xs" title="Modifier la liste">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-plus text-xs text-slate-400 ml-1.5"></i>
+                            <input type="text"
+                                   placeholder="Ajouter une tâche rapide + Entrée..."
+                                   onkeydown="if(event.key==='Enter'){quickAddTaskInList('${lst.id}', this);}"
+                                   class="w-full bg-transparent text-xs font-medium text-slate-700 outline-none">
+                        </div>
+
+                        <div class="divide-y divide-slate-100 max-h-[460px] overflow-y-auto">
+                            ${tasksRowsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function buildTaskRowHtml(t) {
+            const isDone = t.status === 'done';
+            const isWaiting = t.status === 'waiting';
+            const subtasks = t.subtasks || [];
+            const doneSubs = subtasks.filter(s => s.done).length;
+
+            let prioBadge = '';
+            if (t.priority === 'high' && !isDone) {
+                prioBadge = `<span class="px-1.5 py-0.5 bg-rose-100 text-rose-700 rounded text-[10px] font-bold">🔴 Urgent</span>`;
+            } else if (t.priority === 'medium' && !isDone) {
+                prioBadge = `<span class="px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded text-[10px] font-bold">🟠 À suivre</span>`;
+            }
+
+            let statusPill = '';
+            if (isWaiting) {
+                statusPill = `<div class="mt-1 px-2 py-1 bg-amber-100/90 border border-amber-300 text-amber-900 rounded-md text-[11px] font-semibold flex items-center gap-1.5">
+                    <i class="fa-solid fa-hourglass-half text-amber-700"></i>
+                    <span>${escapeHtml(t.waitingReason || 'En attente / Bloqué')}</span>
+                </div>`;
+            } else if (t.status === 'in_progress') {
+                statusPill = `<span class="px-1.5 py-0.5 bg-sky-100 text-sky-700 rounded text-[10px] font-bold">⚡ En cours</span>`;
+            }
+
+            let dueBadge = '';
+            if (t.dueDate && !isDone) {
+                const formattedDate = t.dueDate.split('-').reverse().slice(0,2).join('/');
+                dueBadge = `<span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-mono font-bold"><i class="fa-regular fa-calendar"></i> ${formattedDate}</span>`;
+            }
+
+            let subtasksHtml = '';
+            if (subtasks.length > 0) {
+                const subItems = subtasks.map((s, sIdx) => `
+                    <div class="flex items-start gap-2 py-0.5 pl-1 text-xs ${s.done ? 'line-through text-slate-400' : 'text-slate-600'}"
+                         onclick="event.stopPropagation(); toggleSubtaskDirect(${t.id}, ${sIdx});">
+                        <input type="checkbox" ${s.done ? 'checked' : ''} class="mt-0.5 rounded text-[#C41E3A] cursor-pointer">
+                        <span class="leading-snug">${escapeHtml(s.text)}</span>
+                    </div>
+                `).join('');
+
+                subtasksHtml = `
+                    <div class="mt-2 pt-1.5 border-t border-slate-100 space-y-0.5">
+                        <div class="text-[10px] font-bold text-slate-400 mb-1">Sous-tâches (${doneSubs}/${subtasks.length}) :</div>
+                        ${subItems}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="task-row ${isDone ? 'task-done' : ''} ${isWaiting ? 'task-waiting' : ''}" onclick="openTaskModal(${t.id})">
+                    <div class="flex items-start gap-2.5">
+                        <div class="custom-chk mt-0.5 ${isDone ? 'checked' : ''}" onclick="event.stopPropagation(); toggleTaskDoneDirect(${t.id});" title="Cocher / Décocher">
+                            ${isDone ? '<i class="fa-solid fa-check text-[10px]"></i>' : ''}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="task-title-text text-xs font-bold text-slate-800 leading-snug">${escapeHtml(t.title)}</span>
+                                <button onclick="event.stopPropagation(); quickToggleWaiting(${t.id});" class="text-[11px] ${isWaiting ? 'text-amber-600' : 'text-slate-300 hover:text-amber-600'} px-1" title="Basculer En attente / Bloqué">
+                                    <i class="fa-solid fa-hourglass-half"></i>
+                                </button>
+                            </div>
+                            ${t.notes ? `<p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">${escapeHtml(t.notes)}</p>` : ''}
+                            <div class="flex items-center flex-wrap gap-1.5 mt-1">
+                                ${prioBadge}
+                                ${t.status === 'in_progress' ? statusPill : ''}
+                                ${dueBadge}
+                            </div>
+                            ${isWaiting ? statusPill : ''}
+                            ${subtasksHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTrelloKanbanView(container, filteredTasks) {
+            const cols = [
+                { key: 'todo', title: '🔥 1. À faire', color: '#C41E3A', bg: 'bg-rose-50 text-[#C41E3A]' },
+                { key: 'in_progress', title: '⚡ 2. En cours d\'action', color: '#0284C7', bg: 'bg-sky-50 text-sky-700' },
+                { key: 'waiting', title: '⏳ 3. En attente / Bloqué', color: '#D97706', bg: 'bg-amber-50 text-amber-800' },
+                { key: 'done', title: '✅ 4. Terminé', color: '#10B981', bg: 'bg-emerald-50 text-emerald-700' }
+            ];
+
+            let html = `<div class="kanban-grid">`;
+
+            cols.forEach(col => {
+                const colTasks = filteredTasks.filter(t => t.status === col.key);
+
+                const cardsHtml = colTasks.map(t => {
+                    const lst = workspaceTasks.lists.find(l => l.id === t.listId) || { title: 'Liste', icon: '📋', color: '#64748B' };
+                    const subs = t.subtasks || [];
+                    const doneSubs = subs.filter(s => s.done).length;
+
+                    return `
+                        <div class="kanban-task-card"
+                             draggable="true"
+                             ondragstart="onKanbanDragStart(event, ${t.id})"
+                             onclick="openTaskModal(${t.id})"
+                             style="border-left: 4px solid ${lst.color};">
+                            <div class="flex items-center justify-between gap-1 mb-1.5">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold text-white" style="background-color:${lst.color};">
+                                    ${lst.icon} ${escapeHtml(lst.title)}
+                                </span>
+                                ${t.priority === 'high' ? '<span class="text-[10px] font-bold text-rose-600">🔴 Urgent</span>' : ''}
+                            </div>
+                            <div class="font-bold text-xs text-slate-800 mb-1">${escapeHtml(t.title)}</div>
+                            ${t.notes ? `<p class="text-[11px] text-slate-500 line-clamp-2 mb-1.5">${escapeHtml(t.notes)}</p>` : ''}
+                            ${t.status === 'waiting' && t.waitingReason ? `<div class="px-2 py-1 bg-amber-50 border border-amber-200 rounded text-[10px] font-semibold text-amber-800 mb-1.5">⏳ ${escapeHtml(t.waitingReason)}</div>` : ''}
+                            <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-100">
+                                <span>${subs.length > 0 ? `☑️ ${doneSubs}/${subs.length} sous-tâches` : 'Action directe'}</span>
+                                ${t.dueDate ? `<span>📅 ${t.dueDate.split('-').reverse().slice(0,2).join('/')}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                html += `
+                    <div class="kanban-col"
+                         ondragover="event.preventDefault(); this.classList.add('drag-over');"
+                         ondragleave="this.classList.remove('drag-over');"
+                         ondrop="onKanbanDrop(event, '${col.key}', this)">
+                        <div class="flex items-center justify-between px-2 py-1.5 border-b border-slate-300">
+                            <span class="font-fredoka font-bold text-sm text-slate-800">${col.title}</span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-bold ${col.bg}">${colTasks.length}</span>
+                        </div>
+                        <div class="space-y-2.5 flex-1">
+                            ${cardsHtml || '<div class="text-center py-12 text-xs text-slate-400 italic">Glissez une tâche ici</div>'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function onKanbanDragStart(e, taskId) {
+            draggedTaskId = taskId;
+            e.dataTransfer.setData('text/plain', String(taskId));
+        }
+
+        function onKanbanDrop(e, newStatus, colEl) {
+            e.preventDefault();
+            colEl.classList.remove('drag-over');
+            if (!draggedTaskId) return;
+            const task = workspaceTasks.tasks.find(t => t.id === draggedTaskId);
+            if (task) {
+                task.status = newStatus;
+                if (newStatus === 'waiting' && !task.waitingReason) {
+                    const reason = prompt("Précisez pourquoi cette tâche est en attente / bloquée :", "Attente retour / Date");
+                    if (reason) task.waitingReason = reason;
+                }
+                triggerAutoSave();
+                renderTasksWorkspace();
+                showToast("📌 Statut mis à jour !");
+            }
+            draggedTaskId = null;
+        }
+
+        function renderGoogleTasksFocusView(container, filteredTasks) {
+            const currentTasks = focusSelectedListId === 'ALL'
+                ? filteredTasks
+                : filteredTasks.filter(t => t.listId === focusSelectedListId);
+
+            const sidebarListsHtml = workspaceTasks.lists.map(l => {
+                const count = (workspaceTasks.tasks || []).filter(t => t.listId === l.id && t.status !== 'done').length;
+                const active = focusSelectedListId === l.id;
+                return `
+                    <button onclick="focusSelectedListId='${l.id}'; renderTasksWorkspace();"
+                            class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition ${active ? 'bg-[#C41E3A] text-white shadow-sm' : 'hover:bg-slate-100 text-slate-700'}">
+                        <span class="truncate">${l.icon} ${escapeHtml(l.title)}</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] ${active ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}">${count}</span>
+                    </button>
+                `;
+            }).join('');
+
+            const tasksHtml = currentTasks.length > 0
+                ? currentTasks.map(t => buildTaskRowHtml(t)).join('')
+                : `<div class="p-10 text-center text-xs text-slate-400">Aucune tâche à afficher pour cette sélection.</div>`;
+
+            container.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                    <div class="lg:col-span-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-1.5">
+                        <button onclick="focusSelectedListId='ALL'; renderTasksWorkspace();"
+                                class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition ${focusSelectedListId === 'ALL' ? 'bg-slate-900 text-white' : 'hover:bg-slate-100 text-slate-700'}">
+                            <span>📋 Toutes les listes</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-white/20">${filteredTasks.length}</span>
+                        </button>
+                        <div class="border-t border-slate-100 my-2 pt-2 text-[10px] font-bold uppercase text-slate-400 px-2">Mes 6 Listes Google Tasks</div>
+                        ${sidebarListsHtml}
+                    </div>
+                    <div class="lg:col-span-9 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                            <h3 class="font-fredoka font-bold text-base text-slate-800">Liste détaillée des tâches & sous-tâches</h3>
+                            <button onclick="openTaskModal(null, focusSelectedListId === 'ALL' ? null : focusSelectedListId)" class="px-3 py-1.5 bg-[#C41E3A] text-white rounded-xl text-xs font-bold">+ Ajouter une tâche ici</button>
+                        </div>
+                        <div class="divide-y divide-slate-100">
+                            ${tasksHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ========================================================================= */
+        /* ACTIONS CRUD SUR LES TÂCHES                                               */
+        /* ========================================================================= */
+        function quickAddTaskInList(listId, inputEl) {
+            const val = inputEl.value.trim();
+            if (!val) return;
+            workspaceTasks.tasks.unshift({
+                id: Date.now(),
+                listId: listId,
+                title: val,
+                status: 'todo',
+                priority: 'normal',
+                dueDate: '',
+                waitingReason: '',
+                notes: '',
+                subtasks: []
+            });
+            inputEl.value = '';
+            triggerAutoSave();
+            renderTasksWorkspace();
+            showToast("✅ Tâche ajoutée !");
+        }
+
+        function toggleTaskDoneDirect(taskId) {
+            const t = workspaceTasks.tasks.find(x => x.id === taskId);
+            if (!t) return;
+            t.status = (t.status === 'done') ? 'todo' : 'done';
+            triggerAutoSave();
+            renderTasksWorkspace();
+        }
+
+        function toggleSubtaskDirect(taskId, subIdx) {
+            const t = workspaceTasks.tasks.find(x => x.id === taskId);
+            if (!t || !t.subtasks || !t.subtasks[subIdx]) return;
+            t.subtasks[subIdx].done = !t.subtasks[subIdx].done;
+            triggerAutoSave();
+            renderTasksWorkspace();
+        }
+
+        function quickToggleWaiting(taskId) {
+            const t = workspaceTasks.tasks.find(x => x.id === taskId);
+            if (!t) return;
+            if (t.status === 'waiting') {
+                t.status = 'todo';
+                showToast("▶️ Tâche remise en statut À faire");
+            } else {
+                const r = prompt("Pourquoi cette tâche est-elle en attente / bloquée ?", t.waitingReason || "Attente retour / Date");
+                if (r === null) return;
+                t.status = 'waiting';
+                t.waitingReason = r.trim() || "En attente";
+                showToast("⏳ Tâche marquée En attente / Bloquée");
+            }
+            triggerAutoSave();
+            renderTasksWorkspace();
+        }
+
+        function openTaskModal(taskId = null, prefillListId = null) {
+            editingTaskId = taskId;
+            const listSelect = document.getElementById('tm-list');
+            listSelect.innerHTML = workspaceTasks.lists.map(l => `<option value="${l.id}">${l.icon} ${escapeHtml(l.title)}</option>`).join('');
+
+            if (taskId !== null) {
+                const t = workspaceTasks.tasks.find(x => x.id === taskId);
+                if (!t) return;
+                document.getElementById('tm-title').value = t.title || '';
+                listSelect.value = t.listId;
+                document.getElementById('tm-status').value = t.status || 'todo';
+                document.getElementById('tm-priority').value = t.priority || 'normal';
+                document.getElementById('tm-due').value = t.dueDate || '';
+                document.getElementById('tm-waiting-reason').value = t.waitingReason || '';
+                document.getElementById('tm-notes').value = t.notes || '';
+                modalSubtasksTemp = JSON.parse(JSON.stringify(t.subtasks || []));
+                document.getElementById('btn-delete-task-modal').classList.remove('hidden');
+            } else {
+                document.getElementById('tm-title').value = '';
+                if (prefillListId) listSelect.value = prefillListId;
+                document.getElementById('tm-status').value = 'todo';
+                document.getElementById('tm-priority').value = 'normal';
+                document.getElementById('tm-due').value = '';
+                document.getElementById('tm-waiting-reason').value = '';
+                document.getElementById('tm-notes').value = '';
+                modalSubtasksTemp = [];
+                document.getElementById('btn-delete-task-modal').classList.add('hidden');
+            }
+
+            toggleWaitingReasonBox();
+            renderModalSubtasks();
+            document.getElementById('task-modal').classList.add('open');
+        }
+
+        function closeTaskModal() {
+            document.getElementById('task-modal').classList.remove('open');
+        }
+
+        function toggleWaitingReasonBox() {
+            const st = document.getElementById('tm-status').value;
+            document.getElementById('tm-waiting-box').classList.toggle('hidden', st !== 'waiting');
+        }
+
+        function addSubtaskInModal() {
+            const input = document.getElementById('tm-subtask-input');
+            const raw = input.value.trim();
+            if (!raw) return;
+
+            raw.split('\n').map(s => s.trim()).filter(Boolean).forEach((line, idx) => {
+                const cleanLine = line.replace(/^[-*•\[\]\s]+/, '');
+                if (cleanLine) {
+                    modalSubtasksTemp.push({ id: Date.now() + idx, text: cleanLine, done: false });
+                }
+            });
+
+            input.value = '';
+            renderModalSubtasks();
+        }
+
+        function renderModalSubtasks() {
+            const container = document.getElementById('tm-subtasks-list');
+            if (modalSubtasksTemp.length === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-400 italic py-2">Aucune sous-tâche pour le moment.</div>`;
+                return;
+            }
+            container.innerHTML = modalSubtasksTemp.map((s, idx) => `
+                <div class="flex items-center justify-between gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
+                    <label class="flex items-center gap-2 text-xs flex-1 cursor-pointer ${s.done ? 'line-through text-slate-400' : 'text-slate-700 font-medium'}">
+                        <input type="checkbox" ${s.done ? 'checked' : ''} onchange="modalSubtasksTemp[${idx}].done = this.checked; renderModalSubtasks();" class="rounded text-[#C41E3A]">
+                        <span>${escapeHtml(s.text)}</span>
+                    </label>
+                    <button type="button" onclick="modalSubtasksTemp.splice(${idx}, 1); renderModalSubtasks();" class="text-slate-400 hover:text-rose-600 text-xs">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function saveTaskModal() {
+            const title = document.getElementById('tm-title').value.trim();
+            if (!title) {
+                alert("Veuillez renseigner l'intitulé de la tâche.");
+                return;
+            }
+
+            const payload = {
+                id: editingTaskId !== null ? editingTaskId : Date.now(),
+                listId: document.getElementById('tm-list').value,
+                title: title,
+                status: document.getElementById('tm-status').value,
+                priority: document.getElementById('tm-priority').value,
+                dueDate: document.getElementById('tm-due').value,
+                waitingReason: document.getElementById('tm-waiting-reason').value.trim(),
+                notes: document.getElementById('tm-notes').value.trim(),
+                subtasks: modalSubtasksTemp
+            };
+
+            if (editingTaskId !== null) {
+                const idx = workspaceTasks.tasks.findIndex(t => t.id === editingTaskId);
+                if (idx !== -1) workspaceTasks.tasks[idx] = payload;
+            } else {
+                workspaceTasks.tasks.unshift(payload);
+            }
+
+            closeTaskModal();
+            triggerAutoSave();
+            renderTasksWorkspace();
+            showToast("💾 Tâche enregistrée !");
+        }
+
+        function deleteTaskFromModal() {
+            if (editingTaskId === null) return;
+            if (confirm("Supprimer définitivement cette tâche ?")) {
+                workspaceTasks.tasks = workspaceTasks.tasks.filter(t => t.id !== editingTaskId);
+                closeTaskModal();
+                triggerAutoSave();
+                renderTasksWorkspace();
+                showToast("🗑️ Tâche supprimée");
+            }
+        }
+
+        function openListModal(listId = null) {
+            editingListId = listId;
+            if (listId) {
+                const l = workspaceTasks.lists.find(x => x.id === listId);
+                if (!l) return;
+                document.getElementById('lm-icon').value = l.icon || '📋';
+                document.getElementById('lm-title').value = l.title || '';
+                document.getElementById('lm-color').value = l.color || '#C41E3A';
+            } else {
+                document.getElementById('lm-icon').value = '🥋';
+                document.getElementById('lm-title').value = '';
+                document.getElementById('lm-color').value = '#C41E3A';
+            }
+            document.getElementById('list-modal').classList.add('open');
+        }
+
+        function closeListModal() { document.getElementById('list-modal').classList.remove('open'); }
+
+        function saveListModal() {
+            const icon = document.getElementById('lm-icon').value.trim() || '📋';
+            const title = document.getElementById('lm-title').value.trim();
+            const color = document.getElementById('lm-color').value || '#C41E3A';
+            if (!title) return;
+
+            if (editingListId) {
+                const l = workspaceTasks.lists.find(x => x.id === editingListId);
+                if (l) { l.icon = icon; l.title = title; l.color = color; }
+            } else {
+                workspaceTasks.lists.push({ id: 'lst_' + Date.now(), title, icon, color });
+            }
+
+            closeListModal();
+            triggerAutoSave();
+            renderTasksWorkspace();
+            showToast("📁 Liste enregistrée !");
+        }
+
+        function openBulkAddModal() {
+            const sel = document.getElementById('bulk-list-select');
+            sel.innerHTML = workspaceTasks.lists.map(l => `<option value="${l.id}">${l.icon} ${escapeHtml(l.title)}</option>`).join('');
+            document.getElementById('bulk-lines-input').value = '';
+            document.getElementById('bulk-modal').classList.add('open');
+        }
+
+        function closeBulkAddModal() { document.getElementById('bulk-modal').classList.remove('open'); }
+
+        function confirmBulkAdd() {
+            const listId = document.getElementById('bulk-list-select').value;
+            const raw = document.getElementById('bulk-lines-input').value.trim();
+            if (!raw) return;
+
+            const lines = raw.split('\n').map(s => s.trim()).filter(Boolean);
+            lines.reverse().forEach((line, idx) => {
+                const clean = line.replace(/^[-*•]\s*/, '');
+                if (clean) {
+                    workspaceTasks.tasks.unshift({
+                        id: Date.now() + idx,
+                        listId: listId,
+                        title: clean,
+                        status: 'todo',
+                        priority: 'normal',
+                        dueDate: '',
+                        waitingReason: '',
+                        notes: '',
+                        subtasks: []
+                    });
+                }
+            });
+
+            closeBulkAddModal();
+            triggerAutoSave();
+            renderTasksWorkspace();
+            showToast(`⚡ ${lines.length} tâches créées !`);
+        }
+
+        /* ========================================================================= */
+        /* LOGIQUE DE L'ESPACE 2 : STUDIO NOTION PRO (NOTES & DOSSIERS)              */
+        /* ========================================================================= */
+        function setNotesViewMode(mode) {
+            notesViewMode = mode;
+            ['split', 'gallery', 'stream'].forEach(m => {
+                document.getElementById('btn-nview-' + m).classList.toggle('active', m === mode);
+            });
+            renderNotesWorkspace();
+        }
+
+        function setNoteTagFilter(tag) {
+            if (activeNoteTagFilter === tag && tag !== 'ALL') {
+                activeNoteTagFilter = 'ALL';
+            } else {
+                activeNoteTagFilter = tag;
+            }
+
+            ['ALL', 'PINNED', 'Important', 'Procédure', 'Mairie', 'Idée'].forEach(t => {
+                const btn = document.getElementById('ntag-' + t);
+                if (btn) {
+                    if (t === activeNoteTagFilter) {
+                        btn.className = "px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#C41E3A] text-white shadow-sm";
+                    } else {
+                        btn.className = "px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 hover:bg-slate-200";
+                    }
+                }
+            });
+            renderNotesWorkspace();
+        }
+
+        function getAllNotesWithFolder() {
+            const list = [];
+            Object.keys(notionData).forEach(fKey => {
+                if (fKey.startsWith('_')) return;
+                const folder = notionData[fKey];
+                (folder.blocks || []).forEach((b, idx) => {
+                    list.push({
+                        folderKey: fKey,
+                        folderTitle: folder.title,
+                        folderIcon: folder.icon || '📂',
+                        blockIndex: idx,
+                        note: b
+                    });
+                });
+            });
+            return list;
+        }
+
+        function getFilteredAndSortedNotes() {
+            const q = (document.getElementById('global-search-input')?.value || '').trim().toLowerCase();
+            const sortMode = document.getElementById('notes-sort-select')?.value || 'pinned_recent';
+
+            let items = getAllNotesWithFolder().filter(item => {
+                if (currentFolderKey !== 'ALL_NOTES' && item.folderKey !== currentFolderKey) return false;
+                if (activeNoteTagFilter === 'PINNED' && !item.note.pinned) return false;
+                if (activeNoteTagFilter !== 'ALL' && activeNoteTagFilter !== 'PINNED') {
+                    if (!(item.note.tags || []).includes(activeNoteTagFilter)) return false;
+                }
+                if (q) {
+                    const hay = `${item.note.title} ${item.note.content} ${(item.note.tags || []).join(' ')}`.toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                return true;
+            });
+
+            if (sortMode === 'pinned_recent') {
+                items.sort((a, b) => {
+                    if (!!b.note.pinned !== !!a.note.pinned) return b.note.pinned ? 1 : -1;
+                    return (b.note.updatedAt || '').localeCompare(a.note.updatedAt || '');
+                });
+            } else if (sortMode === 'recent') {
+                items.sort((a, b) => (b.note.updatedAt || '').localeCompare(a.note.updatedAt || ''));
+            } else if (sortMode === 'alpha') {
+                items.sort((a, b) => (a.note.title || '').localeCompare(b.note.title || ''));
+            }
+            return items;
+        }
+
+        function renderNotesSidebar() {
             const fixedContainer = document.getElementById('fixed-folders-list');
             const customContainer = document.getElementById('custom-folders-list');
-            
             fixedContainer.innerHTML = '';
             customContainer.innerHTML = '';
 
+            let totalNotesCount = 0;
+
             Object.keys(notionData).forEach(key => {
+                if (key.startsWith('_')) return;
                 const folder = notionData[key];
+                const blocksCount = (folder.blocks || []).length;
+                totalNotesCount += blocksCount;
+                const isActive = (currentFolderKey === key);
+
                 const li = document.createElement('li');
-                
-                let deleteBtnHtml = '';
-                if (!folder.isFixed) {
-                    deleteBtnHtml = `<button class="btn-delete-folder" onclick="deleteFolder('${key}', event)" title="Supprimer ce dossier">❌</button>`;
-                }
+                li.className = "flex items-center justify-between group";
 
                 li.innerHTML = `
-                    <button class="folder-btn" id="f-${key}" onclick="selectFolder('${key}')">
-                        <span>${folder.icon || '📂'} ${folder.title}</span>
+                    <button onclick="selectFolder('${key}')"
+                            class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between transition ${isActive ? 'bg-[#FFEBEF] text-[#C41E3A] font-bold border-l-4 border-[#C41E3A]' : 'text-slate-700 hover:bg-slate-100'}">
+                        <span class="truncate">${folder.icon || '📂'} ${escapeHtml(folder.title)}</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? 'bg-[#C41E3A] text-white' : 'bg-slate-100 text-slate-500'}">${blocksCount}</span>
                     </button>
-                    ${deleteBtnHtml}
+                    ${!folder.isFixed ? `<button onclick="deleteFolder('${key}', event)" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-600 px-1 text-xs" title="Supprimer ce dossier"><i class="fa-solid fa-trash"></i></button>` : ''}
                 `;
 
-                if (folder.isFixed) { fixedContainer.appendChild(li); } else { customContainer.appendChild(li); }
+                if (folder.isFixed) fixedContainer.appendChild(li);
+                else customContainer.appendChild(li);
             });
 
-            if (currentFolderKey && document.getElementById(`f-${currentFolderKey}`)) {
-                document.getElementById(`f-${currentFolderKey}`).classList.add('active');
+            const btnAll = document.getElementById('f-ALL_NOTES');
+            if (btnAll) {
+                btnAll.className = `w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition ${currentFolderKey === 'ALL_NOTES' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'}`;
             }
-        }
-
-        function createNewFolder() {
-            const title = prompt("Quel est le nom de votre nouveau dossier ?");
-            if (!title || title.trim() === "") return;
-            const icon = prompt("Saisissez un émoji :", "📂") || "📂";
-            const newKey = 'custom_' + Date.now();
-
-            notionData[newKey] = { title: title.trim(), icon: icon.trim(), isFixed: false, blocks: [] };
-            syncToSupabase(false);
-            renderSidebar();
-            selectFolder(newKey);
-        }
-
-        function deleteFolder(key, event) {
-            event.stopPropagation();
-            if (confirm(`Voulez-vous supprimer définitivement "${notionData[key].title}" ?`)) {
-                if (currentFolderKey === key) {
-                    currentFolderKey = null;
-                    document.getElementById('current-folder-title').innerHTML = "📂 Sélectionner un dossier";
-                    document.getElementById('add-block-btn').style.display = "none";
-                    document.getElementById('blocks-container').innerHTML = `<p style="text-align: center; color: var(--gris-moyen); margin-top: 50px;">Sélectionnez une catégorie.</p>`;
-                }
-                delete notionData[key];
-                syncToSupabase(false);
-                renderSidebar();
-            }
+            document.getElementById('count-all-notes').innerText = totalNotesCount;
+            document.getElementById('badge-total-notes').innerText = totalNotesCount;
         }
 
         function selectFolder(folderKey) {
             currentFolderKey = folderKey;
-            document.querySelectorAll('.folder-btn').forEach(btn => btn.classList.remove('active'));
-            if (document.getElementById(`f-${folderKey}`)) {
-                document.getElementById(`f-${folderKey}`).classList.add('active');
-            }
-            const folder = notionData[folderKey];
-            document.getElementById('current-folder-title').innerHTML = `${folder.icon || '📂'} ${folder.title}`;
-            document.getElementById('add-block-btn').style.display = "block";
-            renderBlocks();
+            activeNoteId = null;
+            renderNotesWorkspace();
         }
 
-        function renderBlocks() {
-            const container = document.getElementById('blocks-container');
-            container.innerHTML = '';
-            const blocks = notionData[currentFolderKey].blocks || [];
+        function renderNotesWorkspace() {
+            renderNotesSidebar();
+            const stage = document.getElementById('notes-main-stage');
+            const items = getFilteredAndSortedNotes();
 
-            if (blocks.length === 0) {
-                container.innerHTML = `<p style="color: var(--gris-moyen); text-align: center; margin-top: 40px; font-style: italic;">Aucun sous-bloc d'information.</p>`;
+            if (notesViewMode === 'split') {
+                renderNotionSplitEditor(stage, items);
+            } else if (notesViewMode === 'gallery') {
+                renderNotionGalleryView(stage, items);
+            } else {
+                renderNotionStreamView(stage, items);
+            }
+        }
+
+        /* --- MODE 1 : STUDIO PAGE NOTION (LISTE DES PAGES AU CENTRE + GRANDE PAGE D'ÉCRITURE À DROITE) --- */
+        function renderNotionSplitEditor(stage, items) {
+            if (items.length > 0 && (!activeNoteId || !items.some(i => i.note.id === activeNoteId))) {
+                activeNoteId = items[0].note.id;
+            }
+
+            const activeItem = items.find(i => i.note.id === activeNoteId) || null;
+            const folderLabel = currentFolderKey === 'ALL_NOTES'
+                ? '🗂️ Toutes mes notes'
+                : `${notionData[currentFolderKey]?.icon || '📂'} ${notionData[currentFolderKey]?.title || 'Dossier'}`;
+
+            const pagesListHtml = items.length > 0 ? items.map(item => {
+                const n = item.note;
+                const isSelected = (n.id === activeNoteId);
+                const plainPreview = (n.content || '').replace(/<[^>]+>/g, ' ').trim().slice(0, 75);
+                const dateShort = n.updatedAt ? new Date(n.updatedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) : '';
+
+                const tagsHtml = (n.tags || []).map(t => `<span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[9px] font-bold">#${escapeHtml(t)}</span>`).join('');
+
+                return `
+                    <div class="notion-page-card ${isSelected ? 'active' : ''}" onclick="activeNoteId=${n.id}; renderNotesWorkspace();">
+                        <div class="flex items-start justify-between gap-1">
+                            <div class="font-fredoka font-bold text-xs text-slate-800 flex items-center gap-1.5 leading-snug">
+                                <span>${n.icon || '📄'}</span>
+                                <span>${escapeHtml(n.title || 'Page sans titre')}</span>
+                            </div>
+                            <button onclick="event.stopPropagation(); togglePinNote('${item.folderKey}', ${n.id});" class="text-xs ${n.pinned ? 'text-amber-500' : 'text-slate-300 hover:text-amber-400'}" title="Épingler en haut">
+                                <i class="fa-solid fa-star"></i>
+                            </button>
+                        </div>
+                        ${plainPreview ? `<p class="text-[11px] text-slate-400 line-clamp-2 mt-1">${escapeHtml(plainPreview)}</p>` : '<p class="text-[11px] text-slate-300 italic mt-1">Page vide...</p>'}
+                        <div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-100">
+                            <div class="flex flex-wrap gap-1">${tagsHtml}</div>
+                            <span class="text-[10px] text-slate-400">${dateShort}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('') : `
+                <div class="text-center py-12 px-4">
+                    <div class="text-2xl mb-2">📓</div>
+                    <div class="text-xs font-bold text-slate-600">Aucune note dans cette vue</div>
+                    <button onclick="createNewNotePage()" class="mt-3 px-3 py-1.5 bg-[#C41E3A] text-white rounded-xl text-xs font-bold">+ Créer une page</button>
+                </div>
+            `;
+
+            let editorPaneHtml = '';
+            if (activeItem) {
+                const n = activeItem.note;
+                const fKey = activeItem.folderKey;
+                const bIdx = activeItem.blockIndex;
+
+                const folderOptions = Object.keys(notionData)
+                    .filter(k => !k.startsWith('_'))
+                    .map(k => `<option value="${k}" ${k === fKey ? 'selected' : ''}>${notionData[k].icon || '📂'} ${escapeHtml(notionData[k].title)}</option>`)
+                    .join('');
+
+                const availableTags = ['Important', 'Procédure', 'Mairie', 'CoDir', 'Idée'];
+                const tagsSelectorHtml = availableTags.map(tag => {
+                    const hasTag = (n.tags || []).includes(tag);
+                    return `
+                        <button type="button"
+                                onclick="toggleTagOnActiveNote('${fKey}', ${n.id}, '${tag}')"
+                                class="note-tag-pill ${hasTag ? 'bg-[#C41E3A] text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}">
+                            #${tag}
+                        </button>
+                    `;
+                }).join('');
+
+                editorPaneHtml = `
+                    <!-- Barre de métadonnées de la Page Notion -->
+                    <div class="px-6 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase">Dossier :</span>
+                            <select onchange="moveNoteToFolder('${fKey}', ${n.id}, this.value)" class="px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-700 outline-none">
+                                ${folderOptions}
+                            </select>
+                            <div class="flex items-center gap-1 ml-2">
+                                ${tagsSelectorHtml}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="togglePinNote('${fKey}', ${n.id})" class="px-2.5 py-1 rounded-lg border text-xs font-bold ${n.pinned ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-white border-slate-200 text-slate-600'}">
+                                <i class="fa-solid fa-star"></i> ${n.pinned ? 'Épinglée' : 'Épingler'}
+                            </button>
+                            <button onclick="convertNoteToTask('${fKey}', ${bIdx})" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold" title="Transformer cette note en tâche à faire">
+                                <i class="fa-solid fa-list-check"></i> Créer Tâche
+                            </button>
+                            <button onclick="duplicateNotePage('${fKey}', ${bIdx})" class="p-1.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs text-slate-600" title="Dupliquer cette note">
+                                <i class="fa-solid fa-clone"></i>
+                            </button>
+                            <button onclick="deleteNotePage('${fKey}', ${n.id})" class="p-1.5 bg-rose-50 border border-rose-200 hover:bg-rose-100 rounded-lg text-xs text-rose-600" title="Supprimer cette note">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Barre d'outils d'écriture et de blocs Notion -->
+                    <div class="px-6 py-2 bg-white border-b border-slate-200 flex items-center gap-1.5 flex-wrap sticky top-0 z-10">
+                        <button type="button" onclick="execNotionCmd('formatBlock', '<h1>')" class="notion-toolbar-btn" title="Grand Titre H1">H1</button>
+                        <button type="button" onclick="execNotionCmd('formatBlock', '<h2>')" class="notion-toolbar-btn" title="Sous-titre H2">H2</button>
+                        <button type="button" onclick="execNotionCmd('formatBlock', '<h3>')" class="notion-toolbar-btn" title="Titre H3">H3</button>
+                        <button type="button" onclick="execNotionCmd('formatBlock', '<p>')" class="notion-toolbar-btn" title="Texte normal">Txt</button>
+                        <span class="text-slate-300">|</span>
+                        <button type="button" onclick="execNotionCmd('bold')" class="notion-toolbar-btn font-bold" title="Gras"><i class="fa-solid fa-bold"></i></button>
+                        <button type="button" onclick="execNotionCmd('italic')" class="notion-toolbar-btn italic" title="Italique"><i class="fa-solid fa-italic"></i></button>
+                        <button type="button" onclick="execNotionCmd('underline')" class="notion-toolbar-btn underline" title="Souligné"><i class="fa-solid fa-underline"></i></button>
+                        <button type="button" onclick="insertNotionHighlight()" class="notion-toolbar-btn !bg-amber-100 !border-amber-300 !text-amber-900" title="Surligner en jaune">🖍️ Surligner</button>
+                        <span class="text-slate-300">|</span>
+                        <button type="button" onclick="execNotionCmd('insertUnorderedList')" class="notion-toolbar-btn" title="Liste à puces"><i class="fa-solid fa-list-ul"></i> Puces</button>
+                        <button type="button" onclick="insertNotionChecklist()" class="notion-toolbar-btn" title="Insérer une case à cocher dans la note"><i class="fa-regular fa-square-check text-[#C41E3A]"></i> Case</button>
+                        <span class="text-slate-300">|</span>
+                        <button type="button" onclick="insertNotionComponent('callout_red')" class="notion-toolbar-btn !border-rose-200 !text-[#C41E3A]">📌 Encart Rouge</button>
+                        <button type="button" onclick="insertNotionComponent('callout_yellow')" class="notion-toolbar-btn !border-amber-200 !text-amber-700">💡 Idée / Astuce</button>
+                        <button type="button" onclick="insertNotionComponent('callout_blue')" class="notion-toolbar-btn !border-sky-200 !text-sky-700">ℹ️ Procédure</button>
+                        <button type="button" onclick="insertNotionComponent('toggle')" class="notion-toolbar-btn">▶️ Bloc Dépliable</button>
+                        <button type="button" onclick="insertNotionComponent('table')" class="notion-toolbar-btn"><i class="fa-solid fa-table"></i> Tableau</button>
+                        <button type="button" onclick="insertNotionComponent('divider')" class="notion-toolbar-btn">➖ Ligne</button>
+                    </div>
+
+                    <!-- Grande Feuille de Rédaction Notion -->
+                    <div class="p-8 max-w-4xl mx-auto w-full">
+                        <div class="flex items-center gap-3 mb-4 pb-3 border-b border-slate-100">
+                            <input type="text"
+                                   value="${escapeHtml(n.icon || '📄')}"
+                                   oninput="updateActiveNoteField('${fKey}', ${bIdx}, 'icon', this.value)"
+                                   class="w-12 h-12 text-center text-2xl bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-200 outline-none"
+                                   title="Changer l'émoji de la page">
+                            <input type="text"
+                                   value="${(n.title || '').replace(/"/g, '&quot;')}"
+                                   oninput="updateActiveNoteField('${fKey}', ${bIdx}, 'title', this.value)"
+                                   placeholder="Titre de votre page de note..."
+                                   class="font-fredoka font-bold text-2xl text-slate-900 w-full outline-none bg-transparent">
+                        </div>
+
+                        <div id="notion-active-canvas"
+                             class="notion-editor-canvas"
+                             contenteditable="true"
+                             oninput="updateActiveNoteField('${fKey}', ${bIdx}, 'content', this.innerHTML)"
+                             placeholder="Commencez à écrire votre note ici, ou cliquez sur les boutons ci-dessus pour insérer des titres, des encadrés, des tableaux ou des listes...">${n.content || ''}</div>
+                    </div>
+                `;
+            } else {
+                editorPaneHtml = `
+                    <div class="flex flex-col items-center justify-center h-[520px] text-center p-6">
+                        <div class="text-4xl mb-3">📓</div>
+                        <h3 class="font-fredoka font-bold text-lg text-slate-700">Sélectionnez ou créez une page de note</h3>
+                        <p class="text-xs text-slate-400 max-w-sm mt-1 mb-4">Vos notes s'ouvrent ici en pleine page comme dans Notion, avec enregistrement automatique à chaque frappe.</p>
+                        <button onclick="createNewNotePage()" class="px-4 py-2 bg-[#C41E3A] text-white rounded-xl text-xs font-bold shadow-sm">+ Créer une nouvelle page</button>
+                    </div>
+                `;
+            }
+
+            stage.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                    <!-- Colonne Centrale : Liste des pages du dossier -->
+                    <div class="lg:col-span-4 xl:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-sm p-3.5 space-y-2.5 max-h-[75vh] flex flex-col">
+                        <div class="flex items-center justify-between px-1 pb-2 border-b border-slate-100">
+                            <span class="font-fredoka font-bold text-xs text-slate-700 truncate">${folderLabel} (${items.length})</span>
+                            <button onclick="createNewNotePage()" class="text-xs font-bold text-[#C41E3A] hover:underline">+ Page</button>
+                        </div>
+                        <div class="space-y-1.5 overflow-y-auto flex-1 pr-1">
+                            ${pagesListHtml}
+                        </div>
+                    </div>
+
+                    <!-- Colonne Droite : Grande Page Notion -->
+                    <div class="lg:col-span-8 xl:col-span-9 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden min-h-[75vh]">
+                        ${editorPaneHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        /* --- MODE 2 : GALERIE DE FICHES (CARTES VISUELLES) --- */
+        function renderNotionGalleryView(stage, items) {
+            if (items.length === 0) {
+                stage.innerHTML = `<div class="bg-white p-12 rounded-2xl border border-slate-200 text-center text-xs text-slate-400">Aucune fiche dans ce dossier. Cliquez sur « + Nouvelle Page de Note » en haut à droite.</div>`;
                 return;
             }
 
-            blocks.forEach((block, index) => {
-                const isCollapsed = block.isCollapsed || false;
-                const toggleIcon = isCollapsed ? "▶️" : "🔽";
-                
-                const blockEl = document.createElement('div');
-                blockEl.className = 'info-block';
-                blockEl.innerHTML = `
-                    <div class="block-header">
-                        <div style="display: flex; align-items: center; width: 75%; gap: 10px;">
-                            <button class="btn-block-action btn-toggle-collapse no-print" onclick="toggleBlockCollapse(${index}, event)" title="${isCollapsed ? 'Déplier' : 'Replier'}">${toggleIcon}</button>
-                            <input type="text" class="block-title" value="${block.title}" onchange="updateBlockTitle(${index}, this.value)" placeholder="Nom du sous-bloc..." style="width: 100%;">
+            const cardsHtml = items.map(item => {
+                const n = item.note;
+                const plain = (n.content || '').replace(/<[^>]+>/g, ' ').trim().slice(0, 180);
+                const tagsHtml = (n.tags || []).map(t => `<span class="px-2 py-0.5 bg-rose-50 text-[#C41E3A] rounded-full text-[10px] font-bold">#${escapeHtml(t)}</span>`).join('');
+
+                return `
+                    <div onclick="activeNoteId=${n.id}; setNotesViewMode('split');"
+                         class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-[#C41E3A] cursor-pointer transition flex flex-col justify-between space-y-3">
+                        <div class="space-y-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <span class="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-bold text-slate-600">${item.folderIcon} ${escapeHtml(item.folderTitle)}</span>
+                                ${n.pinned ? '<span class="text-amber-500 text-xs"><i class="fa-solid fa-star"></i> Épinglée</span>' : ''}
+                            </div>
+                            <h4 class="font-fredoka font-bold text-base text-slate-800">${n.icon || '📄'} ${escapeHtml(n.title)}</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed line-clamp-4">${escapeHtml(plain || 'Page vide...')}</p>
                         </div>
-                        <div class="block-actions no-print">
-                            <button class="btn-block-action" onclick="deleteBlock(${index})" title="Supprimer ce bloc">❌</button>
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <div class="flex flex-wrap gap-1">${tagsHtml}</div>
+                            <span class="text-[11px] font-bold text-[#C41E3A]">Ouvrir la page →</span>
                         </div>
-                    </div>
-                    <div class="block-body" style="display: ${isCollapsed ? 'none' : 'block'};">
-                        <div id="editable-${index}" class="block-editable-text" contenteditable="true" oninput="updateBlockContent(${index}, this.innerHTML)" placeholder="Saisissez ou collez vos notes riches ici...">${block.content}</div>
                     </div>
                 `;
-                container.appendChild(blockEl);
-            });
+            }).join('');
+
+            stage.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">${cardsHtml}</div>`;
         }
 
-        function toggleBlockCollapse(index, event) {
-            event.stopPropagation();
-            const block = notionData[currentFolderKey].blocks[index];
-            block.isCollapsed = !block.isCollapsed;
-            syncToSupabase(false);
-            renderBlocks();
+        /* --- MODE 3 : LECTURE CONTINUE DU DOSSIER --- */
+        function renderNotionStreamView(stage, items) {
+            if (items.length === 0) {
+                stage.innerHTML = `<div class="bg-white p-12 rounded-2xl border border-slate-200 text-center text-xs text-slate-400">Aucune note à afficher.</div>`;
+                return;
+            }
+
+            const streamHtml = items.map(item => {
+                const n = item.note;
+                return `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <h3 class="font-fredoka font-bold text-lg text-[#C41E3A]">${n.icon || '📄'} ${escapeHtml(n.title)}</h3>
+                            <button onclick="activeNoteId=${n.id}; setNotesViewMode('split');" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700">
+                                <i class="fa-solid fa-pen"></i> Éditer en pleine page
+                            </button>
+                        </div>
+                        <div class="prose max-w-none text-sm text-slate-700 leading-relaxed">${n.content || '<span class="italic text-slate-400">Vide</span>'}</div>
+                    </div>
+                `;
+            }).join('');
+
+            stage.innerHTML = `<div class="space-y-4">${streamHtml}</div>`;
         }
 
-        function createNewBlock() {
-            if (!currentFolderKey) return;
-            if (!notionData[currentFolderKey].blocks) notionData[currentFolderKey].blocks = [];
-            notionData[currentFolderKey].blocks.push({
+        /* ========================================================================= */
+        /* ACTIONS D'ÉDITION RICHE NOTION (COMPOSANTS, TAGS, TRI, DÉPLACEMENT)       */
+        /* ========================================================================= */
+        function createNewNotePage() {
+            const targetFolder = (currentFolderKey === 'ALL_NOTES' || !currentFolderKey) ? 'proj' : currentFolderKey;
+            if (!notionData[targetFolder].blocks) notionData[targetFolder].blocks = [];
+
+            const newPage = {
                 id: Date.now(),
-                title: "Nouvelle ligne d'information",
-                content: "",
-                isCollapsed: false
-            });
-            syncToSupabase(false);
-            renderBlocks();
+                icon: "📄",
+                title: "Nouvelle note",
+                pinned: false,
+                tags: [],
+                updatedAt: new Date().toISOString(),
+                content: "<p>Rédigez vos notes ici...</p>"
+            };
+
+            notionData[targetFolder].blocks.unshift(newPage);
+            activeNoteId = newPage.id;
+            if (notesViewMode !== 'split') notesViewMode = 'split';
+            triggerAutoSave();
+            renderNotesWorkspace();
+            showToast("📄 Nouvelle page créée !");
         }
 
-        function updateBlockTitle(index, newValue) {
-            notionData[currentFolderKey].blocks[index].title = newValue;
-            syncToSupabase(false);
-        }
-
-        function updateBlockContent(index, newValue) {
-            notionData[currentFolderKey].blocks[index].content = newValue;
-            clearTimeout(syncTimeout);
-            syncTimeout = setTimeout(() => syncToSupabase(true), 1500);
-        }
-
-        function deleteBlock(index) {
-            if (confirm("Voulez-vous supprimer ce bloc ?")) {
-                notionData[currentFolderKey].blocks.splice(index, 1);
-                syncToSupabase(false);
-                renderBlocks();
+        function updateActiveNoteField(fKey, bIdx, field, val) {
+            const note = notionData[fKey]?.blocks?.[bIdx];
+            if (!note) return;
+            note[field] = val;
+            note.updatedAt = new Date().toISOString();
+            triggerAutoSave();
+            if (field === 'title' || field === 'icon') {
+                // Met à jour la carte dans la liste latérale sans perdre le focus de saisie
+                const cardTitleEl = document.querySelector('.notion-page-card.active .font-fredoka');
+                if (cardTitleEl) {
+                    cardTitleEl.innerHTML = `<span>${note.icon || '📄'}</span><span>${escapeHtml(note.title || 'Page sans titre')}</span>`;
+                }
             }
         }
 
+        function togglePinNote(fKey, noteId) {
+            const note = (notionData[fKey]?.blocks || []).find(b => b.id === noteId);
+            if (!note) return;
+            note.pinned = !note.pinned;
+            note.updatedAt = new Date().toISOString();
+            triggerAutoSave();
+            renderNotesWorkspace();
+            showToast(note.pinned ? "⭐ Note épinglée en haut !" : "☆ Note désépinglée");
+        }
+
+        function toggleTagOnActiveNote(fKey, noteId, tag) {
+            const note = (notionData[fKey]?.blocks || []).find(b => b.id === noteId);
+            if (!note) return;
+            if (!Array.isArray(note.tags)) note.tags = [];
+            const idx = note.tags.indexOf(tag);
+            if (idx > -1) note.tags.splice(idx, 1);
+            else note.tags.push(tag);
+            note.updatedAt = new Date().toISOString();
+            triggerAutoSave();
+            renderNotesWorkspace();
+        }
+
+        function moveNoteToFolder(oldFolderKey, noteId, newFolderKey) {
+            if (oldFolderKey === newFolderKey) return;
+            const idx = (notionData[oldFolderKey]?.blocks || []).findIndex(b => b.id === noteId);
+            if (idx === -1) return;
+            const [moved] = notionData[oldFolderKey].blocks.splice(idx, 1);
+            if (!notionData[newFolderKey].blocks) notionData[newFolderKey].blocks = [];
+            notionData[newFolderKey].blocks.unshift(moved);
+            if (currentFolderKey !== 'ALL_NOTES') currentFolderKey = newFolderKey;
+            triggerAutoSave();
+            renderNotesWorkspace();
+            showToast(`📂 Note déplacée vers ${notionData[newFolderKey].title}`);
+        }
+
+        function duplicateNotePage(fKey, bIdx) {
+            const orig = notionData[fKey]?.blocks?.[bIdx];
+            if (!orig) return;
+            const copy = JSON.parse(JSON.stringify(orig));
+            copy.id = Date.now();
+            copy.title = orig.title + " (Copie)";
+            copy.updatedAt = new Date().toISOString();
+            notionData[fKey].blocks.unshift(copy);
+            activeNoteId = copy.id;
+            triggerAutoSave();
+            renderNotesWorkspace();
+            showToast("📑 Note dupliquée !");
+        }
+
+        function deleteNotePage(fKey, noteId) {
+            if (!confirm("Supprimer définitivement cette page de note ?")) return;
+            notionData[fKey].blocks = (notionData[fKey].blocks || []).filter(b => b.id !== noteId);
+            activeNoteId = null;
+            triggerAutoSave();
+            renderNotesWorkspace();
+            showToast("🗑️ Note supprimée");
+        }
+
+        function execNotionCmd(cmd, val = null) {
+            const canvas = document.getElementById('notion-active-canvas');
+            if (!canvas) return;
+            canvas.focus();
+            document.execCommand(cmd, false, val);
+            canvas.dispatchEvent(new Event('input'));
+        }
+
+        function insertNotionHighlight() {
+            const canvas = document.getElementById('notion-active-canvas');
+            if (!canvas) return;
+            canvas.focus();
+            document.execCommand('hiliteColor', false, '#FEF08A');
+            canvas.dispatchEvent(new Event('input'));
+        }
+
+        function insertNotionChecklist() {
+            const canvas = document.getElementById('notion-active-canvas');
+            if (!canvas) return;
+            canvas.focus();
+            const html = `<div style="display:flex; align-items:center; gap:8px; margin:4px 0;"><input type="checkbox" style="width:15px; height:15px; accent-color:#C41E3A; cursor:pointer;"> <span>Élément à vérifier...</span></div>`;
+            document.execCommand('insertHTML', false, html);
+            canvas.dispatchEvent(new Event('input'));
+        }
+
+        function insertNotionComponent(type) {
+            const canvas = document.getElementById('notion-active-canvas');
+            if (!canvas) return;
+            canvas.focus();
+            let html = '';
+
+            if (type === 'callout_red') {
+                html = `<div style="background:#FFF5F5; border:1px solid #FED7D7; border-left:4px solid #C41E3A; padding:12px 16px; border-radius:8px; margin:12px 0; color:#742A2A;"><strong>📌 IMPORTANT :</strong> Votre note importante ici...</div><p><br></p>`;
+            } else if (type === 'callout_yellow') {
+                html = `<div style="background:#FFFBEB; border:1px solid #FDE68A; border-left:4px solid #D97706; padding:12px 16px; border-radius:8px; margin:12px 0; color:#78350F;"><strong>💡 IDÉE / ASTUCE :</strong> Votre remarque ici...</div><p><br></p>`;
+            } else if (type === 'callout_blue') {
+                html = `<div style="background:#F0F9FF; border:1px solid #BAE6FD; border-left:4px solid #0284C7; padding:12px 16px; border-radius:8px; margin:12px 0; color:#0369A1;"><strong>ℹ️ PROCÉDURE / MÉMO :</strong> Étapes ou informations à conserver...</div><p><br></p>`;
+            } else if (type === 'toggle') {
+                html = `<details open><summary>▶️ Cliquez pour déplier / replier cette section</summary><div style="padding-top:8px;">Contenu détaillé de la section...</div></details><p><br></p>`;
+            } else if (type === 'table') {
+                html = `<table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:13px;"><thead><tr style="background:#1E293B; color:white;"><th style="padding:8px; border:1px solid #CBD5E1; text-align:left;">Élément</th><th style="padding:8px; border:1px solid #CBD5E1; text-align:left;">Détail / Valeur</th><th style="padding:8px; border:1px solid #CBD5E1; text-align:left;">Observation</th></tr></thead><tbody><tr><td style="padding:8px; border:1px solid #CBD5E1;">Ligne 1</td><td style="padding:8px; border:1px solid #CBD5E1;">...</td><td style="padding:8px; border:1px solid #CBD5E1;">...</td></tr><tr><td style="padding:8px; border:1px solid #CBD5E1;">Ligne 2</td><td style="padding:8px; border:1px solid #CBD5E1;">...</td><td style="padding:8px; border:1px solid #CBD5E1;">...</td></tr></tbody></table><p><br></p>`;
+            } else if (type === 'divider') {
+                html = `<hr style="border:none; border-top:2px solid #E2E8F0; margin:16px 0;"><p><br></p>`;
+            }
+
+            if (html) {
+                document.execCommand('insertHTML', false, html);
+                canvas.dispatchEvent(new Event('input'));
+            }
+        }
+
+        function convertNoteToTask(fKey, bIdx) {
+            const block = notionData[fKey]?.blocks?.[bIdx];
+            if (!block) return;
+            openTaskModal(null);
+            document.getElementById('tm-title').value = `${block.icon || '📓'} ${block.title}`;
+            const plainText = (block.content || '').replace(/<[^>]+>/g, ' ').trim();
+            document.getElementById('tm-notes').value = plainText;
+        }
+
+        function createNewFolder() {
+            const title = prompt("Nom de votre nouveau dossier de notes :");
+            if (!title || !title.trim()) return;
+            const icon = prompt("Émoji du dossier :", "📂") || "📂";
+            const newKey = 'custom_' + Date.now();
+
+            notionData[newKey] = { title: title.trim(), icon: icon.trim(), isFixed: false, blocks: [] };
+            currentFolderKey = newKey;
+            triggerAutoSave();
+            renderNotesWorkspace();
+            showToast("📁 Nouveau dossier créé !");
+        }
+
+        function deleteFolder(key, event) {
+            event.stopPropagation();
+            if (confirm(`Supprimer définitivement le dossier "${notionData[key].title}" et ses notes ?`)) {
+                delete notionData[key];
+                currentFolderKey = 'proj';
+                triggerAutoSave();
+                renderNotesWorkspace();
+            }
+        }
+
+        /* ========================================================================= */
+        /* UTILITAIRES                                                               */
+        /* ========================================================================= */
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function showToast(message, type = "success") {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
         window.onload = loadData;
-
-        // Liaison globale pour les liaisons HTML du DOM
-        window.createNewFolder = createNewFolder;
-        window.deleteFolder = deleteFolder;
-        window.selectFolder = selectFolder;
-        window.toggleBlockCollapse = toggleBlockCollapse;
-        window.createNewBlock = createNewBlock;
-        window.updateBlockTitle = updateBlockTitle;
-        window.updateBlockContent = updateBlockContent;
-        window.deleteBlock = deleteBlock;
     </script>
-
-    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
-    <script src="../js/sidebar.js"></script>
-
 </body>
 </html>
