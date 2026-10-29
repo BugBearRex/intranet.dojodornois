@@ -147,7 +147,7 @@
             display: none;
         }
 
-        /* Boîte d'aperçu Gmail / Kalisport */
+        /* Boîte d'aperçu Gmail / Kalisport (Fix Scroll : flex-shrink: 0) */
         .preview-window {
             background: #FFFFFF;
             border: 1px solid #E2E8F0;
@@ -155,8 +155,9 @@
             box-shadow: 0 12px 30px rgba(0,0,0,0.06);
             width: 100%;
             max-width: 740px;
-            margin: 0 auto;
+            margin: 0 auto 24px auto;
             overflow: hidden;
+            flex-shrink: 0;
             transition: all 0.25s ease;
         }
 
@@ -164,9 +165,9 @@
             max-width: 390px;
         }
 
-        .preview-window.dark-sim #preview-output {
-            background-color: #18181B !important;
-            filter: contrast(1.02);
+        .preview-window.dark-sim {
+            background: #0F172A;
+            border-color: #334155;
         }
 
         /* Modales */
@@ -395,9 +396,9 @@
                 </div>
             </div>
 
-            <!-- COLONNE DROITE (6/12) : APERÇU EN DIRECT & CONTRÔLES DE VUE -->
-            <div class="lg:col-span-6 bg-[#F4F6F9] p-5 overflow-y-auto flex flex-col">
-                <div class="mb-3 flex items-center justify-between flex-wrap gap-2 max-w-[740px] w-full mx-auto">
+            <!-- COLONNE DROITE (6/12) : APERÇU EN DIRECT & CONTRÔLES DE VUE (Fix Scroll : min-h-0) -->
+            <div class="lg:col-span-6 bg-[#F4F6F9] p-5 overflow-y-auto flex flex-col min-h-0" id="right-preview-pane">
+                <div class="mb-3 flex items-center justify-between flex-wrap gap-2 max-w-[740px] w-full mx-auto shrink-0">
                     <div class="flex items-center gap-2">
                         <h3 class="font-fredoka text-[#1A1A1A] font-bold text-base">Aperçu du rendu final</h3>
                         <span id="badge-mode" class="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full uppercase">Mode Courriel Gmail</span>
@@ -549,6 +550,7 @@
         // Mails en premier par défaut comme demandé !
         let modeActuel = 'mail'; // 'mail' ou 'newsletter'
         let modeCodeSource = false;
+        let isDarkPreview = false;
         let savedDrafts = [];
 
         const memoireContenu = {
@@ -1350,8 +1352,46 @@
             `;
         }
 
+        // Applique la simulation réaliste du Mode Sombre directement sur l'aperçu
+        function appliquerSimulationSombre() {
+            if (!isDarkPreview) return;
+
+            previewOutput.querySelectorAll('center, table, td, th, tr, div, p, span, strong, li, h1, h2, h3').forEach(el => {
+                const s = el.getAttribute('style') || '';
+                if (!s) return;
+
+                let newS = s
+                    // Fonds extérieurs et cartes blanches -> Fond sombre client mail
+                    .replace(/background-color:\s*#F4F6F9(\s*!important)?/gi, 'background-color: #0F172A !important')
+                    .replace(/background-color:\s*#FFFFFF(\s*!important)?/gi, 'background-color: #1E293B !important')
+                    // Encarts gris clair -> Gris ardoise foncé
+                    .replace(/background-color:\s*#F8FAFC(\s*!important)?/gi, 'background-color: #0F172A !important')
+                    // Encarts alerte rose/rouge -> Rouge sombre contrasté
+                    .replace(/background-color:\s*#FFF5F5(\s*!important)?/gi, 'background-color: #3B1219 !important')
+                    // Encarts alerte jaune -> Ambre sombre contrasté
+                    .replace(/background-color:\s*(#FFFBEB|#FFFDF5)(\s*!important)?/gi, 'background-color: #3B280C !important')
+                    // Encarts alerte verte -> Vert sombre contrasté
+                    .replace(/background-color:\s*#F0FDF4(\s*!important)?/gi, 'background-color: #0D3321 !important')
+                    // Bordures claires -> Bordures sombres
+                    .replace(/border(-top|-bottom)?:\s*([12]px\s+solid\s+)#(E2E8F0|E8E8E8|CBD5E0|FED7D7|FDE68A|BBF7D0)(\s*!important)?/gi, 'border$1: $2#334155 !important')
+                    // Textes sombres -> Textes clairs lisibles sur fond noir
+                    .replace(/color:\s*#(2D3748|1A1A1A|1A202C|3D3D3D)(\s*!important)?/gi, 'color: #F1F5F9 !important')
+                    .replace(/color:\s*#(4A5568|6B6B6B|718096)(\s*!important)?/gi, 'color: #CBD5E1 !important')
+                    .replace(/color:\s*#742A2A(\s*!important)?/gi, 'color: #FECDD3 !important')
+                    .replace(/color:\s*#(78350F|92400E)(\s*!important)?/gi, 'color: #FDE68A !important')
+                    .replace(/color:\s*#14532D(\s*!important)?/gi, 'color: #BBF7D0 !important')
+                    // Rouge Dojo lumineux sur fond sombre
+                    .replace(/color:\s*#C41E3A(\s*!important)?/gi, 'color: #F87171 !important');
+
+                el.setAttribute('style', newS);
+            });
+        }
+
         function genererApercu() {
             previewOutput.innerHTML = getCodeFinal();
+            if (isDarkPreview) {
+                appliquerSimulationSombre();
+            }
         }
 
         /* ========================================================================= */
@@ -1369,7 +1409,6 @@
         }
 
         function copierCodeHTML() {
-            genererApercu();
             navigator.clipboard.writeText(getCodeFinal()).then(() => {
                 const msg = modeActuel === 'newsletter'
                     ? "💻 Code HTML Kalisport copié ! Prêt à coller dans Kalisport."
@@ -1379,7 +1418,8 @@
         }
 
         function copierRichText() {
-            genererApercu();
+            // On s'assure de copier la version claire officielle pour Gmail même si l'aperçu est en mode sombre
+            previewOutput.innerHTML = getCodeFinal();
             const target = document.getElementById('preview-output');
             if (!target.innerHTML.trim()) return;
 
@@ -1396,6 +1436,11 @@
                 showToast("❌ Erreur lors de la copie.");
             }
             selection.removeAllRanges();
+
+            // Si le test mode sombre était actif, on le remet immédiatement à l'écran
+            if (isDarkPreview) {
+                appliquerSimulationSombre();
+            }
         }
 
         async function collerHtmlDirect() {
@@ -1417,7 +1462,6 @@
         }
 
         function injecterHtmlPropre(rawHtml) {
-            // Si le code collé contient déjà tout le wrapper <center>, on extrait uniquement l'intérieur du td principal 30px si possible, sinon on met tout
             let clean = rawHtml.trim();
             if (modeActuel === 'mail' && !clean.includes('dojo-mail-header') && !clean.includes('DOJO DORNOIS')) {
                 const sousTitre = document.getElementById('mail-subtitle-select')?.value || 'Communication officielle';
@@ -1489,11 +1533,13 @@
         function toggleDarkPreview() {
             const box = document.getElementById('preview-window-box');
             const btn = document.getElementById('btn-dark-sim');
-            box.classList.toggle('dark-sim');
-            const isDark = box.classList.contains('dark-sim');
-            btn.className = isDark
-                ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500 text-white transition"
+            isDarkPreview = !isDarkPreview;
+            box.classList.toggle('dark-sim', isDarkPreview);
+            btn.className = isDarkPreview
+                ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500 text-white transition shadow-sm"
                 : "px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition";
+            genererApercu();
+            showToast(isDarkPreview ? "🌙 Aperçu Mode Sombre activé" : "☀️ Retour à l'aperçu Clair");
         }
 
         /* ========================================================================= */
