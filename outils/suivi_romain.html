@@ -1,38 +1,53 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <title id="page-title">Générateur de Relevé de Prestations - Romain Flammang</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilotage & Suivi Romain Flammang — Dojo Dornois</title>
+    <link rel="icon" type="image/png" href="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
+
+    <!-- POLICES OFFICIELLES CHARTE DOJO DORNOIS -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- TAILWIND CSS & FONTAWESOME -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --rouge: #C41E3A;
             --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
             --noir-doux: #1A1A1A;
             --gris-fonce: #3D3D3D;
             --gris-moyen: #6B6B6B;
             --gris-clair: #B8B8B8;
             --gris-tres-clair: #E8E8E8;
-            --fond: #F5F5F5;
+            --fond: #F4F6F9;
             --blanc: #FFFFFF;
-            --sidebar-width: 280px;
-            --topbar-height: 68px;
+            --vert-succes: #2ECC71;
+            --sidebar-width: 270px;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
 
-        body { 
-            font-family: 'Roboto', sans-serif; 
-            background-color: var(--fond); 
-            margin: 0; padding: 0; 
-            color: var(--gris-fonce); 
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fond);
+            color: var(--gris-fonce);
+            margin: 0;
+            padding: 0;
             display: flex;
             height: 100vh;
             overflow: hidden;
+            font-size: 13px;
         }
 
-        /* --- SIDEBAR --- */
+        h1, h2, h3, h4, .font-fredoka { font-family: 'Fredoka', sans-serif; }
+        .font-mono-num { font-family: 'Roboto Mono', monospace; }
+
+        /* SIDEBAR UNIFIÉE */
         .sidebar { 
             width: var(--sidebar-width); 
             min-width: var(--sidebar-width);
@@ -45,349 +60,1712 @@
             position: relative; 
             box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
             flex-shrink: 0; 
-            box-sizing: border-box;
             overflow-x: hidden;
             z-index: 100;
         }
 
-        .sidebar * { max-width: 100%; box-sizing: border-box; }
-
-        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
-        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
-        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
+        /* NAVIGATION PAR ONGLETS */
+        .nav-tab-btn {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 9px 14px;
+            border-radius: 10px;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            white-space: nowrap;
+            color: #475569;
+            background: transparent;
+        }
+        .nav-tab-btn:hover {
+            background: #F1F5F9;
+            color: #1A1A1A;
+        }
+        .nav-tab-btn.active {
+            background: var(--rouge);
+            color: #FFFFFF;
+            box-shadow: 0 3px 10px rgba(196, 30, 58, 0.28);
         }
 
-        .topbar {
-            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; z-index: 50;
+        /* CARTES DE SÉANCES HEBDOMADAIRES */
+        .course-card-item {
+            transition: all 0.15s ease-in-out;
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-left: 5px solid #CBD5E1;
+            color: #475569;
+        }
+        .course-card-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transform: translateY(-1px);
+        }
+        .course-card-item.status-done {
+            background-color: #F0FDF4;
+            border-color: #BBF7D0;
+            border-left-color: #10B981;
+            color: #065F46;
+        }
+        .course-card-item.status-cancelled {
+            background-color: #FFF1F2;
+            border-color: #FECDD3;
+            border-left-color: #C41E3A;
+            color: #881337;
+        }
+        .course-card-item.status-vacation {
+            background-color: #FFFBEB;
+            border-color: #FDE68A;
+            border-left-color: #F59E0B;
+            color: #92400E;
         }
 
-        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); }
-        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
-
-        .btn-dark { background: var(--noir-doux); color: white; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; transition: background 0.15s; display: inline-flex; align-items: center; gap: 6px; }
-        .btn-dark:hover { background: var(--rouge); }
-
-        .app-body {
-            flex: 1; padding: 24px 28px; overflow-y: auto;
+        /* FEUILLE APERÇU RELEVÉ OFFICIEL */
+        #preview-sheet-container {
+            background: #FFFFFF;
+            padding: 34px;
+            border: 1px solid #CBD5E1;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
         }
-
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .panel { background: var(--blanc); padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 4px solid var(--rouge); }
-        
-        h2, h3 { font-family: 'Fredoka', sans-serif; color: var(--rouge); margin-top: 0; display: flex; align-items: center; gap: 10px; }
-        
-        .config-visuels { background-color: #FFF5F5; border: 1px dashed var(--rouge); border-radius: 6px; padding: 15px; margin-bottom: 20px; }
-        .config-title { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-        .upload-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .upload-box { background: white; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px; }
-        .preview-mini { max-height: 45px; display: block; margin-top: 6px; border: 1px solid var(--gris-tres-clair); padding: 2px; }
-
-        .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-        .full-width { grid-column: span 2; }
-        
-        label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 0.85rem; color: var(--gris-fonce); }
-        input, textarea, select { width: 100%; padding: 10px; border: 1px solid var(--gris-clair); border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
-        
-        /* GESTION DES LIGNES DYNAMIQUES */
-        .lines-builder { background: #FAFAFA; border: 1px solid var(--gris-tres-clair); border-radius: 6px; padding: 12px; margin-bottom: 15px; }
-        .line-item { display: grid; grid-template-columns: 110px 1fr 110px 35px; gap: 8px; align-items: center; margin-bottom: 8px; }
-        .line-item select, .line-item input { padding: 6px 8px; font-size: 0.85rem; }
-        .btn-del { background: #E74C3C; color: white; border: none; border-radius: 4px; height: 34px; cursor: pointer; font-weight: bold; }
-        .btn-add-line { background: #27AE60; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
-        .btn-add-deduction { background: var(--rouge); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
-
-        .btn-container { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; transition: background 0.2s; }
-        .btn-primary { background-color: var(--rouge); color: white; }
-        .btn-primary:hover { background-color: var(--rouge-hover); }
-        
-        #preview-zone { background: var(--blanc); padding: 40px; border: 1px solid var(--gris-clair); border-radius: 4px; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
-        
-        /* En-tête Impression */
-        .print-header-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border-bottom: 2px solid var(--gris-tres-clair); }
+        .print-header-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; border-bottom: 2px solid #E2E8F0; }
         .print-header-table td { vertical-align: top; border: none; padding-bottom: 12px; font-size: 9.5pt; line-height: 1.4; }
-        .emitter-cell { width: 40%; text-align: left; }
-        .receiver-cell { width: 40%; text-align: left; padding-left: 15px; border-left: 2px solid var(--gris-tres-clair); }
-        .doc-num-cell { text-align: right; width: 20%; vertical-align: top; }
-        
-        .emitter-title { font-family: 'Fredoka', sans-serif; font-size: 13pt; color: var(--rouge); margin-bottom: 4px; }
-        .receiver-title { font-weight: bold; font-size: 10pt; color: var(--gris-fonce); margin-bottom: 4px; text-transform: uppercase; }
-        
-        .doc-num { font-weight: bold; font-size: 9pt; background: #F5F5F5; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--gris-tres-clair); display: inline-block; white-space: nowrap; text-align: center; }
-        .doc-num .ref-label { font-size: 7.5pt; color: var(--gris-moyen); display: block; text-transform: uppercase; font-weight: normal; margin-bottom: 2px; }
-        .doc-num .ref-value { color: var(--rouge); font-size: 9.5pt; }
-
-        .doc-title-container { text-align: center; margin: 15px 0; border-top: 1px dashed var(--rouge); border-bottom: 1px dashed var(--rouge); padding: 10px 0; width: 100%; }
-        .doc-title { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 14pt; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .intro-text { font-size: 10pt; line-height: 1.45; margin-bottom: 18px; text-align: justify; }
-        
-        /* Tableaux */
-        .prestations-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
-        .prestations-table th { background: var(--rouge); color: white; font-weight: bold; padding: 9px; font-size: 9.5pt; text-transform: uppercase; border: 1px solid var(--rouge); text-align: left; }
-        .prestations-table td { padding: 9px; border: 1px solid var(--gris-tres-clair); font-size: 10pt; text-align: left; }
-        .text-right { text-align: right !important; }
-        
-        .row-total { font-weight: bold; background: #FAFAFA; }
-        .row-deduction { color: var(--rouge); font-weight: 500; }
-        .final-net { font-size: 12pt; color: var(--rouge); font-weight: bold; background: #FFF5F5 !important; border: 2px solid var(--rouge) !important; }
-
-        .obs-block { background: #FAFAFA; border-left: 3px solid var(--rouge); padding: 10px 12px; margin: 18px 0; font-size: 9.5pt; line-height: 1.4; border-radius: 0 4px 4px 0; }
-        .obs-title { font-weight: bold; text-transform: uppercase; font-size: 9pt; color: var(--rouge); margin-bottom: 4px; }
-        
-        .fait-a-ligne { font-size: 10.5pt; text-align: left; margin-top: 20px; margin-bottom: 20px; }
-        
-        /* Zone Signature & Tampons */
-        .sig-container-table { width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed; }
+        .emitter-cell { width: 38%; text-align: left; }
+        .receiver-cell { width: 38%; text-align: left; padding-left: 14px; border-left: 2px solid #E2E8F0; }
+        .doc-num-cell { text-align: right; width: 24%; vertical-align: top; }
+        .emitter-title { font-family: 'Fredoka', sans-serif; font-size: 13pt; color: var(--rouge); margin-bottom: 3px; font-weight: 700; }
+        .receiver-title { font-weight: bold; font-size: 9.5pt; color: var(--gris-fonce); margin-bottom: 3px; text-transform: uppercase; }
+        .doc-num { font-weight: bold; font-size: 9pt; background: #F8FAFC; padding: 6px 10px; border-radius: 6px; border: 1px solid #CBD5E1; display: inline-block; text-align: center; }
+        .doc-num .ref-label { font-size: 7pt; color: var(--gris-moyen); display: block; text-transform: uppercase; font-weight: normal; margin-bottom: 2px; }
+        .doc-num .ref-value { color: var(--rouge); font-size: 9.5pt; font-family: 'Roboto Mono', monospace; }
+        .doc-title-container { text-align: center; margin: 14px 0; border-top: 1.5px dashed var(--rouge); border-bottom: 1.5px dashed var(--rouge); padding: 8px 0; width: 100%; }
+        .doc-title { font-family: 'Fredoka', sans-serif; color: var(--rouge); font-size: 13.5pt; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .prestations-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        .prestations-table th { background: var(--rouge); color: white; font-weight: bold; padding: 8px 10px; font-size: 9pt; text-transform: uppercase; border: 1px solid var(--rouge); text-align: left; }
+        .prestations-table td { padding: 8px 10px; border: 1px solid #E2E8F0; font-size: 9.5pt; text-align: left; }
+        .row-total { font-weight: bold; background: #F8FAFC; }
+        .row-deduction { color: var(--rouge); font-weight: 600; background: #FFF5F5; }
+        .final-net { font-size: 11.5pt; color: var(--rouge); font-weight: bold; background: #FFF1F2 !important; border: 2px solid var(--rouge) !important; }
+        .obs-block { background: #F8FAFC; border-left: 4px solid var(--rouge); padding: 10px 12px; margin: 14px 0; font-size: 9pt; line-height: 1.45; border-radius: 0 6px 6px 0; }
+        .sig-container-table { width: 100%; border-collapse: collapse; margin-top: 18px; table-layout: fixed; }
         .sig-container-table td { border: none; vertical-align: middle; padding: 0 5px; }
-        .tampon-cell { text-align: left; width: 38%; }
-        .tampon-paye-cell { text-align: center; width: 24%; }
-        .box-cell { text-align: right; width: 38%; }
-        
-        /* TAILLE DES TAMPONS */
-        .print-tampon, .print-signature-stamp { 
-            max-height: 110px; 
-            max-width: 100%; 
-            object-fit: contain; 
-            mix-blend-mode: multiply; 
-            display: inline-block; 
-        }
-        
-        .print-tampon-paye { 
-            max-height: 85px; 
-            max-width: 100%; 
-            object-fit: contain; 
-            mix-blend-mode: multiply; 
-            display: inline-block; 
-        }
-        
-        .print-footer { width: 100%; text-align: center; margin-top: 35px; padding-top: 12px; border-top: 1px solid var(--gris-tres-clair); font-size: 8.5pt; color: var(--gris-moyen); font-style: italic; }
+        .print-tampon, .print-signature-stamp { max-height: 100px; max-width: 100%; object-fit: contain; mix-blend-mode: multiply; display: inline-block; }
+        .print-tampon-paye { max-height: 80px; max-width: 100%; object-fit: contain; mix-blend-mode: multiply; display: inline-block; }
 
-        @page {
-            size: A4;
-            margin: 12mm 15mm 12mm 15mm;
+        /* MODALE */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(4px);
+            z-index: 2000; display: none; align-items: center; justify-content: center; padding: 16px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: white; border-radius: 16px; max-width: 520px; width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25); overflow: hidden;
         }
 
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-family: 'Fredoka', sans-serif; font-size: 13px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); background: #1E293B; border-left: 4px solid #10B981; }
+        .toast.error { background: #7F1D1D; border-left-color: #EF4444; }
+
+        /* ZONE IMPRESSION DÉDIÉE */
+        #dedicated-print-root { display: none; }
         @media print {
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            html, body { background: white !important; padding: 0 !important; margin: 0 !important; width: 100% !important; height: auto !important; overflow: visible !important; }
-            .no-print, .sidebar, .topbar { display: none !important; }
-            .main-content { padding: 0 !important; overflow: visible !important; height: auto !important; }
-            .app-body { display: block !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; }
-            .dashboard-grid { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
-            #preview-zone { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
-            
-            .doc-num { border: 1px solid var(--gris-clair) !important; background: #F5F5F5 !important; }
-            .prestations-table th { background: var(--rouge) !important; color: white !important; }
-            .row-total td { background: #FAFAFA !important; }
-            .final-net td { background: #FFF5F5 !important; border: 2px solid var(--rouge) !important; }
-            .obs-block { background: #FAFAFA !important; border-left: 3px solid var(--rouge) !important; }
+            body > *:not(#dedicated-print-root) { display: none !important; }
+            #dedicated-print-root { display: block !important; width: 100% !important; background: white !important; color: #1A1A1A !important; }
+            html, body { background: white !important; margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .print-page-break { page-break-before: always; break-before: page; }
         }
     </style>
 </head>
-<body>
+<body class="h-full flex text-slate-800 antialiased overflow-hidden">
 
-    <!-- SIDEBAR DYNAMIQUE -->
-    <div class="sidebar"></div>
+    <!-- SIDEBAR UNIFIÉE -->
+    <div class="sidebar no-print"></div>
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-        <div class="topbar no-print">
-            <div class="page-title-area">
-                <h2>Relevés de Prestations Romain Flammang</h2>
-                <p>Édition et calcul des indemnités de l'éducateur sportif</p>
+    <div class="toast-container no-print" id="toastContainer"></div>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden no-print">
+
+        <!-- TOPBAR -->
+        <header class="bg-white border-b border-slate-200 px-6 py-3 flex flex-wrap items-center justify-between gap-3 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-[#C41E3A] p-1.5 flex items-center justify-center shadow-md shrink-0">
+                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Dojo Dornois" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-fredoka text-lg font-bold text-[#1A1A1A] uppercase tracking-wide leading-none">Centre de Pilotage & Suivi — Romain Flammang</h1>
+                        <span class="bg-[#C41E3A] text-white font-fredoka text-[11px] px-2.5 py-0.5 rounded-full font-semibold">Forfait 1 500 € / 500h</span>
+                        <span id="sync-badge" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] px-2 py-0.5 rounded-full font-semibold">
+                            <i class="fa-solid fa-cloud-check"></i> Synchronisé
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">Pointage rigoureux des heures, déduction automatique des absences (-30 €/h), relevés mensuels, TER/Écoles & suivi annuel</p>
+                </div>
             </div>
-            <a href="../index.html" class="btn-dark">🏠 Central</a>
-        </div>
 
-        <div class="app-body">
-            <div class="dashboard-grid">
-                
-                <div class="panel no-print">
-                    <div class="config-visuels">
-                        <div class="config-title">💾 Visuels Officiels du Club (Mémorisés)</div>
-                        <div class="upload-grid">
-                            <div class="upload-box">
-                                <label>印 Tampon Club :</label>
-                                <input type="file" id="upload-tampon" accept="image/*" onchange="sauvegarderVisuel('tampon')">
-                                <img id="mini-tampon" class="preview-mini" src="" style="display:none;">
-                            </div>
-                            <div class="upload-box">
-                                <label>💳 Tampon Payé :</label>
-                                <input type="file" id="upload-tampon-paye" accept="image/*" onchange="sauvegarderVisuel('tampon_paye')">
-                                <img id="mini-tampon-paye" class="preview-mini" src="" style="display:none;">
-                            </div>
-                            <div class="upload-box">
-                                <label>✍️ Tampon Signature :</label>
-                                <input type="file" id="upload-sig-stamp" accept="image/*" onchange="sauvegarderVisuel('sig_stamp')">
-                                <img id="mini-sig-stamp" class="preview-mini" src="" style="display:none;">
-                            </div>
+            <!-- Sélecteur de Mois Global & Actions Rapides -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                    <i class="fa-regular fa-calendar-days text-[#C41E3A]"></i>
+                    <span class="text-xs font-fredoka font-bold text-slate-600 uppercase">Période :</span>
+                    <select id="global-month-select" onchange="onGlobalMonthChange(this.value)" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-fredoka font-bold text-[#1A1A1A] outline-none focus:border-[#C41E3A]">
+                        <option value="2026-09">Septembre 2026</option>
+                        <option value="2026-10" selected>Octobre 2026</option>
+                        <option value="2026-11">Novembre 2026</option>
+                        <option value="2026-12">Décembre 2026</option>
+                        <option value="2027-01">Janvier 2027</option>
+                        <option value="2027-02">Février 2027</option>
+                        <option value="2027-03">Mars 2027</option>
+                        <option value="2027-04">Avril 2027</option>
+                        <option value="2027-05">Mai 2027</option>
+                        <option value="2027-06">Juin 2027</option>
+                        <option value="2027-07">Juillet 2027</option>
+                        <option value="2027-08">Août 2027</option>
+                    </select>
+                </div>
+
+                <button onclick="ouvrirModalAjoutSeance()" class="px-3 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-sm">
+                    <i class="fa-solid fa-plus text-rose-400"></i> + Séance / Stage
+                </button>
+
+                <button onclick="syncAllToSupabase(false)" class="px-3.5 py-2 bg-[#2ECC71] hover:bg-emerald-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-sm">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Sync Supabase
+                </button>
+            </div>
+        </header>
+
+        <!-- BARRE D'ONGLETS DE PILOTAGE -->
+        <nav class="bg-white border-b border-slate-200 px-6 py-2 flex items-center gap-1.5 overflow-x-auto shrink-0">
+            <button onclick="switchMainTab('pointage')" id="tab-btn-pointage" class="nav-tab-btn active">
+                <i class="fa-solid fa-calendar-check"></i> 1. Pointage & Suivi des Heures
+            </button>
+            <button onclick="switchMainTab('releve')" id="tab-btn-releve" class="nav-tab-btn">
+                <i class="fa-solid fa-file-invoice-dollar"></i> 2. Éditeur Relevé de Prestation (1 500 €)
+                <span id="badge-absences-releve" class="hidden bg-rose-100 text-[#C41E3A] px-1.5 py-0.2 rounded-full text-[10px] font-bold">0 abs.</span>
+            </button>
+            <button onclick="switchMainTab('ter')" id="tab-btn-ter" class="nav-tab-btn">
+                <i class="fa-solid fa-school"></i> 3. TER, Écoles & Frais Km (Hors Forfait)
+            </button>
+            <button onclick="switchMainTab('reunions')" id="tab-btn-reunions" class="nav-tab-btn">
+                <i class="fa-solid fa-handshake"></i> 4. Réunions (Quota 2/Trim.) & Missions
+            </button>
+            <button onclick="switchMainTab('bilan')" id="tab-btn-bilan" class="nav-tab-btn">
+                <i class="fa-solid fa-chart-pie"></i> 5. Bilan Annuel 500h & Simulateur Salariat
+            </button>
+            <button onclick="switchMainTab('convention')" id="tab-btn-convention" class="nav-tab-btn">
+                <i class="fa-solid fa-scale-balanced"></i> 6. Cadre Convention 2026-2027
+            </button>
+        </nav>
+
+        <!-- ZONE DE CONTENU DÉFILANTE -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+            <!-- ========================================================================= -->
+            <!-- ONGLET 1 : POINTAGE VISUEL HEBDOMADAIRE & SUIVI RIGOUREUX DES HEURES      -->
+            <!-- ========================================================================= -->
+            <section id="view-pointage" class="tab-view space-y-5">
+
+                <!-- Bandeau KPIs Temps Réel du Mois Sélectionné -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-slate-700">
+                        <div class="text-[11px] text-slate-500 font-bold uppercase">1. Volume Planifié (Mois)</div>
+                        <div class="mt-1 flex items-baseline gap-2">
+                            <span id="kpi-pt-planned" class="font-fredoka text-2xl font-bold text-slate-800">0,00 h</span>
+                            <span class="text-[11px] text-slate-400">(Réf lissée : 41,67h)</span>
                         </div>
+                        <div class="mt-1 text-[11px] text-slate-500" id="kpi-pt-sessions-count">0 séances sur le mois</div>
                     </div>
 
-                    <h3>⚙️ Paramètres du Relevé</h3>
-                    <div class="form-group">
-                        <div>
-                            <label>Saison sportive :</label>
-                            <select id="saison" onchange="actualiserReference()">
-                                <option value="2526">Saison 2025-2026 (2526)</option>
-                                <option value="2627" selected>Saison 2026-2027 (2627)</option>
-                                <option value="2728">Saison 2027-2028 (2728)</option>
-                            </select>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
+                        <div class="text-[11px] text-emerald-700 font-bold uppercase">2. Heures Réalisées (Vert)</div>
+                        <div class="mt-1 flex items-baseline gap-2">
+                            <span id="kpi-pt-done" class="font-fredoka text-2xl font-bold text-emerald-600">0,00 h</span>
+                            <span id="kpi-pt-adj" class="text-xs font-bold text-sky-600"></span>
                         </div>
+                        <div class="mt-1 text-[11px] text-slate-400">Cours + stages + ajustements</div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+                        <div class="text-[11px] text-amber-700 font-bold uppercase">3. Vacances / Fériés Lissés</div>
+                        <div class="mt-1 flex items-baseline gap-2">
+                            <span id="kpi-pt-vacation" class="font-fredoka text-2xl font-bold text-amber-600">0,00 h</span>
+                        </div>
+                        <div class="mt-1 text-[11px] text-amber-700">Inclus au forfait (0 € déduit)</div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-[#C41E3A]">
+                        <div class="text-[11px] text-[#C41E3A] font-bold uppercase">4. Absences Déductibles</div>
+                        <div class="mt-1 flex items-baseline gap-2">
+                            <span id="kpi-pt-cancelled" class="font-fredoka text-2xl font-bold text-[#C41E3A]">0,00 h</span>
+                            <span id="kpi-pt-deduction-euro" class="text-xs font-mono-num font-bold bg-rose-50 text-[#C41E3A] px-2 py-0.5 rounded">-0,00 €</span>
+                        </div>
+                        <div class="mt-1 text-[11px] text-slate-500">Art. 6 : Déduction à 30,00 €/h</div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-[#1A1A1A] to-slate-800 text-white p-4 rounded-2xl shadow-md flex flex-col justify-between">
                         <div>
-                            <label>Référence Unique :</label>
-                            <input type="text" id="ref_document" value="DD-2627-JUL-RF" oninput="genererApercu()">
+                            <div class="text-[11px] text-slate-300 font-bold uppercase">5. Net Mensuel Estimé</div>
+                            <div class="mt-1 flex items-baseline justify-between">
+                                <span id="kpi-pt-net-euro" class="font-fredoka text-2xl font-bold text-emerald-400">1 500,00 €</span>
+                                <span class="text-[10px] text-slate-400">Base 1 500 €</span>
+                            </div>
+                        </div>
+                        <button onclick="transfererPointageVersReleve()" class="mt-2 w-full py-1.5 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-[11px] font-fredoka font-bold transition flex items-center justify-center gap-1.5 shadow">
+                            <i class="fa-solid fa-bolt"></i> Générer le Relevé Financier →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Barre d'actions rapides du Pointage -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <span class="font-fredoka font-bold text-sm text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-hand-pointer text-[#C41E3A]"></i> Légende du clic sur une séance :
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
+                            1 clic = ✅ Réalisé
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 text-[#C41E3A] text-xs font-bold">
+                            2 clics = ❌ Absence Romain (-30 €/h)
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
+                            3 clics = 🏖️ Vacances / Trêve (0 € déduit)
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold">
+                            4 clics = ⏳ En attente
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button onclick="validateAllMonth('done')" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-xl text-xs font-bold transition">
+                            <i class="fa-solid fa-check-double"></i> Tout pointer Réalisé (Hors vac.)
+                        </button>
+                        <button onclick="markVacationsAutoMonth()" class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl text-xs font-bold transition" title="Marquer automatiquement les semaines de vacances scolaires Zone A en Trêve lissée">
+                            <i class="fa-solid fa-umbrella-beach"></i> Marquer Vacances Zone A
+                        </button>
+                        <button onclick="validateAllMonth('pending')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+                            <i class="fa-solid fa-rotate-left"></i> Réinitialiser le mois
+                        </button>
+                        <button onclick="imprimerReleveHeuresA4()" class="px-3.5 py-1.5 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-print text-rose-400"></i> 🖨️ Imprimer Pointage Heures (A4)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grille des Semaines du Mois -->
+                <div id="weeks-container" class="grid grid-cols-1 lg:grid-cols-2 gap-5"></div>
+
+                <!-- Bloc Ajustements Horaires Ponctuels (+ Heures sup validées CoDir / - Retenues d'heures) -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h3 class="font-fredoka text-sm font-bold text-slate-800 uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-[#C41E3A]"></i> Ajustements Horaires & Régularisations Ponctuelles (Hors grille hebdo)
+                            </h3>
+                            <p class="text-xs text-slate-500">Ajoutez ici une heure supplémentaire validée par le CoDir (+30 €/h) ou une retenue horaire partielle (ex: retard ou départ anticipé).</p>
+                        </div>
+                    </div>
+                    <div class="p-5 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                            <div class="md:col-span-2">
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Mois</label>
+                                <select id="adj-month" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                                    <option value="2026-09">Septembre 2026</option>
+                                    <option value="2026-10" selected>Octobre 2026</option>
+                                    <option value="2026-11">Novembre 2026</option>
+                                    <option value="2026-12">Décembre 2026</option>
+                                    <option value="2027-01">Janvier 2027</option>
+                                    <option value="2027-02">Février 2027</option>
+                                    <option value="2027-03">Mars 2027</option>
+                                    <option value="2027-04">Avril 2027</option>
+                                    <option value="2027-05">Mai 2027</option>
+                                    <option value="2027-06">Juin 2027</option>
+                                    <option value="2027-07">Juillet 2027</option>
+                                    <option value="2027-08">Août 2027</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-3">
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Type d'ajustement</label>
+                                <select id="adj-type" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                                    <option value="minus">➖ Déduction / Absence partielle (-30 €/h)</option>
+                                    <option value="plus_billable">➕ Supplément validé CoDir (+30 €/h)</option>
+                                    <option value="plus_forfait">⏱️ Heures effectuées incluses au forfait (0 €)</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Durée (Heures)</label>
+                                <input type="number" step="0.25" id="adj-hours" placeholder="Ex: 1.5" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                            </div>
+                            <div class="md:col-span-3">
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Motif précis</label>
+                                <input type="text" id="adj-reason" placeholder="Ex: Absence cours Taïso ou 3e réunion trimestre" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs">
+                            </div>
+                            <div class="md:col-span-2">
+                                <button onclick="addAdjustment()" class="w-full py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold transition">
+                                    + Enregistrer
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="full-width">
-                            <label>Structure de rémunération :</label>
-                            <select id="mode_remun" onchange="basculerModeModele()">
-                                <option value="detail">Saison Actuelle (Lignes détaillées sur-mesure)</option>
-                                <option value="fixe">Saison Prochaine (Forfait Fixe + Extras/Retenues)</option>
-                            </select>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left border-collapse">
+                                <thead class="bg-[#1A1A1A] text-white font-fredoka uppercase text-[11px]">
+                                    <tr>
+                                        <th class="p-2.5">Mois</th>
+                                        <th class="p-2.5">Nature</th>
+                                        <th class="p-2.5">Volume Horaire</th>
+                                        <th class="p-2.5">Impact Financier (30 €/h)</th>
+                                        <th class="p-2.5">Motif / Justification</th>
+                                        <th class="p-2.5 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adjustments-table-body" class="divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================================= -->
+            <!-- ONGLET 2 : ÉDITEUR DU RELEVÉ DE PRESTATION MENSUEL (FORFAIT 1 500 €)      -->
+            <!-- ========================================================================= -->
+            <section id="view-releve" class="tab-view hidden space-y-5">
+
+                <!-- Bandeau de synchronisation intelligente Pointage -> Relevé -->
+                <div class="bg-gradient-to-r from-[#1A1A1A] to-slate-800 text-white p-4 rounded-2xl shadow-sm flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#C41E3A] flex items-center justify-center text-lg shrink-0">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
                         </div>
                         <div>
-                            <label>Période / Mois concerné :</label>
-                            <input type="text" id="periode" value="Juillet 2026" oninput="actualiserReference()">
+                            <h3 class="font-fredoka text-sm font-bold uppercase">Passerelle Automatique : Pointage des Heures ↔ Relevé de Prestations</h3>
+                            <p class="text-xs text-slate-300" id="releve-bridge-summary">Forfait fixe de base : 1 500,00 € • Cliquez à droite pour importer automatiquement les absences pointées sur le mois.</p>
                         </div>
-                        <div>
-                            <label>Date d'édition :</label>
-                            <input type="text" id="date_edition" value="31/07/2026" oninput="genererApercu()">
-                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button onclick="synchroniserReleveDepuisPointage()" class="px-4 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition">
+                            <i class="fa-solid fa-arrows-rotate"></i> Actualiser avec le Pointage du Mois (1 500 € - Absences)
+                        </button>
+                        <button onclick="archiverReleveMoisCourant()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition" title="Mémoriser ce relevé dans le bilan annuel de la saison">
+                            <i class="fa-solid fa-box-archive"></i> Valider & Archiver ce Mois
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+
+                    <!-- COLONNE GAUCHE (5/12) : PARAMÉTRAGE DU RELEVÉ & TAMPONS OFFICIELS -->
+                    <div class="xl:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-5">
                         
-                        <!-- DETAIL DES LIGNES DYNAMIQUES -->
-                        <div class="full-width">
-                            <label style="margin-bottom:8px; color:var(--rouge);">📝 Désignation des prestations et régulations :</label>
-                            <div class="lines-builder">
-                                <div id="lines-container"></div>
-                                <div style="display:flex; gap:8px; margin-top:8px;">
-                                    <button type="button" class="btn-add-line" onclick="ajouterLigne('ajout', '', '')">➕ Ajouter une Prestation</button>
-                                    <button type="button" class="btn-add-deduction" onclick="ajouterLigne('retenue', '', '')">➖ Ajouter une Déduction / Retenue</button>
+                        <!-- Visuels Officiels Mémorisés -->
+                        <div class="bg-rose-50/60 border border-dashed border-[#C41E3A] rounded-xl p-3.5 space-y-2.5">
+                            <div class="font-fredoka text-xs font-bold text-[#C41E3A] uppercase flex items-center justify-between">
+                                <span><i class="fa-solid fa-stamp"></i> Tampons & Signatures Officiels (Mémorisés)</span>
+                                <button onclick="effacerTampons()" class="text-[10px] text-slate-500 hover:text-rose-700 underline">Réinitialiser</button>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-[11px]">
+                                <div class="bg-white p-2 rounded-lg border border-slate-200">
+                                    <label class="block font-bold text-slate-700 mb-1">印 Tampon Club</label>
+                                    <input type="file" id="upload-tampon" accept="image/*" onchange="sauvegarderVisuel('tampon')" class="text-[10px] w-full">
+                                    <img id="mini-tampon" class="max-h-10 mt-1 mx-auto hidden" src="">
+                                </div>
+                                <div class="bg-white p-2 rounded-lg border border-slate-200">
+                                    <label class="block font-bold text-slate-700 mb-1">💳 Tampon Payé</label>
+                                    <input type="file" id="upload-tampon-paye" accept="image/*" onchange="sauvegarderVisuel('tampon_paye')" class="text-[10px] w-full">
+                                    <img id="mini-tampon-paye" class="max-h-10 mt-1 mx-auto hidden" src="">
+                                </div>
+                                <div class="bg-white p-2 rounded-lg border border-slate-200">
+                                    <label class="block font-bold text-slate-700 mb-1">✍️ Signature</label>
+                                    <input type="file" id="upload-sig-stamp" accept="image/*" onchange="sauvegarderVisuel('sig_stamp')" class="text-[10px] w-full">
+                                    <img id="mini-sig-stamp" class="max-h-10 mt-1 mx-auto hidden" src="">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="full-width">
-                            <label>Observations / Notes complémentaires :</label>
-                            <textarea id="observations" rows="3" oninput="genererApercu()">Calcul des indemnités basé sur le calendrier d'interventions validé par le comité de direction.</textarea>
-                        </div>
-                        <div class="full-width">
-                            <label>Mode de règlement prévu :</label>
-                            <input type="text" id="reglement" value="Virement bancaire sous 30 jours" oninput="genererApercu()">
+                        <!-- Paramètres généraux du Relevé -->
+                        <div class="space-y-3">
+                            <h3 class="font-fredoka text-sm font-bold text-[#1A1A1A] uppercase border-b border-slate-100 pb-2">
+                                ⚙️ Paramètres du Relevé Mensuel
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Saison sportive</label>
+                                    <select id="saison" onchange="actualiserReference()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold bg-slate-50">
+                                        <option value="2526">Saison 2025-2026 (2526)</option>
+                                        <option value="2627" selected>Saison 2026-2027 (2627)</option>
+                                        <option value="2728">Saison 2027-2028 (2728)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Référence Unique</label>
+                                    <input type="text" id="ref_document" value="DD-2627-OCT-RF" oninput="genererApercu()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-mono-num font-bold text-[#C41E3A]">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Formule contractuelle</label>
+                                    <select id="mode_remun" onchange="basculerModeModele()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold bg-slate-50">
+                                        <option value="forfait1500" selected>Convention 2026-2027 : Forfait Fixe 1 500 € (- Absences 30€/h)</option>
+                                        <option value="detail">Mode Détaillé sur-mesure (Ou Facture séparée)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Taux horaire déduction absence</label>
+                                    <div class="flex items-center gap-1">
+                                        <input type="number" step="0.5" id="taux_horaire_ref" value="30.00" onchange="genererApercu()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-mono-num font-bold">
+                                        <span class="text-xs font-bold text-slate-500">€/h</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Période / Mois concerné</label>
+                                    <input type="text" id="periode" value="Octobre 2026" oninput="actualiserReference()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Date d'édition</label>
+                                    <input type="text" id="date_edition" value="31/10/2026" oninput="genererApercu()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold">
+                                </div>
+                            </div>
+
+                            <!-- Éditeur de lignes du relevé -->
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="text-xs font-bold text-[#C41E3A] uppercase">📝 Lignes du Relevé (Forfait, Extras & Retenues)</label>
+                                    <span class="text-[11px] text-slate-400">Modifiable à volonté</span>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                                    <div id="lines-container" class="space-y-2"></div>
+                                    <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-200">
+                                        <button type="button" onclick="ajouterLigne('ajout', '', 0)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold">
+                                            ➕ Ajouter Prestation / Extra
+                                        </button>
+                                        <button type="button" onclick="ajouterLigne('retenue', 'Absence cours du ... (X h × 30,00 €/h)', 30)" class="px-3 py-1.5 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold">
+                                            ➖ Ajouter Retenue Absence
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Observations & Mentions contractuelles (Art. 5 & 6)</label>
+                                <textarea id="observations" rows="3" oninput="genererApercu()" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs">Forfait mensuel global et tout compris de 1 500,00 € (Art. 5 de la convention 2026-2027, base annuelle 500h lissées vacances incluses). Toute absence non dispensée fait l'objet d'une déduction directe au taux contractuel de 30,00 €/h (Art. 6).</textarea>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Mode de règlement</label>
+                                    <input type="text" id="reglement" value="Virement bancaire" oninput="genererApercu()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Statut du paiement</label>
+                                    <select id="statut_paiement_releve" onchange="genererApercu()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold bg-slate-50">
+                                        <option value="A_PAYER">⏳ À régler / En préparation</option>
+                                        <option value="VIRE">✅ Virement effectué (Payé)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Boutons d'Impression A4 -->
+                            <div class="pt-3 border-t border-slate-200 flex flex-wrap gap-2">
+                                <button onclick="imprimerReleveFinancierA4()" class="flex-1 py-2.5 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl text-xs font-fredoka font-bold uppercase tracking-wide shadow-sm flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-print"></i> 🖨️ Imprimer Relevé Financier (A4)
+                                </button>
+                                <button onclick="imprimerPackCompletMensuelA4()" class="px-3.5 py-2.5 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-xl text-xs font-fredoka font-bold flex items-center justify-center gap-1.5 shadow-sm" title="Imprimer le Relevé Financier en Page 1 + le Détail complet des Heures en Page 2">
+                                    <i class="fa-solid fa-layer-group text-rose-400"></i> Pack 2 Pages (Financier + Heures)
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="btn-container">
-                        <button class="btn btn-dark" onclick="syncToSupabase()">☁️ Enregistrer vers Supabase</button>
-                        <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimer / Sauvegarder PDF</button>
+
+                    <!-- COLONNE DROITE (7/12) : APERÇU EN DIRECT DU RELEVÉ OFFICIEL A4 -->
+                    <div class="xl:col-span-7 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-fredoka text-sm font-bold text-slate-700 uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-eye text-[#C41E3A]"></i> Aperçu en direct du Relevé Officiel A4
+                            </h3>
+                            <span class="text-xs text-slate-500">Prêt pour PDF / Impression</span>
+                        </div>
+                        <div id="preview-sheet-container">
+                            <div id="render-target"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+            <!-- ========================================================================= -->
+            <!-- ONGLET 3 : INTERVENTIONS TER, ÉCOLES & FRAIS KILOMÉTRIQUES (HORS FORFAIT) -->
+            <!-- ========================================================================= -->
+            <section id="view-ter" class="tab-view hidden space-y-5">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="font-fredoka text-base font-bold text-[#1A1A1A] uppercase">Suivi des Prestations Hors Forfait : TER, Écoles & Déplacements</h2>
+                            <span class="bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold px-2.5 py-0.5 rounded-full">Art. 5 — Facturation séparée</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Conformément à la convention 2026-2027, les cycles scolaires (TER Dornes, Lucenay, Cossaye, Chantenay-St-Imbert) et frais km validés en CoDir (0,35 €/km) sont facturés à part du forfait mensuel de 1 500 €.</p>
+                    </div>
+                    <button onclick="imprimerReleveTerEtFraisA4()" class="px-4 py-2 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-print text-rose-400"></i> 🖨️ Imprimer Relevé TER / Frais Séparé (A4)
+                    </button>
+                </div>
+
+                <!-- Formulaire d'ajout TER / École / Déplacement -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="font-fredoka text-sm font-bold text-slate-800 uppercase">➕ Enregistrer une intervention scolaire (TER / École) ou un déplacement</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="md:col-span-2">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Date</label>
+                            <input type="date" id="ter-date" value="2026-10-15" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Catégorie</label>
+                            <select id="ter-cat" onchange="onTerCatChange()" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                                <option value="TER_DORNES">🏫 TER École de Dornes</option>
+                                <option value="ECOLE_CHANTENAY">🏫 École Chantenay-St-Imbert</option>
+                                <option value="ECOLE_AUTRE">🏫 École Lucenay / Cossaye</option>
+                                <option value="FRAIS_KM">🚗 Frais Kilométriques (0,35 €/km)</option>
+                                <option value="AUTRE_EXT">🎯 Autre Prestation Hors Forfait</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Description / Classe / Trajet</label>
+                            <input type="text" id="ter-desc" placeholder="Ex: Cycle Judo Classe d'Amélie (2 séances)" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1" id="ter-qty-label">Heures / Km</label>
+                            <input type="number" step="0.25" id="ter-qty" value="2" oninput="calcTerMontantAuto()" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono-num font-bold">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Tarif unit. (€)</label>
+                            <input type="number" step="0.01" id="ter-rate" value="30.00" oninput="calcTerMontantAuto()" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono-num font-bold">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Total (€)</label>
+                            <input type="number" step="0.01" id="ter-total" value="60.00" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono-num font-bold text-[#C41E3A]">
+                        </div>
+                        <div class="md:col-span-2">
+                            <button onclick="addTerEntry()" class="w-full py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold transition shadow-sm">
+                                + Ajouter
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tableau des interventions TER & Frais Km -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left border-collapse">
+                            <thead class="bg-[#1A1A1A] text-white font-fredoka uppercase text-[11px]">
+                                <tr>
+                                    <th class="p-3">Date</th>
+                                    <th class="p-3">Dispositif / Catégorie</th>
+                                    <th class="p-3">Détail de l'intervention ou déplacement</th>
+                                    <th class="p-3 text-center">Quantité</th>
+                                    <th class="p-3 text-right">Tarif unitaire</th>
+                                    <th class="p-3 text-right">Montant Total</th>
+                                    <th class="p-3 text-center">Statut Facture</th>
+                                    <th class="p-3 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ter-tbody" class="divide-y divide-slate-200"></tbody>
+                            <tfoot>
+                                <tr class="bg-slate-50 font-bold text-sm border-t-2 border-slate-300">
+                                    <td colspan="5" class="p-3 font-fredoka uppercase text-slate-700">Total Hors Forfait (TER / Écoles / Frais Km)</td>
+                                    <td class="p-3 text-right font-mono-num text-[#C41E3A]" id="ter-grand-total">0,00 €</td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================================= -->
+            <!-- ONGLET 4 : RÉUNIONS (QUOTA 2/TRIMESTRE) & SUIVI DES MISSIONS DE ROMAIN    -->
+            <!-- ========================================================================= -->
+            <section id="view-reunions" class="tab-view hidden space-y-5">
+                
+                <!-- Suivi du Quota de 2 Réunions par Trimestre (Art. 2 de la Convention) -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                        <div>
+                            <h2 class="font-fredoka text-base font-bold text-[#1A1A1A] uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-users-rectangle text-[#C41E3A]"></i> 1. Compteur des Réunions par Trimestre (Article 2 de la Convention)
+                            </h2>
+                            <p class="text-xs text-slate-500">2 réunions par trimestre sont incluses dans le forfait de 1 500 €. Toute réunion supplémentaire demandée sur un même trimestre est facturable (max 2h à 30 €/h, soit 60 € max).</p>
+                        </div>
+                    </div>
+
+                    <!-- Cartes des 4 Trimestres -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="quarters-summary-grid"></div>
+
+                    <!-- Ajout d'une réunion -->
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <div class="md:col-span-2">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Date réunion</label>
+                            <input type="date" id="reu-date" value="2026-10-16" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Trimestre concerné</label>
+                            <select id="reu-quarter" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                                <option value="T1">T1 : Septembre – Novembre 2026</option>
+                                <option value="T2">T2 : Décembre 2026 – Février 2027</option>
+                                <option value="T3">T3 : Mars – Mai 2027</option>
+                                <option value="T4">T4 : Juin – Août 2027</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Durée (h)</label>
+                            <input type="number" step="0.5" id="reu-duration" value="2.0" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Ordre du jour / Objet</label>
+                            <input type="text" id="reu-title" placeholder="Ex: Point rentrée, planning stages & AG" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs">
+                        </div>
+                        <div class="md:col-span-2">
+                            <button onclick="addReunionEntry()" class="w-full py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold transition">
+                                + Enregistrer Réunion
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left border-collapse">
+                            <thead class="bg-[#1A1A1A] text-white font-fredoka uppercase text-[11px]">
+                                <tr>
+                                    <th class="p-2.5">Date</th>
+                                    <th class="p-2.5">Trimestre</th>
+                                    <th class="p-2.5">Objet de la réunion</th>
+                                    <th class="p-2.5 text-center">Durée</th>
+                                    <th class="p-2.5">Statut Forfait / Facturation</th>
+                                    <th class="p-2.5 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reunions-tbody" class="divide-y divide-slate-200"></tbody>
+                        </table>
                     </div>
                 </div>
 
+                <!-- 2. Checklist des Engagements & Livrables Pédagogiques de Romain -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                        <div>
+                            <h3 class="font-fredoka text-sm font-bold text-[#1A1A1A] uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-clipboard-check text-[#C41E3A]"></i> 2. Suivi des Engagements, Documents Légaux & Rappels Terrain de Romain
+                            </h3>
+                            <p class="text-xs text-slate-500">Pour éviter tout oubli : suivi des documents obligatoires (EAPS, assurance, agrément EN) et des livrables pédagogiques attendus par le Bureau.</p>
+                        </div>
+                    </div>
+
+                    <div id="romain-missions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+
+                    <div class="flex gap-2 pt-2">
+                        <input type="text" id="new-mission-input" placeholder="Ajouter un point de suivi pour Romain (ex: Envoyer dates stage Hiver avant le 15/01)..." class="flex-1 px-3 py-2 border border-slate-300 rounded-xl text-xs" onkeydown="if(event.key==='Enter') addRomainMission()">
+                        <button onclick="addRomainMission()" class="px-4 py-2 bg-[#1A1A1A] hover:bg-[#C41E3A] text-white rounded-xl text-xs font-bold transition">+ Ajouter</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================================= -->
+            <!-- ONGLET 5 : BILAN ANNUEL (JAUGE 500H) & SIMULATEUR SALARIAT CCNS           -->
+            <!-- ========================================================================= -->
+            <section id="view-bilan" class="tab-view hidden space-y-6">
+
+                <!-- 1. Jauge Annuelle des 500 Heures & Synthèse Financière Saison 2026-2027 -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                        <div>
+                            <h2 class="font-fredoka text-base font-bold text-[#1A1A1A] uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-chart-line text-[#C41E3A]"></i> 1. Tableau Récapitulatif Annuel 2026-2027 (Objectif Contractuel : 500 Heures / 18 000 €)
+                            </h2>
+                            <p class="text-xs text-slate-500">Suivi mois par mois du forfait de 1 500 €, des heures réellement pointées, des déductions d'absences et du coût global pour le Dojo Dornois.</p>
+                        </div>
+                        <button onclick="imprimerBilanAnnuelA4Paysage()" class="px-4 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-print"></i> 🖨️ Imprimer Bilan Annuel (A4 Paysage)
+                        </button>
+                    </div>
+
+                    <!-- Barre de progression des 500 heures annuelles -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                        <div class="flex items-center justify-between text-xs font-bold">
+                            <span class="font-fredoka uppercase text-slate-700">Progression sur l'engagement annuel de 500,00 heures :</span>
+                            <span id="annual-hours-progress-label" class="font-mono-num text-[#C41E3A]">0,00 h / 500,00 h (0%)</span>
+                        </div>
+                        <div class="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+                            <div id="annual-hours-progress-bar" class="h-full bg-[#C41E3A] transition-all" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left border-collapse">
+                            <thead class="bg-[#1A1A1A] text-white font-fredoka uppercase text-[11px]">
+                                <tr>
+                                    <th class="p-2.5">Mois</th>
+                                    <th class="p-2.5 text-center">Heures Planifiées</th>
+                                    <th class="p-2.5 text-center">Heures Réalisées</th>
+                                    <th class="p-2.5 text-center">Absences (h)</th>
+                                    <th class="p-2.5 text-right">Base Forfait</th>
+                                    <th class="p-2.5 text-right">Retenues Absences</th>
+                                    <th class="p-2.5 text-right">Suppléments CoDir</th>
+                                    <th class="p-2.5 text-right">Net Forfait Club</th>
+                                    <th class="p-2.5 text-right">TER / Écoles & Km</th>
+                                    <th class="p-2.5 text-right">Coût Total Mois</th>
+                                </tr>
+                            </thead>
+                            <tbody id="annual-bilan-tbody" class="divide-y divide-slate-200"></tbody>
+                            <tfoot id="annual-bilan-tfoot" class="bg-slate-100 font-bold border-t-2 border-slate-300"></tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 2. Simulateur Interactif : Prestation 1 500 € vs Passage en Salarié CDI (CCNS + ANS) -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-fredoka text-base font-bold text-[#1A1A1A] uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-calculator text-[#C41E3A]"></i> 2. Simulateur Stratégique : Prestation Auto-Entrepreneur (1 500 €) vs Salariat CDI (CCNS)
+                        </h3>
+                        <p class="text-xs text-slate-500">Outil d'aide à la décision pour le Bureau : comparez en direct ce que touche Romain en net et ce que paye réellement le Dojo (avec/sans aide ANS).</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                            <h4 class="font-fredoka font-bold text-xs uppercase text-slate-700">Paramètres de simulation CDI</h4>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Volume hebdomadaire CDI (heures/sem.)</label>
+                                <input type="number" step="0.5" id="sim-weekly-hours" value="17.5" oninput="runSalariatSimulation()" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                                <span class="text-[10px] text-slate-400">17,5h/sem = 75,83h/mois (seuil mini aide ANS)</span>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Taux horaire Brut (€/h — CCNS Gr. 3/4)</label>
+                                <input type="number" step="0.1" id="sim-hourly-brut" value="14.20" oninput="runSalariatSimulation()" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                                <div class="flex gap-1 mt-1">
+                                    <button onclick="document.getElementById('sim-hourly-brut').value='13.44';runSalariatSimulation();" class="px-2 py-0.5 bg-slate-200 rounded text-[10px] font-bold">Plancher Gr.3 (13,44€)</button>
+                                    <button onclick="document.getElementById('sim-hourly-brut').value='14.50';runSalariatSimulation();" class="px-2 py-0.5 bg-slate-200 rounded text-[10px] font-bold">Gr.4 (14,50€)</button>
+                                    <button onclick="document.getElementById('sim-hourly-brut').value='20.28';runSalariatSimulation();" class="px-2 py-0.5 bg-rose-100 text-[#C41E3A] rounded text-[10px] font-bold">Cible 1200€ Net</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Subvention ANS Emploi (€/mois)</label>
+                                <input type="number" step="50" id="sim-ans-aid" value="500" oninput="runSalariatSimulation()" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Part employeur Mutuelle + Prévoyance (€/mois)</label>
+                                <input type="number" step="5" id="sim-mutuelle" value="25" oninput="runSalariatSimulation()" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4" id="sim-results-cards"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================================= -->
+            <!-- ONGLET 6 : RÉFÉRENTIEL CONVENTION 2026-2027 (MÉMO CONTRACTUEL)            -->
+            <!-- ========================================================================= -->
+            <section id="view-convention" class="tab-view hidden space-y-5">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                        <div>
+                            <h2 class="font-fredoka text-lg font-bold text-[#C41E3A] uppercase">Mémo Officiel — Convention de Prestation de Services 2026-2027</h2>
+                            <p class="text-xs text-slate-500">Synthèse des règles contractuelles signées entre le Dojo Dornois et Romain Flammang (SIREN 932 343 395)</p>
+                        </div>
+                        <span class="px-3 py-1 bg-slate-900 text-white font-fredoka text-xs rounded-full font-bold">En vigueur : 01/09/2026 → 31/08/2027</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed">
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                            <h3 class="font-fredoka font-bold text-sm text-[#1A1A1A] flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-[#C41E3A] text-white flex items-center justify-center text-xs">1</span>
+                                Article 3 — Grille Horaire Réelle (13h15 à 14h30 / sem.) & 500h / an
+                            </h3>
+                            <ul class="list-disc pl-5 space-y-1 text-slate-700">
+                                <li><strong>Mardi :</strong> Taïso Adapté 15h-16h (1h), Pré-Poussins/Poussins/Benjamins 1 17h30-18h45 (1h15), Taïso 18h45-19h30 (0h45), Jujitsu Ne-Waza 19h30-21h00 (1h30).</li>
+                                <li><strong>Jeudi :</strong> Taïso Adapté 15h-16h (1h), Benjamins 2 & Cadets 17h30-18h45 (1h15), Taïso 18h45-19h30 (0h45), Jujitsu Contact 19h30-21h00 (1h30).</li>
+                                <li><strong>Samedi :</strong> Baby Motricité 08h30-09h15 (0h45), Éveil Judo 09h15-10h15 (1h), Pré-Poussins/Poussins 10h15-11h30 (1h15), Taïso 11h30-12h15 (0h45), Benjamins à Adultes 13h30-15h15 (1h45).</li>
+                                <li><strong>Volume global annuel :</strong> <strong>500 heures</strong> (soit <strong>41,67 h/mois lissées</strong> incluant cours, stages vacances, compétitions et réunions).</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                            <h3 class="font-fredoka font-bold text-sm text-[#1A1A1A] flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-[#C41E3A] text-white flex items-center justify-center text-xs">2</span>
+                                Article 5 — Étanchéité du Forfait de 1 500,00 € Net / Mois
+                            </h3>
+                            <ul class="list-disc pl-5 space-y-1 text-slate-700">
+                                <li>Rémunération forfaitaire globale et <strong>« tout compris » de 1 500,00 € / mois</strong> sur 12 mois (18 000 € / an).</li>
+                                <li><strong>Vacances scolaires déjà lissées :</strong> Aucun supplément ne peut être facturé pour les stages ou cours pendant les vacances scolaires.</li>
+                                <li><strong>Verrouillage CoDir :</strong> Aucun supplément ne peut être facturé sans <strong>accord préalable écrit du Comité Directeur</strong>.</li>
+                                <li><strong>Séparation stricte TER / Écoles :</strong> Les cycles scolaires et le TER font l'objet d'une facturation distincte de la facture mensuelle club.</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-rose-50/70 border border-rose-200 space-y-2">
+                            <h3 class="font-fredoka font-bold text-sm text-[#C41E3A] flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-[#C41E3A] text-white flex items-center justify-center text-xs">3</span>
+                                Article 6 — Absences & Déduction Systématique (-30,00 € / h)
+                            </h3>
+                            <p class="text-slate-700">
+                                Le contrat ne prévoit <strong>aucun mécanisme de rattrapage</strong> de cours : toute heure d'intervention non assurée par Romain donne lieu directement et systématiquement à une <strong>déduction sur la facture mensuelle</strong> au prorata du temps non exécuté, calculée au taux horaire contractuel de référence de <strong>30,00 € / heure</strong>.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                            <h3 class="font-fredoka font-bold text-sm text-[#1A1A1A] flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-[#1A1A1A] text-white flex items-center justify-center text-xs">4</span>
+                                Article 2 — Quota des Réunions Trimestrielles
+                            </h3>
+                            <p class="text-slate-700">
+                                Sont incluses dans le forfait de 1 500 € <strong>2 réunions par trimestre</strong> avec le Bureau / Comité Directeur. Toute réunion supplémentaire demandée par le club au-delà de ce quota sur un même trimestre est facturable dans la limite de <strong>2 heures maximum par réunion au tarif de 30,00 € / h</strong> (soit 60,00 € max).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- CONTENEUR D'IMPRESSION A4 DÉDIÉ -->
+    <div id="dedicated-print-root"></div>
+
+    <!-- MODALE 1 : AJOUTER UNE SÉANCE PONCTUELLE / STAGE -->
+    <div class="modal-overlay no-print" id="modalAjoutSeance">
+        <div class="modal-box">
+            <div class="bg-[#1A1A1A] text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 class="font-fredoka text-sm font-bold uppercase">➕ Ajouter une séance ponctuelle / Stage / Coaching</h3>
+                <button onclick="fermerModalAjoutSeance()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-5 space-y-3 text-xs">
                 <div>
-                    <h3 class="no-print">📄 Aperçu du Relevé Officiel</h3>
-                    <div id="preview-zone">
-                        <div id="render-target"></div>
+                    <label class="block font-bold text-slate-600 mb-1">Date exacte :</label>
+                    <input type="date" id="m-add-date" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Intitulé du cours, stage ou compétition :</label>
+                    <input type="text" id="m-add-name" placeholder="Ex: Stage Toussaint Multi-Activités" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Horaires :</label>
+                        <input type="text" id="m-add-time" placeholder="Ex: 10h00-16h00" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Durée (heures) :</label>
+                        <input type="number" step="0.25" id="m-add-duration" value="2.0" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold">
                     </div>
                 </div>
-
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button onclick="fermerModalAjoutSeance()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-xl font-bold">Annuler</button>
+                    <button onclick="validerAjoutSeance()" class="px-4 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl font-bold">Enregistrer</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- MODALE 2 : MODIFIER UNE SÉANCE EXISTANTE -->
+    <div class="modal-overlay no-print" id="modalEditSeance">
+        <div class="modal-box">
+            <div class="bg-[#1A1A1A] text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 class="font-fredoka text-sm font-bold uppercase">✏️ Modifier la séance</h3>
+                <button onclick="fermerModalEditSeance()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-5 space-y-3 text-xs">
+                <input type="hidden" id="m-edit-key">
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Intitulé :</label>
+                    <input type="text" id="m-edit-name" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Horaires :</label>
+                        <input type="text" id="m-edit-time" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Durée (heures) :</label>
+                        <input type="number" step="0.25" id="m-edit-duration" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold">
+                    </div>
+                </div>
+                <div class="flex justify-between items-center pt-3 border-t border-slate-100">
+                    <button onclick="supprimerSeanceActive()" class="px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-trash"></i> Retirer de ce jour
+                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="fermerModalEditSeance()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 rounded-xl font-bold">Annuler</button>
+                        <button onclick="validerEditSeance()" class="px-4 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl font-bold">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR UNIFIÉE DU DOJO DORNOIS -->
+    <script src="../js/sidebar.js"></script>
     <script>
+        /* ========================================================================= */
+        /* CONFIGURATION SUPABASE & COMPATIBILITÉ TOTALE AVEC LES 2 TABLES EXISTANTES */
+        /* ========================================================================= */
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
         const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
         const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
-        const SUPABASE_TABLE = 'suivi_romain';
+        const TABLE_HEURES = 'heures_romain';
+        const TABLE_SUIVI  = 'suivi_romain';
+        const LOGO_URL = 'https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png';
 
+        const MONTHS_CONFIG = [
+            { key: "2026-09", label: "Septembre 2026", short: "SEP", lastDay: "30/09/2026", q: "T1" },
+            { key: "2026-10", label: "Octobre 2026",   short: "OCT", lastDay: "31/10/2026", q: "T1" },
+            { key: "2026-11", label: "Novembre 2026",  short: "NOV", lastDay: "30/11/2026", q: "T1" },
+            { key: "2026-12", label: "Décembre 2026",  short: "DEC", lastDay: "31/12/2026", q: "T2" },
+            { key: "2027-01", label: "Janvier 2027",   short: "JAN", lastDay: "31/01/2027", q: "T2" },
+            { key: "2027-02", label: "Février 2027",   short: "FEV", lastDay: "28/02/2027", q: "T2" },
+            { key: "2027-03", label: "Mars 2027",      short: "MAR", lastDay: "31/03/2027", q: "T3" },
+            { key: "2027-04", label: "Avril 2027",     short: "AVR", lastDay: "30/04/2027", q: "T3" },
+            { key: "2027-05", label: "Mai 2027",       short: "MAI", lastDay: "31/05/2027", q: "T3" },
+            { key: "2027-06", label: "Juin 2027",      short: "JUN", lastDay: "30/06/2027", q: "T4" },
+            { key: "2027-07", label: "Juillet 2027",   short: "JUL", lastDay: "31/07/2027", q: "T4" },
+            { key: "2027-08", label: "Août 2027",      short: "AOU", lastDay: "31/08/2027", q: "T4" }
+        ];
+
+        // PLANNING HEBDOMADAIRE OFFICIEL TYPE
+        const defaultScheduleWeekly = [
+            // MARDI (4.5h)
+            { id: "mar_taiso_seniors", day: 2, name: "Taïso Adapté (Seniors/PSH)", category: "Taïso", duration: 1.0, time: "15h00-16h00" },
+            { id: "mar_enfants", day: 2, name: "Pré-Poussins, Poussins & Benjamins 1", category: "Judo Enfants", duration: 1.25, time: "17h30-18h45" },
+            { id: "mar_taiso_1", day: 2, name: "Taïso Soir", category: "Taïso", duration: 0.75, time: "18h45-19h30" },
+            { id: "mar_jujitsu", day: 2, name: "Jujitsu Ne-Waza", category: "Jujitsu", duration: 1.5, time: "19h30-21h00" },
+            // JEUDI (4.5h)
+            { id: "jeu_taiso_seniors", day: 4, name: "Taïso Adapté (Seniors/PSH)", category: "Taïso", duration: 1.0, time: "15h00-16h00" },
+            { id: "jeu_jeunes", day: 4, name: "Benjamins 2 & Cadets", category: "Judo Jeunes", duration: 1.25, time: "17h30-18h45" },
+            { id: "jeu_taiso_2", day: 4, name: "Taïso Soir", category: "Taïso", duration: 0.75, time: "18h45-19h30" },
+            { id: "jeu_jujitsu_contact", day: 4, name: "Jujitsu Contact", category: "Jujitsu", duration: 1.5, time: "19h30-21h00" },
+            // SAMEDI (5.5h)
+            { id: "sam_baby", day: 6, name: "Baby Motricité", category: "Baby", duration: 0.75, time: "08h30-09h15" },
+            { id: "sam_eveil", day: 6, name: "Éveil Judo", category: "Éveil", duration: 1.0, time: "09h15-10h15" },
+            { id: "sam_enfants", day: 6, name: "Pré-Poussins & Poussins", category: "Judo Enfants", duration: 1.25, time: "10h15-11h30" },
+            { id: "sam_taiso", day: 6, name: "Taïso Matin", category: "Taïso", duration: 0.75, time: "11h30-12h15" },
+            { id: "sam_adultes", day: 6, name: "Benjamins à Adultes", category: "Judo Adultes", duration: 1.75, time: "13h30-15h15" }
+        ];
+
+        // VACANCES ZONE A (2026 - 2027)
+        const vacationRanges = [
+            { start: "2026-10-17", end: "2026-11-02", name: "Vacances de la Toussaint" }, 
+            { start: "2026-12-19", end: "2027-01-04", name: "Vacances de Noël" }, 
+            { start: "2027-02-06", end: "2027-02-22", name: "Vacances d'Hiver" }, 
+            { start: "2027-04-10", end: "2027-04-26", name: "Vacances de Printemps" }, 
+            { start: "2027-07-03", end: "2027-09-01", name: "Vacances d'Été" }  
+        ];
+
+        let activeTab = 'pointage';
+        let currentMonthKey = '2026-10';
+
+        // État global unifié
+        let romainData = {
+            checkState: {},         // { [date_courseId]: 'done' | 'cancelled' | 'vacation' | 'pending' }
+            adjustments: [],        // [{ id, month, type: 'minus'|'plus_billable'|'plus_forfait', hours, reason }]
+            customSessions: [],     // [{ id, date, name, time, duration }]
+            sessionOverrides: {},   // { [date_courseId]: { name, time, duration, deleted } }
+            monthlyStatements: {},  // { [monthKey]: { ref, periode, dateEdition, modeRemun, tauxRef, observations, reglement, statut, lignes: [] } }
+            terEntries: [
+                { id: 101, date: "2026-09-30", cat: "TER_DORNES", desc: "Interventions TER / Écoles — Septembre 2026 (Facture séparée)", qty: 1, rate: 322.25, total: 322.25, paid: true }
+            ],
+            reunions: [
+                { id: 201, date: "2026-09-12", quarter: "T1", duration: 2.0, title: "Réunion de rentrée Bureau / Romain (Lancement saison)" },
+                { id: 202, date: "2026-10-23", quarter: "T1", duration: 2.0, title: "Point CoDir : Stages, Convention & Calendrier" }
+            ],
+            missions: [
+                { id: 301, text: "Carte Professionnelle EAPS à jour (Affichage obligatoire au dojo - Art. L.212-11)", done: true, cat: "Légal" },
+                { id: 302, text: "Attestation d'Assurance RC Professionnelle 2026-2027 remise au Bureau", done: true, cat: "Légal" },
+                { id: 303, text: "Signature de la nouvelle Convention de Prestation 2026-2027 (Forfait 1 500 € / 500h)", done: false, cat: "Contrat" },
+                { id: 304, text: "Agrément Éducation Nationale (CPC EPS) validé pour le cycle TER École de Dornes", done: true, cat: "TER & Écoles" },
+                { id: 305, text: "Transmettre les dates et programmes des stages de vacances au moins 3 semaines avant", done: false, cat: "Pédagogie" },
+                { id: 306, text: "Vérifier l'état du stock des judogis écoles (lavage mercredi) avant chaque jeudi", done: false, cat: "Logistique" }
+            ]
+        };
+
+        // État courant de l'éditeur de relevé (Onglet 2)
         let imgTampon = '';
         let imgTamponPaye = '';
         let imgTamponSignature = '';
-
-        // Lignes par défaut (Saison Actuelle)
         let lignesPrestations = [
-            { type: 'ajout', desc: 'Séance Juin judo', montant: 1100.00 },
-            { type: 'ajout', desc: 'Challenge Taiso', montant: 25.00 },
-            { type: 'ajout', desc: 'Self Defense', montant: 25.00 },
-            { type: 'ajout', desc: 'Jujitsu (2 interventions)', montant: 50.00 }
+            { type: 'ajout', desc: 'Forfait Mensuel Fixe Tout Inclus (Cours réguliers, stages vacances, compétitions & 2 réunions/trimestre)', montant: 1500.00 }
         ];
 
-        async function syncToSupabase(silent = false) {
-            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
-            try {
-                const payload = {
-                    imgTampon,
-                    imgTamponPaye,
-                    imgTamponSignature,
-                    lignesPrestations,
-                    saison: document.getElementById('saison').value,
-                    ref_document: document.getElementById('ref_document').value,
-                    mode_remun: document.getElementById('mode_remun').value,
-                    periode: document.getElementById('periode').value,
-                    date_edition: document.getElementById('date_edition').value,
-                    observations: document.getElementById('observations').value,
-                    reglement: document.getElementById('reglement').value
-                };
+        function isVacationDate(dateStr) {
+            return vacationRanges.some(r => dateStr >= r.start && dateStr <= r.end);
+        }
 
-                localStorage.setItem('suivi_romain_data', JSON.stringify(payload)); 
+        function getLocalDateStr(y, m, d) {
+            return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        }
 
-                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
-                if (error) throw error;
-                
-                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
-                else if (!silent) alert("✓ Enregistrement synchronisé sur Supabase !");
-            } catch (err) {
-                console.error("Erreur Supabase:", err);
-                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
-                else if (!silent) alert("⚠️ Données sauvegardées en local (erreur Supabase)");
+        function formatDuree(h) {
+            return Number(h || 0).toFixed(2).replace('.', ',') + " h";
+        }
+
+        function formatEuro(val) {
+            return Number(val || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+        }
+
+        function getMonthMeta(mKey) {
+            return MONTHS_CONFIG.find(m => m.key === mKey) || MONTHS_CONFIG[1];
+        }
+
+        /* ========================================================================= */
+        /* NAVIGATION ENTRE LES ONGLETS & CHANGEMENT DE MOIS GLOBAL                  */
+        /* ========================================================================= */
+        function switchMainTab(tabKey) {
+            activeTab = tabKey;
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('view-' + tabKey).classList.remove('hidden');
+            document.getElementById('tab-btn-' + tabKey).classList.add('active');
+
+            if (tabKey === 'pointage') renderPointage();
+            if (tabKey === 'releve') {
+                updateReleveBridgeBanner();
+                genererApercu();
+            }
+            if (tabKey === 'ter') renderTerTable();
+            if (tabKey === 'reunions') {
+                renderReunionsTab();
+                renderMissionsList();
+            }
+            if (tabKey === 'bilan') {
+                renderAnnualBilanTable();
+                runSalariatSimulation();
             }
         }
 
-        async function loadData() {
-            const saved = localStorage.getItem('suivi_romain_data');
-            if (saved) {
-                try {
-                    applyData(JSON.parse(saved));
-                } catch(e) {}
+        function onGlobalMonthChange(newMonthKey) {
+            // Sauvegarder d'abord l'état courant du relevé du mois précédent
+            saveCurrentStatementToMonthMemory(currentMonthKey);
+            currentMonthKey = newMonthKey;
+            document.getElementById('adj-month').value = newMonthKey;
+
+            // Charger ou initialiser le relevé pour le nouveau mois sélectionné
+            loadStatementFromMonthMemory(newMonthKey);
+            renderPointage();
+            updateReleveBridgeBanner();
+            if (activeTab === 'bilan') renderAnnualBilanTable();
+        }
+
+        /* ========================================================================= */
+        /* ONGLET 1 : LOGIQUE DU POINTAGE HEBDOMADAIRE DES HEURES                    */
+        /* ========================================================================= */
+        function getCoursesForDay(dateStr) {
+            const dateObj = new Date(dateStr + "T00:00:00");
+            const dayOfWeek = dateObj.getDay();
+            let courses = [];
+
+            const defaultCourses = defaultScheduleWeekly.filter(c => c.day === dayOfWeek);
+            defaultCourses.forEach(c => {
+                const key = `${dateStr}_${c.id}`;
+                const override = romainData.sessionOverrides[key];
+                if (override && override.deleted) return;
+
+                courses.push({
+                    id: c.id,
+                    isCustom: false,
+                    key: key,
+                    dateStr: dateStr,
+                    name: override ? override.name : c.name,
+                    time: override ? override.time : c.time,
+                    duration: override ? parseFloat(override.duration) : c.duration
+                });
+            });
+
+            (romainData.customSessions || []).filter(cs => cs.date === dateStr).forEach(cs => {
+                courses.push({
+                    id: cs.id,
+                    isCustom: true,
+                    key: `custom_${cs.id}`,
+                    dateStr: dateStr,
+                    name: cs.name,
+                    time: cs.time,
+                    duration: parseFloat(cs.duration)
+                });
+            });
+
+            return courses;
+        }
+
+        // Calcule toutes les statistiques horaires et financières d'un mois donné
+        function computeMonthStats(monthKey) {
+            const [year, month] = monthKey.split('-').map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const tauxRef = parseFloat(document.getElementById('taux_horaire_ref')?.value) || 30.0;
+
+            let plannedHours = 0;
+            let doneHours = 0;
+            let absentHours = 0;
+            let vacationHours = 0;
+            let totalSessionsCount = 0;
+            let absentSessionsList = [];
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = getLocalDateStr(year, month, d);
+                const dateObj = new Date(year, month - 1, d);
+                const courses = getCoursesForDay(dateStr);
+
+                courses.forEach(c => {
+                    totalSessionsCount++;
+                    plannedHours += c.duration;
+                    const status = romainData.checkState[c.key] || 'pending';
+
+                    if (status === 'done' || status === true) {
+                        doneHours += c.duration;
+                    } else if (status === 'cancelled') {
+                        absentHours += c.duration;
+                        const dayFormatted = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+                        absentSessionsList.push({
+                            dateStr,
+                            dayFormatted,
+                            name: c.name,
+                            duration: c.duration,
+                            montant: c.duration * tauxRef
+                        });
+                    } else if (status === 'vacation') {
+                        vacationHours += c.duration;
+                    }
+                });
             }
-            
-            try {
-                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
-                if (error) throw error;
-                if (result && result.data) {
-                    applyData(result.data);
-                    localStorage.setItem('suivi_romain_data', JSON.stringify(result.data));
+
+            // Ajustements du mois
+            const monthAdjs = (romainData.adjustments || []).filter(a => a.month === monthKey);
+            let adjDoneHours = 0;
+            let adjAbsentHours = 0;
+            let adjBillableExtraEuro = 0;
+            let adjBillableHours = 0;
+
+            monthAdjs.forEach(a => {
+                const h = parseFloat(a.hours) || 0;
+                if (a.type === 'minus') {
+                    adjAbsentHours += h;
+                } else if (a.type === 'plus_billable') {
+                    adjDoneHours += h;
+                    adjBillableHours += h;
+                    adjBillableExtraEuro += h * tauxRef;
+                } else {
+                    // plus_forfait ou ancien 'plus'
+                    adjDoneHours += h;
                 }
-            } catch(e) {
-                console.error("Erreur chargement Supabase:", e);
+            });
+
+            const totalEffectiveDoneHours = doneHours + adjDoneHours;
+            const totalAbsentHours = absentHours + adjAbsentHours;
+            const totalDeductionEuro = totalAbsentHours * tauxRef;
+            const estimatedNetEuro = 1500.00 - totalDeductionEuro + adjBillableExtraEuro;
+
+            return {
+                plannedHours,
+                doneHours,
+                adjDoneHours,
+                totalEffectiveDoneHours,
+                absentHours,
+                adjAbsentHours,
+                totalAbsentHours,
+                vacationHours,
+                totalSessionsCount,
+                absentSessionsList,
+                monthAdjs,
+                totalDeductionEuro,
+                adjBillableExtraEuro,
+                adjBillableHours,
+                estimatedNetEuro
+            };
+        }
+
+        function renderPointage() {
+            const selectedMonth = currentMonthKey;
+            const [year, month] = selectedMonth.split('-').map(Number);
+            const container = document.getElementById('weeks-container');
+            container.innerHTML = '';
+
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const weeksMap = {};
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateObj = new Date(year, month - 1, d);
+                const dateStr = getLocalDateStr(year, month, d);
+                const courses = getCoursesForDay(dateStr);
+
+                if (courses.length > 0) {
+                    const weekNum = getWeekNumber(dateObj);
+                    if (!weeksMap[weekNum]) weeksMap[weekNum] = {};
+                    weeksMap[weekNum][dateStr] = { dateObj, courses };
+                }
+            }
+
+            if (Object.keys(weeksMap).length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center p-8 bg-white rounded-2xl border border-slate-200 text-slate-400">Aucune séance planifiée pour ce mois. Cliquez sur « + Séance / Stage » en haut à droite.</div>`;
+                updatePointageKPIs();
+                return;
+            }
+
+            Object.keys(weeksMap).forEach((weekNum) => {
+                const datesInWeek = weeksMap[weekNum];
+                const weekBlock = document.createElement('div');
+                weekBlock.className = "bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4";
+
+                let weekDoneHours = 0;
+                let weekAbsentHours = 0;
+                let daysBadgesHtml = '';
+
+                Object.keys(datesInWeek).forEach(dateStr => {
+                    const { dateObj, courses } = datesInWeek[dateStr];
+                    const isVac = isVacationDate(dateStr);
+                    const formattedDay = dateObj.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+
+                    let courseBadges = '';
+
+                    courses.forEach(course => {
+                        const checkKey = course.key;
+                        if (romainData.checkState[checkKey] === undefined) {
+                            romainData.checkState[checkKey] = 'pending';
+                        }
+
+                        let status = romainData.checkState[checkKey];
+                        if (status === true) status = 'done';
+
+                        const isDone = (status === 'done');
+                        const isCancelled = (status === 'cancelled');
+                        const isVacation = (status === 'vacation');
+
+                        if (isDone) weekDoneHours += course.duration;
+                        if (isCancelled) weekAbsentHours += course.duration;
+
+                        let statusClass = '';
+                        let statusIcon = '<i class="fa-regular fa-circle text-slate-300 text-sm" title="En attente de pointage"></i>';
+                        if (isDone) {
+                            statusClass = 'status-done';
+                            statusIcon = '<i class="fa-solid fa-circle-check text-emerald-500 text-sm" title="Réalisé"></i>';
+                        } else if (isCancelled) {
+                            statusClass = 'status-cancelled';
+                            statusIcon = '<i class="fa-solid fa-circle-xmark text-[#C41E3A] text-sm" title="Absence Romain (-30€/h)"></i>';
+                        } else if (isVacation) {
+                            statusClass = 'status-vacation';
+                            statusIcon = '<i class="fa-solid fa-umbrella-beach text-amber-500 text-sm" title="Vacances / Trêve lissée (0€ déduit)"></i>';
+                        }
+
+                        courseBadges += `
+                            <div class="course-card-item p-2.5 rounded-xl font-medium text-xs flex items-center justify-between gap-2 ${statusClass}">
+                                <div onclick="toggleCheckCycle('${checkKey}')" class="truncate flex-1 cursor-pointer">
+                                    <strong class="font-fredoka block text-[11px] leading-tight flex items-center gap-1.5">
+                                        ${course.name}
+                                        ${course.isCustom ? '<span class="px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded text-[9px]">Stage/Extra</span>' : ''}
+                                    </strong>
+                                    <span class="text-[10px] opacity-75 block">${course.time} ${isCancelled ? '• <b class="text-[#C41E3A]">Absent (-'+(course.duration*30)+'€)</b>' : (isVacation ? '• <b>Vacances lissées</b>' : '')}</span>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <span class="font-fredoka font-bold text-[11px]">${course.duration}h</span>
+                                    <div onclick="toggleCheckCycle('${checkKey}')" class="cursor-pointer">
+                                        ${statusIcon}
+                                    </div>
+                                    <button onclick="ouvrirModalEditSeance('${checkKey}', '${course.name.replace(/'/g, "\\'")}', '${course.time}', ${course.duration}, ${course.isCustom})" title="Modifier cette séance" class="text-slate-400 hover:text-slate-700 px-1">
+                                        <i class="fa-solid fa-pen text-[10px]"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    daysBadgesHtml += `
+                        <div class="space-y-1.5 bg-slate-50/80 p-3 rounded-xl border border-slate-200/70">
+                            <div class="text-[11px] font-bold font-fredoka text-slate-600 uppercase border-b border-slate-200 pb-1 mb-2 flex justify-between items-center">
+                                <span>${formattedDay}</span>
+                                <div class="flex items-center gap-1.5">
+                                    ${isVac ? '<span class="text-amber-700 font-bold bg-amber-100 px-1.5 py-0.5 rounded text-[9.5px]">Vacances Zone A</span>' : ''}
+                                    <button onclick="ouvrirModalAjoutSeance('${dateStr}')" title="Ajouter une séance ou stage ce jour" class="text-slate-400 hover:text-[#C41E3A]">
+                                        <i class="fa-solid fa-plus-circle text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                ${courseBadges}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                weekBlock.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-2 flex-wrap gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-[#C41E3A] inline-block"></span>
+                            <h3 class="font-fredoka text-sm font-bold text-slate-800">Semaine N° ${weekNum}</h3>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            ${weekAbsentHours > 0 ? `<span class="text-[11px] font-bold font-fredoka text-[#C41E3A] bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200">Abs: -${formatDuree(weekAbsentHours)}</span>` : ''}
+                            <span class="text-xs font-bold font-fredoka text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                                Réalisé : ${formatDuree(weekDoneHours)}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        ${daysBadgesHtml}
+                    </div>
+                `;
+
+                container.appendChild(weekBlock);
+            });
+
+            updatePointageKPIs();
+            renderAdjustmentsTable();
+        }
+
+        function toggleCheckCycle(key) {
+            let current = romainData.checkState[key] || 'pending';
+            if (current === true) current = 'done';
+
+            if (current === 'pending') {
+                romainData.checkState[key] = 'done';
+            } else if (current === 'done') {
+                romainData.checkState[key] = 'cancelled';
+            } else if (current === 'cancelled') {
+                romainData.checkState[key] = 'vacation';
+            } else {
+                romainData.checkState[key] = 'pending';
+            }
+            autoSaveAllLocal();
+            renderPointage();
+        }
+
+        function validateAllMonth(targetStatus) {
+            const [year, month] = currentMonthKey.split('-').map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = getLocalDateStr(year, month, d);
+                const courses = getCoursesForDay(dateStr);
+                courses.forEach(c => {
+                    if (targetStatus === 'done' && isVacationDate(dateStr) && !c.isCustom) {
+                        romainData.checkState[c.key] = 'vacation';
+                    } else {
+                        romainData.checkState[c.key] = targetStatus;
+                    }
+                });
+            }
+            autoSaveAllLocal();
+            renderPointage();
+            showToast(targetStatus === 'done' ? "✅ Mois pointé (cours réalisés + vacances lissées) !" : "🔄 Mois réinitialisé");
+        }
+
+        function markVacationsAutoMonth() {
+            const [year, month] = currentMonthKey.split('-').map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            let count = 0;
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = getLocalDateStr(year, month, d);
+                if (isVacationDate(dateStr)) {
+                    const courses = getCoursesForDay(dateStr);
+                    courses.forEach(c => {
+                        if (!c.isCustom) {
+                            romainData.checkState[c.key] = 'vacation';
+                            count++;
+                        }
+                    });
+                }
+            }
+            autoSaveAllLocal();
+            renderPointage();
+            showToast(`🏖️ ${count} créneau(x) de vacances marqué(s) en Trêve lissée (0 € déduit) !`);
+        }
+
+        function updatePointageKPIs() {
+            const st = computeMonthStats(currentMonthKey);
+
+            document.getElementById('kpi-pt-planned').textContent = formatDuree(st.plannedHours);
+            document.getElementById('kpi-pt-sessions-count').textContent = `${st.totalSessionsCount} créneaux sur le mois`;
+            document.getElementById('kpi-pt-done').textContent = formatDuree(st.totalEffectiveDoneHours);
+            document.getElementById('kpi-pt-adj').textContent = st.adjDoneHours > 0 ? `(+${formatDuree(st.adjDoneHours)} aj.)` : '';
+            document.getElementById('kpi-pt-vacation').textContent = formatDuree(st.vacationHours);
+            document.getElementById('kpi-pt-cancelled').textContent = formatDuree(st.totalAbsentHours);
+            document.getElementById('kpi-pt-deduction-euro').textContent = `-${formatEuro(st.totalDeductionEuro)}`;
+            document.getElementById('kpi-pt-net-euro').textContent = formatEuro(st.estimatedNetEuro);
+
+            const badgeAbs = document.getElementById('badge-absences-releve');
+            if (st.totalAbsentHours > 0) {
+                badgeAbs.textContent = `-${formatDuree(st.totalAbsentHours)}`;
+                badgeAbs.classList.remove('hidden');
+            } else {
+                badgeAbs.classList.add('hidden');
             }
         }
 
-        function applyData(data) {
-            if (!data) return;
-            if (data.imgTampon !== undefined) imgTampon = data.imgTampon;
-            if (data.imgTamponPaye !== undefined) imgTamponPaye = data.imgTamponPaye;
-            if (data.imgTamponSignature !== undefined) imgTamponSignature = data.imgTamponSignature;
-            if (data.lignesPrestations !== undefined) lignesPrestations = data.lignesPrestations;
-            
-            if (data.saison) document.getElementById('saison').value = data.saison;
-            if (data.ref_document) document.getElementById('ref_document').value = data.ref_document;
-            if (data.mode_remun) document.getElementById('mode_remun').value = data.mode_remun;
-            if (data.periode) document.getElementById('periode').value = data.periode;
-            if (data.date_edition) document.getElementById('date_edition').value = data.date_edition;
-            if (data.observations !== undefined) document.getElementById('observations').value = data.observations;
-            if (data.reglement) document.getElementById('reglement').value = data.reglement;
-            
-            majMinis();
-            afficherLignesBuilder(); 
+        // --- MODALES SÉANCES PONCTUELLES / ÉDITION ---
+        function ouvrirModalAjoutSeance(datePreselect = null) {
+            document.getElementById('m-add-date').value = datePreselect || (currentMonthKey + "-20");
+            document.getElementById('m-add-name').value = "Stage Vacances / Coaching Compétition";
+            document.getElementById('m-add-time').value = "10h00-12h00";
+            document.getElementById('m-add-duration').value = "2.0";
+            document.getElementById('modalAjoutSeance').classList.add('open');
+        }
+
+        function fermerModalAjoutSeance() {
+            document.getElementById('modalAjoutSeance').classList.remove('open');
+        }
+
+        function validerAjoutSeance() {
+            const date = document.getElementById('m-add-date').value;
+            const name = document.getElementById('m-add-name').value.trim();
+            const time = document.getElementById('m-add-time').value.trim();
+            const duration = parseFloat(document.getElementById('m-add-duration').value);
+
+            if (!date || !name || isNaN(duration) || duration <= 0) {
+                alert("Veuillez renseigner correctement la date, l'intitulé et la durée.");
+                return;
+            }
+
+            if (!romainData.customSessions) romainData.customSessions = [];
+            const newId = Date.now();
+            romainData.customSessions.push({ id: newId, date, name, time: time || "Horaire convenu", duration });
+            romainData.checkState[`custom_${newId}`] = 'done';
+
+            autoSaveAllLocal();
+            fermerModalAjoutSeance();
+            renderPointage();
+            showToast("✅ Séance / stage ajouté avec succès !");
+        }
+
+        function ouvrirModalEditSeance(key, name, time, duration, isCustom) {
+            document.getElementById('m-edit-key').value = key;
+            document.getElementById('m-edit-key').setAttribute('data-iscustom', isCustom ? 'true' : 'false');
+            document.getElementById('m-edit-name').value = name;
+            document.getElementById('m-edit-time').value = time;
+            document.getElementById('m-edit-duration').value = duration;
+            document.getElementById('modalEditSeance').classList.add('open');
+        }
+
+        function fermerModalEditSeance() {
+            document.getElementById('modalEditSeance').classList.remove('open');
+        }
+
+        function validerEditSeance() {
+            const key = document.getElementById('m-edit-key').value;
+            const isCustom = document.getElementById('m-edit-key').getAttribute('data-iscustom') === 'true';
+            const name = document.getElementById('m-edit-name').value.trim();
+            const time = document.getElementById('m-edit-time').value.trim();
+            const duration = parseFloat(document.getElementById('m-edit-duration').value);
+
+            if (!name || isNaN(duration) || duration <= 0) return;
+
+            if (isCustom) {
+                const customId = parseInt(key.replace('custom_', ''), 10);
+                const cs = (romainData.customSessions || []).find(x => x.id === customId);
+                if (cs) { cs.name = name; cs.time = time; cs.duration = duration; }
+            } else {
+                if (!romainData.sessionOverrides) romainData.sessionOverrides = {};
+                romainData.sessionOverrides[key] = { name, time, duration, deleted: false };
+            }
+
+            autoSaveAllLocal();
+            fermerModalEditSeance();
+            renderPointage();
+            showToast("✏️ Séance mise à jour !");
+        }
+
+        function supprimerSeanceActive() {
+            const key = document.getElementById('m-edit-key').value;
+            const isCustom = document.getElementById('m-edit-key').getAttribute('data-iscustom') === 'true';
+            if (!confirm("Voulez-vous retirer cette séance pour ce jour ?")) return;
+
+            if (isCustom) {
+                const customId = parseInt(key.replace('custom_', ''), 10);
+                romainData.customSessions = (romainData.customSessions || []).filter(x => x.id !== customId);
+            } else {
+                if (!romainData.sessionOverrides) romainData.sessionOverrides = {};
+                romainData.sessionOverrides[key] = { deleted: true };
+            }
+
+            delete romainData.checkState[key];
+            autoSaveAllLocal();
+            fermerModalEditSeance();
+            renderPointage();
+            showToast("🗑️ Séance retirée de ce jour");
+        }
+
+        // --- AJUSTEMENTS HORAIRES PONCTUELS ---
+        function addAdjustment() {
+            const month = document.getElementById('adj-month').value;
+            const type = document.getElementById('adj-type').value;
+            const hours = parseFloat(document.getElementById('adj-hours').value);
+            const reason = document.getElementById('adj-reason').value.trim();
+
+            if (isNaN(hours) || hours <= 0 || !reason) {
+                alert("Veuillez renseigner la durée et le motif précis.");
+                return;
+            }
+
+            if (!romainData.adjustments) romainData.adjustments = [];
+            romainData.adjustments.push({ id: Date.now(), month, type, hours, reason });
+            document.getElementById('adj-hours').value = '';
+            document.getElementById('adj-reason').value = '';
+
+            autoSaveAllLocal();
+            renderAdjustmentsTable();
+            updatePointageKPIs();
+            showToast("✅ Ajustement enregistré !");
+        }
+
+        function renderAdjustmentsTable() {
+            const tbody = document.getElementById('adjustments-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const list = romainData.adjustments || [];
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Aucun ajustement horaire enregistré.</td></tr>`;
+                return;
+            }
+
+            const tauxRef = parseFloat(document.getElementById('taux_horaire_ref')?.value) || 30.0;
+
+            list.forEach(adj => {
+                let badge = `<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-emerald-100 text-emerald-800">⏱️ Inclus Forfait</span>`;
+                let impactEuro = `0,00 € (Forfait)`;
+                let sign = '+';
+
+                if (adj.type === 'minus') {
+                    badge = `<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-rose-100 text-[#C41E3A]">➖ Déduction Absence</span>`;
+                    impactEuro = `<strong class="text-[#C41E3A]">-${formatEuro(adj.hours * tauxRef)}</strong>`;
+                    sign = '-';
+                } else if (adj.type === 'plus_billable') {
+                    badge = `<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-blue-100 text-blue-800">➕ Extra Facturable CoDir</span>`;
+                    impactEuro = `<strong class="text-emerald-700">+${formatEuro(adj.hours * tauxRef)}</strong>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-2.5 font-bold font-fredoka">${adj.month}</td>
+                        <td class="p-2.5">${badge}</td>
+                        <td class="p-2.5 font-mono-num font-bold ${adj.type === 'minus' ? 'text-[#C41E3A]' : 'text-emerald-700'}">${sign}${formatDuree(adj.hours)}</td>
+                        <td class="p-2.5 font-mono-num">${impactEuro}</td>
+                        <td class="p-2.5 text-slate-700">${adj.reason}</td>
+                        <td class="p-2.5 text-center">
+                            <button onclick="deleteAdjustment(${adj.id})" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteAdjustment(id) {
+            romainData.adjustments = (romainData.adjustments || []).filter(a => a.id !== id);
+            autoSaveAllLocal();
+            renderAdjustmentsTable();
+            updatePointageKPIs();
+        }
+
+        /* ========================================================================= */
+        /* ONGLET 2 : ÉDITEUR DU RELEVÉ DE PRESTATION (FORFAIT 1 500 € & ABSENCES)   */
+        /* ========================================================================= */
+        function updateReleveBridgeBanner() {
+            const st = computeMonthStats(currentMonthKey);
+            const meta = getMonthMeta(currentMonthKey);
+            const el = document.getElementById('releve-bridge-summary');
+            if (!el) return;
+            el.innerHTML = `Mois de <strong>${meta.label}</strong> : <strong>${formatDuree(st.totalEffectiveDoneHours)}</strong> réalisées • <strong class="text-rose-400">${formatDuree(st.totalAbsentHours)} d'absence(s) (-${formatEuro(st.totalDeductionEuro)})</strong> • Net calculé : <strong class="text-emerald-400">${formatEuro(st.estimatedNetEuro)}</strong>`;
+        }
+
+        function transfererPointageVersReleve() {
+            synchroniserReleveDepuisPointage();
+            switchMainTab('releve');
+        }
+
+        function synchroniserReleveDepuisPointage() {
+            const st = computeMonthStats(currentMonthKey);
+            const meta = getMonthMeta(currentMonthKey);
+            const saison = document.getElementById('saison').value || '2627';
+            const tauxRef = parseFloat(document.getElementById('taux_horaire_ref')?.value) || 30.0;
+
+            document.getElementById('periode').value = meta.label;
+            document.getElementById('date_edition').value = meta.lastDay;
+            document.getElementById('ref_document').value = `DD-${saison}-${meta.short}-RF`;
+
+            const newLines = [
+                {
+                    type: 'ajout',
+                    desc: `Forfait Mensuel Fixe Tout Inclus — ${meta.label} (${formatDuree(st.totalEffectiveDoneHours)} réalisées sur le mois)`,
+                    montant: 1500.00
+                }
+            ];
+
+            // Ajouter automatiquement chaque séance pointée en Absence (Rouge)
+            st.absentSessionsList.forEach(abs => {
+                newLines.push({
+                    type: 'retenue',
+                    desc: `Absence du ${abs.dayFormatted} — ${abs.name} (${String(abs.duration).replace('.', ',')} h × ${tauxRef.toFixed(2).replace('.', ',')} €/h)`,
+                    montant: parseFloat((abs.duration * tauxRef).toFixed(2))
+                });
+            });
+
+            // Ajouter les ajustements financiers du mois (- absences partielles ou + suppléments CoDir)
+            st.monthAdjs.forEach(adj => {
+                if (adj.type === 'minus') {
+                    newLines.push({
+                        type: 'retenue',
+                        desc: `${adj.reason} (${String(adj.hours).replace('.', ',')} h × ${tauxRef.toFixed(2).replace('.', ',')} €/h)`,
+                        montant: parseFloat((adj.hours * tauxRef).toFixed(2))
+                    });
+                } else if (adj.type === 'plus_billable') {
+                    newLines.push({
+                        type: 'ajout',
+                        desc: `Supplément validé CoDir : ${adj.reason} (${String(adj.hours).replace('.', ',')} h × ${tauxRef.toFixed(2).replace('.', ',')} €/h)`,
+                        montant: parseFloat((adj.hours * tauxRef).toFixed(2))
+                    });
+                }
+            });
+
+            lignesPrestations = newLines;
+            afficherLignesBuilder();
+            saveCurrentStatementToMonthMemory(currentMonthKey);
+            autoSaveAllLocal();
+            showToast(`⚡ Relevé de ${meta.label} généré avec ${st.absentSessionsList.length} absence(s) déduite(s) !`);
+        }
+
+        function saveCurrentStatementToMonthMemory(mKey) {
+            if (!romainData.monthlyStatements) romainData.monthlyStatements = {};
+            romainData.monthlyStatements[mKey] = {
+                saison: document.getElementById('saison').value,
+                ref_document: document.getElementById('ref_document').value,
+                mode_remun: document.getElementById('mode_remun').value,
+                taux_horaire_ref: parseFloat(document.getElementById('taux_horaire_ref').value) || 30.0,
+                periode: document.getElementById('periode').value,
+                date_edition: document.getElementById('date_edition').value,
+                observations: document.getElementById('observations').value,
+                reglement: document.getElementById('reglement').value,
+                statut: document.getElementById('statut_paiement_releve').value,
+                lignesPrestations: JSON.parse(JSON.stringify(lignesPrestations))
+            };
+        }
+
+        function loadStatementFromMonthMemory(mKey) {
+            const meta = getMonthMeta(mKey);
+            const savedStmt = romainData.monthlyStatements && romainData.monthlyStatements[mKey];
+            if (savedStmt) {
+                document.getElementById('saison').value = savedStmt.saison || '2627';
+                document.getElementById('ref_document').value = savedStmt.ref_document || `DD-2627-${meta.short}-RF`;
+                document.getElementById('mode_remun').value = savedStmt.mode_remun || 'forfait1500';
+                document.getElementById('taux_horaire_ref').value = savedStmt.taux_horaire_ref || 30.0;
+                document.getElementById('periode').value = savedStmt.periode || meta.label;
+                document.getElementById('date_edition').value = savedStmt.date_edition || meta.lastDay;
+                document.getElementById('observations').value = savedStmt.observations || '';
+                document.getElementById('reglement').value = savedStmt.reglement || 'Virement bancaire';
+                document.getElementById('statut_paiement_releve').value = savedStmt.statut || 'A_PAYER';
+                lignesPrestations = JSON.parse(JSON.stringify(savedStmt.lignesPrestations || []));
+                afficherLignesBuilder();
+            } else {
+                // Initialiser proprement sur le forfait de 1 500 € + absences éventuelles du mois
+                synchroniserReleveDepuisPointage();
+            }
+        }
+
+        function archiverReleveMoisCourant() {
+            saveCurrentStatementToMonthMemory(currentMonthKey);
+            autoSaveAllLocal();
+            showToast(`📦 Relevé de ${getMonthMeta(currentMonthKey).label} mémorisé dans le Bilan Annuel !`);
         }
 
         function sauvegarderVisuel(type) {
@@ -402,45 +1780,68 @@
                 if (type === 'tampon') { imgTampon = e.target.result; localStorage.setItem('club_tampon', imgTampon); }
                 else if (type === 'tampon_paye') { imgTamponPaye = e.target.result; localStorage.setItem('club_tampon_paye', imgTamponPaye); }
                 else if (type === 'sig_stamp') { imgTamponSignature = e.target.result; localStorage.setItem('club_tampon_signature', imgTamponSignature); }
-                majMinis(); genererApercu();
-                syncToSupabase(true);
+                majMinis();
+                genererApercu();
+                autoSaveAllLocal();
             };
             reader.readAsDataURL(file);
         }
 
+        function effacerTampons() {
+            if (!confirm("Réinitialiser les tampons mémorisés ?")) return;
+            imgTampon = ''; imgTamponPaye = ''; imgTamponSignature = '';
+            localStorage.removeItem('club_tampon');
+            localStorage.removeItem('club_tampon_paye');
+            localStorage.removeItem('club_tampon_signature');
+            majMinis();
+            genererApercu();
+        }
+
         function majMinis() {
-            if (imgTampon) { document.getElementById('mini-tampon').src = imgTampon; document.getElementById('mini-tampon').style.display = 'block'; }
-            if (imgTamponPaye) { document.getElementById('mini-tampon-paye').src = imgTamponPaye; document.getElementById('mini-tampon-paye').style.display = 'block'; }
-            if (imgTamponSignature) { document.getElementById('mini-sig-stamp').src = imgTamponSignature; document.getElementById('mini-sig-stamp').style.display = 'block'; }
+            const t1 = document.getElementById('mini-tampon');
+            const t2 = document.getElementById('mini-tampon-paye');
+            const t3 = document.getElementById('mini-sig-stamp');
+            if (t1) { t1.src = imgTampon || ''; t1.classList.toggle('hidden', !imgTampon); }
+            if (t2) { t2.src = imgTamponPaye || ''; t2.classList.toggle('hidden', !imgTamponPaye); }
+            if (t3) { t3.src = imgTamponSignature || ''; t3.classList.toggle('hidden', !imgTamponSignature); }
         }
 
         function actualiserReference() {
             const saison = document.getElementById('saison').value;
             const periode = document.getElementById('periode').value.trim();
-            
-            // Extrait les 3 premières lettres du mois en majuscule
-            let moisCourt = periode.substring(0, 3).toUpperCase();
+            let moisCourt = periode.substring(0, 3).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             if (!moisCourt) moisCourt = 'MOIS';
-
-            const ref = `DD-${saison}-${moisCourt}-RF`;
-            document.getElementById('ref_document').value = ref;
+            document.getElementById('ref_document').value = `DD-${saison}-${moisCourt}-RF`;
             genererApercu();
+        }
+
+        function basculerModeModele() {
+            const mode = document.getElementById('mode_remun').value;
+            if (mode === 'forfait1500') {
+                synchroniserReleveDepuisPointage();
+            } else {
+                lignesPrestations = [
+                    { type: 'ajout', desc: 'Interventions Judo / Taïso / Jujitsu — ' + document.getElementById('periode').value, montant: 1500.00 }
+                ];
+                afficherLignesBuilder();
+            }
         }
 
         function afficherLignesBuilder() {
             const container = document.getElementById('lines-container');
+            if (!container) return;
             container.innerHTML = '';
             lignesPrestations.forEach((item, index) => {
                 const div = document.createElement('div');
-                div.className = 'line-item';
+                div.className = 'grid grid-cols-12 gap-2 items-center';
                 div.innerHTML = `
-                    <select onchange="updateLigne(${index}, 'type', this.value)">
+                    <select onchange="updateLigne(${index}, 'type', this.value)" class="col-span-3 px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-bold ${item.type === 'retenue' ? 'bg-rose-50 text-[#C41E3A] border-rose-200' : 'bg-white text-emerald-700'}">
                         <option value="ajout" ${item.type === 'ajout' ? 'selected' : ''}>➕ Prestation</option>
                         <option value="retenue" ${item.type === 'retenue' ? 'selected' : ''}>➖ Retenue</option>
                     </select>
-                    <input type="text" placeholder="Description de la prestation / motif" value="${item.desc}" oninput="updateLigne(${index}, 'desc', this.value)">
-                    <input type="number" step="0.01" placeholder="Montant (€)" value="${item.montant}" oninput="updateLigne(${index}, 'montant', this.value)">
-                    <button class="btn-del" onclick="supprimerLigne(${index})">🗑️</button>
+                    <input type="text" placeholder="Désignation / Motif" value="${item.desc.replace(/"/g, '&quot;')}" oninput="updateLigne(${index}, 'desc', this.value)" class="col-span-6 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs">
+                    <input type="number" step="0.01" placeholder="Montant €" value="${item.montant}" oninput="updateLigne(${index}, 'montant', this.value)" class="col-span-2 px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-mono-num font-bold text-right">
+                    <button type="button" onclick="supprimerLigne(${index})" class="col-span-1 h-8 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-lg text-xs font-bold transition">🗑️</button>
                 `;
                 container.appendChild(div);
             });
@@ -450,47 +1851,32 @@
         function ajouterLigne(type = 'ajout', desc = '', montant = 0) {
             lignesPrestations.push({ type, desc, montant });
             afficherLignesBuilder();
+            saveCurrentStatementToMonthMemory(currentMonthKey);
+            autoSaveAllLocal();
         }
 
         function supprimerLigne(index) {
             lignesPrestations.splice(index, 1);
             afficherLignesBuilder();
+            saveCurrentStatementToMonthMemory(currentMonthKey);
+            autoSaveAllLocal();
         }
 
         function updateLigne(index, field, value) {
             if (field === 'montant') value = parseFloat(value) || 0;
             lignesPrestations[index][field] = value;
             genererApercu();
+            saveCurrentStatementToMonthMemory(currentMonthKey);
+            autoSaveAllLocal();
         }
 
-        function basculerModeModele() {
-            const mode = document.getElementById('mode_remun').value;
-            if (mode === 'fixe') {
-                lignesPrestations = [
-                    { type: 'ajout', desc: 'Forfait Mensuel Fixe Tout Inclus (Cours, stages, tournois)', montant: 1250.00 }
-                ];
-            } else {
-                lignesPrestations = [
-                    { type: 'ajout', desc: 'Séance Judo - Période de ' + document.getElementById('periode').value, montant: 1100.00 },
-                    { type: 'ajout', desc: 'Stages / Animations complémentaires', montant: 100.00 }
-                ];
-            }
-            afficherLignesBuilder();
-        }
-
-        function formatEuro(val) {
-            return parseFloat(val).toFixed(2) + " €";
-        }
-
-        function genererApercu() {
-            const refDoc = document.getElementById('ref_document').value || 'DD-RELEVE-RF';
-            const periode = document.getElementById('periode').value;
-            const date_edition = document.getElementById('date_edition').value;
-            const observations = document.getElementById('observations').value;
-            const reglement = document.getElementById('reglement').value;
-
-            // Met à jour le titre de la page pour le nom par défaut du fichier PDF d'impression
-            document.title = refDoc;
+        function buildReleveSheetHTML() {
+            const refDoc = document.getElementById('ref_document')?.value || 'DD-2627-OCT-RF';
+            const periode = document.getElementById('periode')?.value || 'Octobre 2026';
+            const date_edition = document.getElementById('date_edition')?.value || '31/10/2026';
+            const observations = document.getElementById('observations')?.value || '';
+            const reglement = document.getElementById('reglement')?.value || 'Virement bancaire';
+            const st = computeMonthStats(currentMonthKey);
 
             let tableauLignesHtml = "";
             let totalBrut = 0;
@@ -502,49 +1888,40 @@
                     totalBrut += val;
                     tableauLignesHtml += `
                         <tr>
-                            <td>${item.desc || 'Prestation sans nom'}</td>
-                            <td class="text-right">${formatEuro(val)}</td>
+                            <td><strong>${item.desc || 'Prestation'}</strong></td>
+                            <td style="text-align:right; font-family:'Roboto Mono',monospace; font-weight:700;">${formatEuro(val)}</td>
                         </tr>
                     `;
                 } else {
                     totalRetenues += val;
                     tableauLignesHtml += `
                         <tr class="row-deduction">
-                            <td>❌ Retenue / Déduction : <em>${item.desc || 'Absence / Régulation'}</em></td>
-                            <td class="text-right">- ${formatEuro(val)}</td>
+                            <td>❌ Retenue / Déduction d'absence : <em>${item.desc || 'Absence'}</em></td>
+                            <td style="text-align:right; font-family:'Roboto Mono',monospace; font-weight:700;">- ${formatEuro(val)}</td>
                         </tr>
                     `;
                 }
             });
 
-            let netAPayer = totalBrut - totalRetenues;
-            let tamponHtml = imgTampon ? `<img src="${imgTampon}" class="print-tampon">` : '';
-            let tamponPayeHtml = imgTamponPaye ? `<img src="${imgTamponPaye}" class="print-tampon-paye">` : '';
-            let tamponSigHtml = imgTamponSignature ? `<img src="${imgTamponSignature}" class="print-signature-stamp">` : '';
+            const netAPayer = totalBrut - totalRetenues;
+            const tamponHtml = imgTampon ? `<img src="${imgTampon}" class="print-tampon">` : '';
+            const tamponPayeHtml = imgTamponPaye ? `<img src="${imgTamponPaye}" class="print-tampon-paye">` : '';
+            const tamponSigHtml = imgTamponSignature ? `<img src="${imgTamponSignature}" class="print-signature-stamp">` : '';
 
-            let obsHtml = '';
-            if (observations) {
-                obsHtml = `
-                <div class="obs-block">
-                    <div class="obs-title">Observations & Justifications réglementaires :</div>
-                    ${observations}
-                </div>`;
-            }
-
-            document.getElementById('render-target').innerHTML = `
+            return `
                 <table class="print-header-table">
                     <tr>
                         <td class="emitter-cell">
                             <div class="emitter-title">ROMAIN FLAMMANG</div>
                             <strong>Éducateur Sportif Professionnel</strong><br>
                             2 Rue des Fossés, 58300 Decize<br>
-                            SIREN : 932 343 395
+                            SIREN : 932 343 395 • Non assujetti TVA (293B CGI)
                         </td>
                         <td class="receiver-cell">
-                            <div class="receiver-title">Débité / Destinataire :</div>
+                            <div class="receiver-title">Destinataire / Club :</div>
                             <strong>DOJO DORNOIS</strong><br>
-                            1 Place de la Mairie, 58390 Dornes<br>
-                            RNA : W583001220 &bull; SIRET : 45192841000013
+                            Mairie, 1 Place de la Mairie, 58390 Dornes<br>
+                            RNA : W583001220 • SIRET : 451 928 410 00013
                         </td>
                         <td class="doc-num-cell">
                             <div class="doc-num">
@@ -556,68 +1933,735 @@
                 </table>
                 
                 <div class="doc-title-container">
-                    <h1 class="doc-title">Relevé de Prestations & Suivi d'Indemnités</h1>
+                    <h1 class="doc-title">Relevé de Prestations & Liquidation Mensuelle</h1>
                 </div>
                 
-                <div class="intro-text">
-                    Le présent document récapitule les prestations assurées, les compléments d'activités validés ainsi que les régulations appliquées au titre de la période de <strong>${periode}</strong>.
+                <div style="font-size: 9.5pt; line-height: 1.45; margin-bottom: 14px; text-align: justify;">
+                    Le présent document récapitule le forfait mensuel d'enseignement sportif, les éventuels compléments validés par le Comité Directeur ainsi que les retenues sur absences appliquées au titre de la période de <strong>${periode}</strong> (Volume pointé sur le mois : <strong>${formatDuree(st.totalEffectiveDoneHours)}</strong> réalisées${st.totalAbsentHours > 0 ? `, <strong>${formatDuree(st.totalAbsentHours)}</strong> d'absence déduite` : ''}).
                 </div>
                 
                 <table class="prestations-table">
                     <thead>
                         <tr>
-                            <th>Désignation des Activités / Interventions</th>
-                            <th style="width: 25%;" class="text-right">Montant</th>
+                            <th>Désignation des Activités / Forfait & Régularisations</th>
+                            <th style="width: 24%; text-align:right;">Montant</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${tableauLignesHtml}
                         <tr class="row-total">
-                            <td>Sous-total Brut des interventions dues</td>
-                            <td class="text-right">${formatEuro(totalBrut)}</td>
+                            <td>Sous-total Brut des prestations</td>
+                            <td style="text-align:right; font-family:'Roboto Mono',monospace;">${formatEuro(totalBrut)}</td>
                         </tr>
+                        ${totalRetenues > 0 ? `
+                        <tr class="row-deduction">
+                            <td>Total des retenues sur absences (Art. 6 — 30,00 €/h)</td>
+                            <td style="text-align:right; font-family:'Roboto Mono',monospace;">- ${formatEuro(totalRetenues)}</td>
+                        </tr>` : ''}
                         <tr class="final-net">
-                            <td>NET À LIQUIDER / MONTANT TOTAL RETENU</td>
-                            <td class="text-right">${formatEuro(netAPayer)}</td>
+                            <td>NET À LIQUIDER / MONTANT TOTAL À VERSER</td>
+                            <td style="text-align:right; font-family:'Roboto Mono',monospace;">${formatEuro(netAPayer)}</td>
                         </tr>
                     </tbody>
                 </table>
                 
-                ${obsHtml}
+                ${observations ? `
+                <div class="obs-block">
+                    <div style="font-weight:bold; text-transform:uppercase; font-size:8.5pt; color:#C41E3A; margin-bottom:3px;">Observations & Mentions contractuelles :</div>
+                    ${observations}
+                </div>` : ''}
 
-                <div style="font-size:9.5pt; margin-top:12px;">
-                    <strong>Modalités d'exécution :</strong> Prévu par ${reglement}.
+                <div style="font-size:9.5pt; margin-top:10px; display:flex; justify-content:space-between;">
+                    <span><strong>Modalités de règlement :</strong> ${reglement}</span>
+                    <span><strong>Fait à Dornes, le :</strong> ${date_edition}</span>
                 </div>
-                
-                <div class="fait-a-ligne">Fait à Dornes, le ${date_edition}</div>
                 
                 <table class="sig-container-table">
                     <tr>
-                        <td class="tampon-cell">${tamponHtml}</td>
-                        <td class="tampon-paye-cell">${tamponPayeHtml}</td>
-                        <td class="box-cell">${tamponSigHtml}</td>
+                        <td style="text-align:left; width:38%;">${tamponHtml}</td>
+                        <td style="text-align:center; width:24%;">${tamponPayeHtml}</td>
+                        <td style="text-align:right; width:38%;">${tamponSigHtml}</td>
                     </tr>
                 </table>
                 
-                <div class="print-footer">Dojo Dornois &bull; Validation interne des prestations intervenants &bull; Extrait SIREN Romain Flammang : 932 343 395</div>
+                <div style="width:100%; text-align:center; margin-top:24px; padding-top:8px; border-top:1px solid #E2E8F0; font-size:8pt; color:#64748B; font-style:italic;">
+                    Dojo Dornois • Validation interne des prestations d'encadrement • SIREN Romain Flammang : 932 343 395
+                </div>
             `;
         }
 
-        window.onload = function() {
-            if (!localStorage.getItem('suivi_romain_data')) {
-                imgTampon = localStorage.getItem('club_tampon') || '';
-                imgTamponPaye = localStorage.getItem('club_tampon_paye') || '';
-                imgTamponSignature = localStorage.getItem('club_tampon_signature') || '';
-                majMinis(); 
-                actualiserReference(); 
-                afficherLignesBuilder();
+        function genererApercu() {
+            const target = document.getElementById('render-target');
+            if (!target) return;
+            target.innerHTML = buildReleveSheetHTML();
+        }
+        /* ========================================================================= */
+        /* ONGLET 3 : INTERVENTIONS TER, ÉCOLES & FRAIS KILOMÉTRIQUES (HORS FORFAIT) */
+        /* ========================================================================= */
+        function onTerCatChange() {
+            const cat = document.getElementById('ter-cat').value;
+            const lbl = document.getElementById('ter-qty-label');
+            const rateInp = document.getElementById('ter-rate');
+            const qtyInp = document.getElementById('ter-qty');
+            if (cat === 'FRAIS_KM') {
+                lbl.textContent = "Kilomètres";
+                rateInp.value = "0.35";
+                qtyInp.value = "50";
+            } else {
+                lbl.textContent = "Heures";
+                rateInp.value = "30.00";
+                qtyInp.value = "2";
             }
-            loadData();
-        };
+            calcTerMontantAuto();
+        }
+
+        function calcTerMontantAuto() {
+            const q = parseFloat(document.getElementById('ter-qty').value) || 0;
+            const r = parseFloat(document.getElementById('ter-rate').value) || 0;
+            document.getElementById('ter-total').value = (q * r).toFixed(2);
+        }
+
+        function addTerEntry() {
+            const date = document.getElementById('ter-date').value;
+            const cat = document.getElementById('ter-cat').value;
+            const desc = document.getElementById('ter-desc').value.trim();
+            const qty = parseFloat(document.getElementById('ter-qty').value) || 0;
+            const rate = parseFloat(document.getElementById('ter-rate').value) || 0;
+            const total = parseFloat(document.getElementById('ter-total').value) || 0;
+
+            if (!date || !desc || total <= 0) {
+                alert("Veuillez renseigner la date, la description et le montant.");
+                return;
+            }
+
+            if (!romainData.terEntries) romainData.terEntries = [];
+            romainData.terEntries.push({
+                id: Date.now(),
+                date, cat, desc, qty, rate, total, paid: false
+            });
+            document.getElementById('ter-desc').value = '';
+            autoSaveAllLocal();
+            renderTerTable();
+            showToast("🏫 Prestation hors forfait (TER / École / Km) enregistrée !");
+        }
+
+        function renderTerTable() {
+            const tbody = document.getElementById('ter-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const list = [...(romainData.terEntries || [])].sort((a, b) => b.date.localeCompare(a.date));
+            let grandTotal = 0;
+
+            const catLabels = {
+                TER_DORNES: "🏫 TER École de Dornes",
+                ECOLE_CHANTENAY: "🏫 École Chantenay-St-Imbert",
+                ECOLE_AUTRE: "🏫 École Lucenay / Cossaye",
+                FRAIS_KM: "🚗 Frais Kilométriques (0,35 €/km)",
+                AUTRE_EXT: "🎯 Autre Hors Forfait"
+            };
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400 italic">Aucune intervention TER/École ou note de frais km enregistrée.</td></tr>`;
+            } else {
+                list.forEach(item => {
+                    grandTotal += parseFloat(item.total) || 0;
+                    const unitLabel = item.cat === 'FRAIS_KM' ? 'km' : 'h';
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-mono-num font-bold">${item.date.split('-').reverse().join('/')}</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-800 font-bold text-[11px]">${catLabels[item.cat] || item.cat}</span></td>
+                            <td class="p-3 font-medium text-slate-800">${item.desc}</td>
+                            <td class="p-3 text-center font-mono-num">${item.qty} ${unitLabel}</td>
+                            <td class="p-3 text-right font-mono-num">${formatEuro(item.rate)}</td>
+                            <td class="p-3 text-right font-mono-num font-bold text-[#C41E3A]">${formatEuro(item.total)}</td>
+                            <td class="p-3 text-center">
+                                <button onclick="toggleTerPaid(${item.id})" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${item.paid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                    ${item.paid ? '✅ Réglé' : '⏳ À régler'}
+                                </button>
+                            </td>
+                            <td class="p-3 text-center">
+                                <button onclick="deleteTerEntry(${item.id})" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            document.getElementById('ter-grand-total').textContent = formatEuro(grandTotal);
+        }
+
+        function toggleTerPaid(id) {
+            const it = (romainData.terEntries || []).find(x => x.id === id);
+            if (it) { it.paid = !it.paid; autoSaveAllLocal(); renderTerTable(); }
+        }
+
+        function deleteTerEntry(id) {
+            if (!confirm("Supprimer cette ligne TER / Frais ?")) return;
+            romainData.terEntries = (romainData.terEntries || []).filter(x => x.id !== id);
+            autoSaveAllLocal();
+            renderTerTable();
+        }
+
+        /* ========================================================================= */
+        /* ONGLET 4 : COMPTEUR RÉUNIONS TRIMESTRIELLES & MISSIONS DE ROMAIN          */
+        /* ========================================================================= */
+        function renderReunionsTab() {
+            const qGrid = document.getElementById('quarters-summary-grid');
+            const tbody = document.getElementById('reunions-tbody');
+            if (!qGrid || !tbody) return;
+
+            const quarters = [
+                { id: "T1", label: "T1 : Sept. – Nov. 2026" },
+                { id: "T2", label: "T2 : Déc. 2026 – Fév. 2027" },
+                { id: "T3", label: "T3 : Mars – Mai 2027" },
+                { id: "T4", label: "T4 : Juin – Août 2027" }
+            ];
+
+            const list = romainData.reunions || [];
+
+            qGrid.innerHTML = quarters.map(q => {
+                const qList = list.filter(r => r.quarter === q.id);
+                const cnt = qList.length;
+                const extraCount = Math.max(0, cnt - 2);
+                return `
+                    <div class="p-4 rounded-xl border ${cnt > 2 ? 'bg-amber-50/70 border-amber-300' : 'bg-slate-50 border-slate-200'} space-y-1.5">
+                        <div class="font-fredoka font-bold text-xs text-slate-700 uppercase">${q.label}</div>
+                        <div class="flex items-baseline justify-between">
+                            <span class="font-fredoka text-2xl font-bold ${cnt > 2 ? 'text-[#C41E3A]' : 'text-emerald-700'}">${cnt} / 2</span>
+                            <span class="text-[11px] font-bold ${cnt > 2 ? 'text-[#C41E3A]' : 'text-emerald-600'}">
+                                ${cnt <= 2 ? '✅ Incluses au forfait' : `⚠️ +${extraCount} hors quota (30€/h)`}
+                            </span>
+                        </div>
+                        <div class="text-[10px] text-slate-500">Quota forfait : 2 réunions incluses</div>
+                    </div>
+                `;
+            }).join('');
+
+            tbody.innerHTML = '';
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Aucune réunion enregistrée.</td></tr>`;
+                return;
+            }
+
+            // Déterminer le rang de chaque réunion dans son trimestre
+            quarters.forEach(q => {
+                const qMeetings = list.filter(r => r.quarter === q.id).sort((a, b) => a.date.localeCompare(b.date));
+                qMeetings.forEach((m, idx) => {
+                    const rank = idx + 1;
+                    const isBillable = rank > 2;
+                    const billableHours = Math.min(2, parseFloat(m.duration) || 2);
+                    const statusHtml = isBillable
+                        ? `<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-bold text-[10px]">⚡ Réunion n°${rank} hors quota : Facturable (${billableHours}h × 30€ = ${formatEuro(billableHours*30)})</span>`
+                        : `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">✅ Réunion n°${rank}/2 : Incluse dans le forfait 1 500 €</span>`;
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2.5 font-mono-num font-bold">${m.date.split('-').reverse().join('/')}</td>
+                            <td class="p-2.5 font-bold font-fredoka">${m.quarter}</td>
+                            <td class="p-2.5 font-medium text-slate-800">${m.title}</td>
+                            <td class="p-2.5 text-center font-mono-num">${formatDuree(m.duration)}</td>
+                            <td class="p-2.5">${statusHtml}</td>
+                            <td class="p-2.5 text-center">
+                                <button onclick="deleteReunionEntry(${m.id})" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        function addReunionEntry() {
+            const date = document.getElementById('reu-date').value;
+            const quarter = document.getElementById('reu-quarter').value;
+            const duration = parseFloat(document.getElementById('reu-duration').value) || 2.0;
+            const title = document.getElementById('reu-title').value.trim();
+
+            if (!date || !title) {
+                alert("Veuillez renseigner la date et l'objet de la réunion.");
+                return;
+            }
+
+            if (!romainData.reunions) romainData.reunions = [];
+            romainData.reunions.push({ id: Date.now(), date, quarter, duration, title });
+            document.getElementById('reu-title').value = '';
+            autoSaveAllLocal();
+            renderReunionsTab();
+            showToast("🤝 Réunion enregistrée !");
+        }
+
+        function deleteReunionEntry(id) {
+            romainData.reunions = (romainData.reunions || []).filter(r => r.id !== id);
+            autoSaveAllLocal();
+            renderReunionsTab();
+        }
+
+        function renderMissionsList() {
+            const grid = document.getElementById('romain-missions-grid');
+            if (!grid) return;
+            grid.innerHTML = (romainData.missions || []).map(m => `
+                <div class="p-3 rounded-xl border ${m.done ? 'bg-emerald-50/40 border-emerald-200' : 'bg-white border-slate-200'} flex items-center justify-between gap-3">
+                    <label class="flex items-center gap-2.5 cursor-pointer flex-1 text-xs">
+                        <input type="checkbox" ${m.done ? 'checked' : ''} onchange="toggleRomainMission(${m.id})" class="w-4 h-4 rounded text-[#C41E3A]">
+                        <div>
+                            <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-bold text-[10px] mr-1">${m.cat || 'Suivi'}</span>
+                            <span class="font-medium ${m.done ? 'line-through text-slate-400' : 'text-slate-800'}">${m.text}</span>
+                        </div>
+                    </label>
+                    <button onclick="deleteRomainMission(${m.id})" class="text-slate-300 hover:text-rose-600 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function toggleRomainMission(id) {
+            const m = (romainData.missions || []).find(x => x.id === id);
+            if (m) { m.done = !m.done; autoSaveAllLocal(); renderMissionsList(); }
+        }
+
+        function addRomainMission() {
+            const inp = document.getElementById('new-mission-input');
+            if (!inp || !inp.value.trim()) return;
+            if (!romainData.missions) romainData.missions = [];
+            romainData.missions.push({ id: Date.now(), text: inp.value.trim(), done: false, cat: "Pédagogie" });
+            inp.value = '';
+            autoSaveAllLocal();
+            renderMissionsList();
+        }
+
+        function deleteRomainMission(id) {
+            romainData.missions = (romainData.missions || []).filter(x => x.id !== id);
+            autoSaveAllLocal();
+            renderMissionsList();
+        }
+
+        /* ========================================================================= */
+        /* ONGLET 5 : BILAN ANNUEL 12 MOIS (JAUGE 500H) & SIMULATEUR SALARIAT CCNS   */
+        /* ========================================================================= */
+        function renderAnnualBilanTable() {
+            const tbody = document.getElementById('annual-bilan-tbody');
+            const tfoot = document.getElementById('annual-bilan-tfoot');
+            if (!tbody || !tfoot) return;
+
+            let sumPlanned = 0, sumDone = 0, sumAbsent = 0;
+            let sumBase = 0, sumRetenues = 0, sumExtras = 0, sumNetClub = 0, sumTerKm = 0, sumGlobal = 0;
+
+            tbody.innerHTML = MONTHS_CONFIG.map(m => {
+                const st = computeMonthStats(m.key);
+                const baseForfait = 1500.00;
+                const retenues = st.totalDeductionEuro;
+                const extras = st.adjBillableExtraEuro;
+                const netClub = baseForfait - retenues + extras;
+
+                const terMonth = (romainData.terEntries || [])
+                    .filter(t => t.date && t.date.startsWith(m.key))
+                    .reduce((s, t) => s + (parseFloat(t.total) || 0), 0);
+
+                const totalMois = netClub + terMonth;
+
+                sumPlanned += st.plannedHours;
+                sumDone += st.totalEffectiveDoneHours;
+                sumAbsent += st.totalAbsentHours;
+                sumBase += baseForfait;
+                sumRetenues += retenues;
+                sumExtras += extras;
+                sumNetClub += netClub;
+                sumTerKm += terMonth;
+                sumGlobal += totalMois;
+
+                const isCurrent = (m.key === currentMonthKey);
+
+                return `
+                    <tr class="hover:bg-slate-50 ${isCurrent ? 'bg-rose-50/40 font-semibold' : ''}">
+                        <td class="p-2.5 font-fredoka font-bold text-slate-800">
+                            <button onclick="document.getElementById('global-month-select').value='${m.key}'; onGlobalMonthChange('${m.key}'); switchMainTab('pointage');" class="hover:text-[#C41E3A] flex items-center gap-1.5">
+                                <span>${m.label}</span>
+                                ${isCurrent ? '<span class="w-2 h-2 rounded-full bg-[#C41E3A]"></span>' : ''}
+                            </button>
+                        </td>
+                        <td class="p-2.5 text-center font-mono-num text-slate-500">${formatDuree(st.plannedHours)}</td>
+                        <td class="p-2.5 text-center font-mono-num font-bold text-emerald-700">${formatDuree(st.totalEffectiveDoneHours)}</td>
+                        <td class="p-2.5 text-center font-mono-num ${st.totalAbsentHours > 0 ? 'text-[#C41E3A] font-bold' : 'text-slate-400'}">${st.totalAbsentHours > 0 ? '-' + formatDuree(st.totalAbsentHours) : '0,00 h'}</td>
+                        <td class="p-2.5 text-right font-mono-num">${formatEuro(baseForfait)}</td>
+                        <td class="p-2.5 text-right font-mono-num ${retenues > 0 ? 'text-[#C41E3A] font-bold' : 'text-slate-400'}">${retenues > 0 ? '-' + formatEuro(retenues) : '0,00 €'}</td>
+                        <td class="p-2.5 text-right font-mono-num ${extras > 0 ? 'text-blue-700 font-bold' : 'text-slate-400'}">${extras > 0 ? '+' + formatEuro(extras) : '0,00 €'}</td>
+                        <td class="p-2.5 text-right font-mono-num font-bold text-slate-900">${formatEuro(netClub)}</td>
+                        <td class="p-2.5 text-right font-mono-num text-blue-700">${formatEuro(terMonth)}</td>
+                        <td class="p-2.5 text-right font-mono-num font-bold text-[#C41E3A]">${formatEuro(totalMois)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            tfoot.innerHTML = `
+                <tr>
+                    <td class="p-3 font-fredoka uppercase text-slate-800">TOTAL SAISON 2026-2027</td>
+                    <td class="p-3 text-center font-mono-num">${formatDuree(sumPlanned)}</td>
+                    <td class="p-3 text-center font-mono-num text-emerald-700">${formatDuree(sumDone)}</td>
+                    <td class="p-3 text-center font-mono-num text-[#C41E3A]">-${formatDuree(sumAbsent)}</td>
+                    <td class="p-3 text-right font-mono-num">${formatEuro(sumBase)}</td>
+                    <td class="p-3 text-right font-mono-num text-[#C41E3A]">-${formatEuro(sumRetenues)}</td>
+                    <td class="p-3 text-right font-mono-num text-blue-700">+${formatEuro(sumExtras)}</td>
+                    <td class="p-3 text-right font-mono-num text-slate-900">${formatEuro(sumNetClub)}</td>
+                    <td class="p-3 text-right font-mono-num text-blue-700">${formatEuro(sumTerKm)}</td>
+                    <td class="p-3 text-right font-mono-num text-[#C41E3A] text-sm">${formatEuro(sumGlobal)}</td>
+                </tr>
+            `;
+
+            const pct = Math.min(100, Math.round((sumDone / 500) * 100));
+            document.getElementById('annual-hours-progress-label').textContent = `${formatDuree(sumDone)} / 500,00 h (${pct}%)`;
+            document.getElementById('annual-hours-progress-bar').style.width = `${pct}%`;
+        }
+
+        function runSalariatSimulation() {
+            const weeklyH = parseFloat(document.getElementById('sim-weekly-hours')?.value) || 17.5;
+            const hourlyBrut = parseFloat(document.getElementById('sim-hourly-brut')?.value) || 14.20;
+            const ansAid = parseFloat(document.getElementById('sim-ans-aid')?.value) || 500;
+            const mutuelleClub = parseFloat(document.getElementById('sim-mutuelle')?.value) || 25;
+
+            const monthlyHours = (weeklyH * 52) / 12;
+            const salaireBrut = monthlyHours * hourlyBrut;
+            const salaireNetRomain = salaireBrut * 0.78; // ~22% cotisations salariales
+            const chargesPatronales = salaireBrut * 0.195; // avec réduction générale RGDU sur bas/moyens salaires CCNS
+            const coutTotalDojoAvantAide = salaireBrut + chargesPatronales + mutuelleClub;
+            const coutNetDojoAvecAns = Math.max(0, coutTotalDojoAvantAide - ansAid);
+
+            const container = document.getElementById('sim-results-cards');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="p-4 rounded-2xl border-2 border-slate-200 bg-white space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <span class="font-fredoka font-bold text-sm text-slate-800 uppercase">Statut Actuel : Prestataire (Forfait 1 500 €)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-bold">Auto-Entrepreneur</span>
+                    </div>
+                    <div class="space-y-1.5 text-xs">
+                        <div class="flex justify-between"><span>Facturé au Dojo Dornois :</span><strong class="font-mono-num text-sm text-[#C41E3A]">1 500,00 € / mois</strong></div>
+                        <div class="flex justify-between text-slate-500"><span>Cotisations URSSAF Romain (~23,1%) :</span><span class="font-mono-num">- 346,50 €</span></div>
+                        <div class="flex justify-between pt-1 border-t border-slate-100"><span>Net dans la poche de Romain :</span><strong class="font-mono-num text-emerald-700 text-sm">~1 153,50 € / mois</strong></div>
+                        <div class="text-[11px] text-slate-500 pt-2">
+                            ⚠️ Pas de chômage, retraite minimale, pas d'indemnités maladie ni d'aide ANS Emploi pour le club.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-2xl border-2 border-[#C41E3A] bg-rose-50/30 space-y-3">
+                    <div class="flex items-center justify-between border-b border-rose-200 pb-2">
+                        <span class="font-fredoka font-bold text-sm text-[#C41E3A] uppercase">Simulation Salarié CDI (${weeklyH}h/sem = ${monthlyHours.toFixed(1)}h/mois)</span>
+                        <span class="px-2 py-0.5 rounded bg-[#C41E3A] text-white text-[10px] font-bold">CCNS Sport</span>
+                    </div>
+                    <div class="space-y-1.5 text-xs">
+                        <div class="flex justify-between"><span>Salaire Brut mensuel (${hourlyBrut.toFixed(2)} €/h) :</span><strong class="font-mono-num">${formatEuro(salaireBrut)}</strong></div>
+                        <div class="flex justify-between"><span>Salaire Net versé à Romain (~78%) :</span><strong class="font-mono-num text-emerald-700 text-sm">${formatEuro(salaireNetRomain)} / mois</strong></div>
+                        <div class="flex justify-between text-slate-600"><span>Coût global Dojo (Brut + Patronales + Mutuelle) :</span><span class="font-mono-num font-bold">${formatEuro(coutTotalDojoAvantAide)}</span></div>
+                        <div class="flex justify-between pt-1 border-t border-rose-200">
+                            <span><strong>Coût Net Dojo (après Aide ANS de ${formatEuro(ansAid)}) :</strong></span>
+                            <strong class="font-mono-num text-base text-[#C41E3A]">${formatEuro(coutNetDojoAvecAns)} / mois</strong>
+                        </div>
+                        <div class="text-[11px] text-slate-600 pt-1">
+                            ✅ Inclut 5 sem. de congés payés, trimestres retraite, chômage, mutuelle 50% et prévoyance CCNS.
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ========================================================================= */
+        /* MOTEUR D'IMPRESSION A4 OFFICIEL (CHARTE MASTER 7.0 DOJO DORNOIS)          */
+        /* ========================================================================= */
+        function buildOfficialPrintHeader(docTitle, docSubtitle, refCode) {
+            const dateEd = new Date().toLocaleDateString('fr-FR');
+            return `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2.5px solid #C41E3A; padding-bottom:10px; margin-bottom:12px;">
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <div style="background-color:#C41E3A; width:56px; height:56px; border-radius:12px; padding:5px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <img src="${LOGO_URL}" style="width:100%; height:100%; object-fit:contain;">
+                        </div>
+                        <div style="font-size:8pt; line-height:1.35; color:#3D3D3D;">
+                            <div style="font-family:'Fredoka',sans-serif; font-size:13pt; color:#C41E3A; font-weight:700;">DOJO DORNOIS</div>
+                            Mairie, 1 Place de la Mairie - 58390 DORNES<br>
+                            FFJDA n° CE 08.58.067.0 • Agrément J&S n° 58.S.471<br>
+                            SIRET 451 928 410 00013 • RNA W583001220 • contact@dojodornois.fr
+                        </div>
+                    </div>
+                    <div style="background:#F8FAFC; border:1px solid #CBD5E1; border-radius:8px; padding:6px 12px; text-align:right;">
+                        <span style="font-size:7pt; color:#64748B; text-transform:uppercase; display:block;">Intervenant Sportif • SIREN 932 343 395</span>
+                        <strong style="font-family:'Fredoka',sans-serif; color:#C41E3A; font-size:10pt;">Romain FLAMMANG</strong>
+                        <div style="font-size:7.5pt; color:#475569;">Réf : <strong>${refCode}</strong> • Édité le ${dateEd}</div>
+                    </div>
+                </div>
+                <div style="text-align:center; border-top:1.5px solid #C41E3A; border-bottom:1.5px solid #C41E3A; padding:5px 0; margin:8px 0 12px 0;">
+                    <h1 style="font-family:'Fredoka',sans-serif; font-size:12.5pt; color:#C41E3A; margin:0; text-transform:uppercase;">${docTitle}</h1>
+                    ${docSubtitle ? `<div style="font-size:8.5pt; color:#475569; margin-top:2px;">${docSubtitle}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function buildPointageMonthHTML(monthKey) {
+            const meta = getMonthMeta(monthKey);
+            const [year, month] = monthKey.split('-').map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const st = computeMonthStats(monthKey);
+            const sigPres = localStorage.getItem('club_signature') || imgTamponSignature || '';
+
+            let rowsHtml = '';
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = getLocalDateStr(year, month, d);
+                const dateObj = new Date(year, month - 1, d);
+                const courses = getCoursesForDay(dateStr);
+
+                courses.forEach(c => {
+                    const status = romainData.checkState[c.key] || 'pending';
+                    let statusLabel = '<span style="color:#64748b;">En attente</span>';
+                    if (status === 'done' || status === true) {
+                        statusLabel = '<strong style="color:#047857;">✓ Réalisé</strong>';
+                    } else if (status === 'cancelled') {
+                        statusLabel = `<strong style="color:#C41E3A;">✕ Absent (-${formatEuro(c.duration * 30)})</strong>`;
+                    } else if (status === 'vacation') {
+                        statusLabel = '<span style="color:#B45309; font-weight:600;">🏖️ Vacances lissées</span>';
+                    }
+
+                    const formattedDate = dateObj.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'short' });
+                    rowsHtml += `
+                        <tr style="border-bottom: 1px solid #E2E8F0; page-break-inside: avoid;">
+                            <td style="padding: 5px 7px; text-transform: capitalize; font-weight: 500;">${formattedDate}</td>
+                            <td style="padding: 5px 7px; font-weight: bold; color: #1A1A1A;">
+                                ${c.name} ${c.isCustom ? '<span style="font-size:7pt; color:#2563eb; background:#eff6ff; padding:1px 4px; border-radius:3px;">Stage/Extra</span>' : ''}
+                            </td>
+                            <td style="padding: 5px 7px; color: #64748b;">${c.time}</td>
+                            <td style="padding: 5px 7px; text-align: center; font-weight: bold;">${formatDuree(c.duration)}</td>
+                            <td style="padding: 5px 7px; text-align: right;">${statusLabel}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            return `
+                ${buildOfficialPrintHeader(`RELEVÉ DÉTAILLÉ DES HEURES & POINTAGE — ${meta.label.toUpperCase()}`, "Justification du suivi mensuel des séances (Convention 2026-2027)", `DD-HRS-${meta.short}-RF`)}
+                <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; background:#F8FAFC; border:1px solid #CBD5E1; border-radius:6px; padding:8px; text-align:center; margin-bottom:12px;">
+                    <div><span style="display:block; font-size:7pt; color:#64748B; text-transform:uppercase; font-weight:bold;">1. Volume Planifié</span><strong style="font-family:'Fredoka',sans-serif; font-size:10.5pt;">${formatDuree(st.plannedHours)}</strong></div>
+                    <div><span style="display:block; font-size:7pt; color:#047857; text-transform:uppercase; font-weight:bold;">2. Réel Réalisé</span><strong style="font-family:'Fredoka',sans-serif; font-size:10.5pt; color:#047857;">${formatDuree(st.totalEffectiveDoneHours)}</strong></div>
+                    <div><span style="display:block; font-size:7pt; color:#B45309; text-transform:uppercase; font-weight:bold;">3. Vacances Lissées</span><strong style="font-family:'Fredoka',sans-serif; font-size:10.5pt; color:#B45309;">${formatDuree(st.vacationHours)}</strong></div>
+                    <div><span style="display:block; font-size:7pt; color:#C41E3A; text-transform:uppercase; font-weight:bold;">4. Absences (-30€/h)</span><strong style="font-family:'Fredoka',sans-serif; font-size:10.5pt; color:#C41E3A;">-${formatDuree(st.totalAbsentHours)} (-${formatEuro(st.totalDeductionEuro)})</strong></div>
+                </div>
+                <table style="width:100%; border-collapse:collapse; font-size:8pt;">
+                    <thead>
+                        <tr style="background:#1A1A1A; color:white;">
+                            <th style="padding:6px 7px; text-align:left; width:20%;">Date</th>
+                            <th style="padding:6px 7px; text-align:left;">Intitulé de la Séance / Stage</th>
+                            <th style="padding:6px 7px; text-align:left; width:16%;">Horaires</th>
+                            <th style="padding:6px 7px; text-align:center; width:12%;">Durée</th>
+                            <th style="padding:6px 7px; text-align:right; width:22%;">Statut Pointé</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:18px; page-break-inside:avoid;">
+                    <div style="border:1px dashed #94A3B8; padding:10px; border-radius:6px; min-height:85px; font-size:8pt; background:#FAFAFA; text-align:center;">
+                        <strong style="color:#C41E3A; font-family:'Fredoka',sans-serif;">Le Prestataire / Éducateur Sportif :</strong>
+                        <div style="margin-top:3px; font-weight:bold;">Romain FLAMMANG</div>
+                        <div style="font-size:7pt; color:#64748B; font-style:italic; margin-top:22px;">Relevé d'heures certifié exact</div>
+                    </div>
+                    <div style="border:1px dashed #94A3B8; padding:10px; border-radius:6px; min-height:85px; font-size:8pt; background:#FAFAFA; text-align:center;">
+                        <strong style="color:#C41E3A; font-family:'Fredoka',sans-serif;">Pour le Dojo Dornois, Le Président :</strong>
+                        <div style="margin-top:3px; font-weight:bold;">Jordan LOUDENOT</div>
+                        ${sigPres ? `<img src="${sigPres}" style="max-height:45px; margin:4px auto 0 auto; display:block; mix-blend-mode:multiply;">` : '<div style="font-size:7pt; color:#64748B; font-style:italic; margin-top:22px;">Visa & validation pour liquidation</div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function launchPrintRoot(htmlContent, orientation = 'portrait') {
+            let styleTag = document.getElementById('dynamic-print-page-style');
+            if (!styleTag) {
+                styleTag = document.createElement('style');
+                styleTag.id = 'dynamic-print-page-style';
+                document.head.appendChild(styleTag);
+            }
+            styleTag.innerHTML = `@media print { @page { size: A4 ${orientation}; margin: 10mm 12mm; } }`;
+            const root = document.getElementById('dedicated-print-root');
+            root.innerHTML = htmlContent;
+            setTimeout(() => { window.print(); }, 150);
+        }
+
+        function imprimerReleveFinancierA4() {
+            launchPrintRoot(buildReleveSheetHTML(), 'portrait');
+        }
+
+        function imprimerReleveHeuresA4() {
+            launchPrintRoot(buildPointageMonthHTML(currentMonthKey), 'portrait');
+        }
+
+        function imprimerPackCompletMensuelA4() {
+            const html = `
+                <div>${buildReleveSheetHTML()}</div>
+                <div class="print-page-break">${buildPointageMonthHTML(currentMonthKey)}</div>
+            `;
+            launchPrintRoot(html, 'portrait');
+        }
+
+        function imprimerReleveTerEtFraisA4() {
+            const list = [...(romainData.terEntries || [])].sort((a, b) => a.date.localeCompare(b.date));
+            const total = list.reduce((s, x) => s + (parseFloat(x.total) || 0), 0);
+            const rows = list.map(it => `
+                <tr style="border-bottom:1px solid #E2E8F0;">
+                    <td style="padding:6px 8px;">${it.date.split('-').reverse().join('/')}</td>
+                    <td style="padding:6px 8px; font-weight:bold;">${it.desc}</td>
+                    <td style="padding:6px 8px; text-align:center;">${it.qty} ${it.cat === 'FRAIS_KM' ? 'km' : 'h'}</td>
+                    <td style="padding:6px 8px; text-align:right;">${formatEuro(it.rate)}</td>
+                    <td style="padding:6px 8px; text-align:right; font-weight:bold; color:#C41E3A;">${formatEuro(it.total)}</td>
+                </tr>
+            `).join('');
+
+            const html = `
+                ${buildOfficialPrintHeader("RELEVÉ SPÉCIFIQUE — INTERVENTIONS SCOLAIRES (TER / ÉCOLES) & FRAIS KM", "Facturation distincte du forfait mensuel club (Article 5 de la Convention)", "DD-TER-KM-RF")}
+                <table style="width:100%; border-collapse:collapse; font-size:9pt; margin-top:10px;">
+                    <thead>
+                        <tr style="background:#1A1A1A; color:white;">
+                            <th style="padding:7px 8px; text-align:left;">Date</th>
+                            <th style="padding:7px 8px; text-align:left;">Désignation de l'intervention scolaire ou du déplacement</th>
+                            <th style="padding:7px 8px; text-align:center;">Quantité</th>
+                            <th style="padding:7px 8px; text-align:right;">Tarif unitaire</th>
+                            <th style="padding:7px 8px; text-align:right;">Montant Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                    <tfoot>
+                        <tr style="background:#FFF1F2; border:2px solid #C41E3A; font-weight:bold; font-size:10.5pt; color:#C41E3A;">
+                            <td colspan="4" style="padding:8px;">TOTAL NET HORS FORFAIT (TER / ÉCOLES / FRAIS DÉPLACEMENT)</td>
+                            <td style="padding:8px; text-align:right;">${formatEuro(total)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+            launchPrintRoot(html, 'portrait');
+        }
+
+        function imprimerBilanAnnuelA4Paysage() {
+            renderAnnualBilanTable();
+            const tableClone = document.querySelector('#view-bilan table').outerHTML;
+            const html = `
+                ${buildOfficialPrintHeader("BILAN ANALYTIQUE ANNUEL — SUIVI DES HEURES & RÉMUNÉRATIONS DE ROMAIN FLAMMANG", "Saison 2026-2027 • Base contractuelle : 500 heures / Forfait mensuel 1 500,00 €", "DD-BILAN-2627-RF")}
+                ${tableClone}
+            `;
+            launchPrintRoot(html, 'landscape');
+        }
+
+        function getWeekNumber(d) {
+            const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            date.setUTCDate(date.setUTCDate() + 4 - (date.getUTCDay() || 7));
+            const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+            return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+        }
+
+        /* ========================================================================= */
+        /* SAUVEGARDE & CHARGEMENT UNIFIÉS (LOCALSTORAGE + SUPABASE 2 TABLES)        */
+        /* ========================================================================= */
+        function autoSaveAllLocal() {
+            saveCurrentStatementToMonthMemory(currentMonthKey);
+            localStorage.setItem('romain_hours_data_v6', JSON.stringify(romainData));
+
+            const suiviPayload = {
+                imgTampon,
+                imgTamponPaye,
+                imgTamponSignature,
+                lignesPrestations,
+                saison: document.getElementById('saison')?.value || '2627',
+                ref_document: document.getElementById('ref_document')?.value || 'DD-2627-OCT-RF',
+                mode_remun: document.getElementById('mode_remun')?.value || 'forfait1500',
+                periode: document.getElementById('periode')?.value || 'Octobre 2026',
+                date_edition: document.getElementById('date_edition')?.value || '31/10/2026',
+                observations: document.getElementById('observations')?.value || '',
+                reglement: document.getElementById('reglement')?.value || 'Virement bancaire'
+            };
+            localStorage.setItem('suivi_romain_data', JSON.stringify(suiviPayload));
+            syncAllToSupabase(true);
+        }
+
+        async function syncAllToSupabase(silent = false) {
+            const badge = document.getElementById('sync-badge');
+            if (badge && !silent) {
+                badge.innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> Sync...';
+            }
+            try {
+                const suiviPayload = JSON.parse(localStorage.getItem('suivi_romain_data') || '{}');
+                await Promise.all([
+                    sbClient.from(TABLE_HEURES).upsert({ id: 1, data: romainData }),
+                    sbClient.from(TABLE_SUIVI).upsert({ id: 1, data: suiviPayload })
+                ]);
+                if (badge) {
+                    badge.innerHTML = '<i class="fa-solid fa-cloud-check"></i> Synchronisé';
+                    badge.className = 'bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] px-2 py-0.5 rounded-full font-semibold';
+                }
+                if (!silent) showToast("☁️ Pointage des heures & Relevés synchronisés sur Supabase !");
+            } catch (err) {
+                console.warn("Mode sauvegarde locale actif:", err);
+                if (!silent) showToast("⚠️ Sauvegardé en local (Supabase hors ligne)", "error");
+            }
+        }
+
+        async function loadAllData() {
+            // 1. Chargement local immédiat (heures_romain + suivi_romain + tampons)
+            imgTampon = localStorage.getItem('club_tampon') || '';
+            imgTamponPaye = localStorage.getItem('club_tampon_paye') || '';
+            imgTamponSignature = localStorage.getItem('club_tampon_signature') || '';
+
+            const savedHours = localStorage.getItem('romain_hours_data_v6') || localStorage.getItem('romain_hours_data_v5');
+            if (savedHours) {
+                try {
+                    const parsedH = JSON.parse(savedHours);
+                    romainData = { ...romainData, ...parsedH };
+                } catch (e) {}
+            }
+
+            const savedSuivi = localStorage.getItem('suivi_romain_data');
+            if (savedSuivi) {
+                try {
+                    const parsedS = JSON.parse(savedSuivi);
+                    if (parsedS.imgTampon) imgTampon = parsedS.imgTampon;
+                    if (parsedS.imgTamponPaye) imgTamponPaye = parsedS.imgTamponPaye;
+                    if (parsedS.imgTamponSignature) imgTamponSignature = parsedS.imgTamponSignature;
+                } catch (e) {}
+            }
+
+            majMinis();
+            loadStatementFromMonthMemory(currentMonthKey);
+            renderPointage();
+
+            // 2. Interrogation asynchrone des deux tables Supabase
+            try {
+                const [resH, resS] = await Promise.all([
+                    sbClient.from(TABLE_HEURES).select('data').eq('id', 1).single(),
+                    sbClient.from(TABLE_SUIVI).select('data').eq('id', 1).single()
+                ]);
+
+                if (resH && resH.data && resH.data.data) {
+                    romainData = { ...romainData, ...resH.data.data };
+                    localStorage.setItem('romain_hours_data_v6', JSON.stringify(romainData));
+                }
+                if (resS && resS.data && resS.data.data) {
+                    const sd = resS.data.data;
+                    if (sd.imgTampon) imgTampon = sd.imgTampon;
+                    if (sd.imgTamponPaye) imgTamponPaye = sd.imgTamponPaye;
+                    if (sd.imgTamponSignature) imgTamponSignature = sd.imgTamponSignature;
+                }
+
+                majMinis();
+                loadStatementFromMonthMemory(currentMonthKey);
+                renderPointage();
+            } catch (e) {
+                console.log("Données chargées depuis le cache local.");
+            }
+        }
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3200);
+        }
+
+        window.onload = loadAllData;
     </script>
-
-    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
-    <script src="../js/sidebar.js"></script>
-
 </body>
 </html>
