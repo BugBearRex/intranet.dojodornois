@@ -357,20 +357,24 @@
                 <!-- Grille des Semaines du Mois -->
                 <div id="weeks-container" class="grid grid-cols-1 lg:grid-cols-2 gap-5"></div>
 
-                <!-- Bloc Ajustements Horaires Ponctuels (+ Heures sup validées CoDir / - Retenues d'heures) -->
+                <!-- Bloc Ajustements Horaires, Suppléments Sur-Mesure & Régularisations Ponctuelles -->
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
                         <div>
                             <h3 class="font-fredoka text-sm font-bold text-slate-800 uppercase flex items-center gap-2">
-                                <i class="fa-solid fa-sliders text-[#C41E3A]"></i> Ajustements Horaires & Régularisations Ponctuelles (Hors grille hebdo)
+                                <i class="fa-solid fa-sliders text-[#C41E3A]"></i> Suppléments Validés CoDir (Tarif libre ou Montant fixe) & Ajustements Horaires
                             </h3>
-                            <p class="text-xs text-slate-500">Ajoutez ici une heure supplémentaire validée par le CoDir (+30 €/h) ou une retenue horaire partielle (ex: retard ou départ anticipé).</p>
+                            <p class="text-xs text-slate-500">Ajoutez un supplément horaire au tarif de votre choix (ex: 5,5h à 25 €/h = 137,50 €), un supplément exceptionnel à montant libre en €, ou une retenue partielle.</p>
                         </div>
+                        <span class="text-[11px] bg-rose-50 text-[#C41E3A] border border-rose-200 px-2.5 py-1 rounded-full font-bold">
+                            <i class="fa-solid fa-link"></i> Intégré automatiquement au Relevé Financier & Bilan Annuel
+                        </span>
                     </div>
                     <div class="p-5 space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <input type="hidden" id="adj-edit-id" value="">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end bg-slate-50 p-4 rounded-xl border border-slate-200">
                             <div class="md:col-span-2">
-                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Mois</label>
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Mois imputé</label>
                                 <select id="adj-month" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
                                     <option value="2026-09">Septembre 2026</option>
                                     <option value="2026-10" selected>Octobre 2026</option>
@@ -387,24 +391,37 @@
                                 </select>
                             </div>
                             <div class="md:col-span-3">
-                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Type d'ajustement</label>
-                                <select id="adj-type" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
-                                    <option value="minus">➖ Déduction / Absence partielle (-30 €/h)</option>
-                                    <option value="plus_billable">➕ Supplément validé CoDir (+30 €/h)</option>
-                                    <option value="plus_forfait">⏱️ Heures effectuées incluses au forfait (0 €)</option>
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Type d'ajustement / Supplément</label>
+                                <select id="adj-type" onchange="onAdjTypeChange()" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                                    <option value="plus_billable">➕ Supplément horaire CoDir (Heures × Tarif €/h)</option>
+                                    <option value="plus_custom">💎 Supplément exceptionnel CoDir (Montant libre €)</option>
+                                    <option value="minus">➖ Déduction / Absence partielle (Heures × Tarif €/h)</option>
+                                    <option value="minus_custom">🔻 Retenue exceptionnelle (Montant libre €)</option>
+                                    <option value="plus_forfait">⏱️ Heures réalisées incluses au forfait (0 €)</option>
                                 </select>
                             </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Durée (Heures)</label>
-                                <input type="number" step="0.25" id="adj-hours" placeholder="Ex: 1.5" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+                            <div class="md:col-span-1">
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1" id="adj-hours-label">Heures</label>
+                                <input type="number" step="0.25" id="adj-hours" value="1.0" oninput="calcAdjAmountAuto()" placeholder="Ex: 5.5" class="w-full px-2 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono-num font-bold">
                             </div>
-                            <div class="md:col-span-3">
-                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Motif précis</label>
-                                <input type="text" id="adj-reason" placeholder="Ex: Absence cours Taïso ou 3e réunion trimestre" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs">
+                            <div class="md:col-span-1" id="adj-rate-wrapper">
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Tarif €/h</label>
+                                <input type="number" step="0.5" id="adj-rate" value="30.00" oninput="calcAdjAmountAuto()" placeholder="30 ou 25" class="w-full px-2 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono-num font-bold">
+                            </div>
+                            <div class="md:col-span-2" id="adj-amount-wrapper">
+                                <label class="block text-[11px] font-bold text-[#C41E3A] mb-1">Montant Total (€)</label>
+                                <input type="number" step="0.01" id="adj-amount" value="30.00" placeholder="Ex: 137.50" class="w-full px-2.5 py-2 bg-white border border-rose-300 rounded-lg text-xs font-mono-num font-bold text-[#C41E3A]">
                             </div>
                             <div class="md:col-span-2">
-                                <button onclick="addAdjustment()" class="w-full py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold transition">
-                                    + Enregistrer
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Motif / Décision CoDir</label>
+                                <input type="text" id="adj-reason" placeholder="Ex: Journée du 29/08 validée CoDir" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs">
+                            </div>
+                            <div class="md:col-span-1 flex gap-1">
+                                <button onclick="addAdjustment()" id="btn-save-adj" class="w-full py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold transition shadow-sm" title="Enregistrer">
+                                    + Ajouter
+                                </button>
+                                <button onclick="cancelEditAdjustment()" id="btn-cancel-adj" class="hidden px-2 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold" title="Annuler la modification">
+                                    ✕
                                 </button>
                             </div>
                         </div>
@@ -415,10 +432,11 @@
                                     <tr>
                                         <th class="p-2.5">Mois</th>
                                         <th class="p-2.5">Nature</th>
-                                        <th class="p-2.5">Volume Horaire</th>
-                                        <th class="p-2.5">Impact Financier (30 €/h)</th>
-                                        <th class="p-2.5">Motif / Justification</th>
-                                        <th class="p-2.5 text-center">Action</th>
+                                        <th class="p-2.5 text-center">Volume Horaire</th>
+                                        <th class="p-2.5 text-center">Tarif Appliqué</th>
+                                        <th class="p-2.5 text-right">Impact Financier (€)</th>
+                                        <th class="p-2.5">Motif / Justification CoDir</th>
+                                        <th class="p-2.5 text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="adjustments-table-body" class="divide-y divide-slate-200"></tbody>
@@ -542,8 +560,11 @@
                                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
                                     <div id="lines-container" class="space-y-2"></div>
                                     <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-200">
-                                        <button type="button" onclick="ajouterLigne('ajout', '', 0)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold">
-                                            ➕ Ajouter Prestation / Extra
+                                        <button type="button" onclick="ajouterLigne('ajout', 'Supplément exceptionnel validé CoDir : ', 0)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold">
+                                            ➕ Supplément / Extra (Montant libre €)
+                                        </button>
+                                        <button type="button" onclick="ajouterSupplementHorairePrompt()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold">
+                                            ⏱️ + Supplément Horaire (Heures × Tarif €/h)
                                         </button>
                                         <button type="button" onclick="ajouterLigne('retenue', 'Absence cours du ... (X h × 30,00 €/h)', 30)" class="px-3 py-1.5 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-lg text-xs font-bold">
                                             ➖ Ajouter Retenue Absence
@@ -1065,7 +1086,9 @@
         // État global unifié
         let romainData = {
             checkState: {},         // { [date_courseId]: 'done' | 'cancelled' | 'vacation' | 'pending' }
-            adjustments: [],        // [{ id, month, type: 'minus'|'plus_billable'|'plus_forfait', hours, reason }]
+            adjustments: [
+                { id: 901, month: "2026-09", type: "plus_billable", hours: 5.5, rate: 25.00, amount: 137.50, reason: "Journée du 29/08 validée CoDir" }
+            ],
             customSessions: [],     // [{ id, date, name, time, duration }]
             sessionOverrides: {},   // { [date_courseId]: { name, time, duration, deleted } }
             monthlyStatements: {},  // { [monthKey]: { ref, periode, dateEdition, modeRemun, tauxRef, observations, reglement, statut, lignes: [] } }
@@ -1234,21 +1257,29 @@
                 });
             }
 
-            // Ajustements du mois
+            // Ajustements & Suppléments du mois (Tarif libre €/h ou Montant fixe €)
             const monthAdjs = (romainData.adjustments || []).filter(a => a.month === monthKey);
             let adjDoneHours = 0;
             let adjAbsentHours = 0;
             let adjBillableExtraEuro = 0;
             let adjBillableHours = 0;
+            let adjCustomDeductionEuro = 0;
 
             monthAdjs.forEach(a => {
                 const h = parseFloat(a.hours) || 0;
+                const r = (a.rate !== undefined && a.rate !== null && a.rate !== '') ? parseFloat(a.rate) : tauxRef;
+                const amt = (a.amount !== undefined && a.amount !== null && a.amount !== '') ? parseFloat(a.amount) : (h * r);
+
                 if (a.type === 'minus') {
                     adjAbsentHours += h;
-                } else if (a.type === 'plus_billable') {
+                    adjCustomDeductionEuro += amt;
+                } else if (a.type === 'minus_custom') {
+                    adjAbsentHours += h;
+                    adjCustomDeductionEuro += amt;
+                } else if (a.type === 'plus_billable' || a.type === 'plus_custom') {
                     adjDoneHours += h;
                     adjBillableHours += h;
-                    adjBillableExtraEuro += h * tauxRef;
+                    adjBillableExtraEuro += amt;
                 } else {
                     // plus_forfait ou ancien 'plus'
                     adjDoneHours += h;
@@ -1257,7 +1288,7 @@
 
             const totalEffectiveDoneHours = doneHours + adjDoneHours;
             const totalAbsentHours = absentHours + adjAbsentHours;
-            const totalDeductionEuro = totalAbsentHours * tauxRef;
+            const totalDeductionEuro = (absentHours * tauxRef) + adjCustomDeductionEuro;
             const estimatedNetEuro = 1500.00 - totalDeductionEuro + adjBillableExtraEuro;
 
             return {
@@ -1587,27 +1618,118 @@
             showToast("🗑️ Séance retirée de ce jour");
         }
 
-        // --- AJUSTEMENTS HORAIRES PONCTUELS ---
+        // --- AJUSTEMENTS HORAIRES & SUPPLÉMENTS SUR-MESURE CODIR ---
+        function onAdjTypeChange() {
+            const type = document.getElementById('adj-type').value;
+            const rateWrap = document.getElementById('adj-rate-wrapper');
+            const amtInp = document.getElementById('adj-amount');
+            const hoursLbl = document.getElementById('adj-hours-label');
+
+            if (type === 'plus_custom' || type === 'minus_custom') {
+                rateWrap.classList.add('opacity-40');
+                hoursLbl.textContent = "Heures (opt.)";
+                amtInp.focus();
+            } else if (type === 'plus_forfait') {
+                rateWrap.classList.add('opacity-40');
+                hoursLbl.textContent = "Heures";
+                amtInp.value = "0.00";
+            } else {
+                rateWrap.classList.remove('opacity-40');
+                hoursLbl.textContent = "Heures";
+                calcAdjAmountAuto();
+            }
+        }
+
+        function calcAdjAmountAuto() {
+            const type = document.getElementById('adj-type').value;
+            if (type === 'plus_custom' || type === 'minus_custom') return;
+            if (type === 'plus_forfait') {
+                document.getElementById('adj-amount').value = "0.00";
+                return;
+            }
+            const h = parseFloat(document.getElementById('adj-hours').value) || 0;
+            const r = parseFloat(document.getElementById('adj-rate').value) || 0;
+            document.getElementById('adj-amount').value = (h * r).toFixed(2);
+        }
+
         function addAdjustment() {
+            const editId = document.getElementById('adj-edit-id').value;
             const month = document.getElementById('adj-month').value;
             const type = document.getElementById('adj-type').value;
-            const hours = parseFloat(document.getElementById('adj-hours').value);
+            const hours = parseFloat(document.getElementById('adj-hours').value) || 0;
+            const rate = parseFloat(document.getElementById('adj-rate').value) || 0;
+            const amount = parseFloat(document.getElementById('adj-amount').value) || 0;
             const reason = document.getElementById('adj-reason').value.trim();
 
-            if (isNaN(hours) || hours <= 0 || !reason) {
-                alert("Veuillez renseigner la durée et le motif précis.");
+            if (!reason) {
+                alert("Veuillez renseigner le motif ou la décision du CoDir.");
+                return;
+            }
+            if ((type === 'plus_billable' || type === 'minus') && hours <= 0 && amount <= 0) {
+                alert("Veuillez renseigner le nombre d'heures ou le montant.");
+                return;
+            }
+            if ((type === 'plus_custom' || type === 'minus_custom') && amount <= 0) {
+                alert("Veuillez saisir le montant en euros (€).");
                 return;
             }
 
             if (!romainData.adjustments) romainData.adjustments = [];
-            romainData.adjustments.push({ id: Date.now(), month, type, hours, reason });
-            document.getElementById('adj-hours').value = '';
-            document.getElementById('adj-reason').value = '';
 
+            const payload = {
+                id: editId ? parseInt(editId, 10) : Date.now(),
+                month,
+                type,
+                hours,
+                rate: (type === 'plus_forfait') ? 0 : rate,
+                amount: (type === 'plus_forfait') ? 0 : amount,
+                reason
+            };
+
+            if (editId) {
+                const idx = romainData.adjustments.findIndex(x => x.id === parseInt(editId, 10));
+                if (idx !== -1) romainData.adjustments[idx] = payload;
+            } else {
+                romainData.adjustments.push(payload);
+            }
+
+            cancelEditAdjustment();
             autoSaveAllLocal();
             renderAdjustmentsTable();
             updatePointageKPIs();
-            showToast("✅ Ajustement enregistré !");
+            updateReleveBridgeBanner();
+            showToast(editId ? "✏️ Supplément / Ajustement mis à jour !" : "✅ Supplément / Ajustement enregistré !");
+        }
+
+        function editAdjustment(id) {
+            const adj = (romainData.adjustments || []).find(a => a.id === id);
+            if (!adj) return;
+            const tauxRef = parseFloat(document.getElementById('taux_horaire_ref')?.value) || 30.0;
+            const r = (adj.rate !== undefined && adj.rate !== null) ? adj.rate : tauxRef;
+            const amt = (adj.amount !== undefined && adj.amount !== null) ? adj.amount : ((parseFloat(adj.hours)||0) * r);
+
+            document.getElementById('adj-edit-id').value = adj.id;
+            document.getElementById('adj-month').value = adj.month;
+            document.getElementById('adj-type').value = adj.type;
+            document.getElementById('adj-hours').value = adj.hours || 0;
+            document.getElementById('adj-rate').value = r;
+            document.getElementById('adj-amount').value = Number(amt).toFixed(2);
+            document.getElementById('adj-reason').value = adj.reason || '';
+
+            document.getElementById('btn-save-adj').textContent = "💾 Modifier";
+            document.getElementById('btn-cancel-adj').classList.remove('hidden');
+            onAdjTypeChange();
+        }
+
+        function cancelEditAdjustment() {
+            document.getElementById('adj-edit-id').value = '';
+            document.getElementById('adj-hours').value = '1.0';
+            document.getElementById('adj-rate').value = '30.00';
+            document.getElementById('adj-amount').value = '30.00';
+            document.getElementById('adj-reason').value = '';
+            document.getElementById('btn-save-adj').textContent = "+ Ajouter";
+            document.getElementById('btn-cancel-adj').classList.add('hidden');
+            onAdjTypeChange();
         }
 
         function renderAdjustmentsTable() {
@@ -1616,35 +1738,56 @@
             tbody.innerHTML = '';
             const list = romainData.adjustments || [];
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Aucun ajustement horaire enregistré.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Aucun supplément ou ajustement horaire enregistré.</td></tr>`;
                 return;
             }
 
             const tauxRef = parseFloat(document.getElementById('taux_horaire_ref')?.value) || 30.0;
 
             list.forEach(adj => {
+                const h = parseFloat(adj.hours) || 0;
+                const r = (adj.rate !== undefined && adj.rate !== null && adj.rate !== '') ? parseFloat(adj.rate) : tauxRef;
+                const amt = (adj.amount !== undefined && adj.amount !== null && adj.amount !== '') ? parseFloat(adj.amount) : (h * r);
+
                 let badge = `<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-emerald-100 text-emerald-800">⏱️ Inclus Forfait</span>`;
-                let impactEuro = `0,00 € (Forfait)`;
+                let rateDisplay = `Inclus forfait`;
+                let impactEuro = `<span class="text-slate-400">0,00 €</span>`;
                 let sign = '+';
+                let isNegative = false;
 
                 if (adj.type === 'minus') {
                     badge = `<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-rose-100 text-[#C41E3A]">➖ Déduction Absence</span>`;
-                    impactEuro = `<strong class="text-[#C41E3A]">-${formatEuro(adj.hours * tauxRef)}</strong>`;
+                    rateDisplay = `${formatEuro(r)}/h`;
+                    impactEuro = `<strong class="text-[#C41E3A]">-${formatEuro(amt)}</strong>`;
                     sign = '-';
+                    isNegative = true;
+                } else if (adj.type === 'minus_custom') {
+                    badge = `<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-rose-100 text-[#C41E3A]">🔻 Retenue Montant Libre</span>`;
+                    rateDisplay = `Montant fixe`;
+                    impactEuro = `<strong class="text-[#C41E3A]">-${formatEuro(amt)}</strong>`;
+                    sign = '-';
+                    isNegative = true;
                 } else if (adj.type === 'plus_billable') {
-                    badge = `<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-blue-100 text-blue-800">➕ Extra Facturable CoDir</span>`;
-                    impactEuro = `<strong class="text-emerald-700">+${formatEuro(adj.hours * tauxRef)}</strong>`;
+                    badge = `<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-blue-100 text-blue-800">➕ Supplément Horaire CoDir</span>`;
+                    rateDisplay = `${formatEuro(r)}/h`;
+                    impactEuro = `<strong class="text-emerald-700">+${formatEuro(amt)}</strong>`;
+                } else if (adj.type === 'plus_custom') {
+                    badge = `<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-purple-100 text-purple-800">💎 Supplément Exceptionnel CoDir</span>`;
+                    rateDisplay = `Forfait / Libre`;
+                    impactEuro = `<strong class="text-emerald-700">+${formatEuro(amt)}</strong>`;
                 }
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
                         <td class="p-2.5 font-bold font-fredoka">${adj.month}</td>
                         <td class="p-2.5">${badge}</td>
-                        <td class="p-2.5 font-mono-num font-bold ${adj.type === 'minus' ? 'text-[#C41E3A]' : 'text-emerald-700'}">${sign}${formatDuree(adj.hours)}</td>
-                        <td class="p-2.5 font-mono-num">${impactEuro}</td>
-                        <td class="p-2.5 text-slate-700">${adj.reason}</td>
-                        <td class="p-2.5 text-center">
-                            <button onclick="deleteAdjustment(${adj.id})" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button>
+                        <td class="p-2.5 text-center font-mono-num font-bold ${isNegative ? 'text-[#C41E3A]' : 'text-emerald-700'}">${h > 0 ? sign + formatDuree(h) : '—'}</td>
+                        <td class="p-2.5 text-center font-mono-num text-slate-600">${rateDisplay}</td>
+                        <td class="p-2.5 text-right font-mono-num">${impactEuro}</td>
+                        <td class="p-2.5 font-medium text-slate-800">${adj.reason}</td>
+                        <td class="p-2.5 text-center space-x-1">
+                            <button onclick="editAdjustment(${adj.id})" class="text-slate-400 hover:text-blue-600 px-1" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteAdjustment(${adj.id})" class="text-slate-400 hover:text-rose-600 px-1" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -1652,10 +1795,12 @@
         }
 
         function deleteAdjustment(id) {
+            if (!confirm("Supprimer cet ajustement / supplément ?")) return;
             romainData.adjustments = (romainData.adjustments || []).filter(a => a.id !== id);
             autoSaveAllLocal();
             renderAdjustmentsTable();
             updatePointageKPIs();
+            updateReleveBridgeBanner();
         }
 
         /* ========================================================================= */
@@ -1666,7 +1811,8 @@
             const meta = getMonthMeta(currentMonthKey);
             const el = document.getElementById('releve-bridge-summary');
             if (!el) return;
-            el.innerHTML = `Mois de <strong>${meta.label}</strong> : <strong>${formatDuree(st.totalEffectiveDoneHours)}</strong> réalisées • <strong class="text-rose-400">${formatDuree(st.totalAbsentHours)} d'absence(s) (-${formatEuro(st.totalDeductionEuro)})</strong> • Net calculé : <strong class="text-emerald-400">${formatEuro(st.estimatedNetEuro)}</strong>`;
+            const supTxt = st.adjBillableExtraEuro > 0 ? ` • <strong class="text-sky-300">Suppléments CoDir : +${formatEuro(st.adjBillableExtraEuro)}</strong>` : '';
+            el.innerHTML = `Mois de <strong>${meta.label}</strong> : <strong>${formatDuree(st.totalEffectiveDoneHours)}</strong> réalisées${supTxt} • <strong class="text-rose-400">${formatDuree(st.totalAbsentHours)} d'absence(s) (-${formatEuro(st.totalDeductionEuro)})</strong> • Net calculé : <strong class="text-emerald-400">${formatEuro(st.estimatedNetEuro)}</strong>`;
         }
 
         function transfererPointageVersReleve() {
@@ -1701,19 +1847,35 @@
                 });
             });
 
-            // Ajouter les ajustements financiers du mois (- absences partielles ou + suppléments CoDir)
+            // Ajouter les ajustements & suppléments financiers du mois (avec leur tarif spécifique ex: 25€/h ou montant libre €)
             st.monthAdjs.forEach(adj => {
+                const h = parseFloat(adj.hours) || 0;
+                const r = (adj.rate !== undefined && adj.rate !== null && adj.rate !== '') ? parseFloat(adj.rate) : tauxRef;
+                const amt = (adj.amount !== undefined && adj.amount !== null && adj.amount !== '') ? parseFloat(adj.amount) : (h * r);
+
                 if (adj.type === 'minus') {
                     newLines.push({
                         type: 'retenue',
-                        desc: `${adj.reason} (${String(adj.hours).replace('.', ',')} h × ${tauxRef.toFixed(2).replace('.', ',')} €/h)`,
-                        montant: parseFloat((adj.hours * tauxRef).toFixed(2))
+                        desc: `${adj.reason} (${String(h).replace('.', ',')} h × ${r.toFixed(2).replace('.', ',')} €/h)`,
+                        montant: parseFloat(amt.toFixed(2))
+                    });
+                } else if (adj.type === 'minus_custom') {
+                    newLines.push({
+                        type: 'retenue',
+                        desc: `${adj.reason}${h > 0 ? ' (' + String(h).replace('.', ',') + ' h)' : ''}`,
+                        montant: parseFloat(amt.toFixed(2))
                     });
                 } else if (adj.type === 'plus_billable') {
                     newLines.push({
                         type: 'ajout',
-                        desc: `Supplément validé CoDir : ${adj.reason} (${String(adj.hours).replace('.', ',')} h × ${tauxRef.toFixed(2).replace('.', ',')} €/h)`,
-                        montant: parseFloat((adj.hours * tauxRef).toFixed(2))
+                        desc: `Supplément validé CoDir : ${adj.reason} (${String(h).replace('.', ',')} h × ${r.toFixed(2).replace('.', ',')} €/h)`,
+                        montant: parseFloat(amt.toFixed(2))
+                    });
+                } else if (adj.type === 'plus_custom') {
+                    newLines.push({
+                        type: 'ajout',
+                        desc: `Supplément exceptionnel validé CoDir : ${adj.reason}${h > 0 ? ' (' + String(h).replace('.', ',') + ' h)' : ''}`,
+                        montant: parseFloat(amt.toFixed(2))
                     });
                 }
             });
@@ -1722,7 +1884,7 @@
             afficherLignesBuilder();
             saveCurrentStatementToMonthMemory(currentMonthKey);
             autoSaveAllLocal();
-            showToast(`⚡ Relevé de ${meta.label} généré avec ${st.absentSessionsList.length} absence(s) déduite(s) !`);
+            showToast(`⚡ Relevé de ${meta.label} actualisé (Net : ${formatEuro(st.estimatedNetEuro)}) !`);
         }
 
         function saveCurrentStatementToMonthMemory(mKey) {
@@ -1853,6 +2015,20 @@
             afficherLignesBuilder();
             saveCurrentStatementToMonthMemory(currentMonthKey);
             autoSaveAllLocal();
+        }
+
+        function ajouterSupplementHorairePrompt() {
+            const motif = prompt("Intitulé du supplément validé par le CoDir :", "Journée du 29/08 validée CoDir");
+            if (!motif) return;
+            const hStr = prompt("Nombre d'heures réalisées :", "5.5");
+            const h = parseFloat((hStr || "0").replace(',', '.')) || 0;
+            const rStr = prompt("Tarif horaire accordé (€/h) :", "25");
+            const r = parseFloat((rStr || "30").replace(',', '.')) || 0;
+            const total = parseFloat((h * r).toFixed(2));
+            const desc = h > 0
+                ? `Supplément validé CoDir : ${motif} (${String(h).replace('.', ',')} h × ${r.toFixed(2).replace('.', ',')} €/h)`
+                : `Supplément exceptionnel validé CoDir : ${motif}`;
+            ajouterLigne('ajout', desc, total);
         }
 
         function supprimerLigne(index) {
@@ -2453,6 +2629,18 @@
                     </thead>
                     <tbody>${rowsHtml}</tbody>
                 </table>
+                ${st.monthAdjs.length > 0 ? `
+                    <div style="background:#F0F9FF; border:1px solid #BAE6FD; border-left:4px solid #0284C7; padding:8px 12px; border-radius:6px; margin-top:10px; font-size:8pt; color:#0369A1;">
+                        <strong style="text-transform:uppercase; font-size:7.5pt; display:block; margin-bottom:3px;">Suppléments & Ajustements enregistrés sur la période :</strong>
+                        ${st.monthAdjs.map(a => {
+                            const h = parseFloat(a.hours) || 0;
+                            const r = (a.rate !== undefined && a.rate !== null && a.rate !== '') ? parseFloat(a.rate) : 30;
+                            const amt = (a.amount !== undefined && a.amount !== null && a.amount !== '') ? parseFloat(a.amount) : (h * r);
+                            const isNeg = (a.type === 'minus' || a.type === 'minus_custom');
+                            return `<div>• <strong>${isNeg ? '-' : '+'}${h > 0 ? formatDuree(h) + ' (' : ''}${isNeg ? '-' : '+'}${formatEuro(amt)}${h > 0 ? ')' : ''}</strong> : ${a.reason}</div>`;
+                        }).join('')}
+                    </div>
+                ` : ''}
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:18px; page-break-inside:avoid;">
                     <div style="border:1px dashed #94A3B8; padding:10px; border-radius:6px; min-height:85px; font-size:8pt; background:#FAFAFA; text-align:center;">
                         <strong style="color:#C41E3A; font-family:'Fredoka',sans-serif;">Le Prestataire / Éducateur Sportif :</strong>
@@ -2621,6 +2809,22 @@
                 } catch (e) {}
             }
 
+            if (!Array.isArray(romainData.adjustments)) romainData.adjustments = [];
+            if (!romainData.adjustments.some(a => a.month === '2026-09' && String(a.reason).includes('29/08'))) {
+                romainData.adjustments.push({
+                    id: 901,
+                    month: "2026-09",
+                    type: "plus_billable",
+                    hours: 5.5,
+                    rate: 25.00,
+                    amount: 137.50,
+                    reason: "Journée du 29/08 validée CoDir"
+                });
+                // Si le relevé de 2026-09 n'avait pas encore ce supplément, on le régénère proprement
+                if (romainData.monthlyStatements && romainData.monthlyStatements['2026-09']) {
+                    delete romainData.monthlyStatements['2026-09'];
+                }
+            }
             majMinis();
             loadStatementFromMonthMemory(currentMonthKey);
             renderPointage();
