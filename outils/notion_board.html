@@ -23,7 +23,7 @@
             --gris-fonce: #2D3748;
             --gris-moyen: #64748B;
             --gris-clair: #94A3B8;
-            --gris-tres-clair: #E2E8F0;
+            --gris-tres-clair: #E2E8E0;
             --fond: #F4F6F9;
             --blanc: #FFFFFF;
         }
@@ -148,6 +148,38 @@
             background: #10B981;
             border-color: #10B981;
             color: white;
+        }
+
+        /* Bouton de bascule directe Tâche -> Page Note Détaillée */
+        .task-note-bridge-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            transition: all 0.15s ease;
+            border: 1px solid #E2E8F0;
+            background: #F8FAFC;
+            color: #475569;
+            flex-shrink: 0;
+        }
+        .task-note-bridge-btn:hover {
+            background: var(--rouge);
+            color: #FFFFFF;
+            border-color: var(--rouge);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(196, 30, 58, 0.25);
+        }
+        .task-note-bridge-btn.has-linked-note {
+            background: #FFF1F2;
+            color: var(--rouge);
+            border-color: #FECDD3;
+        }
+        .task-note-bridge-btn.has-linked-note:hover {
+            background: var(--rouge);
+            color: #FFFFFF;
         }
 
         .kanban-grid {
@@ -367,7 +399,7 @@
                                 <i class="fa-solid fa-cloud-check"></i> Synchronisé
                             </span>
                         </div>
-                        <p class="text-xs text-slate-500">1. Pilotage des Tâches (Google Tasks / Keep / Trello) • 2. Carnets de Notes (Studio Notion)</p>
+                        <p class="text-xs text-slate-500">1. Pilotage des Tâches (Google Tasks / Keep / Trello) • 2. Carnets de Notes & Dossier Tâches lié</p>
                     </div>
                 </div>
 
@@ -390,6 +422,10 @@
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                     <input type="text" id="global-search-input" oninput="handleGlobalSearch()" placeholder="Rechercher partout..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-full text-xs outline-none focus:bg-white focus:border-[#C41E3A]">
                 </div>
+
+                <button onclick="syncAllTasksToNotesFolder(false)" id="btn-sync-task-notes" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-[#C41E3A] border border-rose-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-sm" title="Générer ou mettre à jour une page de note détaillée dans le dossier Tâches pour chaque tâche active">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Lier toutes les Tâches → Notes
+                </button>
 
                 <button onclick="openBulkAddModal()" id="btn-top-bulk" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-sm" title="Coller plusieurs lignes d'un coup pour créer des tâches en série">
                     <i class="fa-solid fa-bolt"></i> Ajout Multiple
@@ -471,6 +507,10 @@
                     </div>
 
                     <div class="flex items-center gap-2 flex-wrap">
+                        <button onclick="openNotesFolderTasks()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-[#C41E3A] border border-rose-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition" title="Ouvrir directement le dossier Tâches dans le Studio Notes">
+                            <i class="fa-solid fa-folder-open"></i> Voir Dossier « Tâches » dans Notes
+                        </button>
+
                         <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 cursor-pointer bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
                             <input type="checkbox" id="chk-show-completed" onchange="renderTasksWorkspace()" class="rounded text-[#C41E3A]">
                             <span>Afficher les tâches terminées</span>
@@ -514,6 +554,7 @@
                         <div class="flex items-center gap-1 pl-2 border-l border-slate-200 flex-wrap" id="notes-tag-filters">
                             <button onclick="setNoteTagFilter('ALL')" id="ntag-ALL" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-800 text-white">Toutes</button>
                             <button onclick="setNoteTagFilter('PINNED')" id="ntag-PINNED" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100">⭐ Épinglées</button>
+                            <button onclick="setNoteTagFilter('Tâche liée')" id="ntag-Tâche liée" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-[#C41E3A] border border-rose-200 hover:bg-rose-100">✅ Tâches liées</button>
                             <button onclick="setNoteTagFilter('Important')" id="ntag-Important" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">#Important</button>
                             <button onclick="setNoteTagFilter('Procédure')" id="ntag-Procédure" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100">#Procédure</button>
                             <button onclick="setNoteTagFilter('Mairie')" id="ntag-Mairie" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100">#Mairie</button>
@@ -558,7 +599,7 @@
 
                         <div>
                             <div class="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-1 px-1">Pôles du Dojo</div>
-                            <ul class="space-y-1 max-h-[380px] overflow-y-auto pr-1" id="fixed-folders-list"></ul>
+                            <ul class="space-y-1 max-h-[420px] overflow-y-auto pr-1" id="fixed-folders-list"></ul>
                         </div>
 
                         <div id="custom-folders-wrapper">
@@ -634,8 +675,19 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Détails / Notes de la tâche</label>
-                    <textarea id="tm-notes" rows="3" placeholder="Précisions, numéros de téléphone, historique d'envoi..." class="w-full p-3 border border-slate-300 rounded-xl text-xs outline-none focus:border-[#C41E3A]"></textarea>
+                    <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Résumé rapide (affiché sur la carte de tâche)</label>
+                    <textarea id="tm-notes" rows="2" placeholder="Court rappel ou info clé visible sur la liste de tâches..." class="w-full p-3 border border-slate-300 rounded-xl text-xs outline-none focus:border-[#C41E3A]"></textarea>
+                </div>
+
+                <!-- Encart Liaison Page Détaillée dans le Dossier Tâches des Notes -->
+                <div class="bg-rose-50/70 border border-rose-200 rounded-xl p-3.5 flex items-center justify-between gap-3 flex-wrap">
+                    <div class="text-xs text-slate-700">
+                        <strong class="font-fredoka text-[#C41E3A] block text-xs"><i class="fa-solid fa-book-open"></i> Besoin de noter tout le détail (checklists Jour J, affaires à emmener, déroulé) ?</strong>
+                        <span>Basculez cette tâche sur sa propre page complète dans le dossier <strong>« ✅ Tâches »</strong> des Notes sans alourdir votre carte.</span>
+                    </div>
+                    <button type="button" onclick="saveAndOpenTaskNoteFromModal()" class="px-3.5 py-2 bg-[#C41E3A] hover:bg-[#A3182E] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm shrink-0">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir sa Page dans « Tâches » (Notes)
+                    </button>
                 </div>
 
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
@@ -740,7 +792,6 @@
 
     <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
     <script src="../js/sidebar.js"></script>
-
     <script>
         /* ========================================================================= */
         /* CONFIGURATION SUPABASE & VOS 6 LISTES GOOGLE TASKS INTÉGRALES             */
@@ -750,8 +801,14 @@
         const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
         const SUPABASE_TABLE = 'notion_board';
 
-        // 1. Dossiers Notion par défaut (Base de connaissances)
+        // 1. Dossiers Notion par défaut (Base de connaissances + Dossier Tâches lié)
         const defaultFolders = {
+            taches: {
+                title: "Tâches (Fiches & Détails)",
+                icon: "✅",
+                isFixed: true,
+                blocks: []
+            },
             proj: {
                 title: "Projets Dojo Dornois",
                 icon: "📂",
@@ -1154,9 +1211,9 @@
         let focusSelectedListId = 'ALL';
 
         // État Studio Notion (Espace 2)
-        let currentFolderKey = 'proj'; // ou 'ALL_NOTES'
+        let currentFolderKey = 'taches'; // Par défaut prêt sur Tâches ou Projets
         let activeNoteId = null;
-        let notesViewMode = 'split'; // 'split' (Éditeur Page Notion), 'gallery' (Cartes), 'stream' (Lecture continue)
+        let notesViewMode = 'split';
         let activeNoteTagFilter = 'ALL';
 
         // État Modales Tâches
@@ -1165,6 +1222,159 @@
         let editingListId = null;
         let draggedTaskId = null;
         let syncTimeout = null;
+
+        /* ========================================================================= */
+        /* LIAISON AUTOMATIQUE & BIDIRECTIONNELLE : TÂCHES (ONGLET 1) ↔ NOTES (DOSSIER TÂCHES) */
+        /* ========================================================================= */
+        function buildDefaultTaskNoteTemplate(task, listObj) {
+            const listLabel = listObj ? `${listObj.icon || '📋'} ${listObj.title}` : 'Liste de tâches';
+            const introNotes = task.notes ? `<p>${escapeHtml(task.notes)}</p>` : `<p><em>Aucun résumé court renseigné sur la tâche. Utilisez cette page pour noter tous vos détails sans alourdir votre carte de tâche.</em></p>`;
+
+            return `<h1>${escapeHtml(task.title)}</h1>` +
+                `<div style="background:#FFF5F5; border:1px solid #FED7D7; border-left:4px solid #C41E3A; padding:12px 16px; border-radius:8px; margin:12px 0; color:#742A2A;">` +
+                `<strong>📌 Contexte & Rappel de la tâche (${escapeHtml(listLabel)}) :</strong>${introNotes}` +
+                `</div>` +
+                `<h2>🎒 À penser / À emmener le Jour J (Logistique & Matériel)</h2>` +
+                `<div style="display:flex; align-items:center; gap:8px; margin:4px 0;"><input type="checkbox" style="width:15px; height:15px; accent-color:#C41E3A; cursor:pointer;"> <span>Documents / Feuilles d'émargement / Stylos...</span></div>` +
+                `<div style="display:flex; align-items:center; gap:8px; margin:4px 0;"><input type="checkbox" style="width:15px; height:15px; accent-color:#C41E3A; cursor:pointer;"> <span>Matériel informatique / Rallonge / Affichage...</span></div>` +
+                `<h2>📝 Détails complets, Déroulé & Notes de suivi</h2>` +
+                `<p>Notez ici tout le détail de ce point (avant, pendant, après, compte-rendu, idées, contacts...)</p>`;
+        }
+
+        function ensureSingleTaskLinkedNote(task) {
+            if (!notionData.taches) {
+                notionData.taches = { title: "Tâches (Fiches & Détails)", icon: "✅", isFixed: true, blocks: [] };
+            }
+            if (!Array.isArray(notionData.taches.blocks)) {
+                notionData.taches.blocks = [];
+            }
+
+            const lst = (workspaceTasks.lists || []).find(l => l.id === task.listId);
+            const listIcon = lst ? (lst.icon || '✅') : '✅';
+            const listTag = lst ? lst.title.replace(/^\d+\s*-\s*/, '').trim() : 'Tâche';
+
+            // Chercher si une page liée existe déjà dans le dossier taches (ou dans un autre dossier)
+            let existingNote = null;
+            let foundFolderKey = 'taches';
+
+            Object.keys(notionData).forEach(fKey => {
+                if (fKey.startsWith('_')) return;
+                const found = (notionData[fKey]?.blocks || []).find(b => b.linkedTaskId === task.id || (task.linkedNoteId && b.id === task.linkedNoteId));
+                if (found) {
+                    existingNote = found;
+                    foundFolderKey = fKey;
+                }
+            });
+
+            if (existingNote) {
+                task.linkedNoteId = existingNote.id;
+                existingNote.linkedTaskId = task.id;
+                // On met à jour le titre et l'icône si la tâche a changé de nom, sans jamais écraser le contenu détaillé écrit dans la note !
+                existingNote.title = task.title;
+                if (!existingNote.icon || existingNote.icon === '📄') existingNote.icon = listIcon;
+                if (!Array.isArray(existingNote.tags)) existingNote.tags = [];
+                if (!existingNote.tags.includes('Tâche liée')) existingNote.tags.push('Tâche liée');
+                if (task.priority === 'high' && !existingNote.tags.includes('Important')) existingNote.tags.push('Important');
+                return { note: existingNote, folderKey: foundFolderKey, created: false };
+            }
+
+            // Sinon, on crée automatiquement la nouvelle page dans le dossier "Tâches"
+            const newNoteId = Date.now() + Math.floor(Math.random() * 100000);
+            const tags = ['Tâche liée'];
+            if (task.priority === 'high') tags.push('Important');
+            if (listTag) tags.push(listTag);
+
+            const newNote = {
+                id: newNoteId,
+                linkedTaskId: task.id,
+                icon: listIcon,
+                title: task.title,
+                pinned: task.priority === 'high',
+                tags: tags,
+                updatedAt: new Date().toISOString(),
+                content: buildDefaultTaskNoteTemplate(task, lst)
+            };
+
+            notionData.taches.blocks.unshift(newNote);
+            task.linkedNoteId = newNote.id;
+            return { note: newNote, folderKey: 'taches', created: true };
+        }
+
+        function syncAllTasksToNotesFolder(silent = true) {
+            let createdCount = 0;
+            // Parcourir en ordre inverse pour garder l'ordre naturel en haut du dossier Tâches
+            const tasksList = [...(workspaceTasks.tasks || [])].reverse();
+            tasksList.forEach(t => {
+                const res = ensureSingleTaskLinkedNote(t);
+                if (res.created) createdCount++;
+            });
+            if (!silent) {
+                triggerAutoSave();
+                renderTasksWorkspace();
+                renderNotesWorkspace();
+                showToast(createdCount > 0
+                    ? `✅ ${createdCount} nouvelle(s) page(s) créée(s) dans le dossier « Tâches » !`
+                    : `✅ Toutes vos tâches (${workspaceTasks.tasks.length}) ont déjà leur page liée dans le dossier « Tâches » !`);
+            }
+            return createdCount;
+        }
+
+        // Fonction appelée au clic sur le bouton "📓 Page Détail" sur n'importe quelle tâche
+        function openOrCreateTaskNotePage(taskId, event = null) {
+            if (event) event.stopPropagation();
+            const task = (workspaceTasks.tasks || []).find(t => t.id === taskId);
+            if (!task) return;
+
+            const { note, folderKey } = ensureSingleTaskLinkedNote(task);
+            triggerAutoSave();
+
+            // Basculer directement sur l'Espace 2 (Notes), sélectionner le dossier Tâches et ouvrir la page
+            currentFolderKey = folderKey;
+            activeNoteId = note.id;
+            notesViewMode = 'split';
+            switchMainSpace('notes');
+            showToast(`📓 Page détaillée ouverte : ${task.title}`);
+        }
+
+        function openNotesFolderTasks() {
+            syncAllTasksToNotesFolder(true);
+            currentFolderKey = 'taches';
+            notesViewMode = 'split';
+            switchMainSpace('notes');
+        }
+
+        function saveAndOpenTaskNoteFromModal() {
+            const title = document.getElementById('tm-title').value.trim();
+            if (!title) {
+                alert("Veuillez renseigner l'intitulé de la tâche avant d'ouvrir sa page de note.");
+                return;
+            }
+            const targetId = editingTaskId !== null ? editingTaskId : Date.now();
+            const payload = {
+                id: targetId,
+                listId: document.getElementById('tm-list').value,
+                title: title,
+                status: document.getElementById('tm-status').value,
+                priority: document.getElementById('tm-priority').value,
+                dueDate: document.getElementById('tm-due').value,
+                waitingReason: document.getElementById('tm-waiting-reason').value.trim(),
+                notes: document.getElementById('tm-notes').value.trim(),
+                subtasks: modalSubtasksTemp
+            };
+
+            if (editingTaskId !== null) {
+                const idx = workspaceTasks.tasks.findIndex(t => t.id === editingTaskId);
+                if (idx !== -1) {
+                    payload.linkedNoteId = workspaceTasks.tasks[idx].linkedNoteId;
+                    workspaceTasks.tasks[idx] = payload;
+                }
+            } else {
+                workspaceTasks.tasks.unshift(payload);
+            }
+
+            closeTaskModal();
+            openOrCreateTaskNotePage(targetId);
+        }
 
         /* ========================================================================= */
         /* CHARGEMENT & SYNCHRONISATION SUPABASE + LOCALSTORAGE                      */
@@ -1189,7 +1399,6 @@
                 if (error && error.code !== 'PGRST116') throw error;
                 if (result && result.data) {
                     const cloudData = result.data;
-                    // Si le cloud n'avait pas encore la v2 des tâches Google Tasks, on préserve nos 6 listes Google Tasks
                     if (!cloudData._workspace_tasks_v2) {
                         cloudData._workspace_tasks_v2 = workspaceTasks;
                     }
@@ -1207,9 +1416,27 @@
             if (!notionData || typeof notionData !== 'object') {
                 notionData = JSON.parse(JSON.stringify(defaultFolders));
             }
+
+            // Garantir que le dossier 'taches' apparaît en tout premier dans les dossiers fixes
+            const orderedNotionData = {
+                taches: notionData.taches || JSON.parse(JSON.stringify(defaultFolders.taches))
+            };
+            orderedNotionData.taches.isFixed = true;
+            orderedNotionData.taches.icon = orderedNotionData.taches.icon || "✅";
+            orderedNotionData.taches.title = orderedNotionData.taches.title || "Tâches (Fiches & Détails)";
+            if (!Array.isArray(orderedNotionData.taches.blocks)) orderedNotionData.taches.blocks = [];
+
             Object.keys(defaultFolders).forEach(k => {
-                if (!notionData[k]) notionData[k] = JSON.parse(JSON.stringify(defaultFolders[k]));
-                // Normaliser chaque bloc en Page Notion complète
+                if (k === 'taches') return;
+                orderedNotionData[k] = notionData[k] || JSON.parse(JSON.stringify(defaultFolders[k]));
+            });
+            Object.keys(notionData).forEach(k => {
+                if (!orderedNotionData[k]) orderedNotionData[k] = notionData[k];
+            });
+            notionData = orderedNotionData;
+
+            Object.keys(notionData).forEach(k => {
+                if (k.startsWith('_')) return;
                 if (Array.isArray(notionData[k].blocks)) {
                     notionData[k].blocks.forEach((b, idx) => {
                         if (!b.id) b.id = Date.now() + idx;
@@ -1227,15 +1454,20 @@
                 workspaceTasks = JSON.parse(JSON.stringify(defaultWorkspaceTasks));
                 notionData._workspace_tasks_v2 = workspaceTasks;
             }
+
+            // Liaison automatique : chaque tâche de l'Onglet 1 dispose automatiquement de sa page dans le dossier "Tâches" de l'Onglet 2
+            syncAllTasksToNotesFolder(true);
         }
 
         function restaurerTachesGoogleTasks() {
             if (confirm("Recharger les 6 listes et 27 tâches officielles Google Tasks ?")) {
                 workspaceTasks = JSON.parse(JSON.stringify(defaultWorkspaceTasks));
                 notionData._workspace_tasks_v2 = workspaceTasks;
+                syncAllTasksToNotesFolder(true);
                 triggerAutoSave();
                 renderTasksWorkspace();
-                showToast("✅ Vos 6 listes Google Tasks ont été restaurées !");
+                renderNotesWorkspace();
+                showToast("✅ Vos 6 listes Google Tasks ont été restaurées et liées au dossier Tâches !");
             }
         }
 
@@ -1437,6 +1669,7 @@
             const isWaiting = t.status === 'waiting';
             const subtasks = t.subtasks || [];
             const doneSubs = subtasks.filter(s => s.done).length;
+            const hasNote = !!t.linkedNoteId;
 
             let prioBadge = '';
             if (t.priority === 'high' && !isDone) {
@@ -1486,11 +1719,18 @@
                             ${isDone ? '<i class="fa-solid fa-check text-[10px]"></i>' : ''}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between gap-1">
+                            <div class="flex items-start justify-between gap-1.5">
                                 <span class="task-title-text text-xs font-bold text-slate-800 leading-snug">${escapeHtml(t.title)}</span>
-                                <button onclick="event.stopPropagation(); quickToggleWaiting(${t.id});" class="text-[11px] ${isWaiting ? 'text-amber-600' : 'text-slate-300 hover:text-amber-600'} px-1" title="Basculer En attente / Bloqué">
-                                    <i class="fa-solid fa-hourglass-half"></i>
-                                </button>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <button onclick="openOrCreateTaskNotePage(${t.id}, event)"
+                                            class="task-note-bridge-btn ${hasNote ? 'has-linked-note' : ''}"
+                                            title="Basculer sur la page détaillée de cette tâche dans le dossier « Tâches » des Notes">
+                                        <i class="fa-solid fa-book-open"></i> Page Note
+                                    </button>
+                                    <button onclick="event.stopPropagation(); quickToggleWaiting(${t.id});" class="text-[11px] ${isWaiting ? 'text-amber-600' : 'text-slate-300 hover:text-amber-600'} px-1" title="Basculer En attente / Bloqué">
+                                        <i class="fa-solid fa-hourglass-half"></i>
+                                    </button>
+                                </div>
                             </div>
                             ${t.notes ? `<p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">${escapeHtml(t.notes)}</p>` : ''}
                             <div class="flex items-center flex-wrap gap-1.5 mt-1">
@@ -1531,10 +1771,15 @@
                              onclick="openTaskModal(${t.id})"
                              style="border-left: 4px solid ${lst.color};">
                             <div class="flex items-center justify-between gap-1 mb-1.5">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold text-white" style="background-color:${lst.color};">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold text-white truncate" style="background-color:${lst.color};">
                                     ${lst.icon} ${escapeHtml(lst.title)}
                                 </span>
-                                ${t.priority === 'high' ? '<span class="text-[10px] font-bold text-rose-600">🔴 Urgent</span>' : ''}
+                                <div class="flex items-center gap-1 shrink-0">
+                                    ${t.priority === 'high' ? '<span class="text-[10px] font-bold text-rose-600">🔴</span>' : ''}
+                                    <button onclick="openOrCreateTaskNotePage(${t.id}, event)" class="task-note-bridge-btn has-linked-note" title="Ouvrir la page de note détaillée">
+                                        <i class="fa-solid fa-book-open"></i> Note
+                                    </button>
+                                </div>
                             </div>
                             <div class="font-bold text-xs text-slate-800 mb-1">${escapeHtml(t.title)}</div>
                             ${t.notes ? `<p class="text-[11px] text-slate-500 line-clamp-2 mb-1.5">${escapeHtml(t.notes)}</p>` : ''}
@@ -1636,12 +1881,12 @@
         }
 
         /* ========================================================================= */
-        /* ACTIONS CRUD SUR LES TÂCHES                                               */
+        /* ACTIONS CRUD SUR LES TÂCHES (AVEC CRÉATION AUTO DE LA PAGE NOTE LIÉE)     */
         /* ========================================================================= */
         function quickAddTaskInList(listId, inputEl) {
             const val = inputEl.value.trim();
             if (!val) return;
-            workspaceTasks.tasks.unshift({
+            const newTask = {
                 id: Date.now(),
                 listId: listId,
                 title: val,
@@ -1651,11 +1896,14 @@
                 waitingReason: '',
                 notes: '',
                 subtasks: []
-            });
+            };
+            workspaceTasks.tasks.unshift(newTask);
+            ensureSingleTaskLinkedNote(newTask);
             inputEl.value = '';
             triggerAutoSave();
             renderTasksWorkspace();
-            showToast("✅ Tâche ajoutée !");
+            renderNotesSidebar();
+            showToast("✅ Tâche ajoutée + Page créée dans le dossier « Tâches » !");
         }
 
         function toggleTaskDoneDirect(taskId) {
@@ -1664,6 +1912,7 @@
             t.status = (t.status === 'done') ? 'todo' : 'done';
             triggerAutoSave();
             renderTasksWorkspace();
+            if (activeMainSpace === 'notes') renderNotesWorkspace();
         }
 
         function toggleSubtaskDirect(taskId, subIdx) {
@@ -1672,6 +1921,7 @@
             t.subtasks[subIdx].done = !t.subtasks[subIdx].done;
             triggerAutoSave();
             renderTasksWorkspace();
+            if (activeMainSpace === 'notes') renderNotesWorkspace();
         }
 
         function quickToggleWaiting(taskId) {
@@ -1790,15 +2040,22 @@
 
             if (editingTaskId !== null) {
                 const idx = workspaceTasks.tasks.findIndex(t => t.id === editingTaskId);
-                if (idx !== -1) workspaceTasks.tasks[idx] = payload;
+                if (idx !== -1) {
+                    payload.linkedNoteId = workspaceTasks.tasks[idx].linkedNoteId;
+                    workspaceTasks.tasks[idx] = payload;
+                }
             } else {
                 workspaceTasks.tasks.unshift(payload);
             }
 
+            ensureSingleTaskLinkedNote(payload);
+
             closeTaskModal();
             triggerAutoSave();
             renderTasksWorkspace();
-            showToast("💾 Tâche enregistrée !");
+            if (activeMainSpace === 'notes') renderNotesWorkspace();
+            else renderNotesSidebar();
+            showToast("💾 Tâche enregistrée & liée au dossier Tâches !");
         }
 
         function deleteTaskFromModal() {
@@ -1867,7 +2124,7 @@
             lines.reverse().forEach((line, idx) => {
                 const clean = line.replace(/^[-*•]\s*/, '');
                 if (clean) {
-                    workspaceTasks.tasks.unshift({
+                    const nt = {
                         id: Date.now() + idx,
                         listId: listId,
                         title: clean,
@@ -1877,18 +2134,21 @@
                         waitingReason: '',
                         notes: '',
                         subtasks: []
-                    });
+                    };
+                    workspaceTasks.tasks.unshift(nt);
+                    ensureSingleTaskLinkedNote(nt);
                 }
             });
 
             closeBulkAddModal();
             triggerAutoSave();
             renderTasksWorkspace();
-            showToast(`⚡ ${lines.length} tâches créées !`);
+            renderNotesSidebar();
+            showToast(`⚡ ${lines.length} tâches créées et liées au dossier Tâches !`);
         }
 
         /* ========================================================================= */
-        /* LOGIQUE DE L'ESPACE 2 : STUDIO NOTION PRO (NOTES & DOSSIERS)              */
+        /* LOGIQUE DE L'ESPACE 2 : STUDIO NOTION PRO (NOTES & DOSSIER TÂCHES)        */
         /* ========================================================================= */
         function setNotesViewMode(mode) {
             notesViewMode = mode;
@@ -1905,7 +2165,7 @@
                 activeNoteTagFilter = tag;
             }
 
-            ['ALL', 'PINNED', 'Important', 'Procédure', 'Mairie', 'Idée'].forEach(t => {
+            ['ALL', 'PINNED', 'Tâche liée', 'Important', 'Procédure', 'Mairie', 'Idée'].forEach(t => {
                 const btn = document.getElementById('ntag-' + t);
                 if (btn) {
                     if (t === activeNoteTagFilter) {
@@ -1980,13 +2240,14 @@
                 const blocksCount = (folder.blocks || []).length;
                 totalNotesCount += blocksCount;
                 const isActive = (currentFolderKey === key);
+                const isTaskFolder = (key === 'taches');
 
                 const li = document.createElement('li');
                 li.className = "flex items-center justify-between group";
 
                 li.innerHTML = `
                     <button onclick="selectFolder('${key}')"
-                            class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between transition ${isActive ? 'bg-[#FFEBEF] text-[#C41E3A] font-bold border-l-4 border-[#C41E3A]' : 'text-slate-700 hover:bg-slate-100'}">
+                            class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between transition ${isActive ? 'bg-[#FFEBEF] text-[#C41E3A] font-bold border-l-4 border-[#C41E3A]' : (isTaskFolder ? 'bg-rose-50/50 text-[#C41E3A] font-bold hover:bg-rose-50' : 'text-slate-700 hover:bg-slate-100')}">
                         <span class="truncate">${folder.icon || '📂'} ${escapeHtml(folder.title)}</span>
                         <span class="text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? 'bg-[#C41E3A] text-white' : 'bg-slate-100 text-slate-500'}">${blocksCount}</span>
                     </button>
@@ -2025,6 +2286,70 @@
             }
         }
 
+        // Construit le bandeau interactif en haut d'une Page Note lorsqu'elle est liée à une Tâche de l'Onglet 1
+        function buildLinkedTaskBannerHtml(note) {
+            if (!note.linkedTaskId) return '';
+            const task = (workspaceTasks.tasks || []).find(t => t.id === note.linkedTaskId);
+            if (!task) return '';
+
+            const lst = (workspaceTasks.lists || []).find(l => l.id === task.listId) || { title: 'Tâches', icon: '📋', color: '#C41E3A' };
+            const subtasks = task.subtasks || [];
+            const doneSubs = subtasks.filter(s => s.done).length;
+
+            const subsHtml = subtasks.length > 0 ? `
+                <div class="mt-2.5 pt-2 border-t border-rose-200/70 grid grid-cols-1 md:grid-cols-2 gap-1.5">
+                    ${subtasks.map((s, sIdx) => `
+                        <label class="flex items-center gap-2 text-xs cursor-pointer bg-white/80 px-2.5 py-1 rounded-lg border border-rose-100 ${s.done ? 'line-through text-slate-400' : 'text-slate-700 font-medium'}">
+                            <input type="checkbox" ${s.done ? 'checked' : ''} onchange="toggleSubtaskDirect(${task.id}, ${sIdx})" class="rounded text-[#C41E3A]">
+                            <span class="truncate">${escapeHtml(s.text)}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            ` : '';
+
+            return `
+                <div class="mx-8 mt-5 p-3.5 rounded-2xl bg-rose-50/70 border border-rose-200 shadow-sm">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-white" style="background-color:${lst.color};">
+                                ${lst.icon} ${escapeHtml(lst.title)}
+                            </span>
+                            <span class="text-xs font-fredoka font-bold text-slate-800">
+                                🔗 Page liée à la tâche de l'Onglet 1
+                            </span>
+                            ${task.dueDate ? `<span class="px-2 py-0.5 bg-white border border-rose-200 rounded text-[11px] font-mono font-bold text-[#C41E3A]">📅 Échéance : ${task.dueDate.split('-').reverse().join('/')}</span>` : ''}
+                            ${subtasks.length > 0 ? `<span class="text-[11px] font-bold text-slate-600">☑️ ${doneSubs}/${subtasks.length} sous-tâches</span>` : ''}
+                        </div>
+
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <select onchange="updateLinkedTaskStatusFromNote(${task.id}, this.value)" class="px-2.5 py-1 bg-white border border-rose-300 rounded-lg text-xs font-bold text-slate-800 outline-none">
+                                <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>🔥 À faire</option>
+                                <option value="in_progress" ${task.status === 'in_progress' ? 'selected' : ''}>⚡ En cours</option>
+                                <option value="waiting" ${task.status === 'waiting' ? 'selected' : ''}>⏳ En attente / Bloqué</option>
+                                <option value="done" ${task.status === 'done' ? 'selected' : ''}>✅ Terminé</option>
+                            </select>
+                            <button onclick="openTaskModal(${task.id})" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg text-xs font-bold">
+                                <i class="fa-solid fa-sliders"></i> Paramètres Tâche
+                            </button>
+                            <button onclick="switchMainSpace('tasks')" class="px-2.5 py-1 bg-[#1A1A1A] hover:bg-slate-800 text-white rounded-lg text-xs font-bold">
+                                <i class="fa-solid fa-arrow-left"></i> Retour Onglet Tâches
+                            </button>
+                        </div>
+                    </div>
+                    ${subsHtml}
+                </div>
+            `;
+        }
+
+        function updateLinkedTaskStatusFromNote(taskId, newStatus) {
+            const task = (workspaceTasks.tasks || []).find(t => t.id === taskId);
+            if (!task) return;
+            task.status = newStatus;
+            triggerAutoSave();
+            renderNotesWorkspace();
+            showToast("📌 Statut de la tâche mis à jour !");
+        }
+
         /* --- MODE 1 : STUDIO PAGE NOTION (LISTE DES PAGES AU CENTRE + GRANDE PAGE D'ÉCRITURE À DROITE) --- */
         function renderNotionSplitEditor(stage, items) {
             if (items.length > 0 && (!activeNoteId || !items.some(i => i.note.id === activeNoteId))) {
@@ -2042,14 +2367,25 @@
                 const plainPreview = (n.content || '').replace(/<[^>]+>/g, ' ').trim().slice(0, 75);
                 const dateShort = n.updatedAt ? new Date(n.updatedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) : '';
 
-                const tagsHtml = (n.tags || []).map(t => `<span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[9px] font-bold">#${escapeHtml(t)}</span>`).join('');
+                const linkedTask = n.linkedTaskId ? (workspaceTasks.tasks || []).find(t => t.id === n.linkedTaskId) : null;
+                const taskStatusBadge = linkedTask
+                    ? (linkedTask.status === 'done'
+                        ? `<span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 rounded text-[9px] font-bold">✅ Fait</span>`
+                        : (linkedTask.status === 'waiting'
+                            ? `<span class="px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded text-[9px] font-bold">⏳ Attente</span>`
+                            : (linkedTask.status === 'in_progress'
+                                ? `<span class="px-1.5 py-0.5 bg-sky-100 text-sky-800 rounded text-[9px] font-bold">⚡ En cours</span>`
+                                : `<span class="px-1.5 py-0.5 bg-rose-100 text-[#C41E3A] rounded text-[9px] font-bold">🔥 À faire</span>`)))
+                    : '';
+
+                const tagsHtml = (n.tags || []).slice(0, 2).map(t => `<span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[9px] font-bold">#${escapeHtml(t)}</span>`).join('');
 
                 return `
                     <div class="notion-page-card ${isSelected ? 'active' : ''}" onclick="activeNoteId=${n.id}; renderNotesWorkspace();">
                         <div class="flex items-start justify-between gap-1">
                             <div class="font-fredoka font-bold text-xs text-slate-800 flex items-center gap-1.5 leading-snug">
                                 <span>${n.icon || '📄'}</span>
-                                <span>${escapeHtml(n.title || 'Page sans titre')}</span>
+                                <span class="${linkedTask && linkedTask.status === 'done' ? 'line-through text-slate-400' : ''}">${escapeHtml(n.title || 'Page sans titre')}</span>
                             </div>
                             <button onclick="event.stopPropagation(); togglePinNote('${item.folderKey}', ${n.id});" class="text-xs ${n.pinned ? 'text-amber-500' : 'text-slate-300 hover:text-amber-400'}" title="Épingler en haut">
                                 <i class="fa-solid fa-star"></i>
@@ -2057,7 +2393,7 @@
                         </div>
                         ${plainPreview ? `<p class="text-[11px] text-slate-400 line-clamp-2 mt-1">${escapeHtml(plainPreview)}</p>` : '<p class="text-[11px] text-slate-300 italic mt-1">Page vide...</p>'}
                         <div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-100">
-                            <div class="flex flex-wrap gap-1">${tagsHtml}</div>
+                            <div class="flex flex-wrap items-center gap-1">${taskStatusBadge}${tagsHtml}</div>
                             <span class="text-[10px] text-slate-400">${dateShort}</span>
                         </div>
                     </div>
@@ -2081,7 +2417,7 @@
                     .map(k => `<option value="${k}" ${k === fKey ? 'selected' : ''}>${notionData[k].icon || '📂'} ${escapeHtml(notionData[k].title)}</option>`)
                     .join('');
 
-                const availableTags = ['Important', 'Procédure', 'Mairie', 'CoDir', 'Idée'];
+                const availableTags = ['Tâche liée', 'Important', 'Procédure', 'Mairie', 'CoDir', 'Idée'];
                 const tagsSelectorHtml = availableTags.map(tag => {
                     const hasTag = (n.tags || []).includes(tag);
                     return `
@@ -2093,6 +2429,8 @@
                     `;
                 }).join('');
 
+                const linkedTaskBanner = buildLinkedTaskBannerHtml(n);
+
                 editorPaneHtml = `
                     <!-- Barre de métadonnées de la Page Notion -->
                     <div class="px-6 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
@@ -2101,7 +2439,7 @@
                             <select onchange="moveNoteToFolder('${fKey}', ${n.id}, this.value)" class="px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-700 outline-none">
                                 ${folderOptions}
                             </select>
-                            <div class="flex items-center gap-1 ml-2">
+                            <div class="flex items-center gap-1 ml-2 flex-wrap">
                                 ${tagsSelectorHtml}
                             </div>
                         </div>
@@ -2110,9 +2448,11 @@
                             <button onclick="togglePinNote('${fKey}', ${n.id})" class="px-2.5 py-1 rounded-lg border text-xs font-bold ${n.pinned ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-white border-slate-200 text-slate-600'}">
                                 <i class="fa-solid fa-star"></i> ${n.pinned ? 'Épinglée' : 'Épingler'}
                             </button>
-                            <button onclick="convertNoteToTask('${fKey}', ${bIdx})" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold" title="Transformer cette note en tâche à faire">
-                                <i class="fa-solid fa-list-check"></i> Créer Tâche
-                            </button>
+                            ${!n.linkedTaskId ? `
+                                <button onclick="convertNoteToTask('${fKey}', ${bIdx})" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold" title="Transformer cette note en tâche à faire">
+                                    <i class="fa-solid fa-list-check"></i> Créer Tâche
+                                </button>
+                            ` : ''}
                             <button onclick="duplicateNotePage('${fKey}', ${bIdx})" class="p-1.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs text-slate-600" title="Dupliquer cette note">
                                 <i class="fa-solid fa-clone"></i>
                             </button>
@@ -2136,6 +2476,7 @@
                         <span class="text-slate-300">|</span>
                         <button type="button" onclick="execNotionCmd('insertUnorderedList')" class="notion-toolbar-btn" title="Liste à puces"><i class="fa-solid fa-list-ul"></i> Puces</button>
                         <button type="button" onclick="insertNotionChecklist()" class="notion-toolbar-btn" title="Insérer une case à cocher dans la note"><i class="fa-regular fa-square-check text-[#C41E3A]"></i> Case</button>
+                        <button type="button" onclick="insertNotionComponent('pack_jour_j')" class="notion-toolbar-btn !bg-rose-50 !border-rose-200 !text-[#C41E3A]">🎒 Bloc « À emmener Jour J »</button>
                         <span class="text-slate-300">|</span>
                         <button type="button" onclick="insertNotionComponent('callout_red')" class="notion-toolbar-btn !border-rose-200 !text-[#C41E3A]">📌 Encart Rouge</button>
                         <button type="button" onclick="insertNotionComponent('callout_yellow')" class="notion-toolbar-btn !border-amber-200 !text-amber-700">💡 Idée / Astuce</button>
@@ -2144,6 +2485,8 @@
                         <button type="button" onclick="insertNotionComponent('table')" class="notion-toolbar-btn"><i class="fa-solid fa-table"></i> Tableau</button>
                         <button type="button" onclick="insertNotionComponent('divider')" class="notion-toolbar-btn">➖ Ligne</button>
                     </div>
+
+                    ${linkedTaskBanner}
 
                     <!-- Grande Feuille de Rédaction Notion -->
                     <div class="p-8 max-w-4xl mx-auto w-full">
@@ -2172,7 +2515,7 @@
                     <div class="flex flex-col items-center justify-center h-[520px] text-center p-6">
                         <div class="text-4xl mb-3">📓</div>
                         <h3 class="font-fredoka font-bold text-lg text-slate-700">Sélectionnez ou créez une page de note</h3>
-                        <p class="text-xs text-slate-400 max-w-sm mt-1 mb-4">Vos notes s'ouvrent ici en pleine page comme dans Notion, avec enregistrement automatique à chaque frappe.</p>
+                        <p class="text-xs text-slate-400 max-w-sm mt-1 mb-4">Vos notes et vos fiches de tâches détaillées s'ouvrent ici en pleine page comme dans Notion, avec enregistrement automatique à chaque frappe.</p>
                         <button onclick="createNewNotePage()" class="px-4 py-2 bg-[#C41E3A] text-white rounded-xl text-xs font-bold shadow-sm">+ Créer une nouvelle page</button>
                     </div>
                 `;
@@ -2288,9 +2631,15 @@
             if (!note) return;
             note[field] = val;
             note.updatedAt = new Date().toISOString();
+
+            // Si le titre d'une note liée à une tâche est modifié, synchroniser le titre de la tâche
+            if (field === 'title' && note.linkedTaskId) {
+                const linkedTask = (workspaceTasks.tasks || []).find(t => t.id === note.linkedTaskId);
+                if (linkedTask) linkedTask.title = val;
+            }
+
             triggerAutoSave();
             if (field === 'title' || field === 'icon') {
-                // Met à jour la carte dans la liste latérale sans perdre le focus de saisie
                 const cardTitleEl = document.querySelector('.notion-page-card.active .font-fredoka');
                 if (cardTitleEl) {
                     cardTitleEl.innerHTML = `<span>${note.icon || '📄'}</span><span>${escapeHtml(note.title || 'Page sans titre')}</span>`;
@@ -2338,6 +2687,7 @@
             if (!orig) return;
             const copy = JSON.parse(JSON.stringify(orig));
             copy.id = Date.now();
+            delete copy.linkedTaskId;
             copy.title = orig.title + " (Copie)";
             copy.updatedAt = new Date().toISOString();
             notionData[fKey].blocks.unshift(copy);
@@ -2349,6 +2699,11 @@
 
         function deleteNotePage(fKey, noteId) {
             if (!confirm("Supprimer définitivement cette page de note ?")) return;
+            const note = (notionData[fKey].blocks || []).find(b => b.id === noteId);
+            if (note && note.linkedTaskId) {
+                const t = (workspaceTasks.tasks || []).find(x => x.id === note.linkedTaskId);
+                if (t) delete t.linkedNoteId;
+            }
             notionData[fKey].blocks = (notionData[fKey].blocks || []).filter(b => b.id !== noteId);
             activeNoteId = null;
             triggerAutoSave();
@@ -2387,7 +2742,14 @@
             canvas.focus();
             let html = '';
 
-            if (type === 'callout_red') {
+            if (type === 'pack_jour_j') {
+                html = `<h2>🎒 À penser / À emmener le Jour J</h2>` +
+                       `<div style="background:#FFF5F5; border:1px solid #FECDD3; border-radius:10px; padding:12px 16px; margin:10px 0;">` +
+                       `<div style="display:flex; align-items:center; gap:8px; margin:4px 0;"><input type="checkbox" style="width:15px; height:15px; accent-color:#C41E3A; cursor:pointer;"> <span>Documents imprimés & stylos</span></div>` +
+                       `<div style="display:flex; align-items:center; gap:8px; margin:4px 0;"><input type="checkbox" style="width:15px; height:15px; accent-color:#C41E3A; cursor:pointer;"> <span>Ordinateur / Chargeur / Rallonge</span></div>` +
+                       `<div style="display:flex; align-items:center; gap:8px; margin:4px 0;"><input type="checkbox" style="width:15px; height:15px; accent-color:#C41E3A; cursor:pointer;"> <span>Caisse / Buvette / Verres Éco-Cups</span></div>` +
+                       `</div><p><br></p>`;
+            } else if (type === 'callout_red') {
                 html = `<div style="background:#FFF5F5; border:1px solid #FED7D7; border-left:4px solid #C41E3A; padding:12px 16px; border-radius:8px; margin:12px 0; color:#742A2A;"><strong>📌 IMPORTANT :</strong> Votre note importante ici...</div><p><br></p>`;
             } else if (type === 'callout_yellow') {
                 html = `<div style="background:#FFFBEB; border:1px solid #FDE68A; border-left:4px solid #D97706; padding:12px 16px; border-radius:8px; margin:12px 0; color:#78350F;"><strong>💡 IDÉE / ASTUCE :</strong> Votre remarque ici...</div><p><br></p>`;
@@ -2433,7 +2795,7 @@
             event.stopPropagation();
             if (confirm(`Supprimer définitivement le dossier "${notionData[key].title}" et ses notes ?`)) {
                 delete notionData[key];
-                currentFolderKey = 'proj';
+                currentFolderKey = 'taches';
                 triggerAutoSave();
                 renderNotesWorkspace();
             }
