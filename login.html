@@ -5,60 +5,197 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion — Intranet Dojo Dornois</title>
     <link rel="icon" type="image/png" href="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --rouge: #C41E3A;
             --rouge-hover: #A3182E;
+            --rouge-clair: #FFEBEF;
             --noir-doux: #1A1A1A;
+            --gris-fonce: #3D3D3D;
+            --gris-moyen: #6B6B6B;
+            --gris-clair: #E8E8E8;
             --fond: #F4F6F9;
         }
+        * { box-sizing: border-box; }
         body {
             font-family: 'Roboto', sans-serif;
             background-color: var(--fond);
             background-image: url("data:image/svg+xml,%3Csvg width='56' height='100' viewBox='0 0 56 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 68L28 84L56 68L56 84L28 100Z' fill='none' stroke='%23C41E3A' stroke-opacity='0.15' stroke-width='1.8'/%3E%3C/svg%3E");
-            margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 16px;
         }
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.97);
             backdrop-filter: blur(10px);
-            border-radius: 16px; border: 1px solid rgba(255,255,255,0.6);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            padding: 32px; width: 100%; max-width: 380px; text-align: center;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 32px 28px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
         }
         .logo-box {
-            background: var(--rouge); width: 64px; height: 64px; border-radius: 12px;
-            margin: 0 auto 16px; display: flex; align-items: center; justify-content: center;
+            background: var(--rouge);
+            width: 64px;
+            height: 64px;
+            border-radius: 14px;
+            margin: 0 auto 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
         }
         .logo-box img { width: 44px; height: 44px; object-fit: contain; }
-        h1 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); font-size: 1.4rem; margin: 0 0 6px; }
-        p { color: #6B6B6B; font-size: 0.85rem; margin: 0 0 24px; }
-        .form-group { text-align: left; margin-bottom: 16px; }
-        label { font-size: 0.8rem; font-weight: 500; color: #3D3D3D; display: block; margin-bottom: 6px; }
-        input {
-            width: 100%; padding: 10px 12px; border: 1px solid #E8E8E8; border-radius: 8px;
-            font-size: 0.9rem; box-sizing: border-box; transition: all 0.2s;
+        h1 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); font-size: 1.45rem; margin: 0 0 4px; }
+        .subtitle { color: var(--gris-moyen); font-size: 0.85rem; margin: 0 0 20px; }
+
+        /* Sélecteur de profils */
+        .profile-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gris-moyen);
+            margin-bottom: 8px;
+            display: block;
+            text-align: left;
         }
-        input:focus { outline: none; border-color: var(--rouge); box-shadow: 0 0 0 3px rgba(196,30,58,0.1); }
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .profile-btn {
+            background: #F8FAFC;
+            border: 1.5px solid var(--gris-clair);
+            border-radius: 10px;
+            padding: 8px 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .profile-btn:hover {
+            border-color: var(--rouge);
+            background: #FFF9FA;
+        }
+        .profile-btn.active {
+            border-color: var(--rouge);
+            background: var(--rouge-clair);
+            box-shadow: 0 2px 8px rgba(196, 30, 58, 0.15);
+        }
+        .profile-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--noir-doux);
+            color: white;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-btn.active .profile-avatar { background: var(--rouge); }
+        .profile-name { font-size: 0.8rem; font-weight: 600; color: var(--noir-doux); }
+        .profile-role { font-size: 0.68rem; color: var(--gris-moyen); }
+
+        .form-group { text-align: left; margin-bottom: 14px; }
+        label { font-size: 0.8rem; font-weight: 500; color: var(--gris-fonce); display: block; margin-bottom: 6px; }
+        .input-wrapper { position: relative; }
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gris-clair);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            background: #FFFFFF;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--rouge);
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+        .toggle-pwd {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--gris-moyen);
+            padding: 2px;
+        }
         .btn-login {
-            width: 100%; background: var(--rouge); color: white; border: none; padding: 12px;
-            border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;
-            transition: background 0.2s; margin-top: 8px;
+            width: 100%;
+            background: var(--rouge);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 6px;
         }
         .btn-login:hover { background: var(--rouge-hover); }
-        .error-msg { color: #E74C3C; font-size: 0.8rem; margin-top: 12px; display: none; }
+        .btn-login:disabled { opacity: 0.7; cursor: not-allowed; }
+        .error-msg {
+            color: #C41E3A;
+            background: #FFEBEF;
+            border: 1px solid #F5C2C7;
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            margin-top: 12px;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
     <div class="login-card">
         <div class="logo-box">
-            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo">
+            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo Dojo Dornois">
         </div>
         <h1>Espace Sécurisé</h1>
-        <p>Intranet Officiel du Dojo Dornois</p>
+        <p class="subtitle">Intranet Officiel du Dojo Dornois</p>
+
+        <!-- Sélection rapide du profil -->
+        <span class="profile-label">Connexion rapide par profil</span>
+        <div class="profiles-grid">
+            <button type="button" class="profile-btn" onclick="selectProfile(this, 'Jordan', 'Président', 'loudenotjordan58@gmail.com')">
+                <div class="profile-avatar">J</div>
+                <span class="profile-name">Jordan</span>
+                <span class="profile-role">Président</span>
+            </button>
+            <button type="button" class="profile-btn" onclick="selectProfile(this, 'Fanny', 'Trésorière', 'fanny_thevenin@hotmail.fr')">
+                <div class="profile-avatar">F</div>
+                <span class="profile-name">Fanny</span>
+                <span class="profile-role">Trésorière</span>
+            </button>
+            <button type="button" class="profile-btn" onclick="selectProfile(this, 'Membre', 'Bureau / Prof', '')">
+                <div class="profile-avatar">+</div>
+                <span class="profile-name">Autre</span>
+                <span class="profile-role">Bureau / Prof</span>
+            </button>
+        </div>
 
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
@@ -67,7 +204,10 @@
             </div>
             <div class="form-group">
                 <label for="password">Mot de passe</label>
-                <input type="password" id="password" required placeholder="••••••••">
+                <div class="input-wrapper">
+                    <input type="password" id="password" required placeholder="••••••••">
+                    <button type="button" class="toggle-pwd" onclick="togglePassword()" title="Afficher / Masquer">👁️</button>
+                </div>
             </div>
             <button type="submit" class="btn-login" id="btnLogin">Se connecter</button>
             <div class="error-msg" id="errorMsg">Identifiants incorrects.</div>
@@ -75,25 +215,73 @@
     </div>
 
     <script>
-        const sbClient = supabase.createClient('https://tumrbyxfnkqobyfzucax.supabase.co', 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8');
+        const sbClient = supabase.createClient(
+            'https://tumrbyxfnkqobyfzucax.supabase.co',
+            'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8'
+        );
+
+        let selectedUser = { name: 'Utilisateur', role: 'Membre' };
+
+        // Si une session est déjà active, redirection directe vers l'intranet
+        (async function checkExistingSession() {
+            const { data: { session } } = await sbClient.auth.getSession();
+            if (session) {
+                window.location.href = 'index.html';
+            }
+        })();
+
+        function selectProfile(btnEl, name, role, email) {
+            document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+            selectedUser = { name, role };
+
+            const emailInput = document.getElementById('email');
+            const pwdInput = document.getElementById('password');
+            emailInput.value = email;
+
+            if (email) {
+                pwdInput.focus();
+            } else {
+                emailInput.focus();
+            }
+        }
+
+        function togglePassword() {
+            const pwdInput = document.getElementById('password');
+            pwdInput.type = pwdInput.type === 'password' ? 'text' : 'password';
+        }
 
         async function handleLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('btnLogin');
             const errorEl = document.getElementById('errorMsg');
             btn.innerText = "Vérification...";
+            btn.disabled = true;
             errorEl.style.display = 'none';
 
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
 
             const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
 
             if (error) {
-                errorEl.innerText = "Échec de connexion : " + error.message;
+                errorEl.innerText = "Échec de connexion : " + (error.message === "Invalid login credentials" ? "E-mail ou mot de passe incorrect." : error.message);
                 errorEl.style.display = 'block';
                 btn.innerText = "Se connecter";
+                btn.disabled = false;
             } else {
+                // Détection automatique du profil même si l'e-mail a été tapé à la main
+                if (email === 'loudenotjordan58@gmail.com') {
+                    selectedUser = { name: 'Jordan', role: 'Président' };
+                } else if (email === 'fanny_thevenin@hotmail.fr') {
+                    selectedUser = { name: 'Fanny', role: 'Trésorière' };
+                }
+
+                localStorage.setItem('dojo_user_profile', JSON.stringify({
+                    name: selectedUser.name,
+                    role: selectedUser.role,
+                    email: email
+                }));
                 window.location.href = 'index.html';
             }
         }
