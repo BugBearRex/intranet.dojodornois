@@ -2,26 +2,40 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Suivi & Budget Interventions — Intranet Dojo Dornois</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi Écoles & Facturation TER — Intranet Dojo Dornois</title>
+    <link rel="icon" type="image/png" href="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --rouge: #C41E3A;
             --rouge-hover: #A3182E;
-            --rouge-clair: #FFEBEF;
             --rouge-deep: #8B1429;
+            --rouge-clair: #FFEBEF;
+            --rouge-soft: #FFF5F7;
+            --rouge-border: #FFC2CE;
             --noir-doux: #1A1A1A;
+            --anthracite: #2D2D2D;
             --gris-fonce: #3D3D3D;
             --gris-moyen: #6B6B6B;
             --gris-clair: #B8B8B8;
-            --gris-tres-clair: #E8E8E8;
+            --gris-tres-clair: #E4E7EC;
             --fond: #F4F6F9;
             --blanc: #FFFFFF;
+            --bleu-chantenay: #0284C7;
+            --bleu-clair: #E0F2FE;
+            --bleu-border: #BAE6FD;
+            --vert: #15803D;
+            --vert-clair: #DCFCE7;
+            --vert-border: #86EFAC;
+            --ambre: #B45309;
+            --ambre-clair: #FEF3C7;
+            --ambre-border: #FDE68A;
             --sidebar-width: 280px;
-            --topbar-height: 68px;
-            --status-done: #CAFFBF;
-            --status-todo: #FFADAD;
-            --vert-compta: #2A9D8F;
+            --topbar-height: 72px;
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 8px 24px rgba(196, 30, 58, 0.12);
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -29,474 +43,1537 @@
         body {
             font-family: 'Roboto', sans-serif;
             background-color: var(--fond);
-            margin: 0; padding: 0;
+            margin: 0;
+            padding: 0;
             color: var(--gris-fonce);
             display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* --- FIX SIDEBAR DÉBORDEMENT --- */
-        .sidebar { 
-            width: var(--sidebar-width); 
+        /* ===== SIDEBAR UNIFIÉE ===== */
+        .sidebar {
+            width: var(--sidebar-width);
             min-width: var(--sidebar-width);
             max-width: var(--sidebar-width);
-            background: var(--noir-doux); 
-            color: var(--blanc); 
-            display: flex; 
-            flex-direction: column; 
-            height: 100%; 
-            position: relative; 
-            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
-            flex-shrink: 0; 
-            box-sizing: border-box;
+            background: var(--noir-doux);
+            color: var(--blanc);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.12);
+            flex-shrink: 0;
             overflow-x: hidden;
             z-index: 100;
         }
+        .sidebar * { max-width: 100%; box-sizing: border-box; }
 
-        .sidebar * {
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-
-        .nav-link { display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; padding: 9px 12px; color: var(--gris-clair); text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 0.85rem; margin-bottom: 3px; }
-        .nav-link:hover { background: rgba(255,255,255,0.08); color: var(--blanc); }
-        .nav-link.active { background: var(--rouge); color: var(--blanc); font-weight: bold; }
-
-        /* ===== MAIN CONTENT ===== */
+        /* ===== CONTENEUR PRINCIPAL ===== */
         .main-content {
-            flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0;
-        }
-
-        .topbar {
-            background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.04); flex-shrink: 0; z-index: 50;
-        }
-
-        .page-title-area h2 { font-family: 'Fredoka', sans-serif; margin: 0; font-size: 1.35rem; color: var(--noir-doux); line-height: 1; }
-        .page-title-area p { margin: 2px 0 0 0; font-size: 0.78rem; color: var(--gris-moyen); }
-
-        /* ===== SYSTEME D'ONGLETS ===== */
-        .tabs-header {
-            display: flex; background: var(--blanc); padding: 0 28px; border-bottom: 1px solid var(--gris-tres-clair); gap: 8px; flex-shrink: 0;
-        }
-        .tab-btn {
-            padding: 14px 20px; font-family: 'Fredoka', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--gris-moyen); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 8px;
-        }
-        .tab-btn:hover { color: var(--rouge); background: var(--rouge-clair); }
-        .tab-btn.active { color: var(--rouge); border-bottom-color: var(--rouge); background: transparent; }
-
-        .tab-content {
-            display: none; flex: 1; overflow: hidden;
-        }
-        .tab-content.active {
+            flex: 1;
             display: flex;
+            flex-direction: column;
+            height: 100vh;
+            min-width: 0;
+            overflow: hidden;
         }
 
-        .workspace-grid {
-            flex: 1; display: grid; grid-template-columns: 380px 1fr; gap: 24px; padding: 24px 28px; overflow: hidden; width: 100%;
+        /* ===== TOPBAR IDENTITÉ DOJO DORNOIS ===== */
+        .topbar {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+            color: var(--blanc);
+            height: var(--topbar-height);
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--rouge);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+            flex-shrink: 0;
+            z-index: 50;
         }
 
-        .full-workspace {
-            flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px;
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }
 
-        /* Panneaux */
-        .panel {
-            background: var(--blanc); border-radius: 10px; border: 1px solid var(--gris-tres-clair); box-shadow: 0 2px 10px rgba(0,0,0,0.03); padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto;
+        .logo-box {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, var(--rouge), var(--rouge-deep));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.45);
+            flex-shrink: 0;
         }
 
-        .panel h3 { font-family: 'Fredoka', sans-serif; color: var(--noir-doux); margin: 0 0 5px 0; font-size: 1.1rem; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .logo-box img {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+        }
 
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--gris-fonce); }
-        .form-control { width: 100%; padding: 8px 12px; border: 1.5px solid var(--gris-tres-clair); border-radius: 7px; font-size: 0.875rem; font-family: 'Roboto', sans-serif; }
-        .form-control:focus { outline: none; border-color: var(--rouge); box-shadow: 0 0 0 3px rgba(196,30,58,0.08); }
-        
+        .page-title-area h1 {
+            font-family: 'Fredoka', sans-serif;
+            margin: 0;
+            font-size: 1.35rem;
+            color: var(--blanc);
+            letter-spacing: 0.3px;
+        }
+
+        .page-title-area h1 span {
+            color: #FF6B81;
+        }
+
+        .page-title-area p {
+            margin: 2px 0 0 0;
+            font-size: 0.8rem;
+            color: #D1D5DB;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sync-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #E5E7EB;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.76rem;
+            font-weight: 500;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2ECC71;
+            box-shadow: 0 0 8px #2ECC71;
+        }
+
+        /* ===== BARRE D'ONGLETS ===== */
+        .tabs-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--blanc);
+            padding: 0 28px;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            flex-shrink: 0;
+        }
+
+        .tabs-left {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tab-btn {
+            padding: 14px 20px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--gris-moyen);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: var(--rouge);
+            background: var(--rouge-soft);
+        }
+
+        .tab-btn.active {
+            color: var(--rouge);
+            border-bottom-color: var(--rouge);
+            background: var(--rouge-soft);
+        }
+
+        .tab-badge {
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: var(--fond);
+            color: var(--gris-fonce);
+        }
+
+        .tab-btn.active .tab-badge {
+            background: var(--rouge);
+            color: var(--blanc);
+        }
+
+        /* ===== ZONE DE TRAVAIL DÉFILABLE (SCROLL FIX GARANTI) ===== */
+        .tab-pane {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 24px 28px 60px 28px;
+            min-height: 0;
+        }
+
+        .tab-pane.active {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        /* ===== BOUTONS ===== */
         .btn {
-            background: var(--rouge); color: white; border: none; padding: 10px 16px; border-radius: 7px; cursor: pointer; font-weight: 500; font-size: 0.875rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; text-decoration: none;
+            background: var(--rouge);
+            color: var(--blanc);
+            border: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: 'Roboto', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: all 0.18s;
+            text-decoration: none;
+            box-shadow: 0 2px 6px rgba(196, 30, 58, 0.25);
         }
-        .btn:hover { background: var(--rouge-hover); }
-        .btn-secondary { background: var(--gris-moyen); color: white; }
-        .btn-secondary:hover { background: var(--gris-fonce); }
-        .btn-dark { background: var(--noir-doux); color: white; }
-        .btn-dark:hover { background: #333; }
-        .btn-full { width: 100%; }
+        .btn:hover {
+            background: var(--rouge-hover);
+            transform: translateY(-1px);
+        }
 
-        /* Filtres */
-        .filter-row {
-            display: flex; gap: 12px; background: var(--rouge-clair); padding: 12px; border-radius: 8px; border-left: 4px solid var(--rouge); margin-bottom: 5px; align-items: center;
+        .btn-outline {
+            background: var(--blanc);
+            color: var(--noir-doux);
+            border: 1.5px solid var(--gris-tres-clair);
+            box-shadow: none;
         }
-        .filter-row .form-group { flex: 1; margin: 0; }
+        .btn-outline:hover {
+            border-color: var(--rouge);
+            color: var(--rouge);
+            background: var(--rouge-soft);
+        }
 
-        /* Tableaux */
-        .table-container { flex: 1; overflow-y: auto; border: 1px solid var(--gris-tres-clair); border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-        th { background: var(--noir-doux); color: white; padding: 12px; font-weight: 500; position: sticky; top: 0; z-index: 10; }
-        td { padding: 12px; border-bottom: 1px solid var(--gris-tres-clair); background: white; }
-        tr:hover td { background-color: var(--fond); }
-        
-        /* Statuts */
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: inline-block; cursor: pointer; }
-        .badge-valide { background: var(--status-done); color: #1e4620; }
-        .badge-prevu { background: var(--status-todo); color: #611a1a; }
+        .btn-dark {
+            background: rgba(255,255,255,0.12);
+            color: var(--blanc);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: none;
+        }
+        .btn-dark:hover {
+            background: rgba(255,255,255,0.22);
+        }
 
-        /* Accordéon Notes */
-        .notes-accordion {
-            border: 1px solid var(--gris-tres-clair); border-radius: 6px; margin-top: 10px; overflow: hidden;
+        .btn-green {
+            background: var(--vert);
+            color: var(--blanc);
+            box-shadow: 0 2px 6px rgba(21, 128, 61, 0.25);
         }
-        .notes-header {
-            background: var(--fond); padding: 10px 14px; font-weight: 500; font-size: 0.85rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;
-        }
-        .notes-content {
-            padding: 12px; display: none; background: white; border-top: 1px solid var(--gris-tres-clair);
-        }
-        .notes-content.open { display: block; }
+        .btn-green:hover { background: #166534; }
 
-        /* Budget Styles */
-        .budget-summary-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 10px;
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.78rem;
+            border-radius: 6px;
         }
-        .budget-card {
-            padding: 16px; border-radius: 8px; background: var(--fond); border-left: 4px solid var(--gris-moyen);
-        }
-        .budget-card.prev { border-left-color: #3a86c8; }
-        .budget-card.real { border-left-color: var(--vert-compta); }
-        .budget-card.diff { border-left-color: var(--rouge); }
-        .budget-card h4 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--gris-moyen); text-transform: uppercase; }
-        .budget-card p { margin: 0; font-size: 1.4rem; font-weight: 700; font-family: 'Fredoka', sans-serif; }
 
-        /* GESTIONNAIRE DE NOTES (ONGLET 3) */
-        .note-card {
-            border: 1px solid var(--gris-tres-clair); border-radius: 8px; background: white; overflow: hidden; transition: box-shadow 0.2s; margin-bottom: 12px;
+        /* ===== CARTES ÉCOLES (FILTRE MACRO VISUEL) ===== */
+        .schools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            flex-shrink: 0;
         }
-        .note-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .note-header-bar {
-            background: var(--fond); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; border-bottom: 1px solid transparent;
+
+        .school-card {
+            background: var(--blanc);
+            border-radius: 12px;
+            padding: 18px 20px;
+            border: 2px solid var(--gris-tres-clair);
+            border-top: 5px solid var(--noir-doux);
+            box-shadow: var(--shadow-card);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        .note-card.expanded .note-header-bar { border-bottom-color: var(--gris-tres-clair); }
-        .note-title-text { font-family: 'Fredoka', sans-serif; font-size: 1rem; color: var(--noir-doux); display: flex; align-items: center; gap: 8px; }
-        .note-actions { display: flex; align-items: center; gap: 8px; }
-        .note-body { display: none; padding: 16px; background: white; }
-        .note-card.expanded .note-body { display: block; }
-        
-        .files-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--gris-tres-clair); }
+
+        .school-card.card-dornes { border-top-color: var(--rouge); }
+        .school-card.card-chantenay { border-top-color: var(--bleu-chantenay); }
+
+        .school-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .school-card.selected {
+            border-color: var(--rouge);
+            border-top-width: 5px;
+            background: linear-gradient(180deg, #FFFFFF 0%, #FFF9FA 100%);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .school-card.card-chantenay.selected {
+            border-color: var(--bleu-chantenay);
+            background: linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 100%);
+            box-shadow: 0 8px 24px rgba(2, 132, 199, 0.14);
+        }
+
+        .school-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .school-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            color: var(--noir-doux);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .school-subtitle {
+            font-size: 0.78rem;
+            color: var(--gris-moyen);
+            margin-top: 3px;
+        }
+
+        .school-chip {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--fond);
+            color: var(--noir-doux);
+            white-space: nowrap;
+        }
+        .card-dornes .school-chip { background: var(--rouge-clair); color: var(--rouge-deep); }
+        .card-chantenay .school-chip { background: var(--bleu-clair); color: #0369A1; }
+
+        .school-stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .school-big-num {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--noir-doux);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: var(--fond);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--rouge), #FF4757);
+            border-radius: 99px;
+            transition: width 0.3s ease;
+        }
+        .card-chantenay .progress-bar-fill {
+            background: linear-gradient(90deg, var(--bleu-chantenay), #38BDF8);
+        }
+
+        /* ===== MODULE FACTURATION MENSUELLE AUTOMATIQUE DE ROMAIN ===== */
+        .billing-widget {
+            background: var(--blanc);
+            border-radius: 12px;
+            border: 1px solid var(--gris-tres-clair);
+            border-left: 6px solid var(--rouge);
+            box-shadow: var(--shadow-card);
+            padding: 18px 22px;
+            flex-shrink: 0;
+        }
+
+        .billing-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed var(--gris-tres-clair);
+            margin-bottom: 16px;
+        }
+
+        .billing-title-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .billing-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: var(--rouge-clair);
+            color: var(--rouge);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .billing-title-block h3 {
+            font-family: 'Fredoka', sans-serif;
+            margin: 0;
+            font-size: 1.08rem;
+            color: var(--noir-doux);
+        }
+
+        .billing-title-block p {
+            margin: 2px 0 0 0;
+            font-size: 0.78rem;
+            color: var(--gris-moyen);
+        }
+
+        .month-pills-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .month-pill {
+            border: 1px solid var(--gris-tres-clair);
+            background: var(--fond);
+            color: var(--gris-fonce);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .month-pill:hover {
+            border-color: var(--rouge);
+            color: var(--rouge);
+        }
+
+        .month-pill.active {
+            background: var(--rouge);
+            color: var(--blanc);
+            border-color: var(--rouge);
+            box-shadow: 0 2px 8px rgba(196, 30, 58, 0.3);
+        }
+
+        .rate-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--fond);
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--gris-tres-clair);
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .rate-control input {
+            width: 58px;
+            padding: 3px 6px;
+            border: 1px solid var(--gris-clair);
+            border-radius: 5px;
+            font-weight: 700;
+            text-align: right;
+            font-size: 0.82rem;
+        }
+
+        .billing-cards-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .invoice-calc-box {
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border: 1px solid var(--gris-tres-clair);
+        }
+
+        .invoice-calc-box.box-dornes {
+            background: var(--rouge-soft);
+            border-color: var(--rouge-border);
+        }
+
+        .invoice-calc-box.box-chantenay {
+            background: #F0F9FF;
+            border-color: var(--bleu-border);
+        }
+
+        .invoice-calc-box.box-total {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+            color: var(--blanc);
+            border-color: var(--noir-doux);
+        }
+
+        .invoice-box-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .box-dornes .invoice-box-top { color: var(--rouge-deep); }
+        .box-chantenay .invoice-box-top { color: #0369A1; }
+        .box-total .invoice-box-top { color: #FCA5A5; }
+
+        .invoice-box-main {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-top: 2px;
+        }
+
+        .invoice-amount {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.55rem;
+            font-weight: 700;
+        }
+
+        .box-dornes .invoice-amount { color: var(--rouge); }
+        .box-chantenay .invoice-amount { color: var(--bleu-chantenay); }
+        .box-total .invoice-amount { color: #2ECC71; }
+
+        .invoice-hours-detail {
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .invoice-box-sub {
+            font-size: 0.75rem;
+            opacity: 0.85;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 6px;
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+        .box-total .invoice-box-sub {
+            border-top-color: rgba(255,255,255,0.15);
+            color: #D1D5DB;
+        }
+
+        /* ===== PANNEAU LISTE & GRILLE DES SÉANCES ===== */
+        .content-panel {
+            background: var(--blanc);
+            border-radius: 12px;
+            border: 1px solid var(--gris-tres-clair);
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .toolbar {
+            padding: 16px 20px;
+            background: var(--blanc);
+            border-bottom: 1px solid var(--gris-tres-clair);
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .toolbar-filters {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .form-control {
+            padding: 8px 12px;
+            border: 1.5px solid var(--gris-tres-clair);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: 'Roboto', sans-serif;
+            color: var(--noir-doux);
+            background: var(--blanc);
+            transition: border-color 0.15s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--rouge);
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        .view-toggle {
+            display: inline-flex;
+            background: var(--fond);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--gris-tres-clair);
+        }
+
+        .view-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--gris-moyen);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .view-btn.active {
+            background: var(--rouge);
+            color: var(--blanc);
+            box-shadow: 0 2px 6px rgba(196, 30, 58, 0.25);
+        }
+
+        /* ===== TABLEAU PRO ===== */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table.dojo-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        table.dojo-table th {
+            background: var(--noir-doux);
+            color: var(--blanc);
+            padding: 12px 16px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 500;
+            font-size: 0.84rem;
+            letter-spacing: 0.3px;
+        }
+
+        table.dojo-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            vertical-align: middle;
+        }
+
+        table.dojo-table tbody tr:hover td {
+            background-color: var(--rouge-soft);
+        }
+
+        /* Badges École & Statut */
+        .ecole-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.78rem;
+        }
+        .ecole-badge.dornes {
+            background: var(--rouge-clair);
+            color: var(--rouge-deep);
+            border: 1px solid var(--rouge-border);
+        }
+        .ecole-badge.chantenay {
+            background: var(--bleu-clair);
+            color: #0369A1;
+            border: 1px solid var(--bleu-border);
+        }
+        .ecole-badge.other {
+            background: var(--ambre-clair);
+            color: var(--ambre);
+            border: 1px solid var(--ambre-border);
+        }
+
+        .classe-tag {
+            display: inline-block;
+            background: var(--fond);
+            color: var(--noir-doux);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            border: 1px solid var(--gris-tres-clair);
+        }
+
+        .statut-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.12s, box-shadow 0.12s;
+        }
+        .statut-btn:hover {
+            transform: scale(1.04);
+        }
+        .statut-btn.valide {
+            background: var(--vert-clair);
+            color: var(--vert);
+            border: 1px solid var(--vert-border);
+        }
+        .statut-btn.prevu {
+            background: var(--ambre-clair);
+            color: var(--ambre);
+            border: 1px solid var(--ambre-border);
+        }
+
+        /* ===== MODE GRILLE PAR CLASSES (AVEC DÉFILEMENT FLUIDE) ===== */
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 18px;
+            padding: 20px;
+        }
+
+        .class-card {
+            background: var(--blanc);
+            border: 1.5px solid var(--gris-tres-clair);
+            border-top: 4px solid var(--rouge);
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .class-card.chantenay-card {
+            border-top-color: var(--bleu-chantenay);
+        }
+
+        .class-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--gris-tres-clair);
+        }
+
+        .class-card-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.05rem;
+            color: var(--noir-doux);
+            margin: 0;
+        }
+
+        .class-sessions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .class-session-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-radius: 7px;
+            background: var(--fond);
+            border: 1px solid var(--gris-tres-clair);
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .class-session-row:hover {
+            border-color: var(--rouge);
+            background: var(--blanc);
+        }
+        .class-session-row.is-done {
+            background: #F0FDF4;
+            border-color: var(--vert-border);
+        }
+
+        .panel-footer {
+            padding: 14px 20px;
+            background: var(--fond);
+            border-top: 1px solid var(--gris-tres-clair);
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.86rem;
+            font-weight: 500;
+        }
+
+        /* ===== TIROIR LATÉRAL (DRAWER) ===== */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+            z-index: 1000;
+            display: none;
+            justify-content: flex-end;
+        }
+        .drawer-overlay.open { display: flex; }
+
+        .drawer-box {
+            width: 460px;
+            max-width: 92vw;
+            background: var(--blanc);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -8px 0 30px rgba(0,0,0,0.2);
+            animation: slideInRight 0.2s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .drawer-head {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+            color: var(--blanc);
+            padding: 18px 22px;
+            border-bottom: 3px solid var(--rouge);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .drawer-head h3 {
+            font-family: 'Fredoka', sans-serif;
+            margin: 0;
+            font-size: 1.15rem;
+        }
+
+        .drawer-body {
+            padding: 22px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .drawer-foot {
+            padding: 16px 22px;
+            background: var(--fond);
+            border-top: 1px solid var(--gris-tres-clair);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--noir-doux);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* ===== NOTES LAYOUT ===== */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .note-item {
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1.5px solid var(--gris-tres-clair);
+            margin-bottom: 8px;
+            cursor: pointer;
+            background: var(--blanc);
+            transition: all 0.15s;
+        }
+        .note-item:hover { border-color: var(--rouge); }
+        .note-item.active {
+            border-color: var(--rouge);
+            border-left-width: 5px;
+            background: var(--rouge-soft);
+        }
+
         .file-chip {
-            display: inline-flex; align-items: center; gap: 6px; background: var(--rouge-clair); color: var(--rouge-deep); padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid rgba(196,30,58,0.2); transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--rouge-clair);
+            color: var(--rouge-deep);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--rouge-border);
         }
-        .file-chip:hover { background: var(--rouge); color: white; }
-        .file-chip .remove-file { cursor: pointer; font-weight: bold; margin-left: 6px; opacity: 0.7; padding: 2px 4px; border-radius: 3px; }
-        .file-chip .remove-file:hover { opacity: 1; background: rgba(0,0,0,0.15); }
+        .file-chip:hover {
+            background: var(--rouge);
+            color: var(--blanc);
+        }
 
-        /* MODALE POP-UP */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000;
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 3000;
         }
-        .modal-overlay.active { display: flex; }
-        .modal-card {
-            background: white; border-radius: 12px; width: 550px; max-width: 90%; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 16px;
+        .toast {
+            background: var(--noir-doux);
+            color: var(--blanc);
+            padding: 12px 18px;
+            border-radius: 8px;
+            border-left: 4px solid #2ECC71;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
         }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 10px; }
-        .modal-header h3 { font-family: 'Fredoka', sans-serif; margin: 0; color: var(--noir-doux); }
-        .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--gris-moyen); }
 
-        /* --- TOAST NOTIFICATIONS SYNC CLOUD --- */
-        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
-        .toast { color: white; padding: 12px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
-        .toast.success { background: #1a472a; border-left: 4px solid #2ecc71; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        /* ===== IMPRESSION OFFICIELLE A4 ===== */
+        #print-sheet { display: none; }
 
         @media print {
-            body { background: white; padding: 0; color: black; display: block !important; }
-            .no-print, .sidebar, .topbar { display: none !important; }
-            .main-content { padding: 0 !important; overflow: visible !important; }
-            .app-body { display: block !important; margin: 0 !important; padding: 0 !important; }
+            @page { size: A4 portrait; margin: 12mm; }
+            body {
+                background: #FFFFFF !important;
+                color: #1A1A1A !important;
+                height: auto !important;
+                overflow: visible !important;
+                display: block !important;
+            }
+            .sidebar, .topbar, .tabs-header, .tab-pane, .drawer-overlay, .toast-container, .no-print {
+                display: none !important;
+            }
+            .main-content {
+                height: auto !important;
+                overflow: visible !important;
+                display: block !important;
+            }
+            #print-sheet {
+                display: block !important;
+                width: 100%;
+                font-family: 'Roboto', sans-serif;
+            }
+            .print-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 3px solid #C41E3A;
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+            }
+            .print-logo {
+                width: 48px;
+                height: 48px;
+                background: #C41E3A !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 6px;
+            }
+            .print-logo img { width: 100%; height: 100%; object-fit: contain; }
+            .print-kpi-bar {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+                background: #F8FAFC !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                border: 1px solid #E2E8F0;
+                border-radius: 8px;
+                padding: 10px 14px;
+                margin-bottom: 14px;
+                font-size: 8.5pt;
+            }
+            .print-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 8.5pt;
+                margin-bottom: 18px;
+            }
+            .print-table th {
+                background: #1A1A1A !important;
+                color: #FFFFFF !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                padding: 6px 8px;
+                text-align: left;
+            }
+            .print-table td {
+                padding: 6px 8px;
+                border-bottom: 1px solid #E2E8F0;
+            }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- SIDEBAR DYNAMIQUE -->
-    <div class="sidebar"></div>
+    <div class="sidebar no-print"></div>
 
-    <!-- ===== MAIN CONTENT ===== -->
+    <!-- CONTENU PRINCIPAL -->
     <div class="main-content">
-        <div class="topbar no-print">
-            <div class="page-title-area">
-                <h2>Espace Éducatif & Scolaire (TER / ANS)</h2>
-                <p>Planification, Restitution budgétaire et Prise de notes</p>
+
+        <!-- TOPBAR -->
+        <header class="topbar no-print">
+            <div class="topbar-brand">
+                <div class="logo-box">
+                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo Dojo Dornois">
+                </div>
+                <div class="page-title-area">
+                    <h1>Espace Écoles & Facturation <span>TER / Scolaire</span></h1>
+                    <p>École de Dornes • École de Chantenay-Saint-Imbert • Calcul automatique des factures de Romain</p>
+                </div>
             </div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn" id="main-print-btn" onclick="imprimerFiltres()">🖨️ Imprimer la sélection filtrée</button>
+            <div class="topbar-actions">
+                <div class="sync-pill">
+                    <span class="sync-dot" id="syncDot"></span>
+                    <span id="syncText">Cloud synchronisé</span>
+                </div>
+                <button class="btn btn-dark" onclick="openCycleDrawer()">📅 Générer un cycle</button>
+                <button class="btn btn-dark" onclick="imprimerSelectionOfficielle()">🖨️ Imprimer Bilan A4</button>
+                <button class="btn" onclick="openSessionDrawer(-1)">➕ Ajouter une séance</button>
                 <a href="../index.html" class="btn btn-dark">🏠 Central</a>
             </div>
-        </div>
+        </header>
 
+        <!-- BARRE D'ONGLETS -->
         <div class="tabs-header no-print">
-            <button class="tab-btn active" onclick="switchTab('tab-suivi', this)">🏫 Suivi des Interventions</button>
-            <button class="tab-btn" onclick="switchTab('tab-budget', this)">💰 Budget Demandé vs Réel</button>
-            <button class="tab-btn" onclick="switchTab('tab-notes', this)">📓 Notes Générales du Projet</button>
+            <div class="tabs-left">
+                <button class="tab-btn active" onclick="switchTab('tab-suivi', this)">
+                    🥋 Suivi des Séances & Facturation Mensuelle
+                    <span class="tab-badge" id="badge-count-seances">0</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab('tab-budget', this)">
+                    💰 Synthèse Annuelle Romain & Budget ANS
+                    <span class="tab-badge" id="badge-count-budget">0</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab('tab-notes', this)">
+                    📓 Conventions & Dossiers Écoles
+                    <span class="tab-badge" id="badge-count-notes">0</span>
+                </button>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--gris-moyen);">
+                Éducateur référent : <strong style="color: var(--noir-doux);">Romain FLAMMANG</strong>
+            </div>
         </div>
 
-        <!-- ================= ONGLET 1 : SUIVI & PLANIFICATION ================= -->
-        <div id="tab-suivi" class="tab-content active">
-            <div class="workspace-grid">
-                <!-- FORMULAIRE -->
-                <div class="panel no-print">
-                    <h3 id="form-panel-title">➕ Ajouter une intervention</h3>
-                    <input type="hidden" id="edit-index" value="-1">
-                    
-                    <div class="form-group">
-                        <label>École</label>
-                        <input type="text" id="inter-ecole" class="form-control" placeholder="Ex: Dornes, Chantenay-Saint-Imbert, Lucenay-lès-Aix, Cossaye" required>
+        <!-- ================= ONGLET 1 : SUIVI, GRILLE CLASSES & FACTURATION MENSUELLE ================= -->
+        <div id="tab-suivi" class="tab-pane active no-print">
+
+            <!-- 1. CARTES ÉTABLISSEMENTS (DORNES & CHANTENAY-SAINT-IMBERT) -->
+            <div class="schools-grid" id="schoolsGrid"></div>
+
+            <!-- 2. CALCULATEUR AUTOMATIQUE DE FACTURATION MENSUELLE DE ROMAIN -->
+            <div class="billing-widget">
+                <div class="billing-top-bar">
+                    <div class="billing-title-block">
+                        <div class="billing-icon">🧾</div>
+                        <div>
+                            <h3>Calculateur Automatique de Facturation — Romain Flammang</h3>
+                            <p>Montants calculés en direct selon les séances pointées en <strong>🟢 Validé</strong> sur le mois sélectionné (hors forfait club)</p>
+                        </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Classe</label>
-                        <input type="text" id="inter-classe" class="form-control" placeholder="Ex: CP, CE1" required>
+
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <div class="rate-control" title="Taux horaire interventions scolaires (Convention Romain)">
+                            <span>Tarif Romain :</span>
+                            <input type="number" id="input-taux-romain" value="30" min="1" step="0.5" onchange="updateTauxHoraire(this.value)">
+                            <span>€ / h</span>
+                        </div>
+                        <button class="btn btn-green btn-sm" onclick="validerToutLeMoisActif()" id="btn-valider-mois">
+                            ✅ Tout valider ce mois
+                        </button>
                     </div>
-                    
+                </div>
+
+                <!-- Pastilles des mois -->
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+                    <div class="month-pills-bar" id="monthPillsBar"></div>
+                </div>
+
+                <!-- 3 Cartes de facturation : Dornes | Chantenay-Saint-Imbert | Total Romain -->
+                <div class="billing-cards-row" id="monthlyBillingCards"></div>
+            </div>
+
+            <!-- 3. TABLEAU OU GRILLE PAR CLASSES -->
+            <div class="content-panel">
+                <div class="toolbar">
+                    <div class="toolbar-filters">
+                        <input type="text" id="filter-search" class="form-control" style="width: 230px;" placeholder="🔍 Rechercher classe, prof, note..." oninput="renderSuivi()">
+
+                        <select id="filter-ecole" class="form-control" onchange="onSelectEcoleFilter(this.value)">
+                            <option value="">🏫 Toutes les Écoles</option>
+                        </select>
+
+                        <select id="filter-classe" class="form-control" onchange="renderSuivi()">
+                            <option value="">🎓 Toutes les Classes</option>
+                        </select>
+
+                        <select id="filter-mois" class="form-control" onchange="onSelectMoisTableFilter(this.value)">
+                            <option value="">📅 Tous les mois de l'année</option>
+                        </select>
+
+                        <select id="filter-statut" class="form-control" onchange="renderSuivi()">
+                            <option value="">⚡ Tous les statuts</option>
+                            <option value="Validé">🟢 Validé uniquement</option>
+                            <option value="Prévu">🟠 Prévu uniquement</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="view-toggle">
+                            <button class="view-btn active" id="btn-mode-list" onclick="setViewMode('list')">📋 Vue Liste</button>
+                            <button class="view-btn" id="btn-mode-classes" onclick="setViewMode('classes')">🎓 Grille par Classes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VUE LISTE -->
+                <div class="table-container" id="view-list-box">
+                    <table class="dojo-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 135px;">Date</th>
+                                <th style="width: 210px;">École</th>
+                                <th style="width: 220px;">Classe & Enseignant(e)</th>
+                                <th style="width: 85px;">Heures</th>
+                                <th style="width: 120px;">Coût Romain</th>
+                                <th>Séance & Remarques</th>
+                                <th style="width: 135px;">Statut (1 clic)</th>
+                                <th style="width: 90px; text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="interventions-tbody"></tbody>
+                    </table>
+                </div>
+
+                <!-- VUE GRILLE PAR CLASSES (DÉFILEMENT CORRIGÉ) -->
+                <div class="classes-grid" id="view-classes-box" style="display: none;"></div>
+
+                <!-- PIED DE TABLEAU -->
+                <div class="panel-footer">
+                    <div>
+                        Sélection affichée : <strong id="footer-seances-count">0</strong> séances
+                        (<span id="footer-seances-done" style="color: var(--vert); font-weight: 700;">0 validées</span> •
+                        <span id="footer-seances-todo" style="color: var(--ambre); font-weight: 700;">0 prévues</span>)
+                    </div>
+                    <div style="display: flex; gap: 20px; align-items: center;">
+                        <span>Heures prévues : <strong id="footer-hours-total">0h</strong></span>
+                        <span>Heures validées : <strong id="footer-hours-done" style="color: var(--rouge); font-size: 1rem;">0h</strong></span>
+                        <span style="background: var(--noir-doux); color: var(--blanc); padding: 4px 12px; border-radius: 6px; font-weight: 700;">
+                            Montant Validé Sélection : <span id="footer-amount-done" style="color: #2ECC71;">0,00 €</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= ONGLET 2 : SYNTHÈSE ANNUELLE ROMAIN & BUDGET ANS ================= -->
+        <div id="tab-budget" class="tab-pane no-print">
+
+            <!-- TABLEAU RÉCAPITULATIF MENSUEL DES FACTURES DE ROMAIN PAR ÉCOLE -->
+            <div class="content-panel">
+                <div class="toolbar">
+                    <div>
+                        <h3 style="font-family: 'Fredoka', sans-serif; margin: 0; color: var(--noir-doux); font-size: 1.1rem;">
+                            📊 Récapitulatif Mensuel des Factures Scolaires de Romain (Dornes vs Chantenay-Saint-Imbert)
+                        </h3>
+                        <p style="margin: 2px 0 0 0; font-size: 0.8rem; color: var(--gris-moyen);">
+                            Ventilation automatique par mois et par école selon vos pointages (Tarif : <strong class="label-taux-romain">30 €</strong>/h)
+                        </p>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="dojo-table">
+                        <thead>
+                            <tr>
+                                <th>Mois</th>
+                                <th>École de Dornes (Validé / Prévu)</th>
+                                <th>Facture Romain — Dornes</th>
+                                <th>Chantenay-St-Imbert (Validé / Prévu)</th>
+                                <th>Facture Romain — Chantenay</th>
+                                <th>Total Mensuel Validé à Facturer</th>
+                            </tr>
+                        </thead>
+                        <tbody id="romain-monthly-summary-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- BUDGET GLOBAL ANS / PROJETS SCOLAIRES -->
+            <div class="schools-grid">
+                <div class="school-card" style="border-top-color: #0284C7; cursor: default;">
+                    <div class="school-title">📥 Recettes & Subventions Prévues</div>
+                    <div class="school-big-num" id="b-rec-prev">0,00 €</div>
+                    <div class="school-subtitle">Réel encaissé : <strong id="b-rec-real" style="color: var(--vert);">0,00 €</strong></div>
+                </div>
+                <div class="school-card" style="border-top-color: var(--rouge); cursor: default;">
+                    <div class="school-title">📤 Dépenses & Charges Prévues</div>
+                    <div class="school-big-num" id="b-dep-prev">0,00 €</div>
+                    <div class="school-subtitle">Réel engagé : <strong id="b-dep-real" style="color: var(--rouge);">0,00 €</strong></div>
+                </div>
+                <div class="school-card" style="border-top-color: var(--vert); cursor: default;">
+                    <div class="school-title">⚖️ Solde Net Exécuté</div>
+                    <div class="school-big-num" id="b-net-real">0,00 €</div>
+                    <div class="school-subtitle" id="b-net-prev-sub">Prévisionnel : 0,00 €</div>
+                </div>
+            </div>
+
+            <div class="content-panel">
+                <div class="toolbar">
+                    <h3 style="font-family: 'Fredoka', sans-serif; margin: 0; color: var(--noir-doux); font-size: 1.1rem;">
+                        💰 Postes Budgétaires (TER Dornes, Chantenay-Saint-Imbert, ANS & Judogis Écoles)
+                    </h3>
+                    <button class="btn btn-sm" onclick="openBudgetDrawer(-1)">➕ Ajouter une ligne budgétaire</button>
+                </div>
+                <div class="table-container">
+                    <table class="dojo-table">
+                        <thead>
+                            <tr>
+                                <th>Poste de Dépense / Recette</th>
+                                <th style="width: 150px;">Type</th>
+                                <th style="width: 160px; text-align: right;">Prévisionnel</th>
+                                <th style="width: 160px; text-align: right;">Réel Exécuté</th>
+                                <th style="width: 150px; text-align: right;">Écart</th>
+                                <th style="width: 90px; text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="budget-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ONGLET 3 : NOTES & DOCUMENTS OFFICIELS ================= -->
+        <div id="tab-notes" class="tab-pane no-print">
+            <div class="notes-grid">
+                <div class="content-panel" style="padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <strong style="font-family: 'Fredoka', sans-serif; font-size: 1rem;">📂 Dossiers & Conventions</strong>
+                        <button class="btn btn-sm" onclick="creerNouvelleNote()">➕ Nouvelle note</button>
+                    </div>
+                    <div id="notes-list-sidebar"></div>
+                </div>
+
+                <div class="content-panel" style="padding: 22px; gap: 16px;">
+                    <input type="hidden" id="active-note-id" value="">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 14px;">
+                        <input type="text" id="note-title-field" class="form-control" style="font-family: 'Fredoka', sans-serif; font-size: 1.15rem; font-weight: 600; flex: 1;" placeholder="Titre de la note...">
+                        <button class="btn btn-outline btn-sm" onclick="supprimerNoteActive()" style="color: var(--rouge);">🗑️ Supprimer</button>
+                        <button class="btn btn-sm" onclick="sauvegarderNoteActive()">💾 Enregistrer</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contenu du dossier / Mémos avec les directrices d'écoles (Mme Guipon, Mme Cristo...)</label>
+                        <textarea id="note-content-field" class="form-control" style="min-height: 240px; line-height: 1.6; resize: vertical;"></textarea>
+                    </div>
+
+                    <div style="border-top: 1px dashed var(--gris-tres-clair); padding-top: 14px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong style="font-size: 0.84rem;">📎 Pièces jointes (Agrément Éducation Nationale, Conventions...)</strong>
+                            <label class="btn btn-outline btn-sm" style="cursor: pointer;">
+                                ➕ Joindre un fichier
+                                <input type="file" id="note-file-input" multiple style="display: none;" onchange="uploadFichiersNote(this)">
+                            </label>
+                        </div>
+                        <div id="note-files-box" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= FEUILLE D'IMPRESSION A4 OFFICIELLE ================= -->
+        <div id="print-sheet">
+            <div class="print-header">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div class="print-logo">
+                        <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo">
+                    </div>
+                    <div>
+                        <h1 style="font-family: 'Fredoka', sans-serif; font-size: 18pt; margin: 0; text-transform: uppercase;">
+                            Dojo <span style="color: #C41E3A;">Dornois</span>
+                        </h1>
+                        <p style="margin: 2px 0 0 0; font-size: 8.5pt; color: #475569;">
+                            38 Route de Decize, 58390 Dornes • SIRET : 451 928 410 00013 • RNA : W583001220
+                        </p>
+                    </div>
+                </div>
+                <div style="text-align: right; font-size: 8.5pt;">
+                    <strong style="font-size: 10.5pt; display: block;">RELEVÉ D'INTERVENTIONS SCOLAIRES & FACTURATION</strong>
+                    <span id="print-date-edition">Édité le --/--/----</span>
+                </div>
+            </div>
+
+            <div class="print-kpi-bar">
+                <div>
+                    <div style="font-size: 7pt; text-transform: uppercase; color: #64748B;">Périmètre filtré</div>
+                    <strong id="print-perimetre">Toutes les écoles</strong>
+                </div>
+                <div>
+                    <div style="font-size: 7pt; text-transform: uppercase; color: #64748B;">Séances Validées</div>
+                    <strong id="print-seances">0 / 0</strong>
+                </div>
+                <div>
+                    <div style="font-size: 7pt; text-transform: uppercase; color: #64748B;">Volume Horaire Validé</div>
+                    <strong id="print-heures" style="color: #C41E3A;">0h</strong>
+                </div>
+                <div>
+                    <div style="font-size: 7pt; text-transform: uppercase; color: #64748B;">Montant Facturable Romain</div>
+                    <strong id="print-montant" style="color: #15803D;">0,00 €</strong>
+                </div>
+            </div>
+
+            <table class="print-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>École</th>
+                        <th>Classe</th>
+                        <th>Heures</th>
+                        <th>Montant HT/Net</th>
+                        <th>Statut</th>
+                        <th>Observations</th>
+                    </tr>
+                </thead>
+                <tbody id="print-tbody"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- ================= DRAWER 1 : AJOUT / ÉDITION DE SÉANCE ================= -->
+    <div class="drawer-overlay" id="sessionDrawer" onclick="if(event.target===this) closeSessionDrawer()">
+        <div class="drawer-box">
+            <div class="drawer-head">
+                <h3 id="drawer-session-title">🥋 Fiche de Séance Scolaire</h3>
+                <button class="btn btn-dark btn-sm" onclick="closeSessionDrawer()">✕</button>
+            </div>
+            <div class="drawer-body">
+                <input type="hidden" id="edit-session-idx" value="-1">
+
+                <div class="form-group">
+                    <label>École</label>
+                    <input type="text" id="f-ecole" list="list-ecoles" class="form-control" placeholder="Ex: Dornes, Chantenay-Saint-Imbert...">
+                    <datalist id="list-ecoles">
+                        <option value="Dornes">
+                        <option value="Chantenay-Saint-Imbert">
+                        <option value="Lucenay-lès-Aix">
+                        <option value="Cossaye">
+                    </datalist>
+                </div>
+
+                <div class="form-group">
+                    <label>Classe & Enseignant(e)</label>
+                    <input type="text" id="f-classe" class="form-control" placeholder="Ex: CP (Mme Bonnet), Classe Mme Aubaron...">
+                </div>
+
+                <div class="grid-2">
                     <div class="form-group">
                         <label>Date de l'intervention</label>
-                        <input type="date" id="inter-date" class="form-control" required>
+                        <input type="date" id="f-date" class="form-control">
                     </div>
-
                     <div class="form-group">
-                        <label>Heures dispensées</label>
-                        <input type="number" id="inter-heures" class="form-control" value="1" min="0.25" step="0.25" required>
+                        <label>Durée (heures)</label>
+                        <input type="number" id="f-heures" class="form-control" step="0.25" min="0.25" value="1">
                     </div>
+                </div>
 
+                <div class="grid-2">
                     <div class="form-group">
-                        <label>Professeur référent</label>
-                        <select id="inter-prof" class="form-control">
-                            <option value="Romain">Romain</option>
+                        <label>Intervenant</label>
+                        <select id="f-prof" class="form-control">
+                            <option value="Romain">Romain FLAMMANG</option>
                             <option value="Philippe">Philippe</option>
                         </select>
                     </div>
-
                     <div class="form-group">
-                        <label>Statut initial</label>
-                        <select id="inter-statut" class="form-control">
-                            <option value="Prévu">🔴 Prévu (En attente)</option>
+                        <label>Statut</label>
+                        <select id="f-statut" class="form-control">
+                            <option value="Prévu">🟠 Prévu (À venir)</option>
                             <option value="Validé">🟢 Validé (Cours fait)</option>
                         </select>
                     </div>
-
-                    <div class="notes-accordion">
-                        <div class="notes-header" onclick="toggleNotesAccordion()">
-                            <span>📓 Notes de Séance (Optionnel)</span>
-                            <span id="accordion-arrow">▼</span>
-                        </div>
-                        <div class="notes-content" id="accordion-content">
-                            <textarea id="inter-notes" class="form-control" placeholder="Remarques spécifiques sur ce cours..." style="height: 100px; resize: vertical;"></textarea>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 10px; display: flex; gap: 8px;">
-                        <button class="btn btn-secondary" id="btn-cancel-edit" style="display:none;" onclick="resetForm()">Annuler</button>
-                        <button class="btn btn-full" id="btn-submit-form" onclick="enregistrerIntervention()">⚡ Valider / Enregistrer</button>
-                    </div>
                 </div>
 
-                <!-- TABLEAU -->
-                <div class="panel" style="overflow: hidden;">
-                    <div class="filter-row no-print">
-                        <div style="font-weight: 600; font-size: 0.85rem; color: var(--rouge); text-transform: uppercase; width: 80px;">Filtrer :</div>
-                        <div class="form-group"><select id="filter-ecole" class="form-control" onchange="renderTable()"><option value="">-- Toutes les Écoles --</option></select></div>
-                        <div class="form-group"><select id="filter-classe" class="form-control" onchange="renderTable()"><option value="">-- Toutes les Classes --</option></select></div>
-                    </div>
-
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>École</th>
-                                    <th>Classe</th>
-                                    <th>Heures</th>
-                                    <th>Intervenant</th>
-                                    <th>Statut</th>
-                                    <th style="width: 140px;" class="no-print">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="interventions-tbody"></tbody>
-                        </table>
-                    </div>
-                    
-                    <div style="margin-top: 12px; padding: 10px; background: #fafafa; border-radius: 6px; font-size: 0.85rem; font-weight: 500; display: flex; justify-content: space-between;">
-                        <span>Total Heures Validées (ANS) : <strong id="total-heures" style="color:var(--rouge);">0h</strong></span>
-                        <span>Interventions affichées : <strong id="total-seances">0</strong></span>
-                    </div>
+                <div class="form-group">
+                    <label>Créneau horaire & Notes de séance</label>
+                    <textarea id="f-notes" class="form-control" style="height: 110px; resize: vertical;" placeholder="Ex: Séance 1/7 - 13h45 à 14h45..."></textarea>
                 </div>
             </div>
-        </div>
-
-        <!-- ================= ONGLET 2 : BUDGET COMPLET (ANS) ================= -->
-        <div id="tab-budget" class="tab-content">
-            <div class="full-workspace">
-                <div class="budget-summary-grid">
-                    <div class="budget-card prev">
-                        <h4>Budget Total Demandé</h4>
-                        <p id="b-total-prev">0,00 €</p>
-                    </div>
-                    <div class="budget-card real">
-                        <h4>Budget Total Réel</h4>
-                        <p id="b-total-real">0,00 €</p>
-                    </div>
-                    <div class="budget-card diff">
-                        <h4>Écart / Reste</h4>
-                        <p id="b-total-diff">0,00 €</p>
-                    </div>
-                </div>
-
-                <div style="grid-template-columns: 350px 1fr; gap: 24px; flex: 1; display: grid; overflow: hidden;">
-                    <div class="panel no-print">
-                        <h3>📊 Ligne Budgétaire</h3>
-                        <input type="hidden" id="budget-edit-index" value="-1">
-                        
-                        <div class="form-group">
-                            <label>Poste de dépense / Recette</label>
-                            <input type="text" id="budget-poste" class="form-control" placeholder="Ex: Rémunération intervenants, Matériel pédagogique..." required>
-                        </div>
-                        <div class="form-group">
-                            <label>Type</label>
-                            <select id="budget-type" class="form-control">
-                                <option value="Dépense">🔺 Dépense</option>
-                                <option value="Recette">🔹 Recette / Subvention</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Montant Demandé / Prévisionnel (€)</label>
-                            <input type="number" id="budget-prev" class="form-control" value="0" min="0" step="0.01" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Montant Réel Touché / Engagé (€)</label>
-                            <input type="number" id="budget-real" class="form-control" value="0" min="0" step="0.01" required>
-                        </div>
-                        
-                        <div style="margin-top: 10px; display: flex; gap: 8px;">
-                            <button class="btn btn-secondary" id="btn-cancel-budget" style="display:none;" onclick="resetBudgetForm()">Annuler</button>
-                            <button class="btn btn-full" onclick="enregistrerBudget()">💾 Enregistrer le poste</button>
-                        </div>
-                    </div>
-
-                    <div class="panel" style="overflow: hidden;">
-                        <h3>📋 Tableau de synthèse budgétaire</h3>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Poste</th>
-                                        <th>Type</th>
-                                        <th>Prévisionnel / Demandé</th>
-                                        <th>Réel exécuté</th>
-                                        <th>Écart</th>
-                                        <th style="width: 70px;" class="no-print">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="budget-tbody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= ONGLET 3 : PRISE DE NOTES GENERALES MULTI-NOTES ================= -->
-        <div id="tab-notes" class="tab-content">
-            <div class="full-workspace">
-                <div style="grid-template-columns: 380px 1fr; gap: 24px; flex: 1; display: grid; overflow: hidden;">
-                    <!-- FORMULAIRE D'AJOUT / ÉDITION DE NOTE -->
-                    <div class="panel no-print">
-                        <h3 id="note-form-title">➕ Ajouter une note</h3>
-                        <input type="hidden" id="note-edit-id" value="">
-                        
-                        <div class="form-group">
-                            <label>Titre de la note</label>
-                            <input type="text" id="note-title-input" class="form-control" placeholder="Ex: Convention Éducation Nationale, Bilan 2026..." required>
-                        </div>
-                        
-                        <div class="form-group" style="flex:1;">
-                            <label>Contenu de la note</label>
-                            <textarea id="note-content-input" class="form-control" style="height: 180px; resize: vertical;" placeholder="Rédigez le texte de votre note ici..."></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Ajouter une pièce jointe (Optionnel)</label>
-                            <input type="file" id="note-file-input" class="form-control" multiple>
-                        </div>
-
-                        <div style="margin-top: 10px; display: flex; gap: 8px;">
-                            <button class="btn btn-secondary" id="btn-cancel-note" style="display:none;" onclick="resetNoteForm()">Annuler</button>
-                            <button class="btn btn-full" id="btn-save-note" onclick="enregistrerNouvelleNote()">💾 Enregistrer la note</button>
-                        </div>
-                    </div>
-
-                    <!-- LISTE DES NOTES ACCORDÉONS -->
-                    <div class="panel" style="overflow-y: auto;">
-                        <h3>📓 Liste des Notes Générales et Documents Joints</h3>
-                        <div id="notes-container-list">
-                            <!-- Les notes seront générées dynamiquement ici -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- ================= MODALE DE FICHE DE SÉANCE ================= -->
-    <div class="modal-overlay" id="sessionModal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3 id="modal-title">🥋 Fiche de Séance</h3>
-                <button class="modal-close" onclick="closeModal()">✕</button>
-            </div>
-            <input type="hidden" id="modal-index" value="-1">
-            <div class="form-group">
-                <label>École & Classe</label>
-                <input type="text" id="modal-ecole-classe" class="form-control" readonly style="background:#f4f6f9;">
-            </div>
-            <div class="form-group">
-                <label>Date & Intervenant</label>
-                <input type="text" id="modal-date-prof" class="form-control" readonly style="background:#f4f6f9;">
-            </div>
-            <div class="form-group">
-                <label>Statut de la séance</label>
-                <select id="modal-statut" class="form-control">
-                    <option value="Prévu">🔴 Prévu (En attente)</option>
-                    <option value="Validé">🟢 Validé (Cours fait)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Notes & Remarques de Séance</label>
-                <textarea id="modal-notes" class="form-control" style="height: 120px; resize: vertical;" placeholder="Ajouter des notes sur cette séance..."></textarea>
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
-                <button class="btn btn-secondary" onclick="closeModal()">Fermer</button>
-                <button class="btn" onclick="sauvegarderDepuisModal()">💾 Enregistrer les modifications</button>
+            <div class="drawer-foot">
+                <button class="btn btn-outline" id="btn-del-session" style="margin-right: auto; color: var(--rouge); display: none;" onclick="supprimerSessionActive()">🗑️ Supprimer</button>
+                <button class="btn btn-outline" onclick="closeSessionDrawer()">Annuler</button>
+                <button class="btn" onclick="sauvegarderSession()">💾 Enregistrer</button>
             </div>
         </div>
     </div>
 
-    <script type="text/javascript">
-        const initialDornesSchedule = [
-            // Période 1 (Maternelle PS/MS) - 0.75h (45 min)
-            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-09-15", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 10h45 à 11h30" },
-            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-09-17", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 10h45 à 11h30" },
-            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-09-22", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 10h45 à 11h30" },
-            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-09-24", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 10h45 à 11h30" },
-            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-09-29", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 3/5 - 10h45 à 11h30" },
-            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-10-01", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 3/5 - 10h45 à 11h30" },
-            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-10-06", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 4/5 - 10h45 à 11h30" },
-            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-10-08", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 4/5 - 10h45 à 11h30" },
-            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-10-13", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 10h45 à 11h30" },
-            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-10-15", heures: 0.75, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 10h45 à 11h30" },
+    <!-- ================= DRAWER 2 : GÉNÉRATEUR DE CYCLE EN SÉRIE ================= -->
+    <div class="drawer-overlay" id="cycleDrawer" onclick="if(event.target===this) closeCycleDrawer()">
+        <div class="drawer-box">
+            <div class="drawer-head">
+                <h3>📅 Générer un Cycle de Séances</h3>
+                <button class="btn btn-dark btn-sm" onclick="closeCycleDrawer()">✕</button>
+            </div>
+            <div class="drawer-body">
+                <div class="form-group">
+                    <label>École</label>
+                    <input type="text" id="c-ecole" list="list-ecoles" class="form-control" value="Chantenay-Saint-Imbert">
+                </div>
+                <div class="form-group">
+                    <label>Classe & Enseignant(e)</label>
+                    <input type="text" id="c-classe" class="form-control" placeholder="Ex: Classe Mme Aubaron">
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Date de la 1re séance</label>
+                        <input type="date" id="c-date" class="form-control" value="2026-11-02">
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre de semaines</label>
+                        <input type="number" id="c-count" class="form-control" min="1" max="20" value="7">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Heures par séance</label>
+                        <input type="number" id="c-heures" class="form-control" step="0.25" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Créneau horaire</label>
+                        <input type="text" id="c-horaire" class="form-control" placeholder="Ex: 13h45 à 14h45">
+                    </div>
+                </div>
+            </div>
+            <div class="drawer-foot">
+                <button class="btn btn-outline" onclick="closeCycleDrawer()">Annuler</button>
+                <button class="btn" onclick="genererCycleEnSerie()">⚡ Générer le cycle</button>
+            </div>
+        </div>
+    </div>
 
-            // Période 2 (CP & CE1) - 1h
-            { ecole: "Dornes", classe: "CP (Mme Bonnet)", date: "2026-11-03", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
+    <!-- ================= DRAWER 3 : POSTE BUDGÉTAIRE ================= -->
+    <div class="drawer-overlay" id="budgetDrawer" onclick="if(event.target===this) closeBudgetDrawer()">
+        <div class="drawer-box">
+            <div class="drawer-head">
+                <h3>💰 Ligne Budgétaire</h3>
+                <button class="btn btn-dark btn-sm" onclick="closeBudgetDrawer()">✕</button>
+            </div>
+            <div class="drawer-body">
+                <input type="hidden" id="edit-budget-idx" value="-1">
+                <div class="form-group">
+                    <label>Intitulé du poste</label>
+                    <input type="text" id="b-poste" class="form-control" placeholder="Ex: Participation TER Dornes, Factures Romain...">
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="b-type" class="form-control">
+                        <option value="Recette">🔹 Recette / Subvention</option>
+                        <option value="Dépense">🔺 Dépense / Charge</option>
+                    </select>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Montant Prévisionnel (€)</label>
+                        <input type="number" id="b-prev" class="form-control" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Montant Réel (€)</label>
+                        <input type="number" id="b-real" class="form-control" step="0.01" value="0">
+                    </div>
+                </div>
+            </div>
+            <div class="drawer-foot">
+                <button class="btn btn-outline" onclick="closeBudgetDrawer()">Annuler</button>
+                <button class="btn" onclick="sauvegarderBudget()">💾 Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           DONNÉES OFFICIELLES : DORNES (40 SÉANCES) + CHANTENAY-SAINT-IMBERT (14 SÉANCES)
+           ========================================================================== */
+        const scheduleDornes = [
+            // Période 1 (Septembre - Octobre 2026 : Maternelle PS/MS - 0.75h)
+            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-09-15", heures: 0.75, prof: "Romain", statut: "Validé", notes: "Séance 1/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-09-17", heures: 0.75, prof: "Romain", statut: "Validé", notes: "Séance 1/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-09-22", heures: 0.75, prof: "Romain", statut: "Validé", notes: "Séance 2/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-09-24", heures: 0.75, prof: "Romain", statut: "Validé", notes: "Séance 2/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-09-29", heures: 0.75, prof: "Romain", statut: "Validé", notes: "Séance 3/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-10-01", heures: 0.75, prof: "Romain", statut: "Validé", notes: "Séance 3/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-10-06", heures: 0.75, prof: "Romain", statut: "Validé", notes: "Séance 4/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-10-08", heures: 0.75, prof: "Romain", statut: "Validé", notes: "Séance 4/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Lagandre)", date: "2026-10-13", heures: 0.75, prof: "Romain", statut: "Validé", notes: "Séance 5/5 - 10h45 à 11h30" },
+            { ecole: "Dornes", classe: "PS/MS (Mme Flegar)", date: "2026-10-15", heures: 0.75, prof: "Romain", statut: "Validé", notes: "Séance 5/5 - 10h45 à 11h30" },
+
+            // Période 2 (Novembre - Décembre 2026 : CP & CE1 - 1h)
+            { ecole: "Dornes", classe: "CP (Mme Bonnet)", date: "2026-11-03", heures: 1, prof: "Romain", statut: "Validé", notes: "Séance 1/5 - 13h45 à 14h45" },
             { ecole: "Dornes", classe: "CE1 (M. Fauvre)", date: "2026-11-05", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
             { ecole: "Dornes", classe: "CP (Mme Bonnet)", date: "2026-11-10", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 13h45 à 14h45" },
             { ecole: "Dornes", classe: "CE1 (M. Fauvre)", date: "2026-11-12", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 13h45 à 14h45" },
@@ -507,7 +1584,7 @@
             { ecole: "Dornes", classe: "CP (Mme Bonnet)", date: "2026-12-01", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 13h45 à 14h45" },
             { ecole: "Dornes", classe: "CE1 (M. Fauvre)", date: "2026-12-03", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 13h45 à 14h45" },
 
-            // Période 3 (CE2 & GS) - 1h
+            // Période 3 (Janvier - Février 2027 : CE2 & GS - 1h)
             { ecole: "Dornes", classe: "CE2 (Mme Floury)", date: "2027-01-05", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
             { ecole: "Dornes", classe: "GS (Mme Chatillon)", date: "2027-01-07", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
             { ecole: "Dornes", classe: "CE2 (Mme Floury)", date: "2027-01-12", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 13h45 à 14h45" },
@@ -519,7 +1596,7 @@
             { ecole: "Dornes", classe: "CE2 (Mme Floury)", date: "2027-02-02", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 13h45 à 14h45" },
             { ecole: "Dornes", classe: "GS (Mme Chatillon)", date: "2027-02-04", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 13h45 à 14h45" },
 
-            // Période 4 (CM1 & CM2) - 1h
+            // Période 4 (Mars - Avril 2027 : CM1 & CM2 - 1h)
             { ecole: "Dornes", classe: "CM1 (M. Bernard P.)", date: "2027-03-02", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
             { ecole: "Dornes", classe: "CM2 (Mme Bernard M.)", date: "2027-03-04", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 1/5 - 13h45 à 14h45" },
             { ecole: "Dornes", classe: "CM1 (M. Bernard P.)", date: "2027-03-09", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/5 - 13h45 à 14h45" },
@@ -532,630 +1609,954 @@
             { ecole: "Dornes", classe: "CM2 (Mme Bernard M.)", date: "2027-04-01", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/5 - 13h45 à 14h45" }
         ];
 
+        const scheduleChantenay = [
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Aubaron", date: "2026-11-02", heures: 1, prof: "Romain", statut: "Validé", notes: "Séance 1/7 - Cycle Toussaint-Noël (Coord. Mme Cristo)" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Fayet", date: "2026-11-02", heures: 1, prof: "Romain", statut: "Validé", notes: "Séance 1/7 - Cycle Toussaint-Noël (Coord. Mme Cristo)" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Aubaron", date: "2026-11-09", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/7 - Cycle Découverte Judo" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Fayet", date: "2026-11-09", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 2/7 - Cycle Découverte Judo" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Aubaron", date: "2026-11-16", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 3/7 - Cycle Découverte Judo" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Fayet", date: "2026-11-16", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 3/7 - Cycle Découverte Judo" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Aubaron", date: "2026-11-23", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 4/7 - Cycle Découverte Judo" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Fayet", date: "2026-11-23", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 4/7 - Cycle Découverte Judo" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Aubaron", date: "2026-11-30", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/7 - Cycle Découverte Judo" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Fayet", date: "2026-11-30", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 5/7 - Cycle Découverte Judo" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Aubaron", date: "2026-12-07", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 6/7 - Cycle Découverte Judo" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Fayet", date: "2026-12-07", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 6/7 - Cycle Découverte Judo" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Aubaron", date: "2026-12-14", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 7/7 - Bilan & Clôture du cycle" },
+            { ecole: "Chantenay-Saint-Imbert", classe: "Classe Mme Fayet", date: "2026-12-14", heures: 1, prof: "Romain", statut: "Prévu", notes: "Séance 7/7 - Bilan & Clôture du cycle" }
+        ];
+
+        const defaultBudget = [
+            { poste: "Participation conventionnée TER de Dornes", type: "Recette", prev: 1500, real: 1500 },
+            { poste: "Subvention demandée ANS (Projet Judo Écoles)", type: "Recette", prev: 1220, real: 1000 },
+            { poste: "Factures Romain Flammang — Interventions Dornes & Chantenay", type: "Dépense", prev: 1770, real: 315 },
+            { poste: "Achat parc de Judogis prêtés gratuitement aux écoles", type: "Dépense", prev: 1678.60, real: 1678.60 }
+        ];
+
+        const defaultNotes = [
+            {
+                id: "note-dornes",
+                title: "TER École de Dornes — Mme Guipon",
+                content: "Cycle sur 4 périodes (8 classes, 40 séances soit 37,5h d'enseignement par Romain Flammang).\n• Prêt gratuit des judogis achetés par le Dojo Dornois.\n• Facturation séparée du forfait mensuel club au tarif de 30 €/h.",
+                files: []
+            },
+            {
+                id: "note-chantenay",
+                title: "École de Chantenay-Saint-Imbert — Mme Cristo",
+                content: "Cycle de 14 séances (7 lundis consécutifs à partir du 2 novembre 2026).\n• Classes de Mme Aubaron et Mme Fayet.\n• Agrément Éducation Nationale de Romain Flammang envoyé à Mme Cristo.",
+                files: []
+            }
+        ];
+
         let scolaireDB = {
+            tauxHoraireRomain: 30,
             interventions: [],
             budgetData: [],
             notesList: []
         };
 
+        let activeBillingMonth = '2026-11'; // Par défaut sur Novembre 2026 !
+        let currentViewMode = 'list';
+
+        const MOIS_NOMS = {
+            '01': 'Janvier', '02': 'Février', '03': 'Mars', '04': 'Avril',
+            '05': 'Mai', '06': 'Juin', '07': 'Juillet', '08': 'Août',
+            '09': 'Septembre', '10': 'Octobre', '11': 'Novembre', '12': 'Décembre'
+        };
+
+        function formatMonthLabel(yyyyMm) {
+            if (!yyyyMm || yyyyMm === 'ALL') return 'Toute la saison';
+            const [y, m] = yyyyMm.split('-');
+            return `${MOIS_NOMS[m] || m} ${y}`;
+        }
+
+        /* ==========================================================================
+           SUPABASE & INITIALISATION
+           ========================================================================== */
         const supabaseUrl = 'https://tumrbyxfnkqobyfzucax.supabase.co';
         const supabaseKey = 'sb_publishable_mmpD1yytpJEEJ7FV3oTwzA_Sa55Jf_8';
         const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
         const SUPABASE_TABLE = 'suivi_ecoles';
 
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
-            const toast = document.createElement('div');
-            toast.className = 'toast ' + type;
-            if (type === 'error') {
-                toast.style.backgroundColor = '#8B1429';
-                toast.style.borderLeftColor = '#C41E3A';
-            }
-            toast.innerText = message;
-            container.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 3500);
+        function showToast(msg, isErr = false) {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = 'toast';
+            if (isErr) t.style.borderLeftColor = '#C41E3A';
+            t.textContent = msg;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 3200);
         }
 
         async function saveScolaireData(silent = false) {
-            if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
+            localStorage.setItem('dojo_scolaire_backup', JSON.stringify(scolaireDB));
             try {
-                const payload = scolaireDB; 
-                localStorage.setItem('dojo_scolaire_backup', JSON.stringify(payload)); 
-
-                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
+                const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: scolaireDB });
                 if (error) throw error;
-                
-                if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !", "success");
-            } catch (err) {
-                console.error("Erreur Supabase:", err);
-                if (!silent && typeof showToast === 'function') showToast("⚠️ Données sauvegardées en local (erreur Supabase)", "error");
+                document.getElementById('syncDot').style.background = '#2ECC71';
+                document.getElementById('syncText').textContent = 'Cloud synchronisé';
+                if (!silent) showToast("✓ Sauvegardé et synchronisé sur Supabase !");
+            } catch (e) {
+                document.getElementById('syncDot').style.background = '#F59E0B';
+                document.getElementById('syncText').textContent = 'Sauvegarde locale';
+                if (!silent) showToast("Sauvegardé en local.", true);
+            }
+        }
+
+        function ensureIntegrity() {
+            if (!scolaireDB || typeof scolaireDB !== 'object') {
+                scolaireDB = { tauxHoraireRomain: 30, interventions: [], budgetData: [], notesList: [] };
+            }
+            if (!scolaireDB.tauxHoraireRomain) scolaireDB.tauxHoraireRomain = 30;
+
+            if (!Array.isArray(scolaireDB.interventions) || scolaireDB.interventions.length === 0) {
+                scolaireDB.interventions = [...JSON.parse(JSON.stringify(scheduleDornes)), ...JSON.parse(JSON.stringify(scheduleChantenay))];
+            } else {
+                const hasChantenay = scolaireDB.interventions.some(i => (i.ecole || '').toLowerCase().includes('chantenay'));
+                if (!hasChantenay) {
+                    scolaireDB.interventions.push(...JSON.parse(JSON.stringify(scheduleChantenay)));
+                }
+            }
+
+            if (!Array.isArray(scolaireDB.budgetData) || scolaireDB.budgetData.length === 0) {
+                scolaireDB.budgetData = JSON.parse(JSON.stringify(defaultBudget));
+            }
+            if (!Array.isArray(scolaireDB.notesList) || scolaireDB.notesList.length === 0) {
+                scolaireDB.notesList = JSON.parse(JSON.stringify(defaultNotes));
             }
         }
 
         async function loadScolaireData() {
-            const saved = localStorage.getItem('dojo_scolaire_backup');
-            if (saved) {
+            const local = localStorage.getItem('dojo_scolaire_backup');
+            if (local) {
                 try {
-                    scolaireDB = JSON.parse(saved);
-                    finalizeInitialization();
-                } catch(e) {}
+                    scolaireDB = JSON.parse(local);
+                    ensureIntegrity();
+                    refreshAll();
+                } catch (e) {}
             }
-            
+
             try {
-                const { data: result, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
-                if (error) throw error;
-                if (result && result.data) {
-                    scolaireDB = result.data;
-                    localStorage.setItem('dojo_scolaire_backup', JSON.stringify(scolaireDB));
-                    finalizeInitialization();
-                } else if (!saved) {
-                    useFallbackLocalData();
-                    finalizeInitialization();
+                const { data: res, error } = await sbClient.from(SUPABASE_TABLE).select('data').eq('id', 1).single();
+                if (!error && res && res.data) {
+                    scolaireDB = res.data;
                 }
-            } catch(e) {
-                console.error("Erreur chargement Supabase:", e);
-                if (!saved) {
-                    useFallbackLocalData();
-                    finalizeInitialization();
-                }
+            } catch (e) {}
+
+            ensureIntegrity();
+            localStorage.setItem('dojo_scolaire_backup', JSON.stringify(scolaireDB));
+            refreshAll();
+        }
+
+        function refreshAll() {
+            document.getElementById('input-taux-romain').value = scolaireDB.tauxHoraireRomain || 30;
+            document.querySelectorAll('.label-taux-romain').forEach(el => el.textContent = (scolaireDB.tauxHoraireRomain || 30) + ' €');
+            populateFilters();
+            renderSchoolCards();
+            renderMonthlyBillingWidget();
+            renderSuivi();
+            renderBudgetAndAnnualSummary();
+            renderNotes();
+            document.getElementById('badge-count-seances').textContent = scolaireDB.interventions.length;
+            document.getElementById('badge-count-budget').textContent = scolaireDB.budgetData.length;
+            document.getElementById('badge-count-notes').textContent = scolaireDB.notesList.length;
+        }
+
+        /* ==========================================================================
+           CALCULATEUR DE FACTURATION MENSUELLE DE ROMAIN (DORNES & CHANTENAY)
+           ========================================================================== */
+        function getDistinctMonths() {
+            const set = new Set();
+            scolaireDB.interventions.forEach(i => {
+                if (i.date && i.date.length >= 7) set.add(i.date.substring(0, 7));
+            });
+            return Array.from(set).sort();
+        }
+
+        function updateTauxHoraire(val) {
+            const t = parseFloat(val);
+            if (!isNaN(t) && t > 0) {
+                scolaireDB.tauxHoraireRomain = t;
+                saveScolaireData();
+                refreshAll();
             }
         }
 
-        function useFallbackLocalData() {
-            const backup = localStorage.getItem('dojo_scolaire_backup');
-            if(backup) {
-                scolaireDB = JSON.parse(backup);
-            } else {
-                scolaireDB.interventions = JSON.parse(JSON.stringify(initialDornesSchedule));
-                scolaireDB.budgetData = [
-                    { poste: "Subvention demandée ANS", type: "Recette", prev: 1500, real: 1200 },
-                    { poste: "Indemnités encadrement (Romain/Philippe)", type: "Dépense", prev: 1200, real: 1100 },
-                    { poste: "Achat petits matériels (Ceintures, kits)", type: "Dépense", prev: 300, real: 280 }
-                ];
-                scolaireDB.notesList = [
-                    {
-                        id: "note-1",
-                        title: "Notes Générales du Projet",
-                        content: "Saisis ici toutes tes informations transversales relatives aux cycles scolaires.",
-                        expanded: true,
-                        files: []
-                    }
-                ];
-            }
+        function selectBillingMonth(yyyyMm) {
+            activeBillingMonth = yyyyMm;
+            // Synchronise aussi le filtre mois du tableau si souhaité
+            const fMois = document.getElementById('filter-mois');
+            fMois.value = yyyyMm === 'ALL' ? '' : yyyyMm;
+            renderMonthlyBillingWidget();
+            renderSuivi();
         }
 
-        function finalizeInitialization() {
-            if (!scolaireDB.interventions || scolaireDB.interventions.length === 0) {
-                scolaireDB.interventions = JSON.parse(JSON.stringify(initialDornesSchedule));
-            }
-            if (!scolaireDB.budgetData || scolaireDB.budgetData.length === 0) {
-                scolaireDB.budgetData = [
-                    { poste: "Subvention demandée ANS", type: "Recette", prev: 1500, real: 1200 },
-                    { poste: "Indemnités encadrement (Romain/Philippe)", type: "Dépense", prev: 1200, real: 1100 },
-                    { poste: "Achat petits matériels (Ceintures, kits)", type: "Dépense", prev: 300, real: 280 }
-                ];
-            }
-            if (!scolaireDB.notesList || !Array.isArray(scolaireDB.notesList)) {
-                scolaireDB.notesList = [];
-                if (scolaireDB.notesGenerales) {
-                    scolaireDB.notesList.push({
-                        id: "note-legacy",
-                        title: "Notes Générales du Projet",
-                        content: scolaireDB.notesGenerales,
-                        expanded: true,
-                        files: []
-                    });
-                }
-            }
-
-            populateSelectFilters();
-            renderTable();
-            renderBudget();
-            renderNotesList();
-            document.getElementById('inter-date').valueAsDate = new Date();
+        function onSelectMoisTableFilter(val) {
+            activeBillingMonth = val || 'ALL';
+            renderMonthlyBillingWidget();
+            renderSuivi();
         }
 
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.add('active');
-            btn.classList.add('active');
-
-            const printBtn = document.getElementById('main-print-btn');
-            if (tabId === 'tab-suivi') {
-                printBtn.style.display = "block";
-            } else {
-                printBtn.style.display = "none";
+        function renderMonthlyBillingWidget() {
+            const months = getDistinctMonths();
+            if (activeBillingMonth !== 'ALL' && !months.includes(activeBillingMonth)) {
+                activeBillingMonth = months.includes('2026-11') ? '2026-11' : (months[0] || 'ALL');
             }
+
+            // 1. Barre de pastilles de mois
+            const pillsBar = document.getElementById('monthPillsBar');
+            let pillsHtml = `<button class="month-pill ${activeBillingMonth === 'ALL' ? 'active' : ''}" onclick="selectBillingMonth('ALL')">📚 Toute la saison</button>`;
+            months.forEach(m => {
+                pillsHtml += `<button class="month-pill ${activeBillingMonth === m ? 'active' : ''}" onclick="selectBillingMonth('${m}')">📅 ${formatMonthLabel(m)}</button>`;
+            });
+            pillsBar.innerHTML = pillsHtml;
+
+            // 2. Calcul des heures et factures pour le mois actif
+            const taux = parseFloat(scolaireDB.tauxHoraireRomain) || 30;
+            const listMonth = activeBillingMonth === 'ALL'
+                ? scolaireDB.interventions
+                : scolaireDB.interventions.filter(i => (i.date || '').startsWith(activeBillingMonth));
+
+            const calcSchool = (schoolMatch) => {
+                const sub = listMonth.filter(i => (i.ecole || '').toLowerCase().includes(schoolMatch));
+                const hPrev = sub.reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+                const hDone = sub.filter(i => i.statut === 'Validé').reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+                const sDone = sub.filter(i => i.statut === 'Validé').length;
+                return {
+                    seancesTotal: sub.length,
+                    seancesDone: sDone,
+                    hPrev,
+                    hDone,
+                    factureDone: hDone * taux,
+                    facturePrev: hPrev * taux
+                };
+            };
+
+            const dornes = calcSchool('dornes');
+            const chantenay = calcSchool('chantenay');
+
+            const totalHDone = listMonth.filter(i => i.statut === 'Validé').reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+            const totalHPrev = listMonth.reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+            const totalFactureDone = totalHDone * taux;
+            const totalFacturePrev = totalHPrev * taux;
+
+            const labelPeriode = formatMonthLabel(activeBillingMonth);
+
+            document.getElementById('monthlyBillingCards').innerHTML = `
+                <!-- FACTURE ROMAIN : DORNES -->
+                <div class="invoice-calc-box box-dornes">
+                    <div class="invoice-box-top">
+                        <span>🏫 Facture Romain — Dornes</span>
+                        <span>${labelPeriode}</span>
+                    </div>
+                    <div class="invoice-box-main">
+                        <div class="invoice-amount">${dornes.factureDone.toFixed(2)} €</div>
+                        <div class="invoice-hours-detail">${dornes.hDone}h validées <span style="font-weight:400; color:var(--gris-moyen);">/ ${dornes.hPrev}h prévues</span></div>
+                    </div>
+                    <div class="invoice-box-sub">
+                        <span>${dornes.seancesDone} / ${dornes.seancesTotal} séances validées</span>
+                        <span>Si 100% validé : <strong>${dornes.facturePrev.toFixed(2)} €</strong></span>
+                    </div>
+                </div>
+
+                <!-- FACTURE ROMAIN : CHANTENAY-SAINT-IMBERT -->
+                <div class="invoice-calc-box box-chantenay">
+                    <div class="invoice-box-top">
+                        <span>🏫 Facture Romain — Chantenay-St-Imbert</span>
+                        <span>${labelPeriode}</span>
+                    </div>
+                    <div class="invoice-box-main">
+                        <div class="invoice-amount">${chantenay.factureDone.toFixed(2)} €</div>
+                        <div class="invoice-hours-detail">${chantenay.hDone}h validées <span style="font-weight:400; color:var(--gris-moyen);">/ ${chantenay.hPrev}h prévues</span></div>
+                    </div>
+                    <div class="invoice-box-sub">
+                        <span>${chantenay.seancesDone} / ${chantenay.seancesTotal} séances validées</span>
+                        <span>Si 100% validé : <strong>${chantenay.facturePrev.toFixed(2)} €</strong></span>
+                    </div>
+                </div>
+
+                <!-- TOTAL CUMULÉ ROMAIN SUR LE MOIS -->
+                <div class="invoice-calc-box box-total">
+                    <div class="invoice-box-top">
+                        <span>💰 Total Facturation Scolaire Romain</span>
+                        <span>${labelPeriode}</span>
+                    </div>
+                    <div class="invoice-box-main">
+                        <div class="invoice-amount">${totalFactureDone.toFixed(2)} €</div>
+                        <div class="invoice-hours-detail" style="color:#FFF;">${totalHDone}h validées <span style="font-weight:400; color:#9CA3AF;">/ ${totalHPrev}h</span></div>
+                    </div>
+                    <div class="invoice-box-sub">
+                        <span>Base : ${taux.toFixed(2)} € / heure</span>
+                        <span>Prévisionnel complet : <strong style="color:#FFF;">${totalFacturePrev.toFixed(2)} €</strong></span>
+                    </div>
+                </div>
+            `;
         }
 
-        function toggleNotesAccordion(forceOpen = false) {
-            const content = document.getElementById('accordion-content');
-            const arrow = document.getElementById('accordion-arrow');
-            if (forceOpen) {
-                content.classList.add('open');
-                arrow.innerText = "▲";
-            } else {
-                content.classList.toggle('open');
-                arrow.innerText = content.classList.contains('open') ? "▲" : "▼";
-            }
-        }
-
-        function enregistrerIntervention() {
-            const ecole = document.getElementById('inter-ecole').value.trim();
-            const classe = document.getElementById('inter-classe').value.trim();
-            const date = document.getElementById('inter-date').value;
-            const heures = parseFloat(document.getElementById('inter-heures').value);
-            const prof = document.getElementById('inter-prof').value;
-            const statut = document.getElementById('inter-statut').value;
-            const notes = document.getElementById('inter-notes').value.trim();
-            const editIndex = parseInt(document.getElementById('edit-index').value);
-
-            if (!ecole || !classe || !date || isNaN(heures)) {
-                alert("Tous les champs requis doivent être remplis.");
+        function validerToutLeMoisActif() {
+            const label = formatMonthLabel(activeBillingMonth);
+            const cibles = scolaireDB.interventions.filter(i =>
+                (activeBillingMonth === 'ALL' || (i.date || '').startsWith(activeBillingMonth)) && i.statut !== 'Validé'
+            );
+            if (cibles.length === 0) {
+                showToast(`Toutes les séances de ${label} sont déjà validées !`);
                 return;
             }
-
-            const data = { ecole, classe, date, heures, prof, statut, notes };
-
-            if (editIndex === -1) scolaireDB.interventions.push(data);
-            else scolaireDB.interventions[editIndex] = data;
-
-            saveScolaireData();
-            resetForm();
-            populateSelectFilters();
-            renderTable();
-        }
-
-        function editerIntervention(index) {
-            const item = scolaireDB.interventions[index];
-            document.getElementById('edit-index').value = index;
-            document.getElementById('inter-ecole').value = item.ecole;
-            document.getElementById('inter-classe').value = item.classe;
-            document.getElementById('inter-date').value = item.date;
-            document.getElementById('inter-heures').value = item.heures;
-            document.getElementById('inter-prof').value = item.prof;
-            document.getElementById('inter-statut').value = item.statut;
-            document.getElementById('inter-notes').value = item.notes || '';
-
-            toggleNotesAccordion(true);
-
-            document.getElementById('form-panel-title').innerText = "✏️ Modifier l'intervention";
-            document.getElementById('btn-submit-form').innerText = "💾 Enregistrer les corrections";
-            document.getElementById('btn-cancel-edit').style.display = "inline-flex";
-        }
-
-        // MODALE POP-UP
-        function ouvrirModalSeance(index, e) {
-            if(e) e.stopPropagation();
-            const item = scolaireDB.interventions[index];
-            document.getElementById('modal-index').value = index;
-            document.getElementById('modal-ecole-classe').value = `${item.ecole} — ${item.classe}`;
-            document.getElementById('modal-date-prof').value = `${item.date.split('-').reverse().join('/')} (${item.heures}h) — Intervenant: ${item.prof}`;
-            document.getElementById('modal-statut').value = item.statut;
-            document.getElementById('modal-notes').value = item.notes || '';
-
-            document.getElementById('sessionModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('sessionModal').classList.remove('active');
-        }
-
-        function sauvegarderDepuisModal() {
-            const index = parseInt(document.getElementById('modal-index').value);
-            if(index !== -1) {
-                scolaireDB.interventions[index].statut = document.getElementById('modal-statut').value;
-                scolaireDB.interventions[index].notes = document.getElementById('modal-notes').value.trim();
+            if (confirm(`Passer les ${cibles.length} séances restantes de ${label} en statut "Validé" ?`)) {
+                scolaireDB.interventions.forEach(i => {
+                    if (activeBillingMonth === 'ALL' || (i.date || '').startsWith(activeBillingMonth)) {
+                        i.statut = 'Validé';
+                    }
+                });
                 saveScolaireData();
-                renderTable();
-                closeModal();
+                refreshAll();
             }
         }
 
-        function toggleStatutDirect(index, e) {
-            e.stopPropagation();
-            scolaireDB.interventions[index].statut = scolaireDB.interventions[index].statut === "Validé" ? "Prévu" : "Validé";
-            saveScolaireData();
-            renderTable();
+        /* ==========================================================================
+           CARTES ÉCOLES & FILTRES
+           ========================================================================== */
+        function getStatsForSchool(ecoleName = '') {
+            const list = ecoleName
+                ? scolaireDB.interventions.filter(i => i.ecole === ecoleName)
+                : scolaireDB.interventions;
+            const totalS = list.length;
+            const doneS = list.filter(i => i.statut === 'Validé').length;
+            const totalH = list.reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+            const doneH = list.filter(i => i.statut === 'Validé').reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+            const classesCount = new Set(list.map(i => i.classe)).size;
+            const pct = totalS > 0 ? Math.round((doneS / totalS) * 100) : 0;
+            const taux = parseFloat(scolaireDB.tauxHoraireRomain) || 30;
+            return { totalS, doneS, totalH, doneH, classesCount, pct, montantDone: doneH * taux, montantTotal: totalH * taux };
         }
 
-        function supprimerIntervention(index, e) {
-            e.stopPropagation();
-            if(confirm("Supprimer cette ligne ?")) {
-                scolaireDB.interventions.splice(index, 1);
-                saveScolaireData();
-                populateSelectFilters();
-                renderTable();
-            }
-        }
+        function renderSchoolCards() {
+            const sel = document.getElementById('filter-ecole').value;
+            const g = getStatsForSchool('');
+            const d = getStatsForSchool('Dornes');
+            const c = getStatsForSchool('Chantenay-Saint-Imbert');
 
-        function resetForm() {
-            document.getElementById('edit-index').value = "-1";
-            document.getElementById('inter-ecole').value = "";
-            document.getElementById('inter-classe').value = "";
-            document.getElementById('inter-heures').value = "1";
-            document.getElementById('inter-notes').value = "";
-            document.getElementById('form-panel-title').innerText = "➕ Ajouter une intervention";
-            document.getElementById('btn-submit-form').innerText = "⚡ Valider / Enregistrer";
-            document.getElementById('btn-cancel-edit').style.display = "none";
-        }
-
-        function populateSelectFilters() {
-            const fEcole = document.getElementById('filter-ecole');
-            const fClasse = document.getElementById('filter-classe');
-            const curE = fEcole.value; const curC = fClasse.value;
-
-            const ecoles = [...new Set(scolaireDB.interventions.map(i => i.ecole))];
-            const classes = [...new Set(scolaireDB.interventions.map(i => i.classe))];
-
-            fEcole.innerHTML = '<option value="">-- Toutes les Écoles --</option>';
-            ecoles.forEach(e => fEcole.innerHTML += `<option value="${e}" ${e===curE?'selected':''}>${e}</option>`);
-
-            fClasse.innerHTML = '<option value="">-- Toutes les Classes --</option>';
-            classes.forEach(c => fClasse.innerHTML += `<option value="${c}" ${c===curC?'selected':''}>${c}</option>`);
-        }
-
-        function renderTable() {
-            const selEcole = document.getElementById('filter-ecole').value;
-            const selClasse = document.getElementById('filter-classe').value;
-            const tbody = document.getElementById('interventions-tbody');
-            tbody.innerHTML = '';
-            let totalH = 0; let totalS = 0;
-
-            const sorted = scolaireDB.interventions.map((item, idx) => ({...item, originalIdx: idx}))
-                                       .sort((a,b) => new Date(a.date) - new Date(b.date));
-
-            sorted.forEach(item => {
-                if (selEcole && item.ecole !== selEcole) return;
-                if (selClasse && item.classe !== selClasse) return;
-
-                totalS++;
-                if(item.statut === "Validé") totalH += item.heures;
-
-                const dateFr = item.date.split('-').reverse().join('/');
-                const tr = document.createElement('tr');
-                tr.style.cursor = "pointer";
-                tr.onclick = () => editerIntervention(item.originalIdx);
-
-                tr.innerHTML = `
-                    <td><strong>${dateFr}</strong></td>
-                    <td>${item.ecole}</td>
-                    <td><span class="badge" style="background:#e8e8e8; color:#333;">${item.classe}</span></td>
-                    <td>${item.heures}h</td>
-                    <td>${item.prof}</td>
-                    <td>
-                        <span class="badge ${item.statut === 'Validé' ? 'badge-valide':'badge-prevu'}" onclick="toggleStatutDirect(${item.originalIdx}, event)">
-                            ${item.statut === 'Validé' ? '🟢 Validé':'🔴 Prévu'}
-                        </span>
-                    </td>
-                    <td class="no-print">
-                        <div style="display:flex; gap:4px;">
-                            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="ouvrirModalSeance(${item.originalIdx}, event)" title="Voir / Éditer les notes">👁️</button>
-                            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="supprimerIntervention(${item.originalIdx}, event)" title="Supprimer">✕</button>
+            document.getElementById('schoolsGrid').innerHTML = `
+                <div class="school-card ${sel === '' ? 'selected' : ''}" onclick="selectSchoolFilter('')">
+                    <div class="school-header">
+                        <div>
+                            <h3 class="school-title">🥋 Toutes les Écoles</h3>
+                            <div class="school-subtitle">${g.classesCount} classes suivies • Dornes & Chantenay</div>
                         </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                        <span class="school-chip">Global (${g.pct}%)</span>
+                    </div>
+                    <div class="school-stats-row">
+                        <div class="school-big-num">${g.doneH}h <span style="font-size:0.9rem; font-weight:500; color:var(--gris-moyen);">/ ${g.totalH}h</span></div>
+                        <div style="font-size:0.85rem; font-weight:700; color:var(--vert);">Facturé : ${g.montantDone.toFixed(2)} €</div>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${g.pct}%"></div></div>
+                </div>
+
+                <div class="school-card card-dornes ${sel === 'Dornes' ? 'selected' : ''}" onclick="selectSchoolFilter('Dornes')">
+                    <div class="school-header">
+                        <div>
+                            <h3 class="school-title">🏫 École de Dornes</h3>
+                            <div class="school-subtitle">${d.classesCount} classes (PS à CM2) • Dir. Mme Guipon</div>
+                        </div>
+                        <span class="school-chip">TER Dornes (${d.pct}%)</span>
+                    </div>
+                    <div class="school-stats-row">
+                        <div class="school-big-num">${d.doneH}h <span style="font-size:0.9rem; font-weight:500; color:var(--gris-moyen);">/ ${d.totalH}h</span></div>
+                        <div style="font-size:0.85rem; font-weight:700; color:var(--rouge);">Romain : ${d.montantDone.toFixed(2)} € <span style="font-weight:400; color:var(--gris-moyen);">/ ${d.montantTotal.toFixed(0)}€</span></div>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${d.pct}%"></div></div>
+                </div>
+
+                <div class="school-card card-chantenay ${sel === 'Chantenay-Saint-Imbert' ? 'selected' : ''}" onclick="selectSchoolFilter('Chantenay-Saint-Imbert')">
+                    <div class="school-header">
+                        <div>
+                            <h3 class="school-title">🏫 Chantenay-St-Imbert</h3>
+                            <div class="school-subtitle">${c.classesCount} classes (Mmes Aubaron & Fayet) • Mme Cristo</div>
+                        </div>
+                        <span class="school-chip">Cycle 14 séances (${c.pct}%)</span>
+                    </div>
+                    <div class="school-stats-row">
+                        <div class="school-big-num">${c.doneH}h <span style="font-size:0.9rem; font-weight:500; color:var(--gris-moyen);">/ ${c.totalH}h</span></div>
+                        <div style="font-size:0.85rem; font-weight:700; color:var(--bleu-chantenay);">Romain : ${c.montantDone.toFixed(2)} € <span style="font-weight:400; color:var(--gris-moyen);">/ ${c.montantTotal.toFixed(0)}€</span></div>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${c.pct}%"></div></div>
+                </div>
+            `;
+        }
+
+        function selectSchoolFilter(ecole) {
+            document.getElementById('filter-ecole').value = ecole;
+            populateClasseSelect(ecole);
+            renderSchoolCards();
+            renderSuivi();
+        }
+
+        function onSelectEcoleFilter(ecole) {
+            populateClasseSelect(ecole);
+            renderSchoolCards();
+            renderSuivi();
+        }
+
+        function populateFilters() {
+            const fEcole = document.getElementById('filter-ecole');
+            const curE = fEcole.value;
+            const ecoles = [...new Set(scolaireDB.interventions.map(i => i.ecole))];
+            fEcole.innerHTML = '<option value="">🏫 Toutes les Écoles</option>' +
+                ecoles.map(e => `<option value="${e}" ${e === curE ? 'selected' : ''}>École de ${e}</option>`).join('');
+
+            populateClasseSelect(curE);
+
+            const fMois = document.getElementById('filter-mois');
+            const curM = fMois.value;
+            const months = getDistinctMonths();
+            fMois.innerHTML = '<option value="">📅 Tous les mois de l\'année</option>' +
+                months.map(m => `<option value="${m}" ${m === curM ? 'selected' : ''}>${formatMonthLabel(m)}</option>`).join('');
+        }
+
+        function populateClasseSelect(ecoleFilter = '') {
+            const fClasse = document.getElementById('filter-classe');
+            const curC = fClasse.value;
+            const src = ecoleFilter
+                ? scolaireDB.interventions.filter(i => i.ecole === ecoleFilter)
+                : scolaireDB.interventions;
+            const classes = [...new Set(src.map(i => i.classe))];
+            fClasse.innerHTML = '<option value="">🎓 Toutes les Classes</option>' +
+                classes.map(c => `<option value="${c}" ${c === curC ? 'selected' : ''}>${c}</option>`).join('');
+        }
+
+        /* ==========================================================================
+           RENDU LISTE & GRILLE PAR CLASSES
+           ========================================================================== */
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            document.getElementById('btn-mode-list').classList.toggle('active', mode === 'list');
+            document.getElementById('btn-mode-classes').classList.toggle('active', mode === 'classes');
+            document.getElementById('view-list-box').style.display = mode === 'list' ? 'block' : 'none';
+            document.getElementById('view-classes-box').style.display = mode === 'classes' ? 'grid' : 'none';
+            renderSuivi();
+        }
+
+        function formatDateFr(iso) {
+            if (!iso) return '-';
+            const p = iso.split('-');
+            if (p.length !== 3) return iso;
+            const d = new Date(iso + 'T00:00:00');
+            const j = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'];
+            return `${!isNaN(d) ? j[d.getDay()] + ' ' : ''}${p[2]}/${p[1]}/${p[0]}`;
+        }
+
+        function getFilteredList() {
+            const q = document.getElementById('filter-search').value.trim().toLowerCase();
+            const e = document.getElementById('filter-ecole').value;
+            const c = document.getElementById('filter-classe').value;
+            const m = document.getElementById('filter-mois').value;
+            const s = document.getElementById('filter-statut').value;
+
+            return scolaireDB.interventions
+                .map((item, idx) => ({ ...item, originalIdx: idx }))
+                .filter(item => {
+                    if (e && item.ecole !== e) return false;
+                    if (c && item.classe !== c) return false;
+                    if (m && !(item.date || '').startsWith(m)) return false;
+                    if (s && item.statut !== s) return false;
+                    if (q) {
+                        const hay = `${item.ecole} ${item.classe} ${item.prof} ${item.notes || ''} ${item.date}`.toLowerCase();
+                        if (!hay.includes(q)) return false;
+                    }
+                    return true;
+                })
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+
+        function renderSuivi() {
+            const list = getFilteredList();
+            const taux = parseFloat(scolaireDB.tauxHoraireRomain) || 30;
+            const tbody = document.getElementById('interventions-tbody');
+            const gridBox = document.getElementById('view-classes-box');
+
+            let hTotal = 0, hDone = 0, sDone = 0;
+            list.forEach(i => {
+                const h = parseFloat(i.heures) || 0;
+                hTotal += h;
+                if (i.statut === 'Validé') { hDone += h; sDone++; }
             });
 
-            document.getElementById('total-heures').innerText = totalH + "h";
-            document.getElementById('total-seances').innerText = totalS;
-        }
+            document.getElementById('footer-seances-count').textContent = list.length;
+            document.getElementById('footer-seances-done').textContent = `${sDone} validées`;
+            document.getElementById('footer-seances-todo').textContent = `${list.length - sDone} prévues`;
+            document.getElementById('footer-hours-total').textContent = hTotal + 'h';
+            document.getElementById('footer-hours-done').textContent = hDone + 'h';
+            document.getElementById('footer-amount-done').textContent = (hDone * taux).toFixed(2) + ' €';
 
-        function renderBudget() {
-            const tbody = document.getElementById('budget-tbody');
-            tbody.innerHTML = '';
+            // 1. VUE LISTE
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--gris-moyen);">Aucune séance trouvée pour ces filtres.</td></tr>`;
+            } else {
+                tbody.innerHTML = list.map(item => {
+                    const isDone = item.statut === 'Validé';
+                    const isChantenay = (item.ecole || '').toLowerCase().includes('chantenay');
+                    const badgeClass = isChantenay ? 'chantenay' : ((item.ecole || '').toLowerCase().includes('dornes') ? 'dornes' : 'other');
+                    const coutSeance = ((parseFloat(item.heures) || 0) * taux).toFixed(2);
 
-            let totalPrevRecettes = 0; let totalRealRecettes = 0;
-            let totalPrevDepenses = 0; let totalRealDepenses = 0;
+                    return `
+                        <tr onclick="openSessionDrawer(${item.originalIdx})" style="cursor:pointer;">
+                            <td><strong>${formatDateFr(item.date)}</strong></td>
+                            <td><span class="ecole-badge ${badgeClass}">🏫 ${item.ecole}</span></td>
+                            <td><span class="classe-tag">${item.classe}</span></td>
+                            <td><strong>${item.heures}h</strong></td>
+                            <td style="font-weight:700; color:${isDone ? 'var(--vert)' : 'var(--gris-moyen)'};">${coutSeance} €</td>
+                            <td style="color:var(--gris-moyen); font-size:0.83rem;">${item.notes || '-'}</td>
+                            <td onclick="event.stopPropagation(); toggleStatutDirect(${item.originalIdx})">
+                                <span class="statut-btn ${isDone ? 'valide' : 'prevu'}" title="Cliquer pour basculer Validé / Prévu">
+                                    ${isDone ? '🟢 Validé' : '🟠 Prévu'}
+                                </span>
+                            </td>
+                            <td style="text-align:right;" onclick="event.stopPropagation();">
+                                <button class="btn btn-outline btn-sm" onclick="openSessionDrawer(${item.originalIdx})">✏️</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
 
-            scolaireDB.budgetData.forEach((item, idx) => {
-                const prev = parseFloat(item.prev) || 0;
-                const real = parseFloat(item.real) || 0;
-                const ecart = real - prev;
-
-                if(item.type === "Recette") {
-                    totalPrevRecettes += prev; totalRealRecettes += real;
-                } else {
-                    totalPrevDepenses += prev; totalRealDepenses += real;
-                }
-
-                const tr = document.createElement('tr');
-                tr.style.cursor = "pointer";
-                tr.onclick = () => editerBudget(idx);
-                tr.innerHTML = `
-                    <td><strong>${item.poste}</strong></td>
-                    <td style="color: ${item.type === 'Recette' ? 'var(--vert-compta)':'var(--rouge)'}">${item.type === 'Recette' ? '🔹 Recette':'🔺 Dépense'}</td>
-                    <td>${prev.toFixed(2)} €</td>
-                    <td>${real.toFixed(2)} €</td>
-                    <td style="font-weight:bold; color:${ecart >= 0 ? 'green':'red'}">${ecart >= 0 ? '+':''}${ecart.toFixed(2)} €</td>
-                    <td class="no-print"><button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="supprimerBudget(${idx}, event)">✕</button></td>
-                `;
-                tbody.appendChild(tr);
+            // 2. VUE GRILLE PAR CLASSES
+            const groups = {};
+            list.forEach(item => {
+                const k = `${item.ecole}|||${item.classe}`;
+                if (!groups[k]) groups[k] = { ecole: item.ecole, classe: item.classe, items: [] };
+                groups[k].items.push(item);
             });
 
-            const netPrev = totalPrevRecettes - totalPrevDepenses;
-            const netReal = totalRealRecettes - totalRealDepenses;
-            const netDiff = netReal - netPrev;
+            const gArr = Object.values(groups);
+            if (gArr.length === 0) {
+                gridBox.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:32px; color:var(--gris-moyen);">Aucune classe à afficher.</div>`;
+            } else {
+                gridBox.innerHTML = gArr.map(g => {
+                    const isChantenay = (g.ecole || '').toLowerCase().includes('chantenay');
+                    const doneCount = g.items.filter(i => i.statut === 'Validé').length;
+                    const hDoneClass = g.items.filter(i => i.statut === 'Validé').reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+                    const hTotalClass = g.items.reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+                    const montantClass = (hDoneClass * taux).toFixed(2);
 
-            document.getElementById('b-total-prev').innerText = netPrev.toFixed(2) + " €";
-            document.getElementById('b-total-real').innerText = netReal.toFixed(2) + " €";
-            document.getElementById('b-total-diff').innerText = (netDiff >= 0 ? '+': '') + netDiff.toFixed(2) + " €";
-            document.getElementById('b-total-diff').style.color = netDiff >= 0 ? 'var(--vert-compta)' : 'var(--rouge)';
-        }
-
-        function enregistrerBudget() {
-            const poste = document.getElementById('budget-poste').value.trim();
-            const type = document.getElementById('budget-type').value;
-            const prev = parseFloat(document.getElementById('budget-prev').value) || 0;
-            const real = parseFloat(document.getElementById('budget-real').value) || 0;
-            const idx = parseInt(document.getElementById('budget-edit-index').value);
-
-            if(!poste) { alert("Le nom du poste est requis."); return; }
-
-            const obj = { poste, type, prev, real };
-            if(idx === -1) scolaireDB.budgetData.push(obj);
-            else scolaireDB.budgetData[idx] = obj;
-
-            saveScolaireData();
-            resetBudgetForm();
-            renderBudget();
-        }
-
-        function editerBudget(index) {
-            const item = scolaireDB.budgetData[index];
-            document.getElementById('budget-edit-index').value = index;
-            document.getElementById('budget-poste').value = item.poste;
-            document.getElementById('budget-type').value = item.type;
-            document.getElementById('budget-prev').value = item.prev;
-            document.getElementById('budget-real').value = item.real;
-            document.getElementById('btn-cancel-budget').style.display = "inline-flex";
-        }
-
-        function supprimerBudget(index, e) {
-            e.stopPropagation();
-            if(confirm("Supprimer cette ligne budgétaire ?")) {
-                scolaireDB.budgetData.splice(index, 1);
-                saveScolaireData();
-                renderBudget();
+                    return `
+                        <div class="class-card ${isChantenay ? 'chantenay-card' : ''}">
+                            <div class="class-card-header">
+                                <div>
+                                    <h4 class="class-card-title">🎓 ${g.classe}</h4>
+                                    <div style="margin-top:4px; display:flex; align-items:center; gap:8px;">
+                                        <span class="ecole-badge ${isChantenay ? 'chantenay' : 'dornes'}">${g.ecole}</span>
+                                        <span style="font-size:0.78rem; font-weight:700; color:var(--vert);">Facturé : ${montantClass} € (${hDoneClass}h/${hTotalClass}h)</span>
+                                    </div>
+                                </div>
+                                <span class="classe-tag">${doneCount}/${g.items.length}</span>
+                            </div>
+                            <div class="class-sessions-list">
+                                ${g.items.map((s, idx) => {
+                                    const isDone = s.statut === 'Validé';
+                                    return `
+                                        <div class="class-session-row ${isDone ? 'is-done' : ''}" onclick="openSessionDrawer(${s.originalIdx})">
+                                            <div>
+                                                <strong>${formatDateFr(s.date)}</strong> (${s.heures}h)
+                                                <div style="font-size:0.74rem; color:var(--gris-moyen);">${s.notes || ''}</div>
+                                            </div>
+                                            <span class="statut-btn ${isDone ? 'valide' : 'prevu'}" onclick="event.stopPropagation(); toggleStatutDirect(${s.originalIdx})">
+                                                ${isDone ? '🟢 Validé' : '🟠 Prévu'}
+                                            </span>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             }
         }
 
-        function resetBudgetForm() {
-            document.getElementById('budget-edit-index').value = "-1";
-            document.getElementById('budget-poste').value = "";
-            document.getElementById('budget-prev').value = "0";
-            document.getElementById('budget-real').value = "0";
-            document.getElementById('btn-cancel-budget').style.display = "none";
+        function toggleStatutDirect(index) {
+            const item = scolaireDB.interventions[index];
+            if (!item) return;
+            item.statut = item.statut === 'Validé' ? 'Prévu' : 'Validé';
+            saveScolaireData(true);
+            refreshAll();
+            showToast(`${item.ecole} (${item.classe}) — ${formatDateFr(item.date)} : ${item.statut}`);
         }
 
-        /* ================= FONCTIONS DU GESTIONNAIRE DE NOTES (ONGLET 3) ================= */
+        /* ==========================================================================
+           ONGLET 2 : TABLEAU ANNUEL DES FACTURES DE ROMAIN + BUDGET ANS
+           ========================================================================== */
+        function renderBudgetAndAnnualSummary() {
+            const taux = parseFloat(scolaireDB.tauxHoraireRomain) || 30;
+            const months = getDistinctMonths();
+            const sumTbody = document.getElementById('romain-monthly-summary-tbody');
 
-        function openBase64Document(base64Data, fileName) {
+            let grandDornesH = 0, grandDornesPrevH = 0;
+            let grandChantH = 0, grandChantPrevH = 0;
+
+            sumTbody.innerHTML = months.map(m => {
+                const sub = scolaireDB.interventions.filter(i => (i.date || '').startsWith(m));
+                const dSub = sub.filter(i => (i.ecole || '').toLowerCase().includes('dornes'));
+                const cSub = sub.filter(i => (i.ecole || '').toLowerCase().includes('chantenay'));
+
+                const dPrevH = dSub.reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+                const dDoneH = dSub.filter(i => i.statut === 'Validé').reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+
+                const cPrevH = cSub.reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+                const cDoneH = cSub.filter(i => i.statut === 'Validé').reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+
+                grandDornesH += dDoneH; grandDornesPrevH += dPrevH;
+                grandChantH += cDoneH; grandChantPrevH += cPrevH;
+
+                const dEur = dDoneH * taux;
+                const cEur = cDoneH * taux;
+                const totEur = dEur + cEur;
+
+                return `
+                    <tr>
+                        <td><strong>📅 ${formatMonthLabel(m)}</strong></td>
+                        <td>${dDoneH}h validées <span style="color:var(--gris-moyen);">/ ${dPrevH}h prévues</span></td>
+                        <td><strong style="color:var(--rouge);">${dEur.toFixed(2)} €</strong> <span style="font-size:0.76rem; color:var(--gris-moyen);">(prév. ${(dPrevH*taux).toFixed(0)}€)</span></td>
+                        <td>${cDoneH}h validées <span style="color:var(--gris-moyen);">/ ${cPrevH}h prévues</span></td>
+                        <td><strong style="color:var(--bleu-chantenay);">${cEur.toFixed(2)} €</strong> <span style="font-size:0.76rem; color:var(--gris-moyen);">(prév. ${(cPrevH*taux).toFixed(0)}€)</span></td>
+                        <td style="background:#F0FDF4; font-weight:700; color:var(--vert); font-size:0.95rem;">${totEur.toFixed(2)} €</td>
+                    </tr>
+                `;
+            }).join('') + `
+                <tr style="background:var(--noir-doux); color:var(--blanc); font-weight:700;">
+                    <td style="background:var(--noir-doux); color:var(--blanc);">TOTAL SAISON</td>
+                    <td style="background:var(--noir-doux); color:var(--blanc);">${grandDornesH}h / ${grandDornesPrevH}h</td>
+                    <td style="background:var(--noir-doux); color:#FCA5A5;">${(grandDornesH * taux).toFixed(2)} € (prév. ${(grandDornesPrevH * taux).toFixed(2)} €)</td>
+                    <td style="background:var(--noir-doux); color:var(--blanc);">${grandChantH}h / ${grandChantPrevH}h</td>
+                    <td style="background:var(--noir-doux); color:#7DD3FC;">${(grandChantH * taux).toFixed(2)} € (prév. ${(grandChantPrevH * taux).toFixed(2)} €)</td>
+                    <td style="background:var(--noir-doux); color:#2ECC71; font-size:1.05rem;">${((grandDornesH + grandChantH) * taux).toFixed(2)} €</td>
+                </tr>
+            `;
+
+            // Budget général
+            const bTbody = document.getElementById('budget-tbody');
+            let rPrev = 0, rReal = 0, dPrev = 0, dReal = 0;
+
+            bTbody.innerHTML = scolaireDB.budgetData.map((b, idx) => {
+                const prev = parseFloat(b.prev) || 0;
+                const real = parseFloat(b.real) || 0;
+                const diff = real - prev;
+                if (b.type === 'Recette') { rPrev += prev; rReal += real; }
+                else { dPrev += prev; dReal += real; }
+
+                return `
+                    <tr onclick="openBudgetDrawer(${idx})" style="cursor:pointer;">
+                        <td><strong>${b.poste}</strong></td>
+                        <td><span class="ecole-badge ${b.type === 'Recette' ? 'chantenay' : 'dornes'}">${b.type === 'Recette' ? '🔹 Recette' : '🔺 Dépense'}</span></td>
+                        <td style="text-align:right;">${prev.toFixed(2)} €</td>
+                        <td style="text-align:right; font-weight:700;">${real.toFixed(2)} €</td>
+                        <td style="text-align:right; font-weight:700; color:${diff >= 0 ? 'var(--vert)' : 'var(--rouge)'};">${diff >= 0 ? '+' : ''}${diff.toFixed(2)} €</td>
+                        <td style="text-align:right;" onclick="event.stopPropagation();">
+                            <button class="btn btn-outline btn-sm" onclick="supprimerBudget(${idx})">✕</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('b-rec-prev').textContent = rPrev.toFixed(2) + ' €';
+            document.getElementById('b-rec-real').textContent = rReal.toFixed(2) + ' €';
+            document.getElementById('b-dep-prev').textContent = dPrev.toFixed(2) + ' €';
+            document.getElementById('b-dep-real').textContent = dReal.toFixed(2) + ' €';
+            const netReal = rReal - dReal;
+            const netPrev = rPrev - dPrev;
+            document.getElementById('b-net-real').textContent = netReal.toFixed(2) + ' €';
+            document.getElementById('b-net-real').style.color = netReal >= 0 ? 'var(--vert)' : 'var(--rouge)';
+            document.getElementById('b-net-prev-sub').textContent = `Solde prévisionnel : ${netPrev.toFixed(2)} €`;
+        }
+
+        /* ==========================================================================
+           TIROIRS (SÉANCES, CYCLES, BUDGET)
+           ========================================================================== */
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function openSessionDrawer(idx = -1) {
+            document.getElementById('edit-session-idx').value = idx;
+            const delBtn = document.getElementById('btn-del-session');
+            if (idx >= 0 && scolaireDB.interventions[idx]) {
+                const s = scolaireDB.interventions[idx];
+                document.getElementById('drawer-session-title').textContent = "✏️ Modifier la Séance";
+                document.getElementById('f-ecole').value = s.ecole;
+                document.getElementById('f-classe').value = s.classe;
+                document.getElementById('f-date').value = s.date;
+                document.getElementById('f-heures').value = s.heures;
+                document.getElementById('f-prof').value = s.prof || 'Romain';
+                document.getElementById('f-statut').value = s.statut || 'Prévu';
+                document.getElementById('f-notes').value = s.notes || '';
+                delBtn.style.display = 'inline-flex';
+            } else {
+                document.getElementById('drawer-session-title').textContent = "➕ Ajouter une Séance";
+                document.getElementById('f-ecole').value = document.getElementById('filter-ecole').value || 'Dornes';
+                document.getElementById('f-classe').value = document.getElementById('filter-classe').value || '';
+                document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('f-heures').value = 1;
+                document.getElementById('f-prof').value = 'Romain';
+                document.getElementById('f-statut').value = 'Prévu';
+                document.getElementById('f-notes').value = '';
+                delBtn.style.display = 'none';
+            }
+            document.getElementById('sessionDrawer').classList.add('open');
+        }
+
+        function closeSessionDrawer() { document.getElementById('sessionDrawer').classList.remove('open'); }
+
+        function sauvegarderSession() {
+            const idx = parseInt(document.getElementById('edit-session-idx').value, 10);
+            const ecole = document.getElementById('f-ecole').value.trim();
+            const classe = document.getElementById('f-classe').value.trim();
+            const date = document.getElementById('f-date').value;
+            const heures = parseFloat(document.getElementById('f-heures').value) || 1;
+            const prof = document.getElementById('f-prof').value;
+            const statut = document.getElementById('f-statut').value;
+            const notes = document.getElementById('f-notes').value.trim();
+
+            if (!ecole || !classe || !date) { alert("Veuillez remplir l'école, la classe et la date."); return; }
+
+            const obj = { ecole, classe, date, heures, prof, statut, notes };
+            if (idx === -1) scolaireDB.interventions.push(obj);
+            else scolaireDB.interventions[idx] = obj;
+
+            closeSessionDrawer();
+            saveScolaireData();
+            refreshAll();
+        }
+
+        function supprimerSessionActive() {
+            const idx = parseInt(document.getElementById('edit-session-idx').value, 10);
+            if (idx >= 0 && confirm("Supprimer cette séance ?")) {
+                scolaireDB.interventions.splice(idx, 1);
+                closeSessionDrawer();
+                saveScolaireData();
+                refreshAll();
+            }
+        }
+
+        function openCycleDrawer() { document.getElementById('cycleDrawer').classList.add('open'); }
+        function closeCycleDrawer() { document.getElementById('cycleDrawer').classList.remove('open'); }
+
+        function genererCycleEnSerie() {
+            const ecole = document.getElementById('c-ecole').value.trim();
+            const classe = document.getElementById('c-classe').value.trim();
+            const start = document.getElementById('c-date').value;
+            const count = parseInt(document.getElementById('c-count').value, 10) || 5;
+            const heures = parseFloat(document.getElementById('c-heures').value) || 1;
+            const horaire = document.getElementById('c-horaire').value.trim();
+
+            if (!ecole || !classe || !start) { alert("Remplissez l'école, la classe et la date."); return; }
+
+            const base = new Date(start + 'T12:00:00');
+            for (let i = 0; i < count; i++) {
+                const d = new Date(base);
+                d.setDate(base.getDate() + i * 7);
+                scolaireDB.interventions.push({
+                    ecole,
+                    classe,
+                    date: d.toISOString().split('T')[0],
+                    heures,
+                    prof: 'Romain',
+                    statut: 'Prévu',
+                    notes: `Séance ${i + 1}/${count}${horaire ? ' - ' + horaire : ''}`
+                });
+            }
+            closeCycleDrawer();
+            saveScolaireData();
+            refreshAll();
+        }
+
+        function openBudgetDrawer(idx = -1) {
+            document.getElementById('edit-budget-idx').value = idx;
+            if (idx >= 0 && scolaireDB.budgetData[idx]) {
+                const b = scolaireDB.budgetData[idx];
+                document.getElementById('b-poste').value = b.poste;
+                document.getElementById('b-type').value = b.type;
+                document.getElementById('b-prev').value = b.prev;
+                document.getElementById('b-real').value = b.real;
+            } else {
+                document.getElementById('b-poste').value = '';
+                document.getElementById('b-type').value = 'Dépense';
+                document.getElementById('b-prev').value = 0;
+                document.getElementById('b-real').value = 0;
+            }
+            document.getElementById('budgetDrawer').classList.add('open');
+        }
+        function closeBudgetDrawer() { document.getElementById('budgetDrawer').classList.remove('open'); }
+
+        function sauvegarderBudget() {
+            const idx = parseInt(document.getElementById('edit-budget-idx').value, 10);
+            const poste = document.getElementById('b-poste').value.trim();
+            const type = document.getElementById('b-type').value;
+            const prev = parseFloat(document.getElementById('b-prev').value) || 0;
+            const real = parseFloat(document.getElementById('b-real').value) || 0;
+            if (!poste) return;
+            if (idx === -1) scolaireDB.budgetData.push({ poste, type, prev, real });
+            else scolaireDB.budgetData[idx] = { poste, type, prev, real };
+            closeBudgetDrawer();
+            saveScolaireData();
+            refreshAll();
+        }
+
+        function supprimerBudget(idx) {
+            if (confirm("Supprimer ce poste budgétaire ?")) {
+                scolaireDB.budgetData.splice(idx, 1);
+                saveScolaireData();
+                refreshAll();
+            }
+        }
+
+        /* ==========================================================================
+           ONGLET 3 : NOTES & DOCUMENTS
+           ========================================================================== */
+        function renderNotes() {
+            const box = document.getElementById('notes-list-sidebar');
+            let activeId = document.getElementById('active-note-id').value;
+            if (!scolaireDB.notesList.length) {
+                box.innerHTML = `<p style="color:var(--gris-moyen); font-size:0.85rem;">Aucune note.</p>`;
+                return;
+            }
+            if (!activeId || !scolaireDB.notesList.some(n => n.id === activeId)) {
+                activeId = scolaireDB.notesList[0].id;
+                document.getElementById('active-note-id').value = activeId;
+            }
+            box.innerHTML = scolaireDB.notesList.map(n => `
+                <div class="note-item ${n.id === activeId ? 'active' : ''}" onclick="selectNote('${n.id}')">
+                    <div style="font-weight:700; color:var(--noir-doux); font-size:0.9rem;">${n.title}</div>
+                    <div style="font-size:0.75rem; color:var(--gris-moyen); margin-top:4px;">📎 ${(n.files || []).length} pièce(s) jointe(s)</div>
+                </div>
+            `).join('');
+
+            const activeNote = scolaireDB.notesList.find(n => n.id === activeId);
+            if (activeNote) {
+                document.getElementById('note-title-field').value = activeNote.title || '';
+                document.getElementById('note-content-field').value = activeNote.content || '';
+                const fBox = document.getElementById('note-files-box');
+                if (!activeNote.files || !activeNote.files.length) {
+                    fBox.innerHTML = `<span style="font-size:0.8rem; color:var(--gris-moyen);">Aucun fichier joint.</span>`;
+                } else {
+                    fBox.innerHTML = activeNote.files.map((f, i) => `
+                        <div class="file-chip" onclick="openBase64File('${f.data.replace(/'/g, "\\'")}')">
+                            📎 ${f.name}
+                            <span onclick="event.stopPropagation(); removeNoteFile('${activeNote.id}', ${i})" style="margin-left:6px;">✕</span>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        function selectNote(id) {
+            document.getElementById('active-note-id').value = id;
+            renderNotes();
+        }
+
+        function creerNouvelleNote() {
+            const n = { id: 'note-' + Date.now(), title: 'Nouvelle note école', content: '', files: [] };
+            scolaireDB.notesList.unshift(n);
+            document.getElementById('active-note-id').value = n.id;
+            saveScolaireData();
+            refreshAll();
+        }
+
+        function sauvegarderNoteActive() {
+            const id = document.getElementById('active-note-id').value;
+            const n = scolaireDB.notesList.find(x => x.id === id);
+            if (!n) return;
+            n.title = document.getElementById('note-title-field').value.trim() || 'Note sans titre';
+            n.content = document.getElementById('note-content-field').value;
+            saveScolaireData();
+            renderNotes();
+        }
+
+        function supprimerNoteActive() {
+            const id = document.getElementById('active-note-id').value;
+            if (id && confirm("Supprimer cette note ?")) {
+                scolaireDB.notesList = scolaireDB.notesList.filter(x => x.id !== id);
+                document.getElementById('active-note-id').value = '';
+                saveScolaireData();
+                refreshAll();
+            }
+        }
+
+        async function uploadFichiersNote(input) {
+            const id = document.getElementById('active-note-id').value;
+            const n = scolaireDB.notesList.find(x => x.id === id);
+            if (!n || !input.files.length) return;
+            const arr = await Promise.all(Array.from(input.files).map(f => new Promise(res => {
+                const r = new FileReader();
+                r.onload = e => res({ name: f.name, data: e.target.result });
+                r.readAsDataURL(f);
+            })));
+            n.files = (n.files || []).concat(arr);
+            input.value = '';
+            saveScolaireData();
+            renderNotes();
+        }
+
+        function removeNoteFile(noteId, idx) {
+            const n = scolaireDB.notesList.find(x => x.id === noteId);
+            if (n && n.files) {
+                n.files.splice(idx, 1);
+                saveScolaireData();
+                renderNotes();
+            }
+        }
+
+        function openBase64File(b64) {
             try {
-                const arr = base64Data.split(',');
-                const mimeMatch = arr[0].match(/:(.*?);/);
-                const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+                const arr = b64.split(',');
+                const mime = arr[0].match(/:(.*?);/)[1];
                 const bstr = atob(arr[1]);
                 let n = bstr.length;
-                const u8arr = new Uint8Array(n);
-                while (n--) {
-                    u8arr[n] = bstr.charCodeAt(n);
-                }
-                const blob = new Blob([u8arr], { type: mime });
-                const blobUrl = URL.createObjectURL(blob);
-                
-                const win = window.open(blobUrl, '_blank');
-                if(!win) {
-                    alert("Le navigateur a bloqué la fenêtre surgissante. Veuillez autoriser les pop-ups pour cet intranet.");
-                }
-            } catch(e) {
-                console.error("Erreur ouverture document:", e);
-                alert("Impossible d'ouvrir ce fichier.");
-            }
+                const u8 = new Uint8Array(n);
+                while (n--) u8[n] = bstr.charCodeAt(n);
+                window.open(URL.createObjectURL(new Blob([u8], { type: mime })), '_blank');
+            } catch (e) { alert("Impossible d'ouvrir ce fichier."); }
         }
 
-        function renderNotesList() {
-            const container = document.getElementById('notes-container-list');
-            container.innerHTML = '';
+        /* ==========================================================================
+           IMPRESSION OFFICIELLE A4
+           ========================================================================== */
+        function imprimerSelectionOfficielle() {
+            const list = getFilteredList();
+            const taux = parseFloat(scolaireDB.tauxHoraireRomain) || 30;
+            const ecole = document.getElementById('filter-ecole').value || 'Toutes les écoles (Dornes & Chantenay)';
+            const mois = document.getElementById('filter-mois').value;
+            const perimetre = `${ecole}${mois ? ' — ' + formatMonthLabel(mois) : ''}`;
 
-            if(!scolaireDB.notesList || scolaireDB.notesList.length === 0) {
-                container.innerHTML = `<p style="color: var(--gris-moyen); font-size: 0.9rem; text-align: center; margin-top: 20px;">Aucune note enregistrée. Utilisez le formulaire pour en créer une.</p>`;
-                return;
-            }
+            const doneS = list.filter(i => i.statut === 'Validé').length;
+            const doneH = list.filter(i => i.statut === 'Validé').reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
+            const totH = list.reduce((a, b) => a + (parseFloat(b.heures) || 0), 0);
 
-            scolaireDB.notesList.forEach((note) => {
-                const isExpanded = note.expanded !== false;
-                
-                const card = document.createElement('div');
-                card.className = `note-card ${isExpanded ? 'expanded' : ''}`;
-                
-                let filesHtml = '';
-                if(note.files && note.files.length > 0) {
-                    filesHtml = `<div class="files-list">`;
-                    note.files.forEach((file, fIdx) => {
-                        filesHtml += `
-                            <div class="file-chip" onclick="openBase64Document('${file.data.replace(/'/g, "\\'")}', '${file.name.replace(/'/g, "\\'")}')" title="Cliquer pour ouvrir le document dans un nouvel onglet">
-                                📎 ${file.name}
-                                <span class="remove-file no-print" onclick="supprimerFichierNote('${note.id}', ${fIdx}, event)" title="Supprimer le fichier">✕</span>
-                            </div>
-                        `;
-                    });
-                    filesHtml += `</div>`;
-                }
+            document.getElementById('print-date-edition').textContent = "Édité le " + new Date().toLocaleDateString('fr-FR');
+            document.getElementById('print-perimetre').textContent = perimetre;
+            document.getElementById('print-seances').textContent = `${doneS} validées / ${list.length}`;
+            document.getElementById('print-heures').textContent = `${doneH}h validées (sur ${totH}h)`;
+            document.getElementById('print-montant').textContent = `${(doneH * taux).toFixed(2)} €`;
 
-                card.innerHTML = `
-                    <div class="note-header-bar" onclick="toggleNoteAccordion('${note.id}')">
-                        <div class="note-title-text">
-                            <span>${isExpanded ? '▼' : '►'}</span>
-                            <strong>${note.title || 'Note sans titre'}</strong>
-                        </div>
-                        <div class="note-actions no-print" onclick="event.stopPropagation()">
-                            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.75rem;" onclick="editerNote('${note.id}')" title="Éditer">✏️</button>
-                            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.75rem;" onclick="supprimerNote('${note.id}')" title="Supprimer">✕</button>
-                        </div>
-                    </div>
-                    <div class="note-body">
-                        <div style="white-space: pre-wrap; line-height: 1.5; font-size: 0.9rem;">${note.content || '<em>Aucun contenu textuel</em>'}</div>
-                        ${filesHtml}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+            document.getElementById('print-tbody').innerHTML = list.map(i => `
+                <tr>
+                    <td><strong>${formatDateFr(i.date)}</strong></td>
+                    <td>${i.ecole}</td>
+                    <td>${i.classe}</td>
+                    <td>${i.heures}h</td>
+                    <td>${((parseFloat(i.heures) || 0) * taux).toFixed(2)} €</td>
+                    <td><strong>${i.statut}</strong></td>
+                    <td>${i.notes || '-'}</td>
+                </tr>
+            `).join('');
+
+            window.print();
         }
 
-        function toggleNoteAccordion(noteId) {
-            const note = scolaireDB.notesList.find(n => n.id === noteId);
-            if(note) {
-                note.expanded = !note.expanded;
-                renderNotesList();
-            }
-        }
-
-        async function enregistrerNouvelleNote() {
-            const titleInput = document.getElementById('note-title-input').value.trim();
-            const contentInput = document.getElementById('note-content-input').value.trim();
-            const fileInput = document.getElementById('note-file-input');
-            const noteId = document.getElementById('note-edit-id').value;
-
-            if(!titleInput) {
-                alert("Veuillez saisir un titre pour la note.");
-                return;
-            }
-
-            let filePromises = [];
-            if(fileInput.files.length > 0) {
-                for(let file of fileInput.files) {
-                    filePromises.push(new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            resolve({ name: file.name, data: e.target.result });
-                        };
-                        reader.readAsDataURL(file);
-                    }));
-                }
-            }
-
-            const uploadedFiles = await Promise.all(filePromises);
-
-            if(noteId) {
-                const note = scolaireDB.notesList.find(n => n.id === noteId);
-                if(note) {
-                    note.title = titleInput;
-                    note.content = contentInput;
-                    if(uploadedFiles.length > 0) {
-                        note.files = note.files ? note.files.concat(uploadedFiles) : uploadedFiles;
-                    }
-                }
-            } else {
-                const newNote = {
-                    id: "note-" + Date.now(),
-                    title: titleInput,
-                    content: contentInput,
-                    expanded: true,
-                    files: uploadedFiles
-                };
-                scolaireDB.notesList.unshift(newNote);
-            }
-
-            saveScolaireData();
-            resetNoteForm();
-            renderNotesList();
-        }
-
-        function editerNote(noteId) {
-            const note = scolaireDB.notesList.find(n => n.id === noteId);
-            if(note) {
-                document.getElementById('note-edit-id').value = note.id;
-                document.getElementById('note-title-input').value = note.title;
-                document.getElementById('note-content-input').value = note.content;
-                document.getElementById('note-form-title').innerText = "✏️ Modifier la note";
-                document.getElementById('btn-save-note').innerText = "💾 Enregistrer la note";
-                document.getElementById('btn-cancel-note').style.display = "inline-flex";
-            }
-        }
-
-        function supprimerNote(noteId) {
-            if(confirm("Voulez-vous vraiment supprimer cette note ?")) {
-                scolaireDB.notesList = scolaireDB.notesList.filter(n => n.id !== noteId);
-                saveScolaireData();
-                renderNotesList();
-            }
-        }
-
-        function supprimerFichierNote(noteId, fileIndex, e) {
-            e.stopPropagation();
-            e.preventDefault();
-            const note = scolaireDB.notesList.find(n => n.id === noteId);
-            if(note && note.files) {
-                note.files.splice(fileIndex, 1);
-                saveScolaireData();
-                renderNotesList();
-            }
-        }
-
-        function resetNoteForm() {
-            document.getElementById('note-edit-id').value = "";
-            document.getElementById('note-title-input').value = "";
-            document.getElementById('note-content-input').value = "";
-            document.getElementById('note-file-input').value = "";
-            document.getElementById('note-form-title').innerText = "➕ Ajouter une note";
-            document.getElementById('btn-save-note').innerText = "💾 Enregistrer la note";
-            document.getElementById('btn-cancel-note').style.display = "none";
-        }
-
-        function imprimerFiltres() {
-            const selEcole = document.getElementById('filter-ecole').value;
-            const selClasse = document.getElementById('filter-classe').value;
-            let titreFiltre = "Registre Global des Interventions";
-            if(selEcole || selClasse) titreFiltre = `Registre : ${selEcole ? 'École de ' + selEcole : ''} ${selClasse ? '[' + selClasse + ']' : ''}`;
-
-            let lignesHtml = ''; let totalHPrint = 0;
-            scolaireDB.interventions.forEach(item => {
-                if (selEcole && item.ecole !== selEcole) return;
-                if (selClasse && item.classe !== selClasse) return;
-                if(item.statut === "Validé") totalHPrint += item.heures;
-                lignesHtml += `<tr><td>${item.date.split('-').reverse().join('/')}</td><td>${item.ecole}</td><td>${item.classe}</td><td>${item.heures}h</td><td>${item.prof}</td><td>${item.statut}</td><td>${item.notes || '-'}</td></tr>`;
-            });
-
-            const win = window.open('', '_blank');
-            win.document.write(`<html><head><title>Impression</title><style>body{font-family:sans-serif;padding:30px;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background:#1a1a1a;color:#fff;}</style></head><body><h2>${titreFiltre}</h2><table><thead><tr><th>Date</th><th>École</th><th>Classe</th><th>Heures</th><th>Intervenant</th><th>Statut</th><th>Notes</th></tr></thead><tbody>${lignesHtml}</tbody></table><h3>Total heures validées : ${totalHPrint}h</h3></body></html>`);
-            win.document.close();
-            win.print();
-        }
-
-        window.onload = loadScolaireData;
-
-        window.switchTab = switchTab;
-        window.toggleNotesAccordion = toggleNotesAccordion;
-        window.enregistrerIntervention = enregistrerIntervention;
-        window.editerIntervention = editerIntervention;
-        window.ouvrirModalSeance = ouvrirModalSeance;
-        window.closeModal = closeModal;
-        window.sauvegarderDepuisModal = sauvegarderDepuisModal;
-        window.toggleStatutDirect = toggleStatutDirect;
-        window.supprimerIntervention = supprimerIntervention;
-        window.resetForm = resetForm;
-        window.renderTable = renderTable;
-        window.enregistrerBudget = enregistrerBudget;
-        window.editerBudget = editerBudget;
-        window.supprimerBudget = supprimerBudget;
-        window.resetBudgetForm = resetBudgetForm;
-        window.enregistrerNouvelleNote = enregistrerNouvelleNote;
-        window.editerNote = editerNote;
-        window.supprimerNote = supprimerNote;
-        window.supprimerFichierNote = supprimerFichierNote;
-        window.toggleNoteAccordion = toggleNoteAccordion;
-        window.resetNoteForm = resetNoteForm;
-        window.openBase64Document = openBase64Document;
-        window.imprimerFiltres = imprimerFiltres;
+        window.addEventListener('DOMContentLoaded', loadScolaireData);
     </script>
 
-    <!-- SCRIPT DE LA SIDEBAR UNIFIÉE -->
+    <!-- SIDEBAR UNIFIÉE -->
     <script src="../js/sidebar.js"></script>
-
 </body>
 </html>
