@@ -47,7 +47,7 @@
             border: 1px solid #E0E0E0;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            padding: 24px;
+            padding: 28px;
         }
     </style>
 </head>
@@ -67,7 +67,7 @@
                 </div>
                 <div>
                     <h1 class="font-fredoka text-xl font-bold text-[#1A1A1A]">Studio de Signatures Gmail</h1>
-                    <p class="text-xs text-slate-500">Générateur & Gestionnaire unifié (Dojo Dornois, Comité des Fêtes & Perso)</p>
+                    <p class="text-xs text-slate-500">Générateur multi-modèles & couleurs personnalisables (Dojo Dornois, CdF & Perso)</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -85,27 +85,129 @@
             <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                 <!-- PANNEAU GAUCHE : SÉLECTION & CONFIGURATION -->
-                <div class="lg:col-span-5 space-y-6">
+                <div class="lg:col-span-5 space-y-5">
                     
-                    <!-- CHOIX DE L'ENTITÉ / PROFILE -->
-                    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
+                    <!-- 1. CHOIX DE L'ENTITÉ / PROFIL -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3">
                         <label class="block text-xs font-bold text-slate-500 uppercase font-fredoka tracking-wider">1. Choisir le Profil / Organisme</label>
                         <div class="grid grid-cols-3 gap-2" id="profile-buttons">
                             <!-- Généré dynamiquement -->
                         </div>
                     </div>
 
-                    <!-- FORMULAIRE DE PERSONNALISATION DES CHAMPS -->
+                    <!-- 2. CHOIX DU MODÈLE GRAPHIQUE -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-xs font-bold text-slate-500 uppercase font-fredoka tracking-wider">2. Modèle & Style Graphique</label>
+                            <span class="text-[10px] font-semibold text-slate-400">5 gabarits charte</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="template-buttons">
+                            <button type="button" onclick="selectTemplate('classic')" id="tpl-btn-classic" class="tpl-btn p-2.5 border-2 border-slate-800 bg-slate-100 rounded-xl text-left transition">
+                                <div class="text-xs font-bold font-fredoka text-slate-800">📐 Classique</div>
+                                <div class="text-[10px] text-slate-500 leading-tight mt-0.5">Modèle original latéral</div>
+                            </button>
+                            <button type="button" onclick="selectTemplate('email_header')" id="tpl-btn-email_header" class="tpl-btn p-2.5 border-2 border-slate-200 hover:border-slate-400 rounded-xl text-left transition">
+                                <div class="text-xs font-bold font-fredoka text-slate-800">📨 Bandeau Mail</div>
+                                <div class="text-[10px] text-slate-500 leading-tight mt-0.5">En-tête + filet coloré</div>
+                            </button>
+                            <button type="button" onclick="selectTemplate('email_card')" id="tpl-btn-email_card" class="tpl-btn p-2.5 border-2 border-slate-200 hover:border-slate-400 rounded-xl text-left transition">
+                                <div class="text-xs font-bold font-fredoka text-slate-800">🗂️ Carte Info</div>
+                                <div class="text-[10px] text-slate-500 leading-tight mt-0.5">Encadré & liseré 4px</div>
+                            </button>
+                            <button type="button" onclick="selectTemplate('centered_footer')" id="tpl-btn-centered_footer" class="tpl-btn p-2.5 border-2 border-slate-200 hover:border-slate-400 rounded-xl text-left transition">
+                                <div class="text-xs font-bold font-fredoka text-slate-800">🏛️ Centré Mail</div>
+                                <div class="text-[10px] text-slate-500 leading-tight mt-0.5">Style pied de page</div>
+                            </button>
+                            <button type="button" onclick="selectTemplate('compact')" id="tpl-btn-compact" class="tpl-btn p-2.5 border-2 border-slate-200 hover:border-slate-400 rounded-xl text-left transition col-span-2 sm:col-span-2">
+                                <div class="text-xs font-bold font-fredoka text-slate-800">⚡ Compact / Réponse</div>
+                                <div class="text-[10px] text-slate-500 leading-tight mt-0.5">Format léger pour fils de discussion</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3. PALETTE & COULEURS DU TEXTE -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <label class="text-xs font-bold text-slate-500 uppercase font-fredoka tracking-wider">3. Palette & Couleurs du Texte</label>
+                            <button type="button" onclick="resetProfileColors()" class="text-[10px] font-semibold text-slate-400 hover:text-[#C41E3A] transition">Réinitialiser</button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <!-- Couleur Nom & Prénom -->
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1.5">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-[11px] font-bold text-slate-700">Nom & Prénom</label>
+                                    <span id="lbl-name-color" class="text-[10px] font-mono text-slate-500">#C41E3A</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="color" id="input-name-color" oninput="updateSignature()" class="w-7 h-7 rounded border border-slate-200 cursor-pointer" value="#C41E3A">
+                                    <button type="button" onclick="setQuickColor('input-name-color', '#C41E3A')" title="Rouge Signature" class="w-5 h-5 rounded-full bg-[#C41E3A] border border-white shadow-sm hover:scale-110 transition"></button>
+                                    <button type="button" onclick="setQuickColor('input-name-color', '#1A1A1A')" title="Noir Doux" class="w-5 h-5 rounded-full bg-[#1A1A1A] border border-white shadow-sm hover:scale-110 transition"></button>
+                                    <button type="button" onclick="setQuickColor('input-name-color', '#4169E1')" title="Bleu CdF" class="w-5 h-5 rounded-full bg-[#4169E1] border border-white shadow-sm hover:scale-110 transition"></button>
+                                </div>
+                            </div>
+
+                            <!-- Couleur Titre / Rôle -->
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1.5">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-[11px] font-bold text-slate-700">Titre / Rôle</label>
+                                    <span id="lbl-title-color" class="text-[10px] font-mono text-slate-500">#1A1A1A</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="color" id="input-title-color" oninput="updateSignature()" class="w-7 h-7 rounded border border-slate-200 cursor-pointer" value="#1A1A1A">
+                                    <button type="button" onclick="setQuickColor('input-title-color', '#1A1A1A')" title="Noir Doux" class="w-5 h-5 rounded-full bg-[#1A1A1A] border border-white shadow-sm hover:scale-110 transition"></button>
+                                    <button type="button" onclick="setQuickColor('input-title-color', '#C41E3A')" title="Rouge Signature" class="w-5 h-5 rounded-full bg-[#C41E3A] border border-white shadow-sm hover:scale-110 transition"></button>
+                                    <button type="button" onclick="setQuickColor('input-title-color', '#6B6B6B')" title="Gris Moyen" class="w-5 h-5 rounded-full bg-[#6B6B6B] border border-white shadow-sm hover:scale-110 transition"></button>
+                                </div>
+                            </div>
+
+                            <!-- Couleur Encart Logo -->
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1.5">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-[11px] font-bold text-slate-700">Encart Logo</label>
+                                    <span id="lbl-bg-color" class="text-[10px] font-mono text-slate-500">#C41E3A</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="color" id="input-bg-color" oninput="updateSignature()" class="w-7 h-7 rounded border border-slate-200 cursor-pointer" value="#C41E3A">
+                                    <button type="button" onclick="setQuickColor('input-bg-color', '#C41E3A')" title="Rouge Signature" class="w-5 h-5 rounded-full bg-[#C41E3A] border border-white shadow-sm hover:scale-110 transition"></button>
+                                    <button type="button" onclick="setQuickColor('input-bg-color', '#1A1A1A')" title="Noir Doux" class="w-5 h-5 rounded-full bg-[#1A1A1A] border border-white shadow-sm hover:scale-110 transition"></button>
+                                    <button type="button" onclick="setQuickColor('input-bg-color', '#4169E1')" title="Bleu CdF" class="w-5 h-5 rounded-full bg-[#4169E1] border border-white shadow-sm hover:scale-110 transition"></button>
+                                </div>
+                            </div>
+
+                            <!-- Couleur Filets & Liens -->
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1.5">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-[11px] font-bold text-slate-700">Filets & Liens</label>
+                                    <span id="lbl-accent-color" class="text-[10px] font-mono text-slate-500">#C41E3A</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="color" id="input-accent-color" oninput="updateSignature()" class="w-7 h-7 rounded border border-slate-200 cursor-pointer" value="#C41E3A">
+                                    <button type="button" onclick="setQuickColor('input-accent-color', '#C41E3A')" title="Rouge Signature" class="w-5 h-5 rounded-full bg-[#C41E3A] border border-white shadow-sm hover:scale-110 transition"></button>
+                                    <button type="button" onclick="setQuickColor('input-accent-color', '#1A1A1A')" title="Noir Doux" class="w-5 h-5 rounded-full bg-[#1A1A1A] border border-white shadow-sm hover:scale-110 transition"></button>
+                                    <button type="button" onclick="setQuickColor('input-accent-color', '#4169E1')" title="Bleu CdF" class="w-5 h-5 rounded-full bg-[#4169E1] border border-white shadow-sm hover:scale-110 transition"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. FORMULAIRE DE PERSONNALISATION DES CHAMPS -->
                     <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                            <label class="text-xs font-bold text-slate-500 uppercase font-fredoka tracking-wider">2. Informations de la Signature</label>
+                            <label class="text-xs font-bold text-slate-500 uppercase font-fredoka tracking-wider">4. Informations & Dimensions</label>
                             <span id="badge-theme" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-[#C41E3A]">Thème Dojo</span>
                         </div>
 
                         <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Nom & Prénom</label>
-                                <input type="text" id="input-fullname" oninput="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-[#C41E3A] focus:outline-none" value="JORDAN LOUDENOT">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600 mb-1">Nom & Prénom</label>
+                                    <input type="text" id="input-fullname" oninput="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-[#C41E3A] focus:outline-none" value="JORDAN LOUDENOT">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600 mb-1">Organisme (Entête)</label>
+                                    <input type="text" id="input-org-name" oninput="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none" value="DOJO DORNOIS">
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
@@ -150,24 +252,29 @@
                                 <input type="text" id="input-legal" oninput="updateSignature()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none text-slate-500" value="RNA : W583001220 | SIRET : 451 928 410 00013">
                             </div>
 
-                            <!-- STYLE LOGO ENCART ET DIMENSIONS -->
+                            <!-- BLOC BANDEAU / ACTU OPTIONNEL (STYLE E-MAIL) -->
+                            <div class="pt-2 border-t border-slate-100 space-y-2">
+                                <label class="flex items-center justify-between cursor-pointer">
+                                    <span class="text-xs font-bold text-slate-600 uppercase font-fredoka">✨ Bandeau Actu / Bouton en bas</span>
+                                    <input type="checkbox" id="toggle-banner" onchange="updateSignature()" class="w-4 h-4 accent-[#C41E3A] rounded cursor-pointer">
+                                </label>
+                                <div id="banner-fields" class="grid grid-cols-2 gap-2 hidden">
+                                    <input type="text" id="input-banner-text" oninput="updateSignature()" placeholder="Ex: Saison 2026-2027 • Rejoignez-nous !" value="🥋 Saison 2026-2027 • Toutes nos infos sur dojodornois.fr" class="col-span-2 px-2.5 py-1.5 border border-slate-200 rounded text-xs">
+                                    <input type="text" id="input-banner-url" oninput="updateSignature()" placeholder="Lien URL (optionnel)" value="https://dojodornois.fr" class="col-span-2 px-2.5 py-1.5 border border-slate-200 rounded text-xs text-slate-500">
+                                </div>
+                            </div>
+
+                            <!-- DIMENSIONS LOGO -->
                             <div class="pt-2 border-t border-slate-100">
-                                <label class="block text-xs font-bold text-slate-500 uppercase font-fredoka mb-2">Style & Taille de l'Encart Logo</label>
-                                <div class="grid grid-cols-3 gap-3">
-                                    <div>
-                                        <label class="block text-[11px] text-slate-600 mb-1">Fond Encart</label>
-                                        <div class="flex items-center gap-2">
-                                            <input type="color" id="input-bg-color" onchange="updateSignature()" class="w-8 h-8 rounded border border-slate-200 cursor-pointer" value="#C41E3A">
-                                            <span id="lbl-bg-color" class="text-[10px] font-mono text-slate-500">#C41E3A</span>
-                                        </div>
-                                    </div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase font-fredoka mb-2">Dimensions & Logo</label>
+                                <div class="grid grid-cols-2 gap-3">
                                     <div>
                                         <label class="block text-[11px] text-slate-600 mb-1">Taille Carré (px)</label>
-                                        <input type="number" id="input-box-size" oninput="updateSignature()" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs text-center font-bold" value="84" min="60" max="120">
+                                        <input type="number" id="input-box-size" oninput="updateSignature()" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs text-center font-bold" value="84" min="48" max="120">
                                     </div>
                                     <div>
                                         <label class="block text-[11px] text-slate-600 mb-1">Taille Logo (px)</label>
-                                        <input type="number" id="input-logo-size" oninput="updateSignature()" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs text-center font-bold" value="72" min="50" max="110">
+                                        <input type="number" id="input-logo-size" oninput="updateSignature()" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs text-center font-bold" value="72" min="36" max="110">
                                     </div>
                                 </div>
                                 <div class="mt-2">
@@ -182,20 +289,20 @@
                 <!-- PANNEAU DROITE : RENDU VISUEL & ACTIONS EXPORT -->
                 <div class="lg:col-span-7 space-y-6">
                     
-                    <!-- APPERÇU DANS GMAIL -->
+                    <!-- APERÇU DANS GMAIL -->
                     <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
                                 <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
                                 <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
-                                <span class="text-xs font-bold font-fredoka text-slate-700 ml-2">Aperçu Rendu Gmail Réel (Logo Agrandit & Proportionné)</span>
+                                <span class="text-xs font-bold font-fredoka text-slate-700 ml-2" id="preview-title">Aperçu Rendu Gmail Réel — Modèle Classique Latéral</span>
                             </div>
                             <span class="text-[11px] text-slate-400">Compatible Web & Mobile Gmail</span>
                         </div>
 
                         <!-- CARTE DE RENDU EFFECTIF DE LA SIGNATURE -->
-                        <div class="gmail-canvas flex items-center justify-start min-h-[200px] overflow-x-auto" id="signature-container">
+                        <div class="gmail-canvas flex items-center justify-start min-h-[210px] overflow-x-auto" id="signature-container">
                             <!-- HTML INJECTÉ DYNAMIQUEMENT ICI -->
                         </div>
 
@@ -224,13 +331,10 @@
 
                     <!-- TUTO D'INTÉGRATION RAPIDE -->
                     <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 space-y-1">
-                        <strong class="font-fredoka text-sm block text-amber-950">💡 Comment l'installer dans Gmail en 10 secondes :</strong>
-                        <ol class="list-decimal list-inside space-y-1 text-amber-800">
-                            <li>Clique sur le bouton rouge <strong>"1. Copier pour Gmail"</strong> ci-dessus.</li>
-                            <li>Ouvre tes <strong>Paramètres Gmail</strong> (roue dentée > Voir tous les paramètres > Général > Signature).</li>
-                            <li>Fais <code>Ctrl + V</code> (Coller) directement dans la zone de texte de signature Gmail.</li>
-                            <li>Enregistre les modifications en bas de la page Gmail !</li>
-                        </ol>
+                        <strong class="font-fredoka text-sm block text-amber-950">💡 Astuce multi-signatures dans Gmail :</strong>
+                        <p class="text-amber-800 leading-relaxed">
+                            Tu peux créer plusieurs signatures dans <strong>Paramètres Gmail &gt; Général &gt; Signature</strong> (ex. une signature complète pour les <em>Nouveaux e-mails</em> et le modèle <em>Compact / Réponse</em> pour les <em>Réponses et transferts</em>).
+                        </p>
                     </div>
 
                 </div>
@@ -256,6 +360,10 @@
                     <input type="text" id="new-name" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" placeholder="Ex: Mairie Dornes">
                 </div>
                 <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Nom de l'Organisme (Entête)</label>
+                    <input type="text" id="new-org-name" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" placeholder="Ex: MAIRIE DE DORNES">
+                </div>
+                <div>
                     <label class="block text-xs font-medium text-slate-600 mb-1">Nom & Prénom</label>
                     <input type="text" id="new-fullname" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" value="JORDAN LOUDENOT">
                 </div>
@@ -263,18 +371,26 @@
                     <label class="block text-xs font-medium text-slate-600 mb-1">Intitulé du Rôle / Titre</label>
                     <input type="text" id="new-title" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" placeholder="Ex: Conseiller / Délégué">
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-3 gap-2">
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">Couleur Encart</label>
-                        <input type="color" id="new-color" class="w-full h-8 rounded border border-slate-200" value="#2ECC71">
+                        <label class="block text-[11px] font-medium text-slate-600 mb-1">Encart Logo</label>
+                        <input type="color" id="new-color" class="w-full h-8 rounded border border-slate-200" value="#C41E3A">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">Police Nom</label>
-                        <select id="new-font" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs">
-                            <option value="Fredoka, sans-serif">Fredoka</option>
-                            <option value="Roboto, sans-serif">Roboto</option>
-                        </select>
+                        <label class="block text-[11px] font-medium text-slate-600 mb-1">Couleur Nom</label>
+                        <input type="color" id="new-name-color" class="w-full h-8 rounded border border-slate-200" value="#C41E3A">
                     </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-600 mb-1">Couleur Titre</label>
+                        <input type="color" id="new-title-color" class="w-full h-8 rounded border border-slate-200" value="#1A1A1A">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Police Nom</label>
+                    <select id="new-font" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs">
+                        <option value="Fredoka, sans-serif">Fredoka</option>
+                        <option value="Roboto, sans-serif">Roboto</option>
+                    </select>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-600 mb-1">URL du Logo</label>
@@ -307,6 +423,7 @@
         let profiles = {
             dojo: {
                 name: "🥋 Dojo Dornois",
+                orgName: "DOJO DORNOIS",
                 subname: "Président",
                 fullname: "JORDAN LOUDENOT",
                 title: "Président du Dojo Dornois",
@@ -316,6 +433,9 @@
                 website: "dojodornois.fr",
                 legal: "RNA : W583001220 | SIRET : 451 928 410 00013",
                 bgColor: "#C41E3A",
+                nameColor: "#C41E3A",
+                titleColor: "#1A1A1A",
+                accentColor: "#C41E3A",
                 logoUrl: "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png",
                 fontName: "Fredoka, sans-serif",
                 boxSize: 84,
@@ -324,6 +444,7 @@
             },
             cdf: {
                 name: "🎈 CdF Toury",
+                orgName: "COMITÉ DES FÊTES DE TOURY-LURCY",
                 subname: "Secrétaire",
                 fullname: "JORDAN LOUDENOT",
                 title: "Secrétaire du Comité des Fêtes de Toury-Lurcy",
@@ -333,6 +454,9 @@
                 website: "8 Route de Dornes, 58300 Toury-Lurcy",
                 legal: "RNA : W583002922 | SIRET : 302 897 616 00025",
                 bgColor: "#4169E1",
+                nameColor: "#4169E1",
+                titleColor: "#1A1A1A",
+                accentColor: "#4169E1",
                 logoUrl: "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-comite-des-fetes-de-toury-lurcy-transparent-contour-blanc.png",
                 fontName: "Fredoka, sans-serif",
                 boxSize: 84,
@@ -341,6 +465,7 @@
             },
             perso: {
                 name: "👤 Personnel",
+                orgName: "JORDAN LOUDENOT",
                 subname: "Jordan L.",
                 fullname: "JORDAN LOUDENOT",
                 title: "Citoyen & Bénévole Associatif",
@@ -350,6 +475,9 @@
                 website: "Toury-Lurcy / Dornes (58)",
                 legal: "Nièvre, Bourgogne-Franche-Comté",
                 bgColor: "#1A1A1A",
+                nameColor: "#1A1A1A",
+                titleColor: "#3D3D3D",
+                accentColor: "#1A1A1A",
                 logoUrl: "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png",
                 fontName: "Roboto, sans-serif",
                 boxSize: 84,
@@ -359,6 +487,40 @@
         };
 
         let currentProfileKey = 'dojo';
+        let currentTemplate = 'classic';
+
+        const templateLabels = {
+            classic: "Modèle Classique Latéral",
+            email_header: "Modèle Bandeau E-mail Officiel",
+            email_card: "Modèle Carte Encadrée (Style Bloc Info)",
+            centered_footer: "Modèle Institutionnel Centré",
+            compact: "Modèle Compact / Réponse Rapide"
+        };
+
+        function hexToSoftBg(hex) {
+            const clean = hex.replace('#', '');
+            if (clean.length !== 6) return '#F8FAFC';
+            const r = parseInt(clean.substring(0, 2), 16);
+            const g = parseInt(clean.substring(2, 4), 16);
+            const b = parseInt(clean.substring(4, 6), 16);
+            const softR = Math.round(r * 0.07 + 255 * 0.93);
+            const softG = Math.round(g * 0.07 + 255 * 0.93);
+            const softB = Math.round(b * 0.07 + 255 * 0.93);
+            return `rgb(${softR}, ${softG}, ${softB})`;
+        }
+
+        function setQuickColor(inputId, hexColor) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.value = hexColor;
+                updateSignature();
+            }
+        }
+
+        function resetProfileColors() {
+            selectProfile(currentProfileKey);
+            showToast("✓ Couleurs par défaut du profil restaurées");
+        }
 
         function renderProfileButtons() {
             const container = document.getElementById('profile-buttons');
@@ -383,87 +545,302 @@
             currentProfileKey = key;
             const p = profiles[key];
 
+            const baseColor = p.bgColor || "#C41E3A";
+            const nameColor = p.nameColor || baseColor;
+            const titleColor = p.titleColor || "#1A1A1A";
+            const accentColor = p.accentColor || baseColor;
+
             document.getElementById('input-fullname').value = p.fullname || "JORDAN LOUDENOT";
+            document.getElementById('input-org-name').value = p.orgName || p.name.replace(/^[^\wÀ-ÿ]+\s*/, '').toUpperCase();
             document.getElementById('input-title').value = p.title || "";
             document.getElementById('input-phone').value = p.phone || "";
             document.getElementById('input-email').value = p.email || "";
             document.getElementById('input-org-email').value = p.orgEmail || "";
             document.getElementById('input-website').value = p.website || "";
             document.getElementById('input-legal').value = p.legal || "";
-            document.getElementById('input-bg-color').value = p.bgColor || "#C41E3A";
-            document.getElementById('lbl-bg-color').textContent = p.bgColor || "#C41E3A";
+
+            document.getElementById('input-bg-color').value = baseColor;
+            document.getElementById('input-name-color').value = nameColor;
+            document.getElementById('input-title-color').value = titleColor;
+            document.getElementById('input-accent-color').value = accentColor;
+
             document.getElementById('input-logo-url').value = p.logoUrl || "";
             document.getElementById('select-font-name').value = p.fontName || "Fredoka, sans-serif";
             document.getElementById('input-box-size').value = p.boxSize || 84;
             document.getElementById('input-logo-size').value = p.logoSize || 72;
             document.getElementById('badge-theme').textContent = p.themeBadge || "Profil " + key;
 
-            // Button highlights
             document.querySelectorAll('#profile-buttons button').forEach(b => {
-                b.classList.remove('border-[#C41E3A]', 'border-[#4169E1]', 'border-slate-800', 'bg-rose-50/50', 'bg-blue-50/50', 'bg-slate-100');
+                b.classList.remove('border-slate-800', 'bg-slate-100');
                 b.classList.add('border-slate-200');
             });
 
             const activeBtn = document.getElementById('btn-profile-' + key);
             if(activeBtn) {
+                activeBtn.classList.remove('border-slate-200');
                 activeBtn.classList.add('border-slate-800', 'bg-slate-100');
             }
 
             updateSignature();
         }
 
+        function selectTemplate(tplKey) {
+            currentTemplate = tplKey;
+            document.querySelectorAll('.tpl-btn').forEach(btn => {
+                btn.classList.remove('border-slate-800', 'bg-slate-100');
+                btn.classList.add('border-slate-200');
+            });
+            const active = document.getElementById('tpl-btn-' + tplKey);
+            if (active) {
+                active.classList.remove('border-slate-200');
+                active.classList.add('border-slate-800', 'bg-slate-100');
+            }
+            document.getElementById('preview-title').textContent = "Aperçu Rendu Gmail Réel — " + (templateLabels[tplKey] || "");
+            updateSignature();
+        }
+
+        function buildBannerHtml(accentColor, softBg) {
+            const enabled = document.getElementById('toggle-banner').checked;
+            const fieldsDiv = document.getElementById('banner-fields');
+            if (enabled) {
+                fieldsDiv.classList.remove('hidden');
+            } else {
+                fieldsDiv.classList.add('hidden');
+                return '';
+            }
+
+            const text = document.getElementById('input-banner-text').value.trim();
+            const url = document.getElementById('input-banner-url').value.trim();
+            if (!text) return '';
+
+            const innerContent = url
+                ? `<a href="${url.startsWith('http') ? url : 'https://' + url}" style="color: ${accentColor} !important; font-weight: 700; text-decoration: none;">${text} &rarr;</a>`
+                : `<span style="color: ${accentColor} !important; font-weight: 700;">${text}</span>`;
+
+            return `
+<table cellpadding="0" cellspacing="0" border="0" style="margin-top: 10px; background-color: ${softBg}; border-left: 4px solid ${accentColor}; border-radius: 4px; width: 100%; max-width: 460px;">
+  <tr>
+    <td style="padding: 8px 12px; font-family: 'Roboto', Arial, sans-serif; font-size: 11.5px; line-height: 1.4;">
+      ${innerContent}
+    </td>
+  </tr>
+</table>`;
+        }
+
         function updateSignature() {
             const fullname = document.getElementById('input-fullname').value;
+            const orgName = document.getElementById('input-org-name').value;
             const title = document.getElementById('input-title').value;
             const phone = document.getElementById('input-phone').value;
             const email = document.getElementById('input-email').value;
             const orgEmail = document.getElementById('input-org-email').value;
             const website = document.getElementById('input-website').value;
             const legal = document.getElementById('input-legal').value;
+
             const bgColor = document.getElementById('input-bg-color').value;
+            const nameColor = document.getElementById('input-name-color').value;
+            const titleColor = document.getElementById('input-title-color').value;
+            const accentColor = document.getElementById('input-accent-color').value;
+
             const logoUrl = document.getElementById('input-logo-url').value;
             const fontName = document.getElementById('select-font-name').value;
             const boxSize = parseInt(document.getElementById('input-box-size').value) || 84;
             const logoSize = parseInt(document.getElementById('input-logo-size').value) || 72;
 
-            document.getElementById('lbl-bg-color').textContent = bgColor;
+            document.getElementById('lbl-bg-color').textContent = bgColor.toUpperCase();
+            document.getElementById('lbl-name-color').textContent = nameColor.toUpperCase();
+            document.getElementById('lbl-title-color').textContent = titleColor.toUpperCase();
+            document.getElementById('lbl-accent-color').textContent = accentColor.toUpperCase();
 
-            // HTML TABLE COMPATIBLE 100% GMAIL AVEC TAILLE DE LOGO AGRANDIE
-            const htmlSignature = `
+            const softBg = hexToSoftBg(accentColor);
+            const bannerHtml = buildBannerHtml(accentColor, softBg);
+            const cleanWebsiteHref = website.startsWith('http') ? website : 'https://' + website;
+            const isUrlLike = website.includes('.') && !website.includes(' ');
+
+            let htmlSignature = '';
+
+            if (currentTemplate === 'classic') {
+                // MODÈLE 1 : CLASSIQUE LATÉRAL
+                htmlSignature = `
 <table cellpadding="0" cellspacing="0" border="0" style="font-family: 'Roboto', Arial, sans-serif; font-size: 13px; line-height: 1.4; color: #3D3D3D;">
   <tr>
-    <!-- LOGO DANS SON CARRÉ ARRONDII AGRANDI & BIEN PROPORTIONNÉ -->
     <td style="vertical-align: middle; padding-right: 18px;">
-      <div style="background-color: ${bgColor}; width: ${boxSize}px; height: ${boxSize}px; border-radius: 14px; padding: 6px; display: table-cell; vertical-align: middle; text-align: center;">
-        <img src="${logoUrl}" alt="Logo" width="${logoSize}" height="${logoSize}" style="display: block; width: ${logoSize}px; height: ${logoSize}px; object-fit: contain; margin: 0 auto; border: 0;">
-      </div>
+      <table cellpadding="0" cellspacing="0" border="0" style="background-color: ${bgColor}; width: ${boxSize}px; height: ${boxSize}px; border-radius: 14px;">
+        <tr>
+          <td align="center" valign="middle" style="padding: 6px;">
+            <img src="${logoUrl}" alt="Logo" width="${logoSize}" height="${logoSize}" style="display: block; width: ${logoSize}px; height: ${logoSize}px; object-fit: contain; margin: 0 auto; border: 0;">
+          </td>
+        </tr>
+      </table>
     </td>
-
-    <!-- BARRE VERTICALE DE SÉPARATION -->
-    <td style="border-left: 3px solid ${bgColor}; padding-left: 18px; vertical-align: middle;">
-      <!-- NOM & PRÉNOM -->
-      <div style="font-family: ${fontName}; font-size: 17px; font-weight: 700; color: ${bgColor}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">
+    <td style="border-left: 3px solid ${accentColor}; padding-left: 18px; vertical-align: middle;">
+      <div style="font-family: ${fontName}; font-size: 17px; font-weight: 700; color: ${nameColor} !important; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">
         ${fullname}
       </div>
-      
-      <!-- TITRE / RÔLE -->
-      <div style="font-style: italic; color: #1A1A1A; font-size: 12px; margin-bottom: 8px; font-weight: 500;">
+      <div style="font-style: italic; color: ${titleColor} !important; font-size: 12px; margin-bottom: 8px; font-weight: 500;">
         ${title}
       </div>
-
-      <!-- COORDONEES & CONTACT -->
       <table cellpadding="0" cellspacing="0" border="0" style="font-size: 12px; color: #555555;">
-        ${phone ? `<tr><td style="padding-bottom: 3px;"><span style="color: ${bgColor}; font-weight: bold; margin-right: 6px;">•</span><a href="tel:${phone.replace(/\s/g, '')}" style="color: #3D3D3D; text-decoration: none;">${phone}</a></td></tr>` : ''}
-        ${email ? `<tr><td style="padding-bottom: 3px;"><span style="color: ${bgColor}; font-weight: bold; margin-right: 6px;">•</span><a href="mailto:${email}" style="color: #3D3D3D; text-decoration: none;">${email}</a></td></tr>` : ''}
-        ${orgEmail && orgEmail !== email ? `<tr><td style="padding-bottom: 3px;"><span style="color: ${bgColor}; font-weight: bold; margin-right: 6px;">•</span><a href="mailto:${orgEmail}" style="color: #3D3D3D; text-decoration: none;">${orgEmail}</a></td></tr>` : ''}
-        ${website ? `<tr><td style="padding-top: 2px;"><span style="color: ${bgColor}; font-weight: bold; margin-right: 6px;">🌐</span><a href="${website.startsWith('http') ? website : 'https://' + website}" style="color: ${bgColor}; font-weight: bold; text-decoration: underline;">${website}</a></td></tr>` : ''}
+        ${phone ? `<tr><td style="padding-bottom: 3px;"><span style="color: ${accentColor}; font-weight: bold; margin-right: 6px;">•</span><a href="tel:${phone.replace(/\s/g, '')}" style="color: #3D3D3D !important; text-decoration: none;">${phone}</a></td></tr>` : ''}
+        ${email ? `<tr><td style="padding-bottom: 3px;"><span style="color: ${accentColor}; font-weight: bold; margin-right: 6px;">•</span><a href="mailto:${email}" style="color: #3D3D3D !important; text-decoration: none;">${email}</a></td></tr>` : ''}
+        ${orgEmail && orgEmail !== email ? `<tr><td style="padding-bottom: 3px;"><span style="color: ${accentColor}; font-weight: bold; margin-right: 6px;">•</span><a href="mailto:${orgEmail}" style="color: #3D3D3D !important; text-decoration: none;">${orgEmail}</a></td></tr>` : ''}
+        ${website ? `<tr><td style="padding-top: 2px;"><span style="color: ${accentColor}; font-weight: bold; margin-right: 6px;">🌐</span>${isUrlLike ? `<a href="${cleanWebsiteHref}" style="color: ${accentColor} !important; font-weight: bold; text-decoration: underline;">${website}</a>` : `<span style="color: #3D3D3D !important;">${website}</span>`}</td></tr>` : ''}
       </table>
-
-      <!-- MENTIONS LÉGALES SUPPLÉMENTAIRES -->
-      ${legal ? `<div style="font-size: 10px; color: #888888; margin-top: 6px; font-family: Arial, sans-serif;">${legal}</div>` : ''}
+      ${legal ? `<div style="font-size: 10px; color: #888888 !important; margin-top: 6px; font-family: Arial, sans-serif;">${legal}</div>` : ''}
+      ${bannerHtml}
     </td>
   </tr>
 </table>`.trim();
+
+            } else if (currentTemplate === 'email_header') {
+                // MODÈLE 2 : BANDEAU E-MAIL OFFICIEL
+                const smallBox = Math.min(boxSize, 68);
+                const smallLogo = Math.min(logoSize, 56);
+                htmlSignature = `
+<table cellpadding="0" cellspacing="0" border="0" style="font-family: 'Roboto', Arial, sans-serif; font-size: 13px; line-height: 1.45; color: #2D3748; max-width: 480px; width: 100%;">
+  <tr>
+    <td style="padding-bottom: 12px; border-bottom: 2px solid ${accentColor};">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td valign="middle" style="padding-right: 14px;">
+            <table cellpadding="0" cellspacing="0" border="0" style="background-color: ${bgColor}; width: ${smallBox}px; height: ${smallBox}px; border-radius: 12px;">
+              <tr>
+                <td align="center" valign="middle" style="padding: 5px;">
+                  <img src="${logoUrl}" alt="Logo" width="${smallLogo}" height="${smallLogo}" style="width: ${smallLogo}px; height: ${smallLogo}px; display: block; border: 0; object-fit: contain;">
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td valign="middle">
+            <div style="font-family: ${fontName}; font-size: 18px; font-weight: 700; color: ${nameColor} !important; text-transform: uppercase; letter-spacing: 0.4px; margin: 0;">
+              ${fullname}
+            </div>
+            <div style="font-size: 12.5px; font-weight: 600; color: ${titleColor} !important; margin-top: 2px;">
+              ${title}
+            </div>
+            ${orgName ? `<div style="font-size: 11px; color: #6B6B6B !important; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">${orgName}</div>` : ''}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding-top: 10px; font-size: 12px; color: #4A5568 !important;">
+      ${phone ? `<span style="margin-right: 12px;"><strong style="color: ${accentColor};">Tél.</strong> <a href="tel:${phone.replace(/\s/g, '')}" style="color: #2D3748 !important; text-decoration: none;">${phone}</a></span>` : ''}
+      ${email ? `<span style="margin-right: 12px;"><strong style="color: ${accentColor};">E-mail :</strong> <a href="mailto:${email}" style="color: #2D3748 !important; text-decoration: none;">${email}</a></span>` : ''}
+      ${orgEmail && orgEmail !== email ? `<div style="margin-top: 3px;"><strong style="color: ${accentColor};">Contact officiel :</strong> <a href="mailto:${orgEmail}" style="color: #2D3748 !important; text-decoration: none;">${orgEmail}</a></div>` : ''}
+      ${website ? `<div style="margin-top: 3px;"><strong style="color: ${accentColor};">Adresse / Web :</strong> ${isUrlLike ? `<a href="${cleanWebsiteHref}" style="color: ${accentColor} !important; font-weight: 700; text-decoration: underline;">${website}</a>` : `<span>${website}</span>`}</div>` : ''}
+      ${legal ? `<div style="font-size: 10px; color: #888888 !important; margin-top: 6px;">${legal}</div>` : ''}
+      ${bannerHtml}
+    </td>
+  </tr>
+</table>`.trim();
+
+            } else if (currentTemplate === 'email_card') {
+                // MODÈLE 3 : CARTE ENCADRÉE
+                const cardBox = Math.min(boxSize, 76);
+                const cardLogo = Math.min(logoSize, 64);
+                htmlSignature = `
+<table cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-left: 4px solid ${accentColor} !important; border-radius: 8px; max-width: 500px; width: 100%; font-family: 'Roboto', Arial, sans-serif;">
+  <tr>
+    <td style="padding: 16px 18px;">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="${cardBox + 16}" valign="middle">
+            <table cellpadding="0" cellspacing="0" border="0" style="background-color: ${bgColor}; width: ${cardBox}px; height: ${cardBox}px; border-radius: 12px;">
+              <tr>
+                <td align="center" valign="middle" style="padding: 5px;">
+                  <img src="${logoUrl}" alt="Logo" width="${cardLogo}" height="${cardLogo}" style="width: ${cardLogo}px; height: ${cardLogo}px; display: block; border: 0; object-fit: contain;">
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td valign="middle" style="padding-left: 6px;">
+            ${orgName ? `<div style="display: inline-block; background-color: ${softBg}; color: ${accentColor} !important; font-family: ${fontName}; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">${orgName}</div>` : ''}
+            <div style="font-family: ${fontName}; font-size: 17px; font-weight: 700; color: ${nameColor} !important; text-transform: uppercase; line-height: 1.2;">
+              ${fullname}
+            </div>
+            <div style="font-size: 12px; font-weight: 600; color: ${titleColor} !important; margin-bottom: 8px;">
+              ${title}
+            </div>
+            <table cellpadding="0" cellspacing="0" border="0" style="font-size: 12px; color: #3D3D3D !important; line-height: 1.5;">
+              ${phone ? `<tr><td><strong>📞</strong> <a href="tel:${phone.replace(/\s/g, '')}" style="color: #3D3D3D !important; text-decoration: none;">${phone}</a></td></tr>` : ''}
+              ${email ? `<tr><td><strong>✉️</strong> <a href="mailto:${email}" style="color: #3D3D3D !important; text-decoration: none;">${email}</a>${orgEmail && orgEmail !== email ? ` • <a href="mailto:${orgEmail}" style="color: ${accentColor} !important; font-weight: 600; text-decoration: none;">${orgEmail}</a>` : ''}</td></tr>` : ''}
+              ${website ? `<tr><td><strong>🌐</strong> ${isUrlLike ? `<a href="${cleanWebsiteHref}" style="color: ${accentColor} !important; font-weight: 700; text-decoration: underline;">${website}</a>` : `<span>${website}</span>`}</td></tr>` : ''}
+            </table>
+          </td>
+        </tr>
+      </table>
+      ${legal ? `<div style="border-top: 1px dashed #CBD5E1; margin-top: 10px; padding-top: 7px; font-size: 10px; color: #64748B !important;">${legal}</div>` : ''}
+      ${bannerHtml}
+    </td>
+  </tr>
+</table>`.trim();
+
+            } else if (currentTemplate === 'centered_footer') {
+                // MODÈLE 4 : INSTITUTIONNEL CENTRÉ
+                const footBox = Math.min(boxSize, 64);
+                const footLogo = Math.min(logoSize, 52);
+                htmlSignature = `
+<table cellpadding="0" cellspacing="0" border="0" style="border-top: 2px solid #E8E8E8; max-width: 460px; width: 100%; font-family: 'Roboto', Arial, sans-serif; text-align: center;">
+  <tr>
+    <td align="center" style="padding-top: 16px; padding-bottom: 10px;">
+      <table cellpadding="0" cellspacing="0" border="0" style="background-color: ${bgColor}; width: ${footBox}px; height: ${footBox}px; border-radius: 12px; margin: 0 auto;">
+        <tr>
+          <td align="center" valign="middle" style="padding: 5px;">
+            <img src="${logoUrl}" alt="Logo" width="${footLogo}" height="${footLogo}" style="width: ${footLogo}px; height: ${footLogo}px; display: block; border: 0; object-fit: contain;">
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" style="font-size: 12.5px; color: #4A5568 !important; line-height: 1.5; text-align: center;">
+      <strong style="color: ${nameColor} !important; font-size: 16px; font-family: ${fontName}; text-transform: uppercase; letter-spacing: 0.5px;">${fullname}</strong><br>
+      <strong style="color: ${titleColor} !important; font-size: 12px;">${title}</strong>${orgName ? ` — <span style="color: #6B6B6B !important;">${orgName}</span>` : ''}<br>
+      <span style="font-size: 12px;">
+        ${[
+            phone ? `<a href="tel:${phone.replace(/\s/g, '')}" style="color: #3D3D3D !important; text-decoration: none;">${phone}</a>` : '',
+            email ? `<a href="mailto:${email}" style="color: #3D3D3D !important; text-decoration: none;">${email}</a>` : '',
+            orgEmail && orgEmail !== email ? `<a href="mailto:${orgEmail}" style="color: ${accentColor} !important; font-weight: 600; text-decoration: none;">${orgEmail}</a>` : ''
+        ].filter(Boolean).join(' | ')}
+      </span><br>
+      ${website ? `<span style="font-size: 12px;">${isUrlLike ? `<a href="${cleanWebsiteHref}" style="color: ${accentColor} !important; font-weight: 700; text-decoration: underline;">${website}</a>` : website}</span><br>` : ''}
+      ${legal ? `<span style="font-size: 10px; color: #94A3B8 !important;">${legal}</span>` : ''}
+    </td>
+  </tr>
+</table>`.trim();
+
+            } else if (currentTemplate === 'compact') {
+                // MODÈLE 5 : COMPACT / RÉPONSE RAPIDE
+                htmlSignature = `
+<table cellpadding="0" cellspacing="0" border="0" style="font-family: 'Roboto', Arial, sans-serif; font-size: 12px; line-height: 1.4; color: #3D3D3D;">
+  <tr>
+    <td valign="middle" style="padding-right: 12px;">
+      <table cellpadding="0" cellspacing="0" border="0" style="background-color: ${bgColor}; width: 48px; height: 48px; border-radius: 10px;">
+        <tr>
+          <td align="center" valign="middle" style="padding: 4px;">
+            <img src="${logoUrl}" alt="Logo" width="38" height="38" style="width: 38px; height: 38px; display: block; border: 0; object-fit: contain;">
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td valign="middle" style="border-left: 2px solid ${accentColor}; padding-left: 12px;">
+      <div>
+        <strong style="font-family: ${fontName}; font-size: 14px; color: ${nameColor} !important; text-transform: uppercase;">${fullname}</strong>
+        <span style="color: ${titleColor} !important; font-weight: 500; font-size: 12px;"> • ${title}</span>
+      </div>
+      <div style="font-size: 11.5px; color: #4A5568 !important; margin-top: 2px;">
+        ${[
+            phone ? `<a href="tel:${phone.replace(/\s/g, '')}" style="color: #3D3D3D !important; text-decoration: none;">${phone}</a>` : '',
+            orgEmail ? `<a href="mailto:${orgEmail}" style="color: #3D3D3D !important; text-decoration: none;">${orgEmail}</a>` : (email ? `<a href="mailto:${email}" style="color: #3D3D3D !important; text-decoration: none;">${email}</a>` : ''),
+            website && isUrlLike ? `<a href="${cleanWebsiteHref}" style="color: ${accentColor} !important; font-weight: 700; text-decoration: none;">${website}</a>` : ''
+        ].filter(Boolean).join(' &nbsp;|&nbsp; ')}
+      </div>
+    </td>
+  </tr>
+</table>`.trim();
+            }
 
             document.getElementById('signature-container').innerHTML = htmlSignature;
             document.getElementById('raw-html-code').value = htmlSignature;
@@ -504,10 +881,11 @@
             
             html2canvas(container, {
                 backgroundColor: null,
-                scale: 3
+                scale: 3,
+                useCORS: true
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `signature_${currentProfileKey}_${Date.now()}.png`;
+                link.download = `signature_${currentProfileKey}_${currentTemplate}_${Date.now()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 showToast("✓ PNG téléchargé avec succès !");
@@ -521,9 +899,12 @@
         function saveNewProfile() {
             const key = document.getElementById('new-key').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
             const name = document.getElementById('new-name').value.trim();
+            const orgName = document.getElementById('new-org-name').value.trim();
             const fullname = document.getElementById('new-fullname').value.trim();
             const title = document.getElementById('new-title').value.trim();
             const color = document.getElementById('new-color').value;
+            const nameColor = document.getElementById('new-name-color').value;
+            const titleColor = document.getElementById('new-title-color').value;
             const font = document.getElementById('new-font').value;
             const logo = document.getElementById('new-logo').value.trim();
 
@@ -534,6 +915,7 @@
 
             profiles[key] = {
                 name: "📌 " + name,
+                orgName: orgName || name.toUpperCase(),
                 subname: title || "Profil",
                 fullname: fullname || "JORDAN LOUDENOT",
                 title: title,
@@ -543,6 +925,9 @@
                 website: "dojodornois.fr",
                 legal: "",
                 bgColor: color,
+                nameColor: nameColor,
+                titleColor: titleColor,
+                accentColor: color,
                 logoUrl: logo,
                 fontName: font,
                 boxSize: 84,
@@ -559,12 +944,31 @@
         async function syncToSupabase(silent = false) {
             if (!silent && typeof showToast === 'function') showToast("Synchronisation Supabase en cours...");
             try {
+                // Sauvegarde également les couleurs et champs en cours dans le profil actif
+                if (profiles[currentProfileKey]) {
+                    profiles[currentProfileKey].fullname = document.getElementById('input-fullname').value;
+                    profiles[currentProfileKey].orgName = document.getElementById('input-org-name').value;
+                    profiles[currentProfileKey].title = document.getElementById('input-title').value;
+                    profiles[currentProfileKey].phone = document.getElementById('input-phone').value;
+                    profiles[currentProfileKey].email = document.getElementById('input-email').value;
+                    profiles[currentProfileKey].orgEmail = document.getElementById('input-org-email').value;
+                    profiles[currentProfileKey].website = document.getElementById('input-website').value;
+                    profiles[currentProfileKey].legal = document.getElementById('input-legal').value;
+                    profiles[currentProfileKey].bgColor = document.getElementById('input-bg-color').value;
+                    profiles[currentProfileKey].nameColor = document.getElementById('input-name-color').value;
+                    profiles[currentProfileKey].titleColor = document.getElementById('input-title-color').value;
+                    profiles[currentProfileKey].accentColor = document.getElementById('input-accent-color').value;
+                    profiles[currentProfileKey].logoUrl = document.getElementById('input-logo-url').value;
+                    profiles[currentProfileKey].fontName = document.getElementById('select-font-name').value;
+                }
+
                 const payload = { profiles }; 
                 localStorage.setItem('studio_signature_gmail_data', JSON.stringify(payload)); 
 
                 const { error } = await sbClient.from(SUPABASE_TABLE).upsert({ id: 1, data: payload });
                 if (error) throw error;
                 
+                renderProfileButtons();
                 if (!silent && typeof showToast === 'function') showToast("✓ Enregistrement synchronisé sur Supabase !");
             } catch (err) {
                 console.error("Erreur Supabase:", err);
