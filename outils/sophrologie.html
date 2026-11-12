@@ -150,11 +150,15 @@
         .kpi-card .value { font-family: 'Fredoka', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--noir-doux); margin: 0; }
         .kpi-card .subtext { font-size: 0.75rem; color: var(--gris-moyen); margin-top: 4px; }
 
-        .form-inline { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px dashed var(--gris-clair); }
+        .form-inline { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px dashed var(--gris-clair); align-items: center; }
         .form-inline input, .form-inline select { padding: 8px 12px; border: 1px solid var(--gris-clair); border-radius: 6px; font-size: 0.88rem; outline: none; }
-        .form-inline input[type="text"] { flex-grow: 1; min-width: 200px; }
+        .form-inline input[type="text"] { flex-grow: 1; min-width: 220px; }
 
-        .table-responsive { overflow-x: auto; margin-top: 15px; }
+        .active-session-banner {
+            display: flex; justify-content: space-between; align-items: center; background: var(--violet-clair); color: var(--violet-fonce); padding: 10px 15px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; border-left: 4px solid var(--violet);
+        }
+
+        .table-responsive { overflow-x: auto; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
         th, td { padding: 11px 13px; border-bottom: 1px solid var(--gris-tres-clair); vertical-align: middle; }
         th { background-color: var(--fond); font-family: 'Fredoka', sans-serif; color: var(--gris-fonce); font-weight: 500; }
@@ -194,7 +198,7 @@
         <div class="topbar">
             <div class="page-title-area">
                 <h2>🧘‍♂️ Gestion des Ateliers de Sophrologie</h2>
-                <p>Suivi des présences, encaissements (5 € / 1ère offerte), fiches d'émargement</p>
+                <p>Listes d'inscrits indépendantes par séance, encaissements (5 € / 1ère offerte), fiches d'émargement</p>
             </div>
             <div class="topbar-actions">
                 <button class="btn btn-success" onclick="saveData(false)">☁️ Synchroniser Supabase</button>
@@ -204,8 +208,8 @@
 
         <div class="app-body">
             <div class="tabs">
-                <button id="btn-tab-session" class="tab-btn active" onclick="switchTab('session')">📅 Pointage Séance Active</button>
-                <button id="btn-tab-global" class="tab-btn" onclick="switchTab('global')">🌐 Vue Globale / Grille de Présences</button>
+                <button id="btn-tab-session" class="tab-btn active" onclick="switchTab('session')">📅 Liste &amp; Pointage par Séance</button>
+                <button id="btn-tab-global" class="tab-btn" onclick="switchTab('global')">🌐 Vue Globale / Grille de la Saison</button>
                 <button id="btn-tab-analytics" class="tab-btn" onclick="switchTab('analytics')">📈 Analyse &amp; Assiduité</button>
             </div>
 
@@ -220,7 +224,7 @@
                         </div>
 
                         <div>
-                            <div style="font-size:0.8rem; font-weight:600; color:var(--gris-moyen); margin-bottom:8px;">Séances programmées pour cette saison :</div>
+                            <div style="font-size:0.8rem; font-weight:600; color:var(--gris-moyen); margin-bottom:8px;">Séances programmées (chaque séance a sa propre liste d'inscrits) :</div>
                             <div class="sessions-grid" id="sessions-grid-container"></div>
                         </div>
 
@@ -233,24 +237,30 @@
                         </div>
                     </div>
 
+                    <div class="active-session-banner">
+                        <span id="active-session-label">📋 Liste des participants inscrits pour la séance du --/--</span>
+                        <span style="font-size: 0.78rem; font-weight: normal; opacity: 0.9;">Liste indépendante des autres dates</span>
+                    </div>
+
                     <div class="form-inline">
-                        <input type="text" id="new-name" placeholder="NOM Prénom (Ex: MARTIN Jean)">
+                        <input type="text" id="new-name" list="known-participants-datalist" placeholder="NOM Prénom à inscrire sur cette séance (Ex: MARTIN Jean)">
+                        <datalist id="known-participants-datalist"></datalist>
                         <select id="new-status">
                             <option value="standard">Séance Standard (5 €)</option>
                             <option value="premiere">1ère séance (Offerte !)</option>
                         </select>
-                        <button class="btn btn-violet" onclick="addCustomPerson()">➕ Ajouter au Répertoire</button>
+                        <button class="btn btn-violet" onclick="addPersonToSession()">➕ Inscrire à cette séance</button>
                     </div>
 
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Participant</th>
-                                    <th>Formule / Tarif (Clic pour basculer)</th>
-                                    <th style="text-align: center;">Présence Séance Active</th>
+                                    <th>Participant inscrit (Séance du <span id="th-active-date">--</span>)</th>
+                                    <th>Formule sur cette séance (Clic pour basculer)</th>
+                                    <th style="text-align: center;">Présence effective</th>
                                     <th style="text-align: right;">Dû (€)</th>
-                                    <th style="text-align: center;">Actions</th>
+                                    <th style="text-align: center;">Retirer de cette séance</th>
                                 </tr>
                             </thead>
                             <tbody id="session-table-body"></tbody>
@@ -261,28 +271,33 @@
                 <div style="display: flex; flex-direction: column; gap: 16px;">
                     <div class="summary-box">
                         <div>
-                            <h3>👥 Présents ce jour</h3>
+                            <h3>📝 Inscrits sur cette séance</h3>
+                            <div class="summary-stat" id="day-registered-count">0</div>
+                        </div>
+                        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 0;">
+                        <div>
+                            <h3>👥 Présents pointés ce jour</h3>
                             <div class="summary-stat" id="day-present-count">0</div>
                         </div>
                         <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 0;">
                         <div>
-                            <h3>💰 Caisse estimée (5 €/séance)</h3>
+                            <h3>💰 Caisse estimée (5 €/présent)</h3>
                             <div class="summary-stat" style="color: #2ecc71;" id="day-cash-count">0 €</div>
                         </div>
                     </div>
                     
                     <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--gris-tres-clair); font-size: 0.82rem; color: var(--gris-moyen); line-height: 1.5;">
-                        💡 <strong>Tarif &amp; Présences :</strong><br>
-                        • <strong>Tarif Unique :</strong> 5 € par personne (licencié ou extérieur), 1ère séance d'essai gratuite.<br>
-                        • <strong>Impression :</strong> Le bouton en haut à droite génère le registre d'émargement officiel avec la grille prête à remplir.<br>
-                        • <strong>Horaires :</strong> 19h00 — 20h30 au Dojo.
+                        💡 <strong>Fonctionnement par séance :</strong><br>
+                        • <strong>Indépendance totale :</strong> Ajouter ou retirer un nom ici ne modifie <u>que</u> la séance sélectionnée (les séances passées comme le 16/10 restent intactes).<br>
+                        • <strong>Impression :</strong> Le registre d'émargement n'imprime que les personnes inscrites à la séance active (+ des lignes vierges).<br>
+                        • <strong>Saisie rapide :</strong> Commencez à taper un nom déjà venu une fois pour le sélectionner automatiquement.
                     </div>
                 </div>
             </div>
 
             <div id="tab-global" class="main-card" style="display: none;">
-                <h2>🌐 Matrice Générale des Présences</h2>
-                <p style="color: var(--gris-moyen); font-size: 0.82rem; margin-top: -5px;">Vue synoptique de toutes les séances planifiées.</p>
+                <h2>🌐 Matrice Générale des Présences de la Saison</h2>
+                <p style="color: var(--gris-moyen); font-size: 0.82rem; margin-top: -5px;">Consolidation automatique de toutes les personnes ayant participé à au moins une séance de la saison.</p>
                 
                 <div class="table-responsive">
                     <table style="font-size: 0.82rem;">
@@ -295,14 +310,14 @@
             <div id="tab-analytics" style="display: none; flex-direction: column; gap: 20px;">
                 <div class="kpi-grid">
                     <div class="kpi-card purple">
-                        <h4>Public Total Touché</h4>
+                        <h4>Public Total Touché (Saison)</h4>
                         <div class="value" id="kpi-total-people">0</div>
-                        <div class="subtext">participants uniques enregistrés</div>
+                        <div class="subtext">participants uniques sur la saison</div>
                     </div>
                     <div class="kpi-card green">
                         <h4>Séances Découverte (Offertes)</h4>
                         <div class="value" id="kpi-premieres-count">0</div>
-                        <div class="subtext" id="kpi-premieres-pct">0% du public total</div>
+                        <div class="subtext" id="kpi-premieres-pct">personnes venues en découverte</div>
                     </div>
                     <div class="kpi-card purple">
                         <h4>Taux de Récurrence / Fidélité</h4>
@@ -315,7 +330,7 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gris-tres-clair); padding-bottom:12px; margin-bottom:15px;">
                         <div>
                             <h3 style="font-family:'Fredoka',sans-serif; margin:0; font-size:1.15rem; color:var(--noir-doux);">📊 Analyse d'Assiduité par Participant</h3>
-                            <p style="margin:2px 0 0 0; font-size:0.78rem; color:var(--gris-moyen);">Mesure de la régularité sur la saison active</p>
+                            <p style="margin:2px 0 0 0; font-size:0.78rem; color:var(--gris-moyen);">Calculé automatiquement à partir des listes de chaque séance de la saison active</p>
                         </div>
                         <button class="btn btn-violet" onclick="imprimerBilanAnalytiqueA4()">🖨️ Imprimer ce Bilan Analytique A4</button>
                     </div>
@@ -325,7 +340,7 @@
                             <thead>
                                 <tr>
                                     <th>Participant</th>
-                                    <th>Formule</th>
+                                    <th>Dernier Tarif connu</th>
                                     <th style="text-align: center;">Séances Suivies</th>
                                     <th style="text-align: center;">Taux de Présence</th>
                                     <th style="text-align: center;">Niveau d'Assiduité</th>
@@ -351,7 +366,7 @@
                 <div>
                     <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 6px;">Type de document à imprimer :</label>
                     <select id="print-type-select" style="width: 100%; padding: 8px; border: 1px solid var(--gris-clair); border-radius: 4px;">
-                        <option value="session">📄 Émargement Séance Active (Grille complète à remplir)</option>
+                        <option value="session">📄 Émargement Séance Active (Uniquement les inscrits de cette séance + lignes vierges)</option>
                         <option value="season">📊 Bilan Synoptique Complet de la Saison (Toutes les dates)</option>
                         <option value="analytics">📈 Rapport d'Analyse Analytique &amp; Assiduité</option>
                     </select>
@@ -388,13 +403,15 @@
             "2026/2027": ["16/10", "13/11", "18/12", "15/01", "12/02", "12/03", "16/04", "14/05", "11/06"]
         };
 
+        // Structure : sessionLists["2026/2027"]["16/10"] = [ { name: "NOM Prénom", status: "standard"|"premiere", present: true|false } ]
         let state = {
             seasons: [...defaultSeasons],
             activeSeason: "2026/2027",
             seasonDates: JSON.parse(JSON.stringify(defaultDatesBySeason)),
             activeDate: "16/10",
-            participants: [],
-            presences: {}
+            sessionLists: {},
+            participants: [], // conservé pour rétrocompatibilité / autocomplétion
+            presences: {}     // conservé pour migration transparente
         };
 
         function showToast(message, type = "success") {
@@ -406,18 +423,23 @@
             setTimeout(() => { toast.remove(); }, 3500);
         }
 
+        function normalizeStatus(raw) {
+            const str = (raw || "").toLowerCase();
+            if (str.includes("1ère") || str.includes("premiere") || str.includes("offert") || str.includes("decouverte")) {
+                return "premiere";
+            }
+            return "standard";
+        }
+
         function normalizeParticipant(p) {
             let fullName = "";
             if (p.name) fullName = p.name.trim();
             else if (p.nom || p.prenom) fullName = `${p.nom || ''} ${p.prenom || ''}`.trim();
-
-            let status = "standard";
-            const rawStatut = (p.status || p.statut || "").toLowerCase();
-            if (rawStatut.includes("1ère") || rawStatut.includes("premiere") || rawStatut.includes("offert") || rawStatut.includes("decouverte")) {
-                status = "premiere";
-            }
-
-            return { name: fullName.toUpperCase(), status: status };
+            return {
+                name: fullName.toUpperCase(),
+                status: normalizeStatus(p.status || p.statut),
+                present: (typeof p.present === 'boolean') ? p.present : true
+            };
         }
 
         function ensureSaison2026Dates() {
@@ -430,6 +452,94 @@
             if (state.activeSeason === "2026/2027" && (!state.activeDate || !state.seasonDates["2026/2027"].includes(state.activeDate))) {
                 state.activeDate = state.seasonDates["2026/2027"][0] || "16/10";
             }
+        }
+
+        // Migration automatique de l'ancien système (liste globale) vers des listes indépendantes par séance
+        function ensureSessionListsStructure() {
+            if (!state.sessionLists || typeof state.sessionLists !== 'object') {
+                state.sessionLists = {};
+            }
+
+            const statusLookup = {};
+            if (Array.isArray(state.participants)) {
+                state.participants.forEach(p => {
+                    const norm = normalizeParticipant(p);
+                    if (norm.name) statusLookup[norm.name] = norm.status;
+                });
+            }
+
+            state.seasons.forEach(season => {
+                if (!state.sessionLists[season]) {
+                    state.sessionLists[season] = {};
+                }
+                const dates = state.seasonDates[season] || [];
+                dates.forEach(d => {
+                    if (!Array.isArray(state.sessionLists[season][d])) {
+                        // Si d'anciennes présences existaient pour cette date, on peuple uniquement cette séance
+                        const legacyPresentNames = (state.presences && Array.isArray(state.presences[d])) ? state.presences[d] : [];
+                        state.sessionLists[season][d] = legacyPresentNames.map(rawName => {
+                            const cleanName = String(rawName).trim().toUpperCase();
+                            return {
+                                name: cleanName,
+                                status: statusLookup[cleanName] || "standard",
+                                present: true
+                            };
+                        });
+                    } else {
+                        // Nettoyage et dédoublonnage de la liste de la séance
+                        const map = new Map();
+                        state.sessionLists[season][d].forEach(item => {
+                            const norm = normalizeParticipant(item);
+                            if (norm.name && !map.has(norm.name)) {
+                                map.set(norm.name, norm);
+                            }
+                        });
+                        state.sessionLists[season][d] = Array.from(map.values());
+                    }
+                });
+            });
+        }
+
+        function getActiveSessionList() {
+            const s = state.activeSeason;
+            const d = state.activeDate;
+            if (!s || !d) return [];
+            if (!state.sessionLists[s]) state.sessionLists[s] = {};
+            if (!Array.isArray(state.sessionLists[s][d])) state.sessionLists[s][d] = [];
+            return state.sessionLists[s][d];
+        }
+
+        function getSessionList(season, date) {
+            if (!state.sessionLists[season] || !Array.isArray(state.sessionLists[season][date])) {
+                return [];
+            }
+            return state.sessionLists[season][date];
+        }
+
+        // Récupère tous les noms connus (toutes saisons) pour faciliter l'auto-complétion
+        function updateKnownParticipantsDatalist() {
+            const knownMap = new Map();
+            if (Array.isArray(state.participants)) {
+                state.participants.forEach(p => {
+                    if (p.name) knownMap.set(p.name.toUpperCase(), p.status || 'standard');
+                });
+            }
+            Object.keys(state.sessionLists || {}).forEach(s => {
+                Object.keys(state.sessionLists[s] || {}).forEach(d => {
+                    (state.sessionLists[s][d] || []).forEach(p => {
+                        if (p.name) knownMap.set(p.name.toUpperCase(), p.status || 'standard');
+                    });
+                });
+            });
+
+            const datalist = document.getElementById('known-participants-datalist');
+            if (!datalist) return;
+            datalist.innerHTML = '';
+            Array.from(knownMap.keys()).sort((a, b) => a.localeCompare(b)).forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                datalist.appendChild(opt);
+            });
         }
 
         async function loadData() {
@@ -455,18 +565,14 @@
                         state.seasons = Array.from(new Set([...serverState.seasons, "2025/2026", "2026/2027"]));
                     }
                     if (serverState.activeSeason) state.activeSeason = serverState.activeSeason;
-                    
-                    if (serverState.seasonDates) {
-                        state.seasonDates = serverState.seasonDates;
-                    }
-
-                    ensureSaison2026Dates();
-
+                    if (serverState.seasonDates) state.seasonDates = serverState.seasonDates;
                     if (serverState.activeDate) state.activeDate = serverState.activeDate;
                     if (serverState.presences) state.presences = serverState.presences;
+                    if (serverState.sessionLists) state.sessionLists = serverState.sessionLists;
 
-                    localStorage.setItem('dojo_sophro_backup', JSON.stringify(state));
+                    ensureSaison2026Dates();
                     finalizeInitialization();
+                    localStorage.setItem('dojo_sophro_backup', JSON.stringify(state));
                 }
             } catch (err) {
                 console.warn("Connexion distante indisponible, mode local actif :", err);
@@ -484,6 +590,7 @@
                     if (parsed.seasonDates) state.seasonDates = parsed.seasonDates;
                     if (parsed.activeDate) state.activeDate = parsed.activeDate;
                     if (parsed.presences) state.presences = parsed.presences;
+                    if (parsed.sessionLists) state.sessionLists = parsed.sessionLists;
                 } catch(e) {}
             }
             if (!state.seasons.length) state.seasons = [...defaultSeasons];
@@ -491,24 +598,11 @@
             if (!state.activeSeason) state.activeSeason = "2026/2027";
             if (!state.seasonDates[state.activeSeason]) state.seasonDates[state.activeSeason] = [...defaultDatesBySeason[state.activeSeason]];
             if (!state.activeDate) state.activeDate = state.seasonDates[state.activeSeason][0] || "16/10";
-            if (!state.presences) state.presences = {};
         }
 
         function finalizeInitialization() {
-            const uniqueMap = new Map();
-            state.participants.forEach(p => {
-                if (p.name && !uniqueMap.has(p.name)) {
-                    uniqueMap.set(p.name, p);
-                }
-            });
-            state.participants = Array.from(uniqueMap.values());
-
-            Object.keys(state.seasonDates).forEach(s => {
-                state.seasonDates[s].forEach(d => {
-                    if (!state.presences[d]) state.presences[d] = [];
-                });
-            });
-
+            ensureSessionListsStructure();
+            updateKnownParticipantsDatalist();
             renderSeasons();
             renderSessionsGrid();
             renderSession();
@@ -548,17 +642,10 @@
         async function selectSeason(s) {
             state.activeSeason = s;
             if (!state.seasonDates[s] || state.seasonDates[s].length === 0) {
-                if (defaultDatesBySeason[s]) {
-                    state.seasonDates[s] = [...defaultDatesBySeason[s]];
-                } else {
-                    state.seasonDates[s] = [];
-                }
+                state.seasonDates[s] = defaultDatesBySeason[s] ? [...defaultDatesBySeason[s]] : [];
             }
-            if (state.seasonDates[s].length > 0) {
-                state.activeDate = state.seasonDates[s][0];
-            } else {
-                state.activeDate = "";
-            }
+            state.activeDate = state.seasonDates[s][0] || "";
+            ensureSessionListsStructure();
             await saveData(true);
             renderSeasons();
             renderSessionsGrid();
@@ -566,13 +653,15 @@
         }
 
         async function addSeasonPrompt() {
-            const val = prompt("Saisir la nouvelle saison (ex: 2026/2027) :");
-            if(val && !state.seasons.includes(val.trim())) {
+            const val = prompt("Saisir la nouvelle saison (ex: 2027/2028) :");
+            if (val && !state.seasons.includes(val.trim())) {
                 const seasonName = val.trim();
                 state.seasons.push(seasonName);
                 state.seasonDates[seasonName] = defaultDatesBySeason[seasonName] ? [...defaultDatesBySeason[seasonName]] : [];
+                state.sessionLists[seasonName] = {};
                 state.activeSeason = seasonName;
                 state.activeDate = state.seasonDates[seasonName][0] || "";
+                ensureSessionListsStructure();
                 await saveData(true);
                 renderSeasons();
                 renderSessionsGrid();
@@ -592,7 +681,9 @@
             }
 
             currentDates.forEach(d => {
-                const countPresents = state.presences[d] ? state.presences[d].length : 0;
+                const list = getSessionList(state.activeSeason, d);
+                const countInscrits = list.length;
+                const countPresents = list.filter(p => p.present).length;
                 const isActive = (d === state.activeDate);
 
                 const card = document.createElement('div');
@@ -600,7 +691,7 @@
                 card.onclick = () => selectSessionDate(d);
                 card.innerHTML = `
                     <div class="session-card-date">Séance du ${d}</div>
-                    <div class="session-card-count">👥 ${countPresents} présent(s)</div>
+                    <div class="session-card-count">📝 ${countInscrits} inscrit(s) • 👥 ${countPresents} présent(s)</div>
                 `;
                 container.appendChild(card);
             });
@@ -608,7 +699,7 @@
 
         async function selectSessionDate(date) {
             state.activeDate = date;
-            if(!state.presences[state.activeDate]) state.presences[state.activeDate] = [];
+            ensureSessionListsStructure();
             await saveData(true);
             renderSessionsGrid();
             renderSession();
@@ -626,7 +717,12 @@
 
             if (!state.seasonDates[state.activeSeason].includes(newDate)) {
                 state.seasonDates[state.activeSeason].push(newDate);
-                state.presences[newDate] = [];
+            }
+            if (!state.sessionLists[state.activeSeason]) {
+                state.sessionLists[state.activeSeason] = {};
+            }
+            if (!state.sessionLists[state.activeSeason][newDate]) {
+                state.sessionLists[state.activeSeason][newDate] = [];
             }
             
             state.activeDate = newDate;
@@ -638,11 +734,13 @@
 
         async function deleteActiveSessionDate() {
             const currentDates = state.seasonDates[state.activeSeason] || [];
-            if(currentDates.length === 0) return;
+            if (currentDates.length === 0 || !state.activeDate) return;
 
-            if(confirm(`Voulez-vous supprimer la séance du ${state.activeDate} et ses pointages ?`)) {
+            if (confirm(`Voulez-vous supprimer la séance du ${state.activeDate} et sa liste de participants ?`)) {
                 const dateToDelete = state.activeDate;
-                delete state.presences[dateToDelete];
+                if (state.sessionLists[state.activeSeason]) {
+                    delete state.sessionLists[state.activeSeason][dateToDelete];
+                }
                 state.seasonDates[state.activeSeason] = currentDates.filter(d => d !== dateToDelete);
                 state.activeDate = state.seasonDates[state.activeSeason][0] || "";
                 
@@ -652,53 +750,64 @@
             }
         }
 
-        async function addCustomPerson() {
+        // Ajoute un participant UNIQUEMENT sur la séance active
+        async function addPersonToSession() {
+            if (!state.activeDate) {
+                alert("Veuillez d'abord sélectionner ou créer une date de séance.");
+                return;
+            }
+
             const nameInput = document.getElementById('new-name');
             const statusSelect = document.getElementById('new-status');
             const name = nameInput.value.trim().toUpperCase();
 
             if (!name) {
-                alert("Veuillez saisir un Nom et Prénom.");
+                alert("Veuillez saisir un NOM et Prénom.");
                 return;
             }
 
-            let person = state.participants.find(p => p.name === name);
-            if (!person) {
-                person = { name: name, status: statusSelect.value };
-                state.participants.push(person);
+            const list = getActiveSessionList();
+            const existing = list.find(p => p.name === name);
+
+            if (existing) {
+                existing.status = statusSelect.value;
+                existing.present = true;
             } else {
-                person.status = statusSelect.value;
+                list.push({
+                    name: name,
+                    status: statusSelect.value,
+                    present: true
+                });
             }
 
-            if (state.activeDate) {
-                if (!state.presences[state.activeDate]) {
-                    state.presences[state.activeDate] = [];
-                }
-                if (!state.presences[state.activeDate].includes(person.name)) {
-                    state.presences[state.activeDate].push(person.name);
-                }
+            // On garde trace dans le répertoire d'auto-complétion sans jamais forcer l'ajout aux autres dates
+            if (!state.participants.find(p => p.name === name)) {
+                state.participants.push({ name: name, status: statusSelect.value });
             }
 
             nameInput.value = '';
+            updateKnownParticipantsDatalist();
             await saveData(true);
             renderSessionsGrid();
             renderSession();
         }
 
-        async function deletePerson(name) {
-            if(confirm(`Retirer définitivement ${name} de l'annuaire de sophrologie ?`)) {
-                state.participants = state.participants.filter(p => p.name !== name);
-                Object.keys(state.presences).forEach(d => {
-                    state.presences[d] = state.presences[d].filter(n => n !== name);
-                });
+        // Supprime un participant UNIQUEMENT de la séance active (le 16/10 ou les autres dates ne sont pas touchés)
+        async function removePersonFromSession(name) {
+            if (!state.activeDate) return;
+            if (confirm(`Retirer ${name} uniquement de la séance du ${state.activeDate} ?\n(Ses présences sur les autres séances comme le 16/10 seront conservées)`)) {
+                const s = state.activeSeason;
+                const d = state.activeDate;
+                state.sessionLists[s][d] = getActiveSessionList().filter(p => p.name !== name);
                 await saveData(true);
                 renderSessionsGrid();
                 renderSession();
             }
         }
 
-        async function toggleStatus(name) {
-            const person = state.participants.find(p => p.name === name);
+        async function toggleStatusInSession(name) {
+            const list = getActiveSessionList();
+            const person = list.find(p => p.name === name);
             if (person) {
                 person.status = (person.status === 'premiere') ? 'standard' : 'premiere';
                 await saveData(true);
@@ -706,71 +815,120 @@
             }
         }
 
-        async function togglePresence(name) {
-            if (!state.activeDate) return;
-            let list = state.presences[state.activeDate] || [];
-            if (list.includes(name)) {
-                state.presences[state.activeDate] = list.filter(n => n !== name);
-            } else {
-                state.presences[state.activeDate].push(name);
+        async function togglePresenceInSession(name) {
+            const list = getActiveSessionList();
+            const person = list.find(p => p.name === name);
+            if (person) {
+                person.present = !person.present;
+                await saveData(true);
+                renderSessionsGrid();
+                renderSession();
             }
-            await saveData(true);
-            renderSessionsGrid();
-            renderSession();
         }
 
         function renderSession() {
             const tbody = document.getElementById('session-table-body');
             tbody.innerHTML = '';
 
+            document.getElementById('active-session-label').innerText = state.activeDate
+                ? `📋 Liste des participants inscrits pour la séance du ${state.activeDate} (${state.activeSeason})`
+                : `📋 Aucune séance sélectionnée`;
+            document.getElementById('th-active-date').innerText = state.activeDate || '--';
+
+            const list = getActiveSessionList();
+            list.sort((a, b) => a.name.localeCompare(b.name));
+
+            let countRegistered = list.length;
             let countPresent = 0;
             let totalCash = 0;
 
-            state.participants.sort((a, b) => a.name.localeCompare(b.name));
-
-            state.participants.forEach(p => {
-                const isPresent = (state.activeDate && state.presences[state.activeDate] && state.presences[state.activeDate].includes(p.name));
-                
-                let price = 5;
-                let badgeClass = 'badge-standard';
-                let pastilleClass = 'pastille-green';
-                let badgeLabel = 'Séance (5 €)';
-
-                if (p.status === 'premiere') {
-                    price = 0;
-                    badgeClass = 'badge-premiere';
-                    pastilleClass = 'pastille-violet';
-                    badgeLabel = '1ère fois (Offert !)';
-                }
-
-                if (isPresent) {
-                    countPresent++;
-                    totalCash += price;
-                }
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-weight: 500;">${p.name}</td>
-                    <td>
-                        <span class="badge ${badgeClass}" onclick="toggleStatus('${p.name}')" title="Cliquer pour changer le statut">
-                            <span class="pastille ${pastilleClass}"></span> ${badgeLabel}
-                        </span>
-                    </td>
-                    <td style="text-align: center;">
-                        <input type="checkbox" class="check-box" ${isPresent ? 'checked' : ''} onchange="togglePresence('${p.name}')">
-                    </td>
-                    <td style="text-align: right; font-weight: bold; color: ${isPresent ? 'var(--noir-doux)' : 'var(--gris-clair)'};">
-                        ${isPresent ? price + ' €' : '0 €'}
-                    </td>
-                    <td style="text-align: center;">
-                        <button class="btn-mini-danger" onclick="deletePerson('${p.name}')" title="Retirer du répertoire">🗑️ Suppr.</button>
-                    </td>
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 26px; color: var(--gris-moyen); font-style: italic;">
+                            Aucun participant inscrit pour la séance du <strong>${state.activeDate || '--'}</strong>.<br>
+                            Ajoutez les inscrits de cette séance ci-dessus (la liste est indépendante des autres dates).
+                        </td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
-            });
+            } else {
+                list.forEach(p => {
+                    const isPresent = !!p.present;
+                    
+                    let price = 5;
+                    let badgeClass = 'badge-standard';
+                    let pastilleClass = 'pastille-green';
+                    let badgeLabel = 'Séance (5 €)';
 
+                    if (p.status === 'premiere') {
+                        price = 0;
+                        badgeClass = 'badge-premiere';
+                        pastilleClass = 'pastille-violet';
+                        badgeLabel = '1ère fois (Offert !)';
+                    }
+
+                    if (isPresent) {
+                        countPresent++;
+                        totalCash += price;
+                    }
+
+                    const safeName = p.name.replace(/'/g, "\\'");
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: 500;">${p.name}</td>
+                        <td>
+                            <span class="badge ${badgeClass}" onclick="toggleStatusInSession('${safeName}')" title="Cliquer pour changer le tarif sur cette séance">
+                                <span class="pastille ${pastilleClass}"></span> ${badgeLabel}
+                            </span>
+                        </td>
+                        <td style="text-align: center;">
+                            <input type="checkbox" class="check-box" ${isPresent ? 'checked' : ''} onchange="togglePresenceInSession('${safeName}')">
+                        </td>
+                        <td style="text-align: right; font-weight: bold; color: ${isPresent ? 'var(--noir-doux)' : 'var(--gris-clair)'};">
+                            ${isPresent ? price + ' €' : '0 €'}
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="btn-mini-danger" onclick="removePersonFromSession('${safeName}')" title="Retirer uniquement de la séance du ${state.activeDate}">✕ Retirer de cette séance</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('day-registered-count').innerText = countRegistered;
             document.getElementById('day-present-count').innerText = countPresent;
             document.getElementById('day-cash-count').innerText = `${totalCash} €`;
+        }
+
+        // Construit la liste consolidée de tous les participants d'une saison à partir des séances de cette saison
+        function getSeasonConsolidatedParticipants(season) {
+            const currentDates = state.seasonDates[season] || [];
+            const peopleMap = new Map();
+
+            currentDates.forEach(d => {
+                const list = getSessionList(season, d);
+                list.forEach(item => {
+                    if (!peopleMap.has(item.name)) {
+                        peopleMap.set(item.name, {
+                            name: item.name,
+                            status: item.status,
+                            hadPremiere: item.status === 'premiere',
+                            byDate: {}
+                        });
+                    }
+                    const entry = peopleMap.get(item.name);
+                    entry.status = item.status;
+                    if (item.status === 'premiere') entry.hadPremiere = true;
+                    entry.byDate[d] = {
+                        registered: true,
+                        present: !!item.present,
+                        status: item.status
+                    };
+                });
+            });
+
+            return Array.from(peopleMap.values()).sort((a, b) => a.name.localeCompare(b.name));
         }
 
         function renderGlobalMatrix() {
@@ -778,36 +936,44 @@
             const tbody = document.getElementById('global-table-body');
             
             const currentDates = state.seasonDates[state.activeSeason] || [];
+            const consolidated = getSeasonConsolidatedParticipants(state.activeSeason);
 
             let headHtml = `<tr><th>Participant</th><th>Formule</th>`;
             currentDates.forEach(d => {
                 headHtml += `<th style="text-align: center;">${d}</th>`;
             });
-            headHtml += `</tr>`;
+            headHtml += `<th style="text-align: center;">Total Présences</th></tr>`;
             thead.innerHTML = headHtml;
 
             tbody.innerHTML = '';
-            state.participants.sort((a, b) => a.name.localeCompare(b.name));
 
-            state.participants.forEach(p => {
-                let badgeClass = (p.status === 'premiere') ? 'badge-premiere' : 'badge-standard';
-                let pastilleClass = (p.status === 'premiere') ? 'pastille-violet' : 'pastille-green';
-                let badgeLabel = (p.status === 'premiere') ? '1ère offerte' : 'Tarif 5 €';
+            if (consolidated.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${currentDates.length + 3}" style="text-align:center; padding:20px; color:var(--gris-moyen); font-style:italic;">Aucun participant inscrit sur les séances de la saison ${state.activeSeason}.</td></tr>`;
+                return;
+            }
 
+            consolidated.forEach(p => {
+                let badgeClass = p.hadPremiere ? 'badge-premiere' : 'badge-standard';
+                let pastilleClass = p.hadPremiere ? 'pastille-violet' : 'pastille-green';
+                let badgeLabel = p.hadPremiere ? '1ère offerte utilisée' : 'Tarif 5 €';
+
+                let totalPresent = 0;
                 let rowHtml = `<tr>
                     <td style="font-weight: 500;">${p.name}</td>
                     <td>
-                        <span class="badge ${badgeClass}" style="padding: 3px 8px; font-size: 0.72rem;">
+                        <span class="badge ${badgeClass}" style="padding: 3px 8px; font-size: 0.72rem; cursor: default;">
                             <span class="pastille ${pastilleClass}"></span> ${badgeLabel}
                         </span>
                     </td>`;
                 
                 currentDates.forEach(d => {
-                    const checked = (state.presences[d] && state.presences[d].includes(p.name)) ? '✅' : '—';
-                    rowHtml += `<td style="text-align: center;">${checked}</td>`;
+                    const info = p.byDate[d];
+                    const isPres = info && info.present;
+                    if (isPres) totalPresent++;
+                    rowHtml += `<td style="text-align: center;">${isPres ? '✅' : '—'}</td>`;
                 });
                 
-                rowHtml += `</tr>`;
+                rowHtml += `<td style="text-align: center; font-weight: bold; color: var(--violet-fonce);">${totalPresent}</td></tr>`;
                 tbody.innerHTML += rowHtml;
             });
         }
@@ -815,22 +981,25 @@
         function renderAnalytics() {
             const currentDates = state.seasonDates[state.activeSeason] || [];
             const totalDates = currentDates.length;
+            const consolidated = getSeasonConsolidatedParticipants(state.activeSeason);
 
-            const totalPeople = state.participants.length;
+            const totalPeople = consolidated.length;
             let premieresCount = 0;
             let loyalCount = 0;
 
             const tbody = document.getElementById('analytics-table-body');
             tbody.innerHTML = '';
 
-            state.participants.sort((a, b) => a.name.localeCompare(b.name));
+            if (consolidated.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--gris-moyen); font-style:italic;">Aucune donnée disponible pour cette saison.</td></tr>`;
+            }
 
-            state.participants.forEach(p => {
-                if (p.status === 'premiere') premieresCount++;
+            consolidated.forEach(p => {
+                if (p.hadPremiere) premieresCount++;
 
                 let attendedCount = 0;
                 currentDates.forEach(d => {
-                    if (state.presences[d] && state.presences[d].includes(p.name)) {
+                    if (p.byDate[d] && p.byDate[d].present) {
                         attendedCount++;
                     }
                 });
@@ -846,7 +1015,7 @@
                 let assiduiteLabel = 'Occasionnel (1 séance)';
                 let assiduiteBadgeStyle = 'background:#FAF9FC; color:#666; border:1px solid #ccc;';
                 if (attendedCount === 0) {
-                    assiduiteLabel = 'Aucune séance';
+                    assiduiteLabel = 'Inscrit non présent';
                     assiduiteBadgeStyle = 'background:#f8f9fa; color:#aaa; border:1px solid #ddd;';
                 } else if (attendedCount >= 4) {
                     assiduiteLabel = '🥇 Très Assidu (Fidèle)';
@@ -860,7 +1029,7 @@
                 tr.innerHTML = `
                     <td style="font-weight: 500;">${p.name}</td>
                     <td>
-                        <span class="badge ${badgeClass}" style="padding: 3px 8px; font-size: 0.72rem;">
+                        <span class="badge ${badgeClass}" style="padding: 3px 8px; font-size: 0.72rem; cursor: default;">
                             <span class="pastille ${pastilleClass}"></span> ${badgeLabel}
                         </span>
                     </td>
@@ -938,6 +1107,8 @@
             let titleText = '';
 
             if (printType === 'session') {
+                // N'imprime QUE la liste de la séance active + des lignes vierges
+                const sessionParticipants = [...getActiveSessionList()].sort((a, b) => a.name.localeCompare(b.name));
                 titleText = `Registre d'Émargement — Séance du ${state.activeDate || 'Session'}`;
                 tableHtml = `
                     <table class="sheet-table">
@@ -953,8 +1124,8 @@
                         <tbody>`;
                 
                 let lineIndex = 1;
-                state.participants.forEach((p) => {
-                    const isPresent = (state.activeDate && state.presences[state.activeDate] && state.presences[state.activeDate].includes(p.name));
+                sessionParticipants.forEach((p) => {
+                    const isPresent = !!p.present;
                     let statusTxt = (p.status === 'premiere') ? "1ère séance (Offerte)" : "Séance (5 €)";
 
                     tableHtml += `
@@ -969,8 +1140,8 @@
                     lineIndex++;
                 });
 
-                const minLines = 14;
-                const blankRowsNeeded = Math.max(minLines - state.participants.length, 6);
+                const minLines = 15;
+                const blankRowsNeeded = Math.max(minLines - sessionParticipants.length, 6);
 
                 for (let i = 0; i < blankRowsNeeded; i++) {
                     tableHtml += `
@@ -987,6 +1158,7 @@
 
                 tableHtml += `</tbody></table>`;
             } else {
+                const consolidated = getSeasonConsolidatedParticipants(seasonVal);
                 titleText = `Bilan Synoptique Annuel de Sophrologie — Saison ${seasonVal}`;
                 tableHtml = `
                     <table class="sheet-table">
@@ -997,22 +1169,24 @@
                 currentDates.forEach(d => {
                     tableHtml += `<th style="text-align:center;">${d}</th>`;
                 });
-                tableHtml += `</tr></thead><tbody>`;
+                tableHtml += `<th style="text-align:center;">Total</th></tr></thead><tbody>`;
 
-                if (state.participants.length === 0) {
-                    tableHtml += `<tr><td colspan="${currentDates.length + 2}" style="text-align:center; padding:18px; color:#888; font-style:italic;">Aucun participant enregistré pour cette saison sportive.</td></tr>`;
+                if (consolidated.length === 0) {
+                    tableHtml += `<tr><td colspan="${currentDates.length + 3}" style="text-align:center; padding:18px; color:#888; font-style:italic;">Aucun participant enregistré pour cette saison sportive.</td></tr>`;
                 } else {
-                    state.participants.forEach(p => {
-                        let statusTxt = (p.status === 'premiere') ? `<span style="color:#7A5C9B; font-weight:bold;">🟣 1ère offerte</span>` : `<span style="color:#27ae60; font-weight:bold;">🟢 Tarif 5 €</span>`;
+                    consolidated.forEach(p => {
+                        let statusTxt = p.hadPremiere ? `<span style="color:#7A5C9B; font-weight:bold;">🟣 1ère offerte</span>` : `<span style="color:#27ae60; font-weight:bold;">🟢 Tarif 5 €</span>`;
+                        let totalP = 0;
 
                         tableHtml += `<tr>
                             <td><strong>${p.name}</strong></td>
                             <td>${statusTxt}</td>`;
                         currentDates.forEach(d => {
-                            const checked = (state.presences[d] && state.presences[d].includes(p.name)) ? '✅' : '—';
-                            tableHtml += `<td style="text-align:center;">${checked}</td>`;
+                            const isPres = p.byDate[d] && p.byDate[d].present;
+                            if (isPres) totalP++;
+                            tableHtml += `<td style="text-align:center;">${isPres ? '✅' : '—'}</td>`;
                         });
-                        tableHtml += `</tr>`;
+                        tableHtml += `<td style="text-align:center; font-weight:bold;">${totalP}</td></tr>`;
                     });
                 }
                 tableHtml += `</tbody></table>`;
@@ -1025,27 +1199,28 @@
             const seasonVal = state.activeSeason;
             const currentDates = state.seasonDates[seasonVal] || [];
             const totalDates = currentDates.length;
-            const totalPeople = state.participants.length;
+            const consolidated = getSeasonConsolidatedParticipants(seasonVal);
+            const totalPeople = consolidated.length;
 
             let premieresCount = 0;
             let loyalCount = 0;
 
             let rowsHtml = '';
-            if (state.participants.length === 0) {
+            if (consolidated.length === 0) {
                 rowsHtml = `<tr><td colspan="5" style="text-align:center; padding:18px; color:#888; font-style:italic;">Aucun participant enregistré pour cette saison sportive.</td></tr>`;
             } else {
-                state.participants.sort((a, b) => a.name.localeCompare(b.name)).forEach(p => {
-                    if (p.status === 'premiere') premieresCount++;
+                consolidated.forEach(p => {
+                    if (p.hadPremiere) premieresCount++;
 
                     let attendedCount = 0;
                     currentDates.forEach(d => {
-                        if (state.presences[d] && state.presences[d].includes(p.name)) attendedCount++;
+                        if (p.byDate[d] && p.byDate[d].present) attendedCount++;
                     });
 
                     if (attendedCount >= 2) loyalCount++;
 
                     const attendanceRate = totalDates > 0 ? Math.round((attendedCount / totalDates) * 100) : 0;
-                    let statusLabel = (p.status === 'premiere') ? "1ère séance" : "Tarif 5 €";
+                    let statusLabel = p.hadPremiere ? "1ère séance offerte" : "Tarif 5 €";
 
                     let assiduiteLabel = "Occasionnel";
                     if (attendedCount >= 4) assiduiteLabel = "🥇 Très Assidu (Fidèle)";
