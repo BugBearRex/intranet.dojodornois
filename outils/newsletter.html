@@ -18,6 +18,7 @@
         :root {
             --rouge: #C41E3A;
             --rouge-hover: #A3182E;
+            --rouge-deep: #8B1429;
             --rouge-clair: #FFEBEF;
             --noir-doux: #1A1A1A;
             --gris-fonce: #3D3D3D;
@@ -147,14 +148,14 @@
             display: none;
         }
 
-        /* Boîte d'aperçu Gmail / Kalisport (Fix Scroll : flex-shrink: 0) */
+        /* Boîte d'aperçu Gmail / Kalisport */
         .preview-window {
             background: #FFFFFF;
             border: 1px solid #E2E8F0;
-            border-radius: 12px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+            border-radius: 14px;
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
             width: 100%;
-            max-width: 740px;
+            max-width: 800px;
             margin: 0 auto 24px auto;
             overflow: hidden;
             flex-shrink: 0;
@@ -266,7 +267,7 @@
             <!-- COLONNE GAUCHE (6/12) : PARAMÈTRES, BARRE D'OUTILS, BLOCS & ÉDITEUR -->
             <div class="lg:col-span-6 flex flex-col border-r border-slate-200 bg-white min-h-0 overflow-hidden">
                 
-                <!-- BANDEAU PARAMÈTRES DYNAMIQUES SELON LE MODE (MAIL OU NEWSLETTER) -->
+                <!-- BANDEAU PARAMÈTRES DYNAMIQUES SELON LE MODE + HABILLAGE VISUEL UI -->
                 <div class="bg-slate-50 border-b border-slate-200 px-4 py-2.5 space-y-2 shrink-0">
                     
                     <!-- Options spécifiques Mode MAIL -->
@@ -299,6 +300,36 @@
                         <div class="md:col-span-5 flex items-center gap-1.5">
                             <span class="text-[11px] font-bold uppercase text-slate-500 shrink-0">Accroche :</span>
                             <input type="text" id="news-subtitle-input" oninput="mettreAJourEnteteNewsletter()" placeholder="Ex: Actualités & Infos pratiques • Octobre 2026" class="w-full px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:border-[#C41E3A]">
+                        </div>
+                    </div>
+
+                    <!-- SÉLECTEURS : ÉCRIN EXTÉRIEUR + ENCART HAUT-DROITE -->
+                    <div class="pt-1.5 border-t border-slate-200/80 grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
+                        <div class="md:col-span-6 flex items-center gap-1.5">
+                            <span class="text-[10.5px] font-bold uppercase text-[#C41E3A] shrink-0 flex items-center gap-1">
+                                <i class="fa-solid fa-palette"></i> Écrin :
+                            </span>
+                            <select id="ui-skin-select" onchange="changerDecorLateral(this.value)" class="w-full px-2 py-1 bg-white border border-rose-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:border-[#C41E3A]">
+                                <option value="red_signature" selected>🔴 Rouge Signature Dojo + Hexagones (#B31B34)</option>
+                                <option value="red_deep">🍷 Bordeaux Profond Dojo + Hexagones (#8B1429)</option>
+                                <option value="dark_dojo">🥋 Noir Doux + Hexagones (#1A1A1A)</option>
+                                <option value="navy_dojo">🌙 Bleu Nuit + Hexagones (#272757)</option>
+                                <option value="rose_soft">🌸 Rose Poudré + Hexagones (#FDF2F4)</option>
+                                <option value="minimal">⬜ Classique Gris Clair (#F4F6F9)</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-6 flex items-center gap-1.5">
+                            <span class="text-[10.5px] font-bold uppercase text-slate-500 shrink-0">Encart En-tête :</span>
+                            <select id="ui-badge-select" onchange="changerEncartEntete(this.value)" class="w-full px-2 py-1 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:border-[#C41E3A]">
+                                <option value="saison" selected>📅 Saison 2026-2027 • Dornes (58)</option>
+                                <option value="date_jour">📌 Courrier Officiel • Date du jour auto</option>
+                                <option value="contact">🌐 dojodornois.fr • 06 07 13 91 86</option>
+                                <option value="lieu">📍 Dojo H. Pierrehumbert • 58390 Dornes</option>
+                                <option value="kalisport">📲 Espace Kalisport • Code : U3AMYA</option>
+                                <option value="disciplines">🥋 Judo • Jujitsu • Taïso (Club FFJDA)</option>
+                                <option value="custom">✏️ Texte libre personnalisé...</option>
+                                <option value="none">🚫 Masquer l'encart de droite</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -374,6 +405,7 @@
                     <button type="button" onclick="insererModule('alerte_jaune')" class="block-chip"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Vigilance / Orga</button>
                     <button type="button" onclick="insererModule('alerte_verte')" class="block-chip"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Confirmation / Succès</button>
                     <button type="button" onclick="insererModule('encart_gris')" class="block-chip"><span class="w-2 h-2 rounded-full bg-slate-400"></span> Encart Gris Info</button>
+                    <button type="button" onclick="insererModule('bandeau_valeurs')" class="block-chip">🥋 Citation Code Moral</button>
                     <button type="button" onclick="insererModule('bloc_pj')" class="block-chip">📎 Liste Pièces Jointes</button>
                     <button type="button" onclick="openCtaModal()" class="block-chip !border-rose-200 !text-[#C41E3A]">🔘 Bouton Action</button>
                     <button type="button" onclick="insererModule('programme_horaires')" class="block-chip">⏰ Programme Horaire</button>
@@ -391,14 +423,14 @@
 
                 <!-- PIED DE L'ÉDITEUR : AIDE & COMPTEUR -->
                 <div class="bg-slate-50 border-t border-slate-200 px-4 py-1.5 flex items-center justify-between text-[11px] text-slate-500 shrink-0">
-                    <span>💡 <strong>Astuce :</strong> Cliquez directement dans l'éditeur à gauche pour modifier un texte, ou utilisez <strong>Assistant Gemini</strong> pour imbriquer vos notes.</span>
+                    <span>💡 <strong>Astuce :</strong> Les hexagones latéraux sont encodés en caractères HTML natifs : ils restent 100 % visibles à la réception du mail.</span>
                     <button onclick="reinitialiserGabaritActuel()" class="text-rose-600 hover:underline font-semibold">Réinitialiser le gabarit</button>
                 </div>
             </div>
 
-            <!-- COLONNE DROITE (6/12) : APERÇU EN DIRECT & CONTRÔLES DE VUE (Fix Scroll : min-h-0) -->
-            <div class="lg:col-span-6 bg-[#F4F6F9] p-5 overflow-y-auto flex flex-col min-h-0" id="right-preview-pane">
-                <div class="mb-3 flex items-center justify-between flex-wrap gap-2 max-w-[740px] w-full mx-auto shrink-0">
+            <!-- COLONNE DROITE (6/12) : APERÇU EN DIRECT & CONTRÔLES DE VUE -->
+            <div class="lg:col-span-6 bg-[#E9EEF5] p-5 overflow-y-auto flex flex-col min-h-0" id="right-preview-pane">
+                <div class="mb-3 flex items-center justify-between flex-wrap gap-2 max-w-[800px] w-full mx-auto shrink-0">
                     <div class="flex items-center gap-2">
                         <h3 class="font-fredoka text-[#1A1A1A] font-bold text-base">Aperçu du rendu final</h3>
                         <span id="badge-mode" class="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full uppercase">Mode Courriel Gmail</span>
@@ -406,7 +438,7 @@
 
                     <!-- Contrôles d'aperçu : Bureau / Mobile / Test Mode Sombre -->
                     <div class="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
-                        <button onclick="setPreviewDevice('desktop')" id="btn-dev-desktop" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white transition" title="Vue Ordinateur (650px)">
+                        <button onclick="setPreviewDevice('desktop')" id="btn-dev-desktop" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white transition" title="Vue Ordinateur">
                             <i class="fa-solid fa-desktop"></i> Bureau
                         </button>
                         <button onclick="setPreviewDevice('mobile')" id="btn-dev-mobile" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition" title="Vue Smartphone (390px)">
@@ -423,7 +455,7 @@
                     <div class="bg-[#1A1A1A] text-white px-4 py-2.5 flex justify-between items-center">
                         <div class="flex items-center gap-2 text-xs text-slate-300">
                             <i class="fa-solid fa-shield-check text-emerald-400"></i>
-                            <span id="preview-window-title">Rendu centré 650px • Prêt à coller dans Gmail</span>
+                            <span id="preview-window-title">Écrin Rouge Signature + Hexagones HTML natifs (Conservés à l'envoi)</span>
                         </div>
                         <div class="flex gap-1.5">
                             <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
@@ -547,16 +579,24 @@
         const sbClient = supabase.createClient(supabaseUrl, supabaseKey);
         const SUPABASE_TABLE = 'newsletter_drafts';
 
-        // Mails en premier par défaut comme demandé !
         let modeActuel = 'mail'; // 'mail' ou 'newsletter'
         let modeCodeSource = false;
         let isDarkPreview = false;
+        let isMobileDevice = false;
+        let decorLateralActuel = 'red_signature';
+        let badgeEnteteActuel = 'saison';
+        let customBadgeLine1 = 'SAISON 2026 - 2027';
+        let customBadgeLine2 = 'Dornes (58) • Loi 1901';
         let savedDrafts = [];
 
         const memoireContenu = {
             mail: '',
             newsletter: ''
         };
+
+        // Motif hexagonal SVG complémentaire pour l'aperçu local
+        const HEX_PATTERN_WHITE_URI = "url('data:image/svg+xml;utf8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2256%22%20height=%2298%22%20viewBox=%220%200%2056%2098%22%3E%3Cpath%20d=%22M28%2066L0%2050L0%2016L28%200L56%2016L56%2050L28%2066ZM28%2098L0%2082L0%2066L28%2082L56%2066L56%2082L28%2098Z%22%20fill=%22none%22%20stroke=%22%23FFFFFF%22%20stroke-opacity=%220.11%22%20stroke-width=%221.3%22/%3E%3C/svg%3E')";
+        const HEX_PATTERN_RED_URI = "url('data:image/svg+xml;utf8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2256%22%20height=%2298%22%20viewBox=%220%200%2056%2098%22%3E%3Cpath%20d=%22M28%2066L0%2050L0%2016L28%200L56%2016L56%2050L28%2066ZM28%2098L0%2082L0%2066L28%2082L56%2066L56%2082L28%2098Z%22%20fill=%22none%22%20stroke=%22%23C41E3A%22%20stroke-opacity=%220.11%22%20stroke-width=%221.3%22/%3E%3C/svg%3E')";
 
         const editor = document.getElementById('editor');
         const sourceEditor = document.getElementById('source-editor');
@@ -565,33 +605,45 @@
         const btnToggleSource = document.getElementById('btn-toggle-source');
 
         /* ========================================================================= */
-        /* BLOCS OFFICIELS FIXES (EN-TÊTES & PIEDS DE PAGE CHARTE DOJO DORNOIS)      */
+        /* GESTION DE L'ENCART EN HAUT À DROITE DE L'EN-TÊTE                         */
         /* ========================================================================= */
+        function getBadgeLines(modeBadge) {
+            const dateStr = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            switch (modeBadge) {
+                case 'saison':
+                    return { l1: 'SAISON 2026 - 2027', l2: 'Dornes (58) &bull; Loi 1901' };
+                case 'date_jour':
+                    return { l1: 'COURRIER OFFICIEL', l2: 'Dornes, le ' + dateStr };
+                case 'contact':
+                    return { l1: 'DOJODORNOIS.FR', l2: '06 07 13 91 86 &bull; Dornes' };
+                case 'lieu':
+                    return { l1: 'DOJO H. PIERREHUMBERT', l2: '1 Pl. de la Mairie &bull; Dornes' };
+                case 'kalisport':
+                    return { l1: 'ESPACE CLUB KALISPORT', l2: 'Code d\'accès : U3AMYA' };
+                case 'disciplines':
+                    return { l1: 'JUDO &bull; JUJITSU &bull; TAÏSO', l2: 'Dornes (58) &bull; Club FFJDA' };
+                case 'custom':
+                    return { l1: customBadgeLine1, l2: customBadgeLine2 };
+                default:
+                    return null;
+            }
+        }
 
-        // 1. EN-TÊTE MAIL OFFICIEL (Avec Logo Carré Rouge)
-        function getHeaderMail(sousTitre = "Communication officielle") {
+        function buildHeaderRightBadgeHtml(modeBadge) {
+            if (modeBadge === 'none') return '';
+            const lines = getBadgeLines(modeBadge);
+            if (!lines) return '';
             return `
-                <table id="dojo-mail-header" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px; border-bottom: 2px solid #C41E3A; background-color: #FFFFFF !important;">
+                <table cellpadding="0" cellspacing="0" border="0" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-left: 4px solid #C41E3A !important; border-radius: 6px;">
                     <tbody>
                         <tr>
-                            <td width="76" valign="middle" style="padding-bottom: 16px; background-color: #FFFFFF !important;">
-                                <table cellpadding="0" cellspacing="0" border="0" style="background-color: #C41E3A !important; width: 64px; height: 64px; border-radius: 12px;">
-                                    <tbody>
-                                        <tr>
-                                            <td align="center" valign="middle" style="padding: 6px;">
-                                                <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 52px; height: 52px; display: block; border: 0;" alt="Logo Dojo Dornois">
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                            <td valign="middle" style="padding-left: 14px; padding-bottom: 16px; background-color: #FFFFFF !important;">
-                                <h1 style="font-family: 'Fredoka', Arial, sans-serif; font-size: 22px; font-weight: bold; color: #C41E3A !important; margin: 0; text-transform: uppercase; line-height: 1.2;">
-                                    <span style="color: #C41E3A !important;">DOJO DORNOIS</span>
-                                </h1>
-                                <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 13px; color: #4A5568 !important; margin: 4px 0 0 0;">
-                                    <span id="dojo-mail-subtitle-text" style="color: #4A5568 !important;">${sousTitre}</span>
-                                </p>
+                            <td align="right" valign="middle" style="padding: 6px 11px; background-color: #F8FAFC !important; border-radius: 0 6px 6px 0;">
+                                <div style="font-family: 'Fredoka', Arial, sans-serif; font-size: 10px; font-weight: bold; color: #C41E3A !important; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3; white-space: nowrap;">
+                                    <span id="dojo-badge-line1" style="color: #C41E3A !important;">${lines.l1}</span>
+                                </div>
+                                <div style="font-family: 'Roboto', Arial, sans-serif; font-size: 9.5px; font-weight: bold; color: #1A1A1A !important; margin-top: 1px; line-height: 1.2; white-space: nowrap;">
+                                    <span id="dojo-badge-line2" style="color: #4A5568 !important;">${lines.l2}</span>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -599,17 +651,106 @@
             `;
         }
 
-        // 2. PIED DE PAGE MAIL OFFICIEL (SANS le bandeau Kalisport)
+        function changerEncartEntete(val) {
+            if (val === 'custom') {
+                const l1 = prompt("Ligne 1 de l'encart (en rouge majuscule) :", customBadgeLine1);
+                if (l1 !== null) customBadgeLine1 = l1.trim() || 'DOJO DORNOIS';
+                const l2 = prompt("Ligne 2 de l'encart (en gris/noir) :", customBadgeLine2);
+                if (l2 !== null) customBadgeLine2 = l2.trim() || '58390 Dornes';
+            }
+            badgeEnteteActuel = val;
+
+            if (modeCodeSource) toggleSourceCode();
+            const badgeContainer = editor.querySelector('#dojo-header-badge-cell');
+            if (badgeContainer) {
+                badgeContainer.innerHTML = buildHeaderRightBadgeHtml(badgeEnteteActuel);
+                memoireContenu[modeActuel] = editor.innerHTML;
+            }
+            genererApercu();
+        }
+
+        /* ========================================================================= */
+        /* BLOCS OFFICIELS FIXES (EN-TÊTES & PIEDS DE PAGE CHARTE DOJO DORNOIS)      */
+        /* ========================================================================= */
+
+        // 1. EN-TÊTE MAIL OFFICIEL
+        function getHeaderMail(sousTitre = "Communication officielle") {
+            return `
+                <table id="dojo-mail-header" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 22px; background-color: #FFFFFF !important;">
+                    <tbody>
+                        <tr>
+                            <!-- LOGO CARRÉ ARRONDI PUR -->
+                            <td width="72" valign="middle" style="padding-bottom: 14px; background-color: #FFFFFF !important;">
+                                <table cellpadding="0" cellspacing="0" border="0" bgcolor="#C41E3A" style="background-color: #C41E3A !important; width: 62px; height: 62px; border-radius: 12px;">
+                                    <tbody>
+                                        <tr>
+                                            <td align="center" valign="middle" style="padding: 6px;">
+                                                <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" width="50" height="50" style="width: 50px; height: 50px; display: block; border: 0;" alt="Logo Dojo Dornois">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+
+                            <!-- TITRE BICOLORE CHARTE & SOUS-TITRE SUR 1 SEULE LIGNE -->
+                            <td valign="middle" style="padding-left: 12px; padding-bottom: 14px; background-color: #FFFFFF !important;">
+                                <div style="font-family: 'Fredoka', Arial, sans-serif; font-size: 22px; font-weight: bold; margin: 0; text-transform: uppercase; line-height: 1.15; letter-spacing: 0.4px;">
+                                    <span style="color: #1A1A1A !important;">DOJO</span> <span style="color: #C41E3A !important;">DORNOIS</span>
+                                </div>
+                                <table cellpadding="0" cellspacing="0" border="0" style="margin-top: 5px; background-color: #FFFFFF !important;">
+                                    <tbody>
+                                        <tr>
+                                            <td valign="middle" style="padding-right: 7px;">
+                                                <table cellpadding="0" cellspacing="0" border="0" width="16" style="width: 16px;">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td height="3" bgcolor="#C41E3A" style="height: 3px; background-color: #C41E3A !important; font-size: 1px; line-height: 1px; border-radius: 2px;">&nbsp;</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <td valign="middle" style="font-family: 'Roboto', Arial, sans-serif; font-size: 11.5px; font-weight: bold; color: #4A5568 !important; text-transform: uppercase; letter-spacing: 0.4px;">
+                                                <span id="dojo-mail-subtitle-text" style="color: #4A5568 !important;">${sousTitre}</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+
+                            <!-- ENCART EN HAUT À DROITE DYNAMIQUE -->
+                            <td id="dojo-header-badge-cell" align="right" valign="middle" style="padding-bottom: 14px; background-color: #FFFFFF !important;">
+                                ${buildHeaderRightBadgeHtml(badgeEnteteActuel)}
+                            </td>
+                        </tr>
+                        <!-- DOUBLE BARRE CEINTURE ROUGE & NOIRE -->
+                        <tr>
+                            <td colspan="3" style="padding: 0; background-color: #FFFFFF !important;">
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="76%" height="3" bgcolor="#C41E3A" style="height: 3px; background-color: #C41E3A !important; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                                            <td width="24%" height="3" bgcolor="#1A1A1A" style="height: 3px; background-color: #1A1A1A !important; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // 2. PIED DE PAGE MAIL OFFICIEL (Logo Carré Arrondi Pur, SANS bandeau Kalisport)
         const BLOC_FOOTER_MAIL = `
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top: 2px solid #E8E8E8; margin-top: 28px; background-color: #FFFFFF !important;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top: 2px solid #E2E8F0; margin-top: 24px; background-color: #FFFFFF !important;">
                 <tbody>
                     <tr>
-                        <td align="center" style="padding-top: 20px; padding-bottom: 12px; background-color: #FFFFFF !important;">
-                            <table cellpadding="0" cellspacing="0" border="0" style="background-color: #C41E3A !important; width: 54px; height: 54px; border-radius: 10px; margin: 0 auto;">
+                        <td align="center" style="padding-top: 18px; padding-bottom: 10px; background-color: #FFFFFF !important;">
+                            <table cellpadding="0" cellspacing="0" border="0" bgcolor="#C41E3A" style="background-color: #C41E3A !important; width: 52px; height: 52px; border-radius: 10px; margin: 0 auto;">
                                 <tbody>
                                     <tr>
                                         <td align="center" valign="middle" style="padding: 4px;">
-                                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 44px; height: 44px; display: block; border: 0;" alt="Logo Dojo">
+                                            <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" width="42" height="42" style="width: 42px; height: 42px; display: block; border: 0;" alt="Logo Dojo">
                                         </td>
                                     </tr>
                                 </tbody>
@@ -628,17 +769,17 @@
             </table>
         `;
 
-        // 3. PIED DE PAGE NEWSLETTER KALISPORT (AVEC le bandeau App Kalisport U3AMYA)
+        // 3. PIED DE PAGE NEWSLETTER KALISPORT (AVEC bandeau App Kalisport U3AMYA)
         const BLOC_FOOTER_NEWSLETTER = `
-            <table border="0" cellpadding="0" cellspacing="0" style="border-top: 2px solid #E8E8E8; margin-top: 30px; width: 100%; background-color: #FFFFFF !important;" width="100%">
+            <table border="0" cellpadding="0" cellspacing="0" style="border-top: 2px solid #E2E8F0; margin-top: 26px; width: 100%; background-color: #FFFFFF !important;" width="100%">
                 <tbody>
                     <tr>
-                        <td align="center" style="padding-top: 20px; padding-bottom: 12px; background-color: #FFFFFF !important;">
-                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #C41E3A !important; width: 56px; height: 56px; border-radius: 10px; margin: 0 auto;">
+                        <td align="center" style="padding-top: 18px; padding-bottom: 10px; background-color: #FFFFFF !important;">
+                            <table border="0" cellpadding="0" cellspacing="0" bgcolor="#C41E3A" style="background-color: #C41E3A !important; width: 54px; height: 54px; border-radius: 10px; margin: 0 auto;">
                                 <tbody>
                                     <tr>
                                         <td align="center" style="padding: 4px;" valign="middle">
-                                            <img alt="Logo Dojo" src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width: 46px; height: 46px; display: block; border: 0;" />
+                                            <img alt="Logo Dojo" src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" width="44" height="44" style="width: 44px; height: 44px; display: block; border: 0;" />
                                         </td>
                                     </tr>
                                 </tbody>
@@ -646,7 +787,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td align="center" style="font-size: 12px; color: #4A5568 !important; line-height: 1.6; text-align: center; font-family: 'Roboto', Arial, sans-serif; padding-bottom: 15px; background-color: #FFFFFF !important;">
+                        <td align="center" style="font-size: 12px; color: #4A5568 !important; line-height: 1.6; text-align: center; font-family: 'Roboto', Arial, sans-serif; padding-bottom: 14px; background-color: #FFFFFF !important;">
                             <strong style="color: #1A1A1A !important; font-size: 14px; font-family: 'Fredoka', sans-serif; letter-spacing: 0.5px;">DOJO DORNOIS</strong><br />
                             <span style="color: #4A5568 !important;">1 Place de la Mairie, 58390 Dornes</span><br />
                             <span style="color: #4A5568 !important;">contact@dojodornois.fr | 06.07.13.91.86 | dojodornois.fr</span><br />
@@ -654,8 +795,8 @@
                         </td>
                     </tr>
                     <tr>
-                        <td align="center" style="padding-top: 5px; background-color: #FFFFFF !important;">
-                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #F8FAFC !important; border: 1px dashed #C41E3A !important; border-radius: 6px; margin: 0 auto; max-width: 440px;" width="100%">
+                        <td align="center" style="padding-top: 4px; background-color: #FFFFFF !important;">
+                            <table border="0" cellpadding="0" cellspacing="0" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px dashed #C41E3A !important; border-radius: 6px; margin: 0 auto; max-width: 440px;" width="100%">
                                 <tbody>
                                     <tr>
                                         <td align="center" style="padding: 10px 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #1A202C !important; line-height: 1.4; background-color: #F8FAFC !important;">
@@ -663,7 +804,7 @@
                                                 <tbody>
                                                     <tr>
                                                         <td valign="middle" style="padding-right: 8px;">
-                                                            <img alt="Kalisport" src="https://dojodornois.fr/assets/img/app/icon.svg" style="width: 18px; height: 18px; display: block; border: 0;" />
+                                                            <img alt="Kalisport" src="https://dojodornois.fr/assets/img/app/icon.svg" width="18" height="18" style="width: 18px; height: 18px; display: block; border: 0;" />
                                                         </td>
                                                         <td valign="middle" style="font-family: 'Roboto', Arial, sans-serif; font-size: 12px; color: #1A202C !important;">
                                                             <strong style="color: #1A202C !important;">App Kalisport :</strong> Code d'accès Dojo Dornois <span style="display: inline-block; background-color: #1A1A1A !important; color: #FFFFFF !important; font-family: 'Consolas', monospace; font-weight: bold; font-size: 13px; padding: 2px 8px; border-radius: 4px; letter-spacing: 1px; margin-left: 4px;">U3AMYA</span>
@@ -711,7 +852,7 @@
 
                 badge.className = "px-2.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full uppercase";
                 badge.innerText = "Mode Courriel Gmail";
-                winTitle.innerText = "Rendu centré 650px • Prêt à coller directement dans Gmail";
+                winTitle.innerText = "Écrin Rouge Signature + Hexagones HTML natifs (Conservés à l'envoi)";
 
                 if (!memoireContenu.mail) {
                     chargerGabaritMail('vierge_pro');
@@ -737,6 +878,11 @@
                 }
             }
 
+            genererApercu();
+        }
+
+        function changerDecorLateral(val) {
+            decorLateralActuel = val;
             genererApercu();
         }
 
@@ -777,13 +923,13 @@
                     corpsTexte = `
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Bonjour,</p>
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Rédigez ici le contenu de votre message ou utilisez le bouton <strong>Assistant Gemini</strong> en haut pour imbriquer automatiquement vos notes dans ce gabarit.</p>
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 16px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 16px 0;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #2D3748 !important; text-align: justify; line-height: 1.6; background-color: #F8FAFC !important;">
                                         <strong style="color: #C41E3A !important; font-family: 'Fredoka', sans-serif;">Point important / Synthèse :</strong><br>
-                                        • Élément clé n°1<br>
-                                        • Élément clé n°2
+                                        &bull; Élément clé n°1<br>
+                                        &bull; Élément clé n°2
                                     </td>
                                 </tr>
                             </tbody>
@@ -798,7 +944,7 @@
                     corpsTexte = `
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Bonjour,</p>
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Nous vous remercions chaleureusement pour votre message. C'est un véritable honneur pour le <strong>Dojo Dornois</strong> de recevoir votre proposition et nous sommes vivement intéressés par ce très beau projet.</p>
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 16px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFF5F5" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 16px 0;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #742A2A !important; text-align: justify; line-height: 1.6; background-color: #FFF5F5 !important;">
@@ -818,14 +964,14 @@
                     corpsTexte = `
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Bonjour Nicole,</p>
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Je te prie de bien vouloir trouver ci-joint les éléments administratifs relatifs au <strong>Dojo Dornois</strong> pour la saison sportive 2026-2027 :</p>
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #2D3748 !important; text-align: justify; line-height: 1.6; background-color: #F8FAFC !important;">
                                         <strong style="color: #1A1A1A !important;">📎 Documents joints au présent envoi :</strong><br>
-                                        • <strong>Courrier officiel & Dossier :</strong> Saison 2026-2027<br>
-                                        • <strong>Budget prévisionnel & Liste du Bureau :</strong> en pièces jointes<br>
-                                        • <strong>Attestations et justificatifs en vigueur :</strong> joints au dossier
+                                        &bull; <strong>Courrier officiel & Dossier :</strong> Saison 2026-2027<br>
+                                        &bull; <strong>Budget prévisionnel & Liste du Bureau :</strong> en pièces jointes<br>
+                                        &bull; <strong>Attestations et justificatifs en vigueur :</strong> joints au dossier
                                     </td>
                                 </tr>
                             </tbody>
@@ -840,14 +986,14 @@
                     corpsTexte = `
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Bonjour [Prénom / Nom],</p>
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Je fais suite à votre message concernant [Sujet de la demande].</p>
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #2D3748 !important; text-align: justify; line-height: 1.6; background-color: #F8FAFC !important;">
                                         <strong style="color: #1A1A1A !important;">Récapitulatif :</strong><br>
-                                        • <strong>Éléments pris en compte :</strong> [Détail]<br>
-                                        • <strong>Statut :</strong> [Confirmé / En cours]<br>
-                                        • <strong>Prochaine étape :</strong> [Action prévue]
+                                        &bull; <strong>Éléments pris en compte :</strong> [Détail]<br>
+                                        &bull; <strong>Statut :</strong> [Confirmé / En cours]<br>
+                                        &bull; <strong>Prochaine étape :</strong> [Action prévue]
                                     </td>
                                 </tr>
                             </tbody>
@@ -862,7 +1008,7 @@
                     corpsTexte = `
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Bonjour [Prénom],</p>
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Sauf erreur de notre part, il nous manque encore [la pièce justificative / le règlement de la cotisation] afin de clôturer définitivement l'inscription au <strong>Dojo Dornois</strong> pour cette saison.</p>
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFF5F5" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #742A2A !important; text-align: justify; line-height: 1.5; background-color: #FFF5F5 !important;">
@@ -881,7 +1027,7 @@
                     corpsTexte = `
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Bonjour à toutes et à tous,</p>
                         <p style="text-align: justify; margin-bottom: 15px; color: #2D3748 !important;">Vous êtes conviés à la prochaine réunion du Comité Directeur du <strong>Dojo Dornois</strong> qui se tiendra selon les modalités suivantes :</p>
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #2D3748 !important; text-align: justify; line-height: 1.6; background-color: #F8FAFC !important;">
@@ -898,7 +1044,7 @@
                     break;
             }
 
-            editor.innerHTML = getHeaderMail(sousTitre) + `<div id="mail-body" style="padding: 10px 0; text-align: justify;">${corpsTexte}</div>` + BLOC_FOOTER_MAIL;
+            editor.innerHTML = getHeaderMail(sousTitre) + `<div id="mail-body" style="padding: 6px 0; text-align: justify;">${corpsTexte}</div>` + BLOC_FOOTER_MAIL;
             memoireContenu.mail = editor.innerHTML;
             genererApercu();
         }
@@ -908,16 +1054,31 @@
         /* ========================================================================= */
         function getHeaderNewsletter(titre, sousTitre) {
             return `
-                <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 24px; border-bottom: 2px solid #C41E3A; width: 100%; background-color: #FFFFFF !important;" width="100%">
+                <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 22px; width: 100%; background-color: #FFFFFF !important;" width="100%">
                     <tbody>
                         <tr>
-                            <td style="padding-bottom: 16px; background-color: #FFFFFF !important;" valign="middle">
-                                <h1 style="font-family: 'Fredoka', 'Roboto', Arial, sans-serif; font-size: 24px; font-weight: bold; color: #C41E3A !important; margin: 0; text-transform: uppercase; line-height: 1.2;">
+                            <td style="padding-bottom: 14px; background-color: #FFFFFF !important;" valign="middle">
+                                <div style="font-family: 'Fredoka', Arial, sans-serif; font-size: 22px; font-weight: bold; color: #C41E3A !important; margin: 0; text-transform: uppercase; line-height: 1.2;">
                                     <span id="dojo-news-title-text" style="color: #C41E3A !important;">${titre}</span>
-                                </h1>
-                                <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #4A5568 !important; margin: 6px 0 0 0;">
+                                </div>
+                                <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 13.5px; color: #4A5568 !important; margin: 6px 0 0 0;">
                                     <span id="dojo-news-subtitle-text" style="color: #4A5568 !important;">${sousTitre}</span>
                                 </p>
+                            </td>
+                            <td id="dojo-header-badge-cell" align="right" valign="middle" style="padding-bottom: 14px; background-color: #FFFFFF !important;">
+                                ${buildHeaderRightBadgeHtml(badgeEnteteActuel)}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding: 0; background-color: #FFFFFF !important;">
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="76%" height="3" bgcolor="#C41E3A" style="height: 3px; background-color: #C41E3A !important; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                                            <td width="24%" height="3" bgcolor="#1A1A1A" style="height: 3px; background-color: #1A1A1A !important; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </td>
                         </tr>
                     </tbody>
@@ -936,7 +1097,7 @@
                     <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 15px; color: #2D3748 !important; line-height: 1.6; margin-bottom: 16px; text-align: justify;">
                         Bonjour à toutes et à tous ! Retrouvez ci-dessous les dernières actualités et informations importantes du Dojo Dornois.
                     </p>
-                    <table border="0" cellpadding="0" cellspacing="0" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; margin: 15px 0; width: 100%; border-radius: 0 6px 6px 0;" width="100%">
+                    <table border="0" cellpadding="0" cellspacing="0" bgcolor="#FFF5F5" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; margin: 15px 0; width: 100%; border-radius: 0 6px 6px 0;" width="100%">
                         <tbody>
                             <tr>
                                 <td style="padding: 15px; font-size: 14px; color: #742A2A !important; font-family: 'Roboto', Arial, sans-serif; line-height: 1.5; background-color: #FFF5F5 !important; text-align: justify;">
@@ -956,7 +1117,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <table border="0" cellpadding="0" cellspacing="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0; width: 100%;" width="100%">
+                    <table border="0" cellpadding="0" cellspacing="0" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0; width: 100%;" width="100%">
                         <tbody>
                             <tr>
                                 <td style="padding: 18px; font-size: 14px; text-align: justify; color: #2D3748 !important; font-family: 'Roboto', Arial, sans-serif; line-height: 1.6; background-color: #F8FAFC !important;">
@@ -993,7 +1154,7 @@
                     <p style="font-family: 'Roboto', Arial, sans-serif; font-size: 15px; color: #2D3748 !important; line-height: 1.6; margin-bottom: 16px; text-align: justify;">
                         Bonjour à toutes et à tous ! Afin de simplifier le suivi des cours, des présences et des événements, le Dojo Dornois modernise ses outils de communication.
                     </p>
-                    <table border="0" cellpadding="0" cellspacing="0" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; margin: 15px 0; width: 100%; border-radius: 0 6px 6px 0;" width="100%">
+                    <table border="0" cellpadding="0" cellspacing="0" bgcolor="#FFF5F5" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; margin: 15px 0; width: 100%; border-radius: 0 6px 6px 0;" width="100%">
                         <tbody>
                             <tr>
                                 <td style="padding: 15px; font-size: 14px; color: #742A2A !important; font-family: 'Roboto', Arial, sans-serif; line-height: 1.6; background-color: #FFF5F5 !important; text-align: justify;">
@@ -1028,7 +1189,7 @@
             switch(type) {
                 case 'alerte_rouge':
                     return `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFF5F5" style="background-color: #FFF5F5 !important; border: 1px solid #FED7D7 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #742A2A !important; line-height: 1.6; text-align: justify; background-color: #FFF5F5 !important;">
@@ -1041,7 +1202,7 @@
 
                 case 'alerte_jaune':
                     return `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFFBEB !important; border: 1px solid #FDE68A !important; border-left: 4px solid #D97706 !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFBEB" style="background-color: #FFFBEB !important; border: 1px solid #FDE68A !important; border-left: 4px solid #D97706 !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #78350F !important; line-height: 1.6; text-align: justify; background-color: #FFFBEB !important;">
@@ -1054,7 +1215,7 @@
 
                 case 'alerte_verte':
                     return `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F0FDF4 !important; border: 1px solid #BBF7D0 !important; border-left: 4px solid #16A34A !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F0FDF4" style="background-color: #F0FDF4 !important; border: 1px solid #BBF7D0 !important; border-left: 4px solid #16A34A !important; border-radius: 0 6px 6px 0; margin: 15px 0;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #14532D !important; line-height: 1.6; text-align: justify; background-color: #F0FDF4 !important;">
@@ -1067,7 +1228,7 @@
 
                 case 'encart_gris':
                     return `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 18px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #2D3748 !important; text-align: justify; line-height: 1.6; background-color: #F8FAFC !important;">
@@ -1078,15 +1239,28 @@
                         </table><p><br></p>
                     `;
 
+                case 'bandeau_valeurs':
+                    return `
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-left: 4px solid #C41E3A !important; border-radius: 0 6px 6px 0; margin: 16px 0;">
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 13px 16px; font-family: 'Roboto', Arial, sans-serif; font-size: 13.5px; font-style: italic; color: #4A5568 !important; text-align: justify; line-height: 1.5; background-color: #F8FAFC !important;">
+                                        <strong style="color: #C41E3A !important; font-family: 'Fredoka', sans-serif; font-style: normal;">🥋 Esprit Dojo Dornois :</strong> « Le judo, c'est bien plus qu'un sport : c'est une école de vie fondée sur le respect, l'entraide et la prospérité mutuelle. »
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table><p><br></p>
+                    `;
+
                 case 'bloc_pj':
                     return `
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; margin: 15px 0;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 15px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; color: #2D3748 !important; text-align: justify; line-height: 1.6; background-color: #F8FAFC !important;">
                                         <strong style="color: #1A1A1A !important;">📎 Documents joints au présent envoi :</strong><br>
-                                        • <strong>Pièce jointe n°1 :</strong> [Intitulé du document]<br>
-                                        • <strong>Pièce jointe n°2 :</strong> [Intitulé du document]
+                                        &bull; <strong>Pièce jointe n°1 :</strong> [Intitulé du document]<br>
+                                        &bull; <strong>Pièce jointe n°2 :</strong> [Intitulé du document]
                                     </td>
                                 </tr>
                             </tbody>
@@ -1095,7 +1269,7 @@
 
                 case 'programme_horaires':
                     return `
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 18px 0; border: 1px solid #CBD5E0 !important; border-left: 5px solid #EA580C !important; border-radius: 6px; background-color: #FFFFFF !important; width: 100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#FFFFFF" style="margin: 18px 0; border: 1px solid #CBD5E0 !important; border-left: 5px solid #EA580C !important; border-radius: 6px; background-color: #FFFFFF !important; width: 100%;">
                             <tbody>
                                 <tr>
                                     <td style="padding: 18px; font-family: 'Roboto', Arial, sans-serif; background-color: #FFFFFF !important;">
@@ -1106,17 +1280,17 @@
                                             <tbody>
                                                 <tr>
                                                     <td style="padding: 4px 0; color: #2D3748 !important;">
-                                                        • <strong style="color: #C2410C !important; font-family: 'Consolas', monospace;">10h00 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Accueil des participants</span> au Dojo Henri Pierrehumbert
+                                                        &bull; <strong style="color: #C2410C !important; font-family: 'Consolas', monospace;">10h00 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Accueil des participants</span> au Dojo Henri Pierrehumbert
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td style="padding: 4px 0; color: #2D3748 !important;">
-                                                        • <strong style="color: #C2410C !important; font-family: 'Consolas', monospace;">10h30 - 12h00 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Session sur les tatamis</span>
+                                                        &bull; <strong style="color: #C2410C !important; font-family: 'Consolas', monospace;">10h30 - 12h00 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Session sur les tatamis</span>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td style="padding: 4px 0; color: #2D3748 !important;">
-                                                        • <strong style="color: #C2410C !important; font-family: 'Consolas', monospace;">12h00 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Moment convivial / Clôture</span>
+                                                        &bull; <strong style="color: #C2410C !important; font-family: 'Consolas', monospace;">12h00 :</strong> <span style="color: #1A202C !important; font-weight: 500;">Moment convivial / Clôture</span>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -1129,29 +1303,29 @@
 
                 case 'planning_tableau':
                     return `
-                        <table border="0" cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 18px 0; border: 2px solid #CBD5E0 !important; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; background-color: #FFFFFF !important;">
+                        <table border="0" cellpadding="8" cellspacing="0" width="100%" bgcolor="#FFFFFF" style="border-collapse: collapse; margin: 18px 0; border: 2px solid #CBD5E0 !important; font-family: 'Roboto', Arial, sans-serif; font-size: 13px; background-color: #FFFFFF !important;">
                             <thead>
-                                <tr style="background-color: #1A1A1A !important; color: #FFFFFF !important;">
+                                <tr bgcolor="#1A1A1A" style="background-color: #1A1A1A !important; color: #FFFFFF !important;">
                                     <th style="padding: 10px; border: 1px solid #4A5568 !important; color: #FFFFFF !important; font-family: 'Fredoka', sans-serif; text-align: left; width: 28%;">Date &amp; Créneau</th>
                                     <th style="padding: 10px; border: 1px solid #4A5568 !important; color: #FFFFFF !important; font-family: 'Fredoka', sans-serif; text-align: left; width: 44%;">Cours / Activité</th>
                                     <th style="padding: 10px; border: 1px solid #4A5568 !important; color: #FFFFFF !important; font-family: 'Fredoka', sans-serif; text-align: left; width: 28%;">Lieu &amp; Infos</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr style="background-color: #FFFFFF !important;">
+                                <tr bgcolor="#FFFFFF" style="background-color: #FFFFFF !important;">
                                     <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #1A1A1A !important; font-weight: bold; background-color: #FFFFFF !important;">
                                         Mardi<br><span style="font-weight: normal; color: #4A5568 !important; font-size: 12px;">17h00 - 20h15</span>
                                     </td>
                                     <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #1A202C !important; background-color: #FFFFFF !important;">
-                                        • <strong>Taïso Seniors :</strong> 17h00-18h00<br>
-                                        • <strong>Taïso :</strong> 18h00-18h45<br>
-                                        • <strong>Jujitsu / Judo :</strong> 18h45-20h15
+                                        &bull; <strong>Taïso Seniors :</strong> 17h00-18h00<br>
+                                        &bull; <strong>Taïso :</strong> 18h00-18h45<br>
+                                        &bull; <strong>Jujitsu / Judo :</strong> 18h45-20h15
                                     </td>
                                     <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #2D3748 !important; background-color: #FFFFFF !important;">
                                         Dojo Dornois
                                     </td>
                                 </tr>
-                                <tr style="background-color: #FFFDF5 !important;">
+                                <tr bgcolor="#FFFDF5" style="background-color: #FFFDF5 !important;">
                                     <td style="padding: 10px; border: 1px solid #E2E8F0 !important; color: #92400E !important; font-weight: bold; background-color: #FFFDF5 !important;">
                                         Mercredi<br><span style="font-weight: normal; color: #B45309 !important; font-size: 12px;">10h00 - 17h00</span>
                                     </td>
@@ -1172,12 +1346,12 @@
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 15px 0; background-color: #FFFFFF !important;">
                             <tbody>
                                 <tr>
-                                    <td width="48%" valign="top" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; padding: 14px; text-align: justify;">
+                                    <td width="48%" valign="top" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; padding: 14px; text-align: justify;">
                                         <strong style="color: #C41E3A !important; font-family: 'Fredoka', sans-serif;">Colonne Gauche</strong><br>
                                         <span style="font-size: 13.5px; color: #2D3748 !important;">Détails ou informations du premier bloc.</span>
                                     </td>
                                     <td width="4%">&nbsp;</td>
-                                    <td width="48%" valign="top" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; padding: 14px; text-align: justify;">
+                                    <td width="48%" valign="top" bgcolor="#F8FAFC" style="background-color: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 6px; padding: 14px; text-align: justify;">
                                         <strong style="color: #1A1A1A !important; font-family: 'Fredoka', sans-serif;">Colonne Droite</strong><br>
                                         <span style="font-size: 13.5px; color: #2D3748 !important;">Détails ou informations du second bloc.</span>
                                     </td>
@@ -1194,7 +1368,7 @@
                             <tbody>
                                 <tr>
                                     <td align="center">
-                                        <a href="${url}" style="background-color: #C41E3A !important; color: #FFFFFF !important; padding: 12px 28px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 6px; display: inline-block; box-shadow: 0 2px 4px rgba(196,30,58,0.2);">
+                                        <a href="${url}" style="background-color: #C41E3A !important; color: #FFFFFF !important; padding: 12px 28px; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 6px; display: inline-block;">
                                             <span style="color: #FFFFFF !important;">${txt}</span>
                                         </a>
                                     </td>
@@ -1208,7 +1382,7 @@
                         <p style="text-align: justify; margin-top: 15px; margin-bottom: 0; color: #2D3748 !important;">
                             Bien cordialement,<br>
                             <strong style="color: #1A1A1A !important;">Jordan LOUDENOT</strong><br>
-                            <span style="font-size: 13px; color: #6B6B6B !important;">Président du Dojo Dornois • 06 07 13 91 86</span>
+                            <span style="font-size: 13px; color: #6B6B6B !important;">Président du Dojo Dornois &bull; 06 07 13 91 86</span>
                         </p>
                     `;
 
@@ -1217,7 +1391,7 @@
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 18px 0;">
                             <tbody>
                                 <tr>
-                                    <td style="border-bottom: 2px solid #E8E8E8; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                                    <td height="2" bgcolor="#E8E8E8" style="border-bottom: 2px solid #E8E8E8; font-size: 1px; line-height: 1px;">&nbsp;</td>
                                 </tr>
                             </tbody>
                         </table><p><br></p>
@@ -1307,80 +1481,183 @@
         }
 
         /* ========================================================================= */
-        /* GÉNÉRATION DU CODE FINAL (PROTECTION DARK MODE + CENTRAGE GMAIL 650PX)    */
+        /* COLONNES D'HEXAGONES NATIFS HTML (JAMAIS SUPPRIMÉES PAR GMAIL À L'ENVOI)  */
+        /* ========================================================================= */
+        function buildEmailSafeHexWing(hexAccentColor) {
+            if (isMobileDevice || decorLateralActuel === 'minimal') return '';
+
+            // Maillage d'hexagones en quinconce (caractères Unicode natifs ⬡ &#x2B21; et ⬢ &#x2B22;)
+            let rowsHtml = '';
+            for (let i = 0; i < 19; i++) {
+                if (i % 2 === 0) {
+                    rowsHtml += `<tr><td align="center" style="font-family: 'Segoe UI Symbol', 'Apple Symbols', Arial, sans-serif; font-size: 13px; line-height: 15px; color: ${hexAccentColor} !important; padding: 0; letter-spacing: 2px; white-space: nowrap;">&#x2B21;&nbsp;&#x2B22;</td></tr>`;
+                } else {
+                    rowsHtml += `<tr><td align="center" style="font-family: 'Segoe UI Symbol', 'Apple Symbols', Arial, sans-serif; font-size: 13px; line-height: 15px; color: ${hexAccentColor} !important; padding: 0; letter-spacing: 2px; white-space: nowrap;">&nbsp;&#x2B22;&nbsp;&#x2B21;</td></tr>`;
+                }
+            }
+
+            return `
+                <td width="34" valign="middle" align="center" style="width: 34px; padding: 4px 2px; user-select: none;">
+                    <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto;">
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                </td>
+            `;
+        }
+
+        /* ========================================================================= */
+        /* GÉNÉRATION DU CODE FINAL (100% COMPATIBLE À L'ENVOI GMAIL & KALISPORT)    */
         /* ========================================================================= */
         function getCodeFinal() {
             let contenu = modeCodeSource ? sourceEditor.value : editor.innerHTML;
             
-            contenu = contenu.replace(/<h1>/g, '<h1 style="font-family: \'Fredoka\', Arial, sans-serif; font-size: 24px; color: #C41E3A !important; margin-top: 0; margin-bottom: 15px; text-align: left;"><span style="color: #C41E3A !important;">');
-            contenu = contenu.replace(/<\/h1>/g, '</span></h1>');
-            contenu = contenu.replace(/<h2>/g, '<h2 style="font-family: \'Fredoka\', Arial, sans-serif; font-size: 20px; color: #1A1A1A !important; margin-top: 0; margin-bottom: 12px; text-align: left;"><span style="color: #1A1A1A !important;">');
-            contenu = contenu.replace(/<\/h2>/g, '</span></h2>');
-            contenu = contenu.replace(/<p>/g, '<p style="margin-top: 0; margin-bottom: 15px; line-height: 1.6; color: #2D3748 !important; text-align: justify;">');
+            contenu = contenu.replace(/<h1>/g, "<h1 style='font-family: Fredoka, Arial, sans-serif; font-size: 24px; color: #C41E3A !important; margin-top: 0; margin-bottom: 15px; text-align: left;'><span style='color: #C41E3A !important;'>");
+            contenu = contenu.replace(/<\/h1>/g, "</span></h1>");
+            contenu = contenu.replace(/<h2>/g, "<h2 style='font-family: Fredoka, Arial, sans-serif; font-size: 20px; color: #1A1A1A !important; margin-top: 0; margin-bottom: 12px; text-align: left;'><span style='color: #1A1A1A !important;'>");
+            contenu = contenu.replace(/<\/h2>/g, "</span></h2>");
+            contenu = contenu.replace(/<p>/g, "<p style='margin-top: 0; margin-bottom: 15px; line-height: 1.6; color: #2D3748 !important; text-align: justify;'>");
 
             const preHeader = modeActuel === 'newsletter'
                 ? 'Actualités & Informations du Dojo Dornois'
                 : (document.getElementById('mail-subject-input')?.value || 'Communication officielle du Dojo Dornois');
 
+            // 1. CONFIGURATION DE L'ÉCRIN EXTÉRIEUR + COULEUR TON SUR TON DES HEXAGONES HTML
+            let outerHexColor = '#B31B34';
+            let outerBorderColor = '#8B1429';
+            let hexCharColor = '#CF3A52'; // Ton sur ton lumineux sur le Rouge Signature Dojo
+            let outerPatternStyle = `background-image: ${HEX_PATTERN_WHITE_URI}; background-repeat: repeat;`;
+            let outerPadding = isMobileDevice ? '12px 6px' : '24px 6px';
+
+            if (decorLateralActuel === 'red_signature') {
+                outerHexColor = '#B31B34';
+                outerBorderColor = '#8B1429';
+                hexCharColor = '#D13B54';
+                outerPatternStyle = `background-image: ${HEX_PATTERN_WHITE_URI}; background-repeat: repeat;`;
+            } else if (decorLateralActuel === 'red_deep') {
+                outerHexColor = '#8B1429';
+                outerBorderColor = '#630D1C';
+                hexCharColor = '#AC263E';
+                outerPatternStyle = `background-image: ${HEX_PATTERN_WHITE_URI}; background-repeat: repeat;`;
+            } else if (decorLateralActuel === 'dark_dojo') {
+                outerHexColor = '#1A1A1A';
+                outerBorderColor = '#C41E3A';
+                hexCharColor = '#383838';
+                outerPatternStyle = `background-image: ${HEX_PATTERN_WHITE_URI}; background-repeat: repeat;`;
+            } else if (decorLateralActuel === 'rose_soft') {
+                outerHexColor = '#FDF2F4';
+                outerBorderColor = '#FBCFE8';
+                hexCharColor = '#F3C1CC';
+                outerPatternStyle = `background-image: ${HEX_PATTERN_RED_URI}; background-repeat: repeat;`;
+            } else if (decorLateralActuel === 'navy_dojo') {
+                outerHexColor = '#272757';
+                outerBorderColor = '#1B1B3A';
+                hexCharColor = '#434382';
+                outerPatternStyle = `background-image: ${HEX_PATTERN_WHITE_URI}; background-repeat: repeat;`;
+            } else if (decorLateralActuel === 'minimal') {
+                outerHexColor = '#F4F6F9';
+                outerBorderColor = '#E2E8F0';
+                hexCharColor = '#CBD5E1';
+                outerPatternStyle = '';
+                outerPadding = '16px 8px';
+            }
+
+            // 2. FEUILLE INTÉRIEURE AVEC BARRE ROUGE LATÉRALE GAUCHE (SANS LE BANDEAU SOUS LE PIED DE PAGE)
+            const innerPaperOpen = `
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" style="background-color: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-left: 4px solid #C41E3A !important; border-radius: 6px;">
+                    <tbody>
+                        <tr>
+                            <td bgcolor="#FFFFFF" style="padding: 22px 24px; background-color: #FFFFFF !important; border-radius: 0 6px 6px 0; font-family: 'Roboto', Arial, sans-serif; font-size: 15px; color: #2D3748 !important; line-height: 1.6; text-align: justify;">
+            `;
+            const innerPaperClose = `
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+
+            const sideHexColumn = buildEmailSafeHexWing(hexCharColor);
+
+            // Structure en Table-Écrin 740px centrée avec colonnes d'hexagones HTML natives à gauche et à droite
             return `
                 <div style="display:none;font-size:1px;color:#F4F6F9;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${preHeader}</div>
-                <center style="width: 100%; background-color: #F4F6F9;">
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="background-color: #F4F6F9; padding: 20px 0; width: 100%; margin: 0 auto; text-align: center;">
-                        <tbody>
-                            <tr>
-                                <td align="center" valign="top" style="padding: 0; margin: 0; text-align: center;">
-                                    <!--[if mso]>
-                                    <table width="650" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td align="center">
-                                    <![endif]-->
-                                    <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="background-color: #FFFFFF !important; max-width: 650px; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px; margin: 0 auto; text-align: left;">
-                                        <tbody>
-                                            <tr>
-                                                <td style="padding: 30px; font-family: 'Roboto', Arial, sans-serif; font-size: 15px; color: #2D3748 !important; line-height: 1.6; background-color: #FFFFFF !important; text-align: justify;">
-                                                    ${contenu}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <!--[if mso]>
-                                    </td></tr></table>
-                                    <![endif]-->
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </center>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="width: 100%; margin: 0 auto; background-color: transparent;">
+                    <tbody>
+                        <tr>
+                            <td align="center" valign="top" style="padding: 6px 0;">
+                                <!-- TABLE ÉCRIN (CÔTÉS & FOND DU MAIL - 740PX MAX) -->
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" bgcolor="${outerHexColor}" style="max-width: 740px; width: 100%; margin: 0 auto; background-color: ${outerHexColor} !important; ${outerPatternStyle} border: 2px solid ${outerBorderColor}; border-radius: 14px;">
+                                    <tbody>
+                                        <tr>
+                                            <td align="center" valign="middle" bgcolor="${outerHexColor}" style="padding: ${outerPadding}; background-color: ${outerHexColor} !important; ${outerPatternStyle} border-radius: 12px;">
+                                                <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto;">
+                                                    <tbody>
+                                                        <tr>
+                                                            ${sideHexColumn}
+                                                            <td align="center" valign="top" style="width: 650px; max-width: 650px;">
+                                                                <!-- CARTE CENTRALE DU MESSAGE (650PX MAX) -->
+                                                                <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" bgcolor="#FFFFFF" style="max-width: 650px; width: 100%; margin: 0 auto; background-color: #FFFFFF !important; border: 1px solid #CBD5E1; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16); text-align: left;">
+                                                                    <tbody>
+                                                                        <!-- BARRE SUPÉRIEURE ROUGE & NOIRE SIGNATURE -->
+                                                                        <tr>
+                                                                            <td style="padding: 0; background-color: #C41E3A !important;">
+                                                                                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                                                                    <tbody>
+                                                                                        <tr>
+                                                                                            <td width="75%" height="6" bgcolor="#C41E3A" style="height: 6px; background-color: #C41E3A !important; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                                                                                            <td width="25%" height="6" bgcolor="#1A1A1A" style="height: 6px; background-color: #1A1A1A !important; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <!-- CORPS DE LA CARTE (AVEC PAPIER À BARRE ROUGE LATÉRALE) -->
+                                                                        <tr>
+                                                                            <td bgcolor="#F8FAFC" style="padding: 18px; background-color: #F8FAFC !important; font-family: 'Roboto', Arial, sans-serif; font-size: 15px; color: #2D3748 !important; line-height: 1.6; text-align: justify;">
+                                                                                ${innerPaperOpen}
+                                                                                ${contenu}
+                                                                                ${innerPaperClose}
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                            ${sideHexColumn}
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             `;
         }
 
-        // Applique la simulation réaliste du Mode Sombre directement sur l'aperçu
+        // Simulation réaliste du Mode Sombre sur l'aperçu
         function appliquerSimulationSombre() {
             if (!isDarkPreview) return;
 
-            previewOutput.querySelectorAll('center, table, td, th, tr, div, p, span, strong, li, h1, h2, h3').forEach(el => {
+            previewOutput.querySelectorAll('table, td, th, tr, div, p, span, strong, li, h1, h2, h3').forEach(el => {
                 const s = el.getAttribute('style') || '';
                 if (!s) return;
 
                 let newS = s
-                    // Fonds extérieurs et cartes blanches -> Fond sombre client mail
-                    .replace(/background-color:\s*#F4F6F9(\s*!important)?/gi, 'background-color: #0F172A !important')
                     .replace(/background-color:\s*#FFFFFF(\s*!important)?/gi, 'background-color: #1E293B !important')
-                    // Encarts gris clair -> Gris ardoise foncé
                     .replace(/background-color:\s*#F8FAFC(\s*!important)?/gi, 'background-color: #0F172A !important')
-                    // Encarts alerte rose/rouge -> Rouge sombre contrasté
                     .replace(/background-color:\s*#FFF5F5(\s*!important)?/gi, 'background-color: #3B1219 !important')
-                    // Encarts alerte jaune -> Ambre sombre contrasté
                     .replace(/background-color:\s*(#FFFBEB|#FFFDF5)(\s*!important)?/gi, 'background-color: #3B280C !important')
-                    // Encarts alerte verte -> Vert sombre contrasté
                     .replace(/background-color:\s*#F0FDF4(\s*!important)?/gi, 'background-color: #0D3321 !important')
-                    // Bordures claires -> Bordures sombres
-                    .replace(/border(-top|-bottom)?:\s*([12]px\s+solid\s+)#(E2E8F0|E8E8E8|CBD5E0|FED7D7|FDE68A|BBF7D0)(\s*!important)?/gi, 'border$1: $2#334155 !important')
-                    // Textes sombres -> Textes clairs lisibles sur fond noir
-                    .replace(/color:\s*#(2D3748|1A1A1A|1A202C|3D3D3D)(\s*!important)?/gi, 'color: #F1F5F9 !important')
-                    .replace(/color:\s*#(4A5568|6B6B6B|718096)(\s*!important)?/gi, 'color: #CBD5E1 !important')
+                    .replace(/border(-top|-bottom|-left|-right)?:\s*([12]px\s+solid\s+)#(E2E8F0|EDF2F7|E8E8E8|CBD5E0|CBD5E1|FED7D7|FDE68A|BBF7D0)(\s*!important)?/gi, 'border$1: $2#334155 !important')
+                    .replace(/color:\s*#(2D3748|1A1A1A|1A202C|3D3D3D|334155)(\s*!important)?/gi, 'color: #F1F5F9 !important')
+                    .replace(/color:\s*#(4A5568|6B6B6B|718096|64748B)(\s*!important)?/gi, 'color: #CBD5E1 !important')
                     .replace(/color:\s*#742A2A(\s*!important)?/gi, 'color: #FECDD3 !important')
                     .replace(/color:\s*#(78350F|92400E)(\s*!important)?/gi, 'color: #FDE68A !important')
                     .replace(/color:\s*#14532D(\s*!important)?/gi, 'color: #BBF7D0 !important')
-                    // Rouge Dojo lumineux sur fond sombre
                     .replace(/color:\s*#C41E3A(\s*!important)?/gi, 'color: #F87171 !important');
 
                 el.setAttribute('style', newS);
@@ -1395,7 +1672,7 @@
         }
 
         /* ========================================================================= */
-        /* COPIES VERS GMAIL, KALISPORT & INJECTION DIRECTE DEPUIS GEMINI            */
+        /* COPIES VERS GMAIL (CLIPBOARD HTML NATIF), KALISPORT & GEMINI              */
         /* ========================================================================= */
         function copierObjetMail() {
             const val = document.getElementById('mail-subject-input').value.trim();
@@ -1417,27 +1694,40 @@
             });
         }
 
-        function copierRichText() {
-            // On s'assure de copier la version claire officielle pour Gmail même si l'aperçu est en mode sombre
-            previewOutput.innerHTML = getCodeFinal();
-            const target = document.getElementById('preview-output');
-            if (!target.innerHTML.trim()) return;
+        async function copierRichText() {
+            const htmlComplet = getCodeFinal();
+            previewOutput.innerHTML = htmlComplet;
 
+            try {
+                if (navigator.clipboard && window.ClipboardItem) {
+                    const blobHtml = new Blob([htmlComplet], { type: 'text/html' });
+                    const blobText = new Blob([editor.innerText || ''], { type: 'text/plain' });
+                    const item = new ClipboardItem({
+                        'text/html': blobHtml,
+                        'text/plain': blobText
+                    });
+                    await navigator.clipboard.write([item]);
+                    showToast("✅ Design complet (avec hexagones natifs) copié pour Gmail !");
+                    if (isDarkPreview) appliquerSimulationSombre();
+                    return;
+                }
+            } catch (e) {}
+
+            const target = document.getElementById('preview-output');
             const range = document.createRange();
-            range.selectNode(target);
+            range.selectNodeContents(target);
             const selection = window.getSelection();
             selection.removeAllRanges();
             selection.addRange(range);
 
             try {
                 document.execCommand("copy");
-                showToast("✅ Design visuel copié ! Faites Ctrl+V directement dans Gmail.");
+                showToast("✅ Design visuel copié ! Faites Ctrl+V dans Gmail.");
             } catch (err) {
                 showToast("❌ Erreur lors de la copie.");
             }
             selection.removeAllRanges();
 
-            // Si le test mode sombre était actif, on le remet immédiatement à l'écran
             if (isDarkPreview) {
                 appliquerSimulationSombre();
             }
@@ -1453,7 +1743,6 @@
                 }
             } catch (e) {}
 
-            // Si le navigateur bloque la lecture directe du presse-papiers, bascule ou demande
             const pasted = prompt("Collez ici le code HTML généré par Gemini :");
             if (pasted && pasted.trim()) {
                 injecterHtmlPropre(pasted.trim());
@@ -1463,9 +1752,9 @@
 
         function injecterHtmlPropre(rawHtml) {
             let clean = rawHtml.trim();
-            if (modeActuel === 'mail' && !clean.includes('dojo-mail-header') && !clean.includes('DOJO DORNOIS')) {
+            if (modeActuel === 'mail' && !clean.includes('dojo-mail-header') && !clean.includes('DOJO')) {
                 const sousTitre = document.getElementById('mail-subtitle-select')?.value || 'Communication officielle';
-                clean = getHeaderMail(sousTitre) + `<div id="mail-body" style="padding: 10px 0; text-align: justify;">${clean}</div>` + BLOC_FOOTER_MAIL;
+                clean = getHeaderMail(sousTitre) + `<div id="mail-body" style="padding: 6px 0; text-align: justify;">${clean}</div>` + BLOC_FOOTER_MAIL;
             }
             editor.innerHTML = clean;
             sourceEditor.value = clean;
@@ -1520,14 +1809,17 @@
             const btnMob = document.getElementById('btn-dev-mobile');
 
             if (device === 'mobile') {
+                isMobileDevice = true;
                 box.classList.add('mobile-width');
                 btnMob.className = "px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white transition";
                 btnDesk.className = "px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition";
             } else {
+                isMobileDevice = false;
                 box.classList.remove('mobile-width');
                 btnDesk.className = "px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white transition";
                 btnMob.className = "px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition";
             }
+            genererApercu();
         }
 
         function toggleDarkPreview() {
@@ -1582,6 +1874,8 @@
                 id: Date.now(),
                 title: titre,
                 mode: modeActuel,
+                skin: decorLateralActuel,
+                badge: badgeEnteteActuel,
                 subject: document.getElementById('mail-subject-input').value || '',
                 date: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
                 html: htmlContent
@@ -1638,6 +1932,16 @@
             const d = savedDrafts[idx];
             if (!d) return;
             changerOnglet(d.mode);
+            if (d.skin) {
+                decorLateralActuel = d.skin;
+                const sel = document.getElementById('ui-skin-select');
+                if (sel) sel.value = d.skin;
+            }
+            if (d.badge) {
+                badgeEnteteActuel = d.badge;
+                const selB = document.getElementById('ui-badge-select');
+                if (selB) selB.value = d.badge;
+            }
             if (d.subject) document.getElementById('mail-subject-input').value = d.subject;
             editor.innerHTML = d.html;
             sourceEditor.value = d.html;
