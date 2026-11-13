@@ -1417,12 +1417,12 @@
 
                     <div class="signature-upload-box">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                            <label style="font-size:11.5px; font-weight:700; color:#334155;">✍️ Signature du Président (PNG / JPG)</label>
+                            <span style="font-size:11.5px; font-weight:700; color:#334155;">✍️ Signature du Président (PNG / JPG)</span>
                             <span id="sig-status-badge" style="font-size:10.5px; color:var(--gris-moyen);">Aucune signature</span>
                         </div>
                         <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                            <button type="button" class="btn btn-xs btn-ghost" id="btn-upload-signature">📁 Importer signature</button>
-                            <input type="file" id="rds-signature-input" accept="image/*" style="display:none;">
+                            <label for="rds-signature-input" class="btn btn-xs btn-ghost" id="btn-upload-signature" style="cursor:pointer; margin:0;">📁 Importer signature</label>
+                            <input type="file" id="rds-signature-input" accept="image/png,image/jpeg,image/webp,image/gif,image/*" style="position:fixed; left:-9999px; top:-9999px; width:1px; height:1px; opacity:0;">
                             <button type="button" class="btn btn-xs btn-danger-ghost" id="btn-remove-signature" style="display:none;">🗑️ Retirer</button>
                             <div id="sig-size-control" style="display:none; align-items:center; gap:5px; margin-left:auto; font-size:11px; color:var(--gris-moyen);">
                                 <label for="rds-signature-height">Taille :</label>
@@ -1554,7 +1554,7 @@
                                     Bon pour commande — Le Président :
                                 </div>
                                 <div class="signature-preview-area" id="rds-signature-slot">
-                                    <button type="button" class="signature-placeholder-btn no-print" id="btn-inline-upload-sig">✍️ Cliquer pour ajouter votre signature</button>
+                                    <label for="rds-signature-input" class="signature-placeholder-btn no-print" style="cursor:pointer;">✍️ Cliquer pour ajouter votre signature</label>
                                 </div>
                                 <div style="padding-top:6px; border-top:1px dashed var(--gris-bordure); display:flex; justify-content:space-between; font-size:11px;">
                                     <strong>Jordan LOUDENOT</strong>
@@ -2721,7 +2721,79 @@
         }
 
         // ==================== IMPRESSION ISOLÉE A4 GARANTIE ====================
-        function printIsolated(title, orientation, contentHtml, isPortraitSheet) {
+        function getSharedPrintCss(orientation) {
+            return [
+                ':root { --rouge: #C41E3A; --rouge-hover: #9E182E; --rouge-clair: #FDF2F4; --noir: #1A1A1A; --ardoise: #2D3748; --gris-texte: #2D3748; --gris-moyen: #64748B; --gris-bordure: #CBD5E1; --fond-app: #F4F6F9; --blanc: #FFFFFF; --badge-eco: #059669; --badge-eco-bg: #ECFDF5; --badge-confort: #2563EB; --badge-confort-bg: #EFF6FF; --badge-judo: #7C3AED; --badge-judo-bg: #F5F3FF; --vert-marge: #15803D; }',
+                '@page { size: A4 ' + orientation + '; margin: ' + (orientation === 'portrait' ? '0' : '7mm 9mm') + '; }',
+                '*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }',
+                'html, body { width: 100%; font-family: "Roboto", sans-serif; color: #1A1A1A; background: #FFF; font-size: 8.6pt; line-height: 1.38; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }',
+                '.no-print { display: none !important; }',
+                '.a4-print-page { width: 210mm; height: 297mm; max-height: 297mm; padding: 9mm 11mm 7mm 11mm; background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; page-break-after: always; break-after: page; }',
+                '.a4-print-page:last-child { page-break-after: auto; break-after: auto; }',
+                '.logo-box { background-color: #C41E3A; width: 48px; height: 48px; border-radius: 11px; padding: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }',
+                '.logo-box img { width: 100%; height: 100%; object-fit: contain; }',
+                '.header-official { background: linear-gradient(135deg, #1A1A1A 0%, #2D3748 100%); color: #FFF; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #C41E3A; margin-bottom: 8px; }',
+                '.header-left { display: flex; align-items: center; gap: 12px; }',
+                '.header-title h2 { font-family: "Fredoka", sans-serif; font-size: 14pt; color: #FFF; }',
+                '.header-title p { font-size: 8pt; color: #CBD5E1; }',
+                '.header-meta { text-align: right; font-size: 8pt; color: #CBD5E1; background: rgba(255,255,255,0.08); padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); }',
+                '.header-meta .ref { color: #F87171; font-family: "Roboto Mono", monospace; font-weight: 700; }',
+                '.strategy-banner { background: #FDF2F4; border-left: 4px solid #C41E3A; padding: 7px 12px; margin-bottom: 8px; display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 10px; font-size: 7.5pt; border-radius: 6px; }',
+                '.strategy-col h3 { font-family: "Fredoka", sans-serif; font-size: 8.5pt; color: #C41E3A; margin-bottom: 2px; }',
+                '.strategy-col ul { margin-left: 14px; }',
+                '.kpi-strip, .codir-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px; }',
+                '.codir-kpi-grid { grid-template-columns: repeat(5, 1fr); }',
+                '.kpi-cell, .codir-kpi-box { background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 6px; text-align: center; }',
+                '.kpi-cell .label, .codir-kpi-box .k-lbl { font-size: 7pt; text-transform: uppercase; color: #64748B; font-weight: 700; }',
+                '.kpi-cell .val, .codir-kpi-box .k-val { font-family: "Fredoka", sans-serif; font-size: 11pt; font-weight: 700; }',
+                '.codir-controls-grid { display: none !important; }',
+                '.section-bar { display: flex; justify-content: space-between; align-items: center; margin: 10px 0 4px; padding-bottom: 3px; border-bottom: 1.5px solid #CBD5E1; }',
+                '.section-bar h3 { font-family: "Fredoka", sans-serif; font-size: 10.5pt; color: #1A1A1A; }',
+                '.badge-count { font-size: 7.5pt; background: #F1F5F9; padding: 2px 6px; border-radius: 10px; border: 1px solid #CBD5E1; }',
+                'table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 8pt; }',
+                'th { background: #F1F5F9; color: #1A1A1A; font-weight: 700; text-transform: uppercase; font-size: 7.2pt; padding: 6px 5px; border: 1px solid #CBD5E1; text-align: left; }',
+                'td { padding: 5.5px 5px; border: 1px solid #CBD5E1; vertical-align: middle; }',
+                'tr { page-break-inside: avoid; break-inside: avoid; }',
+                '.th-cost { background: #FEE2E2; color: #991B1B; text-align: center; }',
+                '.th-sell { background: #DCFCE7; color: #166534; text-align: center; }',
+                '.th-margin { background: #FEF3C7; color: #92400E; text-align: center; }',
+                '.th-promo { background: #E0E7FF; color: #1E40AF; text-align: center; }',
+                '.cell-cost, .cell-cost-strong { text-align: center; font-family: "Roboto Mono", monospace; }',
+                '.cell-promo { text-align: center; font-family: "Roboto Mono", monospace; font-weight: 700; color: #1D4ED8; }',
+                '.cell-sell { text-align: center; font-family: "Fredoka", sans-serif; font-weight: 700; color: #C41E3A; font-size: 9pt; }',
+                '.cell-margin { text-align: center; font-family: "Fredoka", sans-serif; color: #15803D; font-weight: 600; }',
+                '.badge { display: inline-block; padding: 2px 5px; border-radius: 4px; font-size: 7pt; font-weight: 600; }',
+                '.badge-accessible { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }',
+                '.badge-confort { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }',
+                '.badge-judo { background: #F5F3FF; color: #7C3AED; border: 1px solid #DDD6FE; }',
+                '.badge-transfert { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }',
+                '.badge-broderie { background: #F3E8FF; color: #7E22CE; border: 1px solid #E9D5FF; }',
+                '.ref-tag { font-family: "Roboto Mono", monospace; font-weight: 700; background: #F1F5F9; padding: 2px 5px; border-radius: 4px; font-size: 7.3pt; border: 1px solid #CBD5E1; display: inline-block; }',
+                '.rds-doc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #C41E3A; padding-bottom: 9px; margin-bottom: 11px; }',
+                '.rds-parties-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 11px; }',
+                '.party-box { background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; padding: 8px 11px; font-size: 8.3pt; line-height: 1.38; }',
+                '.party-box.supplier { background: #FDF2F4; border-color: #FECDD3; border-left: 4px solid #C41E3A; }',
+                '.party-title { font-family: "Fredoka", sans-serif; font-size: 7.4pt; color: #64748B; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }',
+                '.delivery-highlight-box { margin-top: 5px; background: #FFFBEB; border: 1px solid #FDE68A; border-left: 3.5px solid #D97706; border-radius: 5px; padding: 5px 8px; }',
+                '.delivery-highlight-title { font-family: "Fredoka", sans-serif; font-size: 7pt; text-transform: uppercase; letter-spacing: 0.4px; color: #B45309; font-weight: 700; margin-bottom: 1px; }',
+                '.rds-summary-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 11px; }',
+                '.rds-stat-box { background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 6px 8px; text-align: center; }',
+                '.rds-stat-box .num { font-family: "Fredoka", sans-serif; font-size: 13pt; font-weight: 700; color: #C41E3A; }',
+                '.rds-stat-box .lbl { font-size: 6.9pt; color: #64748B; font-weight: 700; text-transform: uppercase; }',
+                'table.rds-order-table { table-layout: fixed; width: 100%; margin-bottom: 10px; }',
+                'table.rds-order-table th { background: #1A1A1A; color: #FFF; font-family: "Fredoka", sans-serif; border: 1px solid #1A1A1A; }',
+                'table.rds-order-table td { word-wrap: break-word; overflow-wrap: break-word; }',
+                'table.rds-order-table tbody tr:nth-child(even) { background: #F8FAFC; }',
+                'table.rds-order-table .badge { white-space: normal; text-align: center; line-height: 1.2; }',
+                'table.rds-order-table .ref-tag { white-space: normal; }',
+                '.signature-preview-area { flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center; margin: 4px 0; }',
+                '.signature-preview-area img { max-width: 210px; object-fit: contain; mix-blend-mode: multiply; display: block; }',
+                '.rds-print-footer { border-top: 2px solid #CBD5E1; padding-top: 6px; margin-top: auto; display: flex; justify-content: space-between; align-items: center; font-size: 7.6pt; color: #64748B; flex-shrink: 0; }',
+                '.page-num-pill { background: #1A1A1A; color: #FFFFFF; font-family: "Roboto Mono", monospace; font-weight: 700; font-size: 7.4pt; padding: 2px 7px; border-radius: 4px; margin-left: 8px; }'
+            ].join('\n');
+        }
+
+        function printIsolated(title, orientation, contentHtml) {
             const win = window.open('', '_blank', 'width=1100,height=900');
             if (!win) {
                 alert('Veuillez autoriser les fenêtres pop-up pour imprimer ou enregistrer en PDF.');
@@ -2731,69 +2803,8 @@
             doc.open();
             doc.write('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>' + escapeHtml(title) + '</title>');
             doc.write('<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;600;700&display=swap" rel="stylesheet">');
-            doc.write('<style>');
-            doc.write(':root { --rouge: #C41E3A; --rouge-hover: #9E182E; --rouge-clair: #FDF2F4; --noir: #1A1A1A; --ardoise: #2D3748; --gris-texte: #2D3748; --gris-moyen: #64748B; --gris-bordure: #CBD5E1; --fond-app: #F4F6F9; --blanc: #FFFFFF; --badge-eco: #059669; --badge-eco-bg: #ECFDF5; --badge-confort: #2563EB; --badge-confort-bg: #EFF6FF; --badge-judo: #7C3AED; --badge-judo-bg: #F5F3FF; --vert-marge: #15803D; }');
-            doc.write('@page { size: A4 ' + orientation + '; margin: 8mm 10mm; }');
-            doc.write('*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }');
-            doc.write('html, body { width: 100%; font-family: "Roboto", sans-serif; color: #1A1A1A; background: #FFF; font-size: 8.6pt; line-height: 1.38; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }');
-            doc.write('.no-print { display: none !important; }');
-            doc.write('.print-sheet-a4-portrait { display: flex; flex-direction: column; justify-content: space-between; min-height: 280mm; width: 100%; }');
-            doc.write('.logo-box { background-color: #C41E3A; width: 48px; height: 48px; border-radius: 11px; padding: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }');
-            doc.write('.logo-box img { width: 100%; height: 100%; object-fit: contain; }');
-            doc.write('.header-official { background: linear-gradient(135deg, #1A1A1A 0%, #2D3748 100%); color: #FFF; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #C41E3A; margin-bottom: 8px; }');
-            doc.write('.header-left { display: flex; align-items: center; gap: 12px; }');
-            doc.write('.header-title h2 { font-family: "Fredoka", sans-serif; font-size: 14pt; color: #FFF; }');
-            doc.write('.header-title p { font-size: 8pt; color: #CBD5E1; }');
-            doc.write('.header-meta { text-align: right; font-size: 8pt; color: #CBD5E1; background: rgba(255,255,255,0.08); padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); }');
-            doc.write('.header-meta .ref { color: #F87171; font-family: "Roboto Mono", monospace; font-weight: 700; }');
-            doc.write('.strategy-banner { background: #FDF2F4; border-left: 4px solid #C41E3A; padding: 7px 12px; margin-bottom: 8px; display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 10px; font-size: 7.5pt; border-radius: 6px; }');
-            doc.write('.strategy-col h3 { font-family: "Fredoka", sans-serif; font-size: 8.5pt; color: #C41E3A; margin-bottom: 2px; }');
-            doc.write('.strategy-col ul { margin-left: 14px; }');
-            doc.write('.kpi-strip, .codir-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px; }');
-            doc.write('.codir-kpi-grid { grid-template-columns: repeat(5, 1fr); }');
-            doc.write('.kpi-cell, .codir-kpi-box { background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 6px; text-align: center; }');
-            doc.write('.kpi-cell .label, .codir-kpi-box .k-lbl { font-size: 7pt; text-transform: uppercase; color: #64748B; font-weight: 700; }');
-            doc.write('.kpi-cell .val, .codir-kpi-box .k-val { font-family: "Fredoka", sans-serif; font-size: 11pt; font-weight: 700; }');
-            doc.write('.codir-controls-grid { display: none !important; }');
-            doc.write('.section-bar { display: flex; justify-content: space-between; align-items: center; margin: 10px 0 4px; padding-bottom: 3px; border-bottom: 1.5px solid #CBD5E1; }');
-            doc.write('.section-bar h3 { font-family: "Fredoka", sans-serif; font-size: 10.5pt; color: #1A1A1A; }');
-            doc.write('.badge-count { font-size: 7.5pt; background: #F1F5F9; padding: 2px 6px; border-radius: 10px; border: 1px solid #CBD5E1; }');
-            doc.write('table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 8pt; }');
-            doc.write('th { background: #F1F5F9; color: #1A1A1A; font-weight: 700; text-transform: uppercase; font-size: 7.2pt; padding: 6px 5px; border: 1px solid #CBD5E1; text-align: left; }');
-            doc.write('td { padding: 5.5px 5px; border: 1px solid #CBD5E1; vertical-align: middle; }');
-            doc.write('tr { page-break-inside: avoid; }');
-            doc.write('.th-cost { background: #FEE2E2; color: #991B1B; text-align: center; } .th-sell { background: #DCFCE7; color: #166534; text-align: center; } .th-margin { background: #FEF3C7; color: #92400E; text-align: center; } .th-promo { background: #E0E7FF; color: #1E40AF; text-align: center; }');
-            doc.write('.cell-cost, .cell-cost-strong { text-align: center; font-family: "Roboto Mono", monospace; } .cell-promo { text-align: center; font-family: "Roboto Mono", monospace; font-weight: 700; color: #1D4ED8; } .cell-sell { text-align: center; font-family: "Fredoka", sans-serif; font-weight: 700; color: #C41E3A; font-size: 9pt; } .cell-margin { text-align: center; font-family: "Fredoka", sans-serif; color: #15803D; font-weight: 600; }');
-            doc.write('.badge { display: inline-block; padding: 2px 5px; border-radius: 4px; font-size: 7pt; font-weight: 600; }');
-            doc.write('.badge-accessible { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; } .badge-confort { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; } .badge-judo { background: #F5F3FF; color: #7C3AED; border: 1px solid #DDD6FE; }');
-            doc.write('.badge-transfert { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; } .badge-broderie { background: #F3E8FF; color: #7E22CE; border: 1px solid #E9D5FF; }');
-            doc.write('.ref-tag { font-family: "Roboto Mono", monospace; font-weight: 700; background: #F1F5F9; padding: 2px 5px; border-radius: 4px; font-size: 7.3pt; border: 1px solid #CBD5E1; display: inline-block; }');
-            doc.write('.rds-doc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #C41E3A; padding-bottom: 10px; margin-bottom: 12px; }');
-            doc.write('.rds-parties-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }');
-            doc.write('.party-box { background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; padding: 9px 12px; font-size: 8.4pt; line-height: 1.4; }');
-            doc.write('.party-box.supplier { background: #FDF2F4; border-color: #FECDD3; border-left: 4px solid #C41E3A; }');
-            doc.write('.party-title { font-family: "Fredoka", sans-serif; font-size: 7.5pt; color: #64748B; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }');
-            doc.write('.delivery-highlight-box { margin-top: 5px; background: #FFFBEB; border: 1px solid #FDE68A; border-left: 3.5px solid #D97706; border-radius: 5px; padding: 5px 8px; }');
-            doc.write('.delivery-highlight-title { font-family: "Fredoka", sans-serif; font-size: 7pt; text-transform: uppercase; letter-spacing: 0.4px; color: #B45309; font-weight: 700; margin-bottom: 1px; }');
-            doc.write('.rds-summary-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }');
-            doc.write('.rds-stat-box { background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 7px 8px; text-align: center; }');
-            doc.write('.rds-stat-box .num { font-family: "Fredoka", sans-serif; font-size: 13.5pt; font-weight: 700; color: #C41E3A; }');
-            doc.write('.rds-stat-box .lbl { font-size: 7pt; color: #64748B; font-weight: 700; text-transform: uppercase; }');
-            doc.write('table.rds-order-table { table-layout: fixed; width: 100%; }');
-            doc.write('table.rds-order-table th { background: #1A1A1A; color: #FFF; font-family: "Fredoka", sans-serif; border: 1px solid #1A1A1A; }');
-            doc.write('table.rds-order-table td { word-wrap: break-word; overflow-wrap: break-word; }');
-            doc.write('table.rds-order-table tbody tr:nth-child(even) { background: #F8FAFC; }');
-            doc.write('table.rds-order-table .badge { white-space: normal; text-align: center; line-height: 1.2; }');
-            doc.write('table.rds-order-table .ref-tag { white-space: normal; }');
-            doc.write('.signature-preview-area { flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center; margin: 4px 0; }');
-            doc.write('.signature-preview-area img { max-width: 210px; object-fit: contain; mix-blend-mode: multiply; display: block; }');
-            doc.write('.footer-bar { border-top: 1px solid #CBD5E1; padding-top: 6px; margin-top: 10px; display: flex; justify-content: space-between; font-size: 7.5pt; color: #64748B; }');
-            doc.write('</style></head><body>');
-            if (isPortraitSheet) {
-                doc.write('<div class="print-sheet-a4-portrait">' + contentHtml + '</div>');
-            } else {
-                doc.write(contentHtml);
-            }
+            doc.write('<style>' + getSharedPrintCss(orientation) + '</style></head><body>');
+            doc.write(contentHtml);
             doc.write('<scr' + 'ipt>window.onload = function(){ setTimeout(function(){ window.print(); }, 350); };</scr' + 'ipt></body></html>');
             doc.close();
         }
@@ -2801,12 +2812,19 @@
         function printCatalog() {
             const sheet = document.getElementById('catalog-printable-sheet').cloneNode(true);
             sheet.querySelectorAll('.no-print').forEach(el => el.remove());
-            printIsolated('Catalogue Boutique - Dojo Dornois', 'landscape', sheet.innerHTML, false);
+            printIsolated('Catalogue Boutique - Dojo Dornois', 'landscape', sheet.innerHTML);
         }
 
         function printRDSOrder() {
+            const win = window.open('', '_blank', 'width=1100,height=900');
+            if (!win) {
+                alert('Veuillez autoriser les fenêtres pop-up pour imprimer ou enregistrer en PDF.');
+                return;
+            }
+
             const sheet = document.getElementById('rds-printable-sheet').cloneNode(true);
             sheet.querySelectorAll('.no-print').forEach(el => el.remove());
+
             const colGroup = sheet.querySelector('table.rds-order-table colgroup');
             if (colGroup && colGroup.lastElementChild) {
                 colGroup.lastElementChild.remove();
@@ -2814,7 +2832,143 @@
             sheet.querySelectorAll('table.rds-order-table tr').forEach(tr => {
                 if (tr.lastElementChild) tr.lastElementChild.remove();
             });
-            printIsolated(document.getElementById('rds-order-num').value || 'Bon de Commande RDS', 'portrait', sheet.innerHTML, true);
+
+            const headerHtml = sheet.querySelector('.rds-doc-header').outerHTML;
+            const partiesHtml = sheet.querySelector('.rds-parties-grid').outerHTML;
+            const summaryHtml = sheet.querySelector('.rds-summary-strip').outerHTML;
+            const colgroupHtml = sheet.querySelector('table.rds-order-table colgroup').outerHTML;
+            const theadHtml = sheet.querySelector('table.rds-order-table thead').outerHTML;
+            const rowHtmlList = Array.from(sheet.querySelectorAll('table.rds-order-table tbody tr')).map(tr => tr.outerHTML);
+            const topContainer = sheet.firstElementChild;
+            const bottomNotesSigHtml = topContainer.lastElementChild.outerHTML;
+            const title = document.getElementById('rds-order-num').value || 'Bon de Commande RDS';
+
+            const payloadJson = JSON.stringify({
+                headerHtml: headerHtml,
+                partiesHtml: partiesHtml,
+                summaryHtml: summaryHtml,
+                colgroupHtml: colgroupHtml,
+                theadHtml: theadHtml,
+                rowHtmlList: rowHtmlList,
+                bottomNotesSigHtml: bottomNotesSigHtml
+            }).replace(/<\/script>/gi, '<\\/script>');
+
+            const paginationRunner = [
+                'function buildFooterHtml(pageNum, totalPages) {',
+                '    var pageTag = totalPages > 1 ? "<span class=\\"page-num-pill\\">Page " + pageNum + " / " + totalPages + "</span>" : "";',
+                '    return "<div class=\\"rds-print-footer\\">" +',
+                '        "<div><strong>DOJO DORNOIS</strong> \• 11 Rue d\'Ettringen / 1 Place de la Mairie, 58390 Dornes \• SIRET 45192841000013</div>" +',
+                '        "<div style=\\"font-family:\'Fredoka\',sans-serif; color:#C41E3A; font-weight:700; display:flex; align-items:center;\\">Commande Fournisseur R.D.S" + pageTag + "</div>" +',
+                '    "</div>";',
+                '}',
+                'function paginateAndPrint() {',
+                '    var stage = document.getElementById("measure-stage");',
+                '    var refBox = document.createElement("div");',
+                '    refBox.style.height = "281mm";',
+                '    stage.appendChild(refBox);',
+                '    var maxPageInnerH = refBox.offsetHeight;',
+                '    stage.removeChild(refBox);',
+                '    stage.innerHTML =',
+                '        "<div id=\\"m-header\\">" + DATA.headerHtml + "</div>" +',
+                '        "<div id=\\"m-parties\\">" + DATA.partiesHtml + "</div>" +',
+                '        "<div id=\\"m-summary\\">" + DATA.summaryHtml + "</div>" +',
+                '        "<table id=\\"m-table\\" class=\\"rds-order-table\\">" + DATA.colgroupHtml + DATA.theadHtml + "<tbody>" + DATA.rowHtmlList.join("") + "</tbody></table>" +',
+                '        "<div id=\\"m-bottom\\">" + DATA.bottomNotesSigHtml + "</div>" +',
+                '        "<div id=\\"m-footer\\">" + buildFooterHtml(1, 2) + "</div>";',
+                '    var hHeader = document.getElementById("m-header").offsetHeight;',
+                '    var hParties = document.getElementById("m-parties").offsetHeight;',
+                '    var hSummary = document.getElementById("m-summary").offsetHeight;',
+                '    var hThead = document.querySelector("#m-table thead").offsetHeight;',
+                '    var rowHeights = Array.from(document.querySelectorAll("#m-table tbody tr")).map(function(tr) { return tr.offsetHeight; });',
+                '    var hBottom = document.getElementById("m-bottom").offsetHeight;',
+                '    var hFooter = document.getElementById("m-footer").offsetHeight;',
+                '    var safetyMargin = 14;',
+                '    var availPage1 = maxPageInnerH - hHeader - hParties - hSummary - hFooter - safetyMargin;',
+                '    var availNextPage = maxPageInnerH - hHeader - hFooter - safetyMargin;',
+                '    var pages = [];',
+                '    var currentRows = [];',
+                '    var usedH = hThead + 10;',
+                '    var isFirstPage = true;',
+                '    for (var i = 0; i < DATA.rowHtmlList.length; i++) {',
+                '        var rH = rowHeights[i] || 32;',
+                '        var limit = isFirstPage ? availPage1 : availNextPage;',
+                '        if (currentRows.length > 0 && (usedH + rH > limit)) {',
+                '            pages.push({ isFirst: isFirstPage, rows: currentRows, includeBottom: false });',
+                '            isFirstPage = false;',
+                '            currentRows = [DATA.rowHtmlList[i]];',
+                '            usedH = hThead + 10 + rH;',
+                '        } else {',
+                '            currentRows.push(DATA.rowHtmlList[i]);',
+                '            usedH += rH;',
+                '        }',
+                '    }',
+                '    var finalLimit = isFirstPage ? availPage1 : availNextPage;',
+                '    if (usedH + hBottom + 8 <= finalLimit) {',
+                '        pages.push({ isFirst: isFirstPage, rows: currentRows, includeBottom: true });',
+                '    } else {',
+                '        pages.push({ isFirst: isFirstPage, rows: currentRows, includeBottom: false });',
+                '        pages.push({ isFirst: false, rows: [], includeBottom: true });',
+                '    }',
+                '    var totalPages = pages.length;',
+                '    stage.remove();',
+                '    pages.forEach(function(p, idx) {',
+                '        var pageNum = idx + 1;',
+                '        var pageDiv = document.createElement("div");',
+                '        pageDiv.className = "a4-print-page";',
+                '        var headerBlock = DATA.headerHtml;',
+                '        if (!p.isFirst) {',
+                '            headerBlock = headerBlock.replace("BON DE COMMANDE FOURNISSEUR", "BON DE COMMANDE FOURNISSEUR (SUITE)");',
+                '        }',
+                '        var topHtml = "<div>" + headerBlock;',
+                '        if (p.isFirst) {',
+                '            topHtml += DATA.partiesHtml + DATA.summaryHtml;',
+                '        }',
+                '        if (p.rows.length > 0) {',
+                '            topHtml += "<table class=\\"rds-order-table\\">" + DATA.colgroupHtml + DATA.theadHtml + "<tbody>" + p.rows.join("") + "</tbody></table>";',
+                '        }',
+                '        if (p.includeBottom) {',
+                '            topHtml += DATA.bottomNotesSigHtml;',
+                '        }',
+                '        topHtml += "</div>";',
+                '        pageDiv.innerHTML = topHtml + buildFooterHtml(pageNum, totalPages);',
+                '        document.body.appendChild(pageDiv);',
+                '    });',
+                '    setTimeout(function() { window.print(); }, 250);',
+                '}',
+                'window.onload = function() {',
+                '    var imgs = Array.from(document.images);',
+                '    var pending = imgs.filter(function(img) { return !img.complete; }).length;',
+                '    var run = function() {',
+                '        if (document.fonts && document.fonts.ready) {',
+                '            document.fonts.ready.then(function() { setTimeout(paginateAndPrint, 80); });',
+                '        } else {',
+                '            setTimeout(paginateAndPrint, 180);',
+                '        }',
+                '    };',
+                '    if (pending === 0) {',
+                '        run();',
+                '    } else {',
+                '        imgs.forEach(function(img) {',
+                '            if (!img.complete) {',
+                '                img.onload = img.onerror = function() {',
+                '                    pending--;',
+                '                    if (pending <= 0) run();',
+                '                };',
+                '            }',
+                '        });',
+                '    }',
+                '};'
+            ].join('\n');
+
+            const doc = win.document;
+            doc.open();
+            doc.write('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>' + escapeHtml(title) + '</title>');
+            doc.write('<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;600;700&display=swap" rel="stylesheet">');
+            doc.write('<style>' + getSharedPrintCss('portrait') + '</style></head><body>');
+            doc.write('<div id="measure-stage" style="width:188mm; position:absolute; left:-9999px; top:0; visibility:hidden;"></div>');
+            doc.write('<scr' + 'ipt>var DATA = ' + payloadJson + ';\n' + paginationRunner + '</scr' + 'ipt>');
+            doc.write('</body></html>');
+            doc.close();
         }
 
         // ==================== MODÈLE DE MAIL RDS ====================
@@ -2943,6 +3097,19 @@ Président — Dojo Dornois
 
         const SIG_IMG_KEY = 'dojo_dornois_president_sig_img_v1';
         const SIG_H_KEY = 'dojo_dornois_president_sig_h_v1';
+        let currentSignatureDataUrl = null;
+        let currentSignatureHeight = 60;
+
+        function loadSavedSignature() {
+            try {
+                const savedImg = localStorage.getItem(SIG_IMG_KEY);
+                if (savedImg) currentSignatureDataUrl = savedImg;
+                const savedH = parseInt(localStorage.getItem(SIG_H_KEY), 10);
+                if (savedH >= 35 && savedH <= 95) {
+                    currentSignatureHeight = savedH;
+                }
+            } catch (e) {}
+        }
 
         function renderSignatureSlot() {
             const slot = document.getElementById('rds-signature-slot');
@@ -2951,35 +3118,22 @@ Président — Dojo Dornois
             const sizeCtrl = document.getElementById('sig-size-control');
             const heightInp = document.getElementById('rds-signature-height');
 
-            let sigData = null;
-            let sigH = 60;
-            try {
-                sigData = localStorage.getItem(SIG_IMG_KEY);
-                const savedH = parseInt(localStorage.getItem(SIG_H_KEY), 10);
-                if (savedH >= 35 && savedH <= 95) {
-                    sigH = savedH;
-                    heightInp.value = savedH;
-                }
-            } catch (e) {}
+            if (heightInp) heightInp.value = currentSignatureHeight;
 
-            if (sigData) {
-                slot.innerHTML = `<img src="${sigData}" alt="Signature Président" style="max-height:${sigH}px;">`;
+            if (currentSignatureDataUrl) {
+                slot.innerHTML = `<img src="${currentSignatureDataUrl}" alt="Signature Président" style="max-height:${currentSignatureHeight}px;">`;
                 badge.textContent = '✅ Enregistrée';
                 badge.style.color = '#15803D';
                 badge.style.fontWeight = '700';
                 remBtn.style.display = 'inline-flex';
                 sizeCtrl.style.display = 'flex';
             } else {
-                slot.innerHTML = '<button type="button" class="signature-placeholder-btn no-print" id="btn-inline-upload-sig">✍️ Cliquer pour ajouter votre signature</button>';
+                slot.innerHTML = '<label for="rds-signature-input" class="signature-placeholder-btn no-print" style="cursor:pointer;">✍️ Cliquer pour ajouter votre signature</label>';
                 badge.textContent = 'Aucune signature';
                 badge.style.color = 'var(--gris-moyen)';
                 badge.style.fontWeight = '400';
                 remBtn.style.display = 'none';
                 sizeCtrl.style.display = 'none';
-                const inlineBtn = document.getElementById('btn-inline-upload-sig');
-                if (inlineBtn) {
-                    inlineBtn.addEventListener('click', () => document.getElementById('rds-signature-input').click());
-                }
             }
         }
 
@@ -2987,31 +3141,38 @@ Président — Dojo Dornois
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function (evt) {
+                const rawDataUrl = evt.target.result;
                 const img = new Image();
                 img.onload = function () {
-                    // Redimensionnement léger via canvas pour garantir un stockage rapide et léger
-                    const maxW = 600;
-                    let w = img.width;
-                    let h = img.height;
-                    if (w > maxW) {
-                        h = Math.round((h * maxW) / w);
-                        w = maxW;
-                    }
-                    const canvas = document.createElement('canvas');
-                    canvas.width = w;
-                    canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
-                    const dataUrl = canvas.toDataURL('image/png');
                     try {
-                        localStorage.setItem(SIG_IMG_KEY, dataUrl);
-                    } catch (e) {
-                        alert('Impossible de sauvegarder la signature dans le navigateur.');
+                        const maxW = 550;
+                        let w = img.width || 300;
+                        let h = img.height || 120;
+                        if (w > maxW) {
+                            h = Math.round((h * maxW) / w);
+                            w = maxW;
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        currentSignatureDataUrl = canvas.toDataURL('image/png');
+                    } catch (canvasErr) {
+                        currentSignatureDataUrl = rawDataUrl;
+                    }
+                    try {
+                        localStorage.setItem(SIG_IMG_KEY, currentSignatureDataUrl);
+                    } catch (storageErr) {
+                        console.warn('Signature conservée en mémoire pour cette session.', storageErr);
                     }
                     renderSignatureSlot();
                     showToast('Signature enregistrée et ajoutée au Bon de Commande.');
                 };
-                img.src = evt.target.result;
+                img.onerror = function () {
+                    alert('Impossible de lire cette image. Essayez un fichier PNG ou JPG.');
+                };
+                img.src = rawDataUrl;
             };
             reader.readAsDataURL(file);
         }
@@ -3121,18 +3282,21 @@ Président — Dojo Dornois
             document.getElementById('btn-save-article-modal').addEventListener('click', saveArticleModal);
 
             // Upload & gestion signature Président
-            document.getElementById('btn-upload-signature').addEventListener('click', () => document.getElementById('rds-signature-input').click());
             document.getElementById('rds-signature-input').addEventListener('change', (e) => {
-                handleSignatureFileUpload(e.target.files[0]);
+                if (e.target.files && e.target.files[0]) {
+                    handleSignatureFileUpload(e.target.files[0]);
+                }
                 e.target.value = '';
             });
             document.getElementById('btn-remove-signature').addEventListener('click', () => {
+                currentSignatureDataUrl = null;
                 try { localStorage.removeItem(SIG_IMG_KEY); } catch (e) {}
                 renderSignatureSlot();
                 showToast('Signature supprimée.');
             });
             document.getElementById('rds-signature-height').addEventListener('input', (e) => {
                 const h = parseInt(e.target.value, 10) || 60;
+                currentSignatureHeight = h;
                 try { localStorage.setItem(SIG_H_KEY, String(h)); } catch (err) {}
                 const img = document.querySelector('#rds-signature-slot img');
                 if (img) img.style.maxHeight = h + 'px';
@@ -3275,8 +3439,10 @@ Président — Dojo Dornois
         window.addEventListener('DOMContentLoaded', () => {
             loadAllState();
             loadSavedAddresses();
+            loadSavedSignature();
             document.getElementById('rds-order-date').valueAsDate = new Date();
             bindEvents();
+            renderSignatureSlot();
             renderCatalogView();
             populateRDSArticleSelect();
             renderRDSOrderSheet();
