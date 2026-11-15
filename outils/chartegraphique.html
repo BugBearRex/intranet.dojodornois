@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charte Graphique Officielle & Design System - Dojo Dornois</title>
+    <title>Charte Graphique Officielle & Design System - Dojo Dornois V10.0</title>
     <!-- POLICES OFFICIELLES -->
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
         /* ==========================================================================
-           1. VARIABLES MASTER & CONFIGURATION (PALETTE & CONFIG)
+           1. VARIABLES MASTER & CONFIGURATION (PALETTE & CONFIG V7.0 + V10.0)
            ========================================================================== */
         :root {
             /* Palette Principale Dojo Dornois */
@@ -17,6 +17,7 @@
             --rouge-hover: #A3182E;
             --rouge-clair: #FFEBEF;
             --rouge-deep: #8B1429;
+            --rouge-glow: rgba(196, 30, 58, 0.16);
             
             --noir-doux: #1A1A1A;
             --noir-hover: #2D2D2D;
@@ -48,17 +49,25 @@
             --jour-samedi-bg: #EDE9FE; --jour-samedi-border: #DDD6FE; --jour-samedi-txt: #6D28D9;
             
             /* Layout & Dimensions */
-            --topbar-height: 68px;
+            --topbar-height: 70px;
+            --radius-lg: 14px;
             --radius-main: 10px;
             --radius-sm: 6px;
-            --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.04);
+            --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 8px 24px rgba(196, 30, 58, 0.10);
+            --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.16);
+
+            /* Pavage Hexagonal Vectoriel SVG Officiel */
+            --bg-hex-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23C41E3A' fill-opacity='0.035'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
 
         *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: 'Roboto', sans-serif;
             background-color: var(--fond);
+            background-image: var(--bg-hex-pattern);
             color: var(--gris-fonce);
             margin: 0;
             padding: 0;
@@ -69,7 +78,7 @@
             overflow: hidden;
         }
 
-        h1, h2, h3, h4 {
+        h1, h2, h3, h4, .font-fredoka {
             font-family: 'Fredoka', sans-serif;
             margin: 0;
             font-weight: 600;
@@ -80,56 +89,229 @@
         }
 
         /* ==========================================================================
-           2. ONGLETS INTERNES DE NAVIGATION DE LA CHARTE
+           2. ZONE PRINCIPALE, TOPBAR PRO & NAVIGATION STICKY (UI / UX V10.0)
            ========================================================================== */
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        .topbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            height: var(--topbar-height);
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            flex-shrink: 0;
+            z-index: 60;
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 14px; }
+        .topbar-logo-badge {
+            background: var(--rouge);
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.25);
+        }
+        .topbar-logo-badge img { width: 100%; height: 100%; object-fit: contain; }
+        .topbar h2 { font-size: 1.25rem; color: var(--noir-doux); line-height: 1.15; }
+        .topbar-subtitle { font-size: 0.76rem; color: var(--gris-moyen); }
+
+        .version-badge-v10 {
+            background: linear-gradient(135deg, var(--rouge), var(--rouge-deep));
+            color: var(--blanc);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.78rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(196, 30, 58, 0.28);
+            white-space: nowrap;
+        }
+
+        .search-box-v10 {
+            position: relative;
+            width: 240px;
+        }
+        .search-box-v10 input {
+            width: 100%;
+            padding: 7px 12px 7px 30px;
+            border-radius: 20px;
+            border: 1px solid var(--gris-tres-clair);
+            background: var(--gris-fond-input);
+            font-size: 12px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-box-v10 input:focus {
+            border-color: var(--rouge);
+            background: var(--blanc);
+            box-shadow: 0 0 0 3px var(--rouge-glow);
+        }
+        .search-box-v10 span {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+        }
+
+        .app-body {
+            flex: 1;
+            padding: 20px 28px 48px 28px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* COCKPIT DE FILTRAGE & SOMMAIRE COLLANT */
+        .charte-nav-cockpit {
+            position: sticky;
+            top: -20px;
+            z-index: 45;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--gris-tres-clair);
+            border-radius: var(--radius-main);
+            padding: 10px 14px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .pole-filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            padding-bottom: 7px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pole-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+        .pole-pill {
+            background: var(--gris-fond-input);
+            border: 1px solid var(--gris-tres-clair);
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.74rem;
+            color: var(--gris-fonce);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .pole-pill:hover, .pole-pill.active {
+            background: var(--noir-doux);
+            color: var(--blanc);
+            border-color: var(--noir-doux);
+        }
+
         .charte-tabs-bar {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
-            background: var(--blanc);
-            padding: 10px 16px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--gris-tres-clair);
-            box-shadow: var(--shadow-card);
         }
 
         .charte-tab-btn {
             background: var(--fond);
             border: 1px solid var(--gris-tres-clair);
-            padding: 7px 12px;
+            padding: 5px 10px;
             border-radius: var(--radius-sm);
             font-weight: 500;
-            font-size: 0.82rem;
+            font-size: 0.76rem;
             cursor: pointer;
             color: var(--gris-fonce);
             text-decoration: none;
             transition: all 0.15s ease;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
         .charte-tab-btn:hover {
             background: var(--rouge-clair);
             color: var(--rouge);
             border-color: var(--rouge);
+            transform: translateY(-1px);
         }
 
         /* ==========================================================================
-           3. ZONE DE CONTENU PRINCIPALE (SCROLLABLE)
+           3. CARTES DE SECTIONS & GRILLES RESPONSIVES
            ========================================================================== */
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .topbar { background: var(--blanc); height: var(--topbar-height); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gris-tres-clair); flex-shrink: 0; }
-        .topbar h2 { font-size: 1.3rem; color: var(--noir-doux); }
+        .card {
+            background: var(--blanc);
+            border-radius: var(--radius-main);
+            border: 1px solid var(--gris-tres-clair);
+            padding: 22px 24px;
+            box-shadow: var(--shadow-card);
+            scroll-margin-top: 120px;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06); }
 
-        .app-body { flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
-        .card { background: var(--blanc); border-radius: var(--radius-main); border: 1px solid var(--gris-tres-clair); padding: 22px; box-shadow: var(--shadow-card); }
-        .card h3 { color: var(--rouge); margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid var(--fond); padding-bottom: 8px; margin-bottom: 16px; }
+        .card-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--fond);
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            gap: 10px;
+        }
 
-        /* NUANCIER */
-        .palette-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 12px; }
-        .color-box { border-radius: var(--radius-sm); border: 1px solid var(--gris-tres-clair); overflow: hidden; }
-        .color-view { height: 48px; }
+        .card h3 {
+            color: var(--rouge);
+            margin: 0;
+            font-size: 1.2rem;
+            border: none;
+            padding: 0;
+        }
+
+        .card-pole-badge {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.7rem;
+            background: var(--rouge-clair);
+            color: var(--rouge);
+            padding: 3px 9px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            flex-shrink: 0;
+        }
+
+        /* NUANCIER INTERACTIF */
+        .palette-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; margin-top: 10px; }
+        .color-box {
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gris-tres-clair);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.16s ease;
+            position: relative;
+        }
+        .color-box:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--rouge);
+        }
+        .color-view { height: 48px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 4px 6px; }
+        .copy-chip {
+            font-size: 9px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            padding: 2px 5px;
+            border-radius: 3px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+        .color-box:hover .copy-chip { opacity: 1; }
         .color-details { padding: 8px 10px; background: var(--blanc); font-size: 0.8rem; }
         .color-details strong { display: block; font-family: 'Fredoka', sans-serif; font-size: 0.88rem; }
 
@@ -138,29 +320,53 @@
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 
+        @media (max-width: 1024px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 720px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
+
         /* ==========================================================================
-           4. GALERIE DE COMPOSANTS UI WEB
+           4. GALERIE DE COMPOSANTS UI WEB (SOCLE V7.0 + AJOUTS V10.0)
            ========================================================================== */
-        .kpi-card { background: var(--blanc); border-radius: var(--radius-main); padding: 16px; border: 1px solid var(--gris-tres-clair); border-left: 5px solid var(--rouge); box-shadow: var(--shadow-card); }
+        .kpi-card {
+            background: var(--blanc);
+            border-radius: var(--radius-main);
+            padding: 16px;
+            border: 1px solid var(--gris-tres-clair);
+            border-left: 5px solid var(--rouge);
+            box-shadow: var(--shadow-card);
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+        .kpi-card:hover { transform: translateY(-2px); }
         .kpi-title { font-size: 11px; color: var(--gris-moyen); font-weight: 500; text-transform: uppercase; }
         .kpi-value { font-family: 'Fredoka', sans-serif; font-size: 22px; color: var(--noir-doux); margin-top: 2px; }
 
-        .btn { font-family: 'Roboto', sans-serif; font-weight: 500; font-size: 12px; padding: 8px 14px; border-radius: var(--radius-sm); border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+        .btn { font-family: 'Roboto', sans-serif; font-weight: 500; font-size: 12px; padding: 8px 14px; border-radius: var(--radius-sm); border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; transition: all 0.15s ease; }
         .btn-primary { background: var(--rouge); color: var(--blanc); }
+        .btn-primary:hover { background: var(--rouge-hover); }
         .btn-dark { background: var(--noir-doux); color: var(--blanc); }
+        .btn-dark:hover { background: var(--noir-hover); }
         .btn-secondary { background: var(--gris-tres-clair); color: var(--gris-fonce); }
+        .btn-outline-red { background: transparent; border: 1.5px solid var(--rouge); color: var(--rouge); font-weight: 600; }
+        .btn-outline-red:hover { background: var(--rouge-clair); }
 
-        .form-control { width: 100%; padding: 8px 12px; border: 1px solid var(--gris-tres-clair); background: var(--gris-fond-input); border-radius: var(--radius-sm); font-size: 12px; outline: none; }
+        .form-control { width: 100%; padding: 8px 12px; border: 1px solid var(--gris-tres-clair); background: var(--gris-fond-input); border-radius: var(--radius-sm); font-size: 12px; outline: none; transition: border-color 0.15s; }
+        .form-control:focus { border-color: var(--rouge); background: var(--blanc); }
 
         .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
         .data-table th { background-color: var(--noir-doux); color: var(--blanc); font-family: 'Fredoka', sans-serif; font-weight: 500; padding: 10px 12px; text-align: left; }
         .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--gris-tres-clair); }
         .data-table tbody tr:hover { background-color: var(--rouge-clair); }
 
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; font-family: 'Fredoka', sans-serif; }
         .badge-success { background: var(--vert-fond); color: var(--vert-succes); }
         .badge-danger { background: var(--rouge-clair); color: var(--rouge); }
         .badge-info { background: var(--bleu-fond); color: var(--bleu-info); }
+        .badge-warning { background: var(--orange-fond); color: var(--orange-warning); }
 
         /* PLANNING & VACANCES COMPONENT */
         .planning-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
@@ -172,10 +378,10 @@
         .modal-demo { background: var(--blanc); border: 1px solid var(--gris-tres-clair); border-radius: var(--radius-main); box-shadow: 0 10px 25px rgba(0,0,0,0.15); max-width: 450px; padding: 18px; margin-top: 10px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gris-tres-clair); padding-bottom: 8px; margin-bottom: 12px; }
 
-        pre { background: var(--noir-doux); color: #F8FAFC; padding: 14px; border-radius: var(--radius-sm); font-family: 'Roboto Mono', monospace; font-size: 0.8rem; overflow-x: auto; border-left: 4px solid var(--rouge); }
+        pre { background: var(--noir-doux); color: #F8FAFC; padding: 14px; border-radius: var(--radius-sm); font-family: 'Roboto Mono', monospace; font-size: 0.78rem; overflow-x: auto; border-left: 4px solid var(--rouge); margin: 8px 0 0 0; }
 
         /* ==========================================================================
-           5. COMPOSANT SPECIFIQUE : EN-TETES ET DOCUMENTS OFFICIELS PRINT / PDF
+           5. EN-TÊTES ET DOCUMENTS OFFICIELS PRINT / PDF (SOCLE V7.0 INTACT)
            ========================================================================== */
         .doc-preview-container {
             background: #525659;
@@ -198,7 +404,6 @@
             font-size: 9pt;
         }
 
-        /* FORMAT A & B : En-tête Signature avec Logo Carré Rouge Arrondi */
         .doc-header-official {
             display: flex;
             justify-content: space-between;
@@ -263,7 +468,6 @@
             margin-bottom: 4px;
         }
 
-        /* FORMAT C : En-tête Table à 3 Colonnes avec Référence */
         .print-header-table {
             width: 100%;
             border-collapse: collapse;
@@ -284,7 +488,6 @@
         .emitter-title { font-family: 'Fredoka', sans-serif; font-size: 11pt; color: var(--rouge); margin-bottom: 2px; }
         .receiver-title { font-weight: bold; font-size: 8.5pt; color: var(--gris-fonce); margin-bottom: 2px; text-transform: uppercase; }
 
-        /* COMPOSANT POLYVALENT : BLOC RÉFÉRENCE / NUMÉRO */
         .doc-num {
             font-weight: bold;
             font-size: 8.5pt;
@@ -326,7 +529,6 @@
             font-size: 8.5pt;
         }
 
-        /* PIED DE PAGE DÉMONSTRATION ÉCRAN */
         .footer-preview-single {
             margin-top: 20px;
             padding-top: 10px;
@@ -356,7 +558,7 @@
         }
 
         /* ==========================================================================
-           6. COMPOSANTS RÈGLES D'USAGE DU LOGO & CO-BRANDING
+           6. RÈGLES D'USAGE DU LOGO, CO-BRANDING & AFFICHES (SOCLE V7.0 INTACT)
            ========================================================================== */
         .clearspace-box {
             border: 2px dashed var(--rouge);
@@ -407,9 +609,6 @@
             margin-bottom: 8px;
         }
 
-        /* ==========================================================================
-           7. CHARTE DE CRÉATION D'AFFICHES & PLANNNGS A4 (HTML PRINT)
-           ========================================================================== */
         .poster-header-demo {
             padding: 16px;
             display: flex;
@@ -438,6 +637,7 @@
             font-size: 24pt;
             text-transform: uppercase;
             line-height: 1.0;
+            white-space: nowrap;
             text-shadow: -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF, 1px 1px 0 #FFF, 2px 3px 5px rgba(0, 0, 0, 0.2);
         }
 
@@ -489,7 +689,186 @@
         }
 
         /* ==========================================================================
-           8. RÈGLES D'IMPRESSION A4 PAYSAGE & EXPORT BOOK PDF (BRAND GUIDELINES)
+           7. NOUVEAUX COMPOSANTS SPÉCIALISÉS V10.0 (TOUS LES DESIGNS DU DOJO)
+           ========================================================================== */
+        /* Blocs Règlement Intérieur & Documents Officiels */
+        .ri-intro-box {
+            background-color: var(--rouge-clair);
+            border-left: 4px solid var(--rouge);
+            padding: 8px 12px;
+            font-size: 8.6pt;
+            font-weight: 500;
+            color: var(--noir-doux);
+            border-radius: 0 5px 5px 0;
+        }
+        .ri-section-card {
+            background: #FAFAFA;
+            border: 1px solid var(--gris-tres-clair);
+            border-radius: 6px;
+            padding: 9px 12px;
+        }
+        .ri-section-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 9.5pt;
+            color: var(--rouge);
+            font-weight: 600;
+            margin: 0 0 4px 0;
+            border-bottom: 1px solid var(--gris-tres-clair);
+            padding-bottom: 3px;
+        }
+        .ri-nb-box {
+            background: #FFF5F5;
+            border: 1px solid #FEB2B2;
+            border-left: 4px solid var(--rouge);
+            border-radius: 4px;
+            padding: 7px 10px;
+            font-size: 8.3pt;
+            font-weight: bold;
+            color: #742A2A;
+        }
+
+        /* Étiquettes Avery J8159 (63.5 x 33.9 mm) */
+        .avery-label-demo {
+            width: 240px;
+            height: 128px;
+            border: 1px dashed var(--gris-clair);
+            border-radius: 6px;
+            padding: 10px 12px;
+            background: var(--blanc);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-card);
+        }
+
+        /* Coupon Invitat'amis & Procuration AG */
+        .cut-coupon-box {
+            border: 1.5px dashed var(--rouge);
+            border-radius: 8px;
+            padding: 12px 14px;
+            background: #FFFDFD;
+            position: relative;
+        }
+
+        /* Livret Mécénat Couverture Sombre Prestige */
+        .mecenat-cover-demo {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D1217 60%, #8B1429 100%);
+            color: var(--blanc);
+            border-radius: var(--radius-main);
+            padding: 18px 20px;
+            border-left: 6px solid var(--rouge);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 145px;
+        }
+
+        /* Ceintures Obi CSS & 8 Piliers Kanji */
+        .obi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 10px; }
+        .obi-item { background: var(--gris-fond-input); border: 1px solid var(--gris-tres-clair); border-radius: var(--radius-sm); padding: 8px; text-align: center; }
+        .obi-bar { height: 20px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.22); display: flex; align-items: center; justify-content: center; margin-bottom: 5px; box-shadow: inset 0 2px 3px rgba(0,0,0,0.1); }
+        .obi-knot { width: 16px; height: 24px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.3); background: inherit; box-shadow: 0 2px 4px rgba(0,0,0,0.22); }
+
+        .kanji-8-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 10px; }
+        .kanji-box { background: var(--blanc); border: 1px solid var(--gris-tres-clair); border-top: 3px solid var(--rouge); border-radius: var(--radius-sm); padding: 7px 4px; text-align: center; }
+        .kanji-symbol { font-size: 1.35rem; color: var(--rouge); font-weight: bold; line-height: 1.1; }
+        .kanji-name { font-family: 'Fredoka', sans-serif; font-size: 0.68rem; color: var(--noir-doux); text-transform: uppercase; margin-top: 2px; }
+
+        /* Diplôme A4 Paysage Prestige */
+        .diploma-preview-card {
+            background: #FFFDF9;
+            border: 3px double var(--rouge);
+            border-radius: 8px;
+            padding: 16px 20px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Vignettes Kalisport 500x500, 128x128 & Carte Hajime */
+        .kalisport-500-demo {
+            width: 210px;
+            height: 210px;
+            background: var(--blanc-casse);
+            border: 1px solid var(--gris-tres-clair);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-card);
+        }
+        .kalisport-128-round {
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #FFFFFF 0%, #F4F6F9 70%, #FFEBEF 100%);
+            border: 3px solid var(--rouge);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8px;
+            box-shadow: 0 6px 16px rgba(196, 30, 58, 0.18);
+        }
+        .hajime-collector-demo {
+            width: 195px;
+            height: 275px;
+            background: linear-gradient(155deg, #1A1A1A 0%, #2D1217 65%, #8B1429 100%);
+            border-radius: 12px;
+            padding: 12px;
+            color: var(--blanc);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+            border: 2px solid rgba(255,255,255,0.14);
+        }
+
+        /* Cockpit Tool Card (Index Intranet) */
+        .intranet-tool-card {
+            background: var(--blanc);
+            border: 1px solid var(--gris-tres-clair);
+            border-radius: var(--radius-main);
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: all 0.16s ease;
+            cursor: pointer;
+        }
+        .intranet-tool-card:hover {
+            border-color: var(--rouge);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Notification Toast */
+        #charte-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--noir-doux);
+            color: var(--blanc);
+            border-left: 4px solid var(--rouge);
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.86rem;
+            box-shadow: var(--shadow-float);
+            z-index: 9999;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.25s ease;
+            pointer-events: none;
+        }
+        #charte-toast.show { transform: translateY(0); opacity: 1; }
+
+        /* ==========================================================================
+           8. RÈGLES D'IMPRESSION A4 PAYSAGE & EXPORT BOOK PDF (SOCLE V7.0 INTACT)
            ========================================================================== */
         .dual-a5-print-wrapper { display: none; }
 
@@ -498,7 +877,7 @@
                 size: A4 landscape;
                 margin: 10mm 15mm 15mm 15mm;
                 @bottom-left {
-                    content: "Charte Graphique & Design System Officiel - Dojo Dornois (RNA : W583001220)";
+                    content: "Charte Graphique & Design System Officiel V10.0 - Dojo Dornois (RNA : W583001220)";
                     font-family: 'Roboto', sans-serif;
                     font-size: 8pt;
                     color: #6B6B6B;
@@ -518,6 +897,7 @@
 
             body {
                 background: white !important;
+                background-image: none !important;
                 color: black !important;
                 display: block !important;
                 height: auto !important;
@@ -526,20 +906,15 @@
                 print-color-adjust: exact !important;
             }
 
-            .sidebar, .topbar, .btn, .charte-tabs-bar {
+            .sidebar, .topbar, .btn, .charte-nav-cockpit, #charte-toast {
                 display: none !important;
             }
 
-            .main-content {
+            .main-content, .app-body {
                 height: auto !important;
                 overflow: visible !important;
                 display: block !important;
-            }
-
-            .app-body {
                 padding: 0 !important;
-                overflow: visible !important;
-                display: block !important;
             }
 
             .card {
@@ -554,29 +929,13 @@
                 justify-content: flex-start;
             }
 
-            .card:last-child {
-                page-break-after: avoid;
-            }
+            .card:last-child { page-break-after: avoid; }
 
-            .doc-preview-container {
-                background: transparent !important;
-                padding: 0 !important;
-                gap: 15px !important;
-            }
+            .doc-preview-container { background: transparent !important; padding: 0 !important; gap: 15px !important; }
+            .doc-page-a4 { box-shadow: none !important; border: 1px solid #DDD !important; max-width: 100% !important; }
 
-            .doc-page-a4 {
-                box-shadow: none !important;
-                border: 1px solid #DDD !important;
-                max-width: 100% !important;
-            }
-
-            /* COMPORTEMENT DUAL A5 CÔTE À CÔTE EN IMPRESSION A4 PAYSAGE */
-            body.page-dual-a5 {
-                display: block !important;
-            }
-            body.page-dual-a5 .card {
-                display: none !important;
-            }
+            body.page-dual-a5 { display: block !important; }
+            body.page-dual-a5 .card { display: none !important; }
             body.page-dual-a5 .dual-a5-print-wrapper {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr;
@@ -610,12 +969,27 @@
     <!-- SIDEBAR GLOBALE INTÉGRÉE AUTOMATIQUEMENT PAR LE SCRIPT -->
     <div class="sidebar"></div>
 
+    <!-- NOTIFICATION TOAST -->
+    <div id="charte-toast">✅ Copié dans le presse-papiers !</div>
+
     <!-- ZONE DE LECTURE DE LA CHARTE AVEC COMPOSANTS EN DIRECT -->
     <div class="main-content">
         <div class="topbar">
-            <h2>Charte Graphique Officielle & Design System Intégral</h2>
-            <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-size:0.85rem; font-weight:bold; color:var(--rouge);">Version Master 7.0 (2026)</span>
+            <div class="topbar-left">
+                <div class="topbar-logo-badge">
+                    <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" alt="Logo Dojo Dornois">
+                </div>
+                <div>
+                    <h2>Charte Graphique Officielle & Design System Intégral</h2>
+                    <div class="topbar-subtitle">Socle Master V7.0 intégral + Encyclopédie complète des réalisations UI/UX & Print du Dojo Dornois</div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div class="search-box-v10">
+                    <span>🔍</span>
+                    <input type="text" id="searchCharteInput" placeholder="Rechercher (Ctrl+K)..." oninput="filterCharteCards(this.value)">
+                </div>
+                <span class="version-badge-v10">Charte Graphique Dojo Dornois V10.0</span>
                 <button onclick="window.print()" class="btn btn-primary" style="box-shadow:0 2px 8px rgba(196,30,58,0.3);">
                     🖨️ Imprimer / Exporter PDF A4
                 </button>
@@ -627,37 +1001,65 @@
 
         <div class="app-body">
             
-            <!-- BARRE DE SOMMAIRE INTERNE DE LA CHARTE -->
-            <div class="charte-tabs-bar">
-                <a href="#section-infos-legales" class="charte-tab-btn">🏛️ 1. Identité SIRENE & Infos Légales</a>
-                <a href="#section-fondations" class="charte-tab-btn">🎨 2. Couleurs & Typos Master</a>
-                <a href="#section-logo-rules" class="charte-tab-btn">📐 3. Usage Logo & Interdits</a>
-                <a href="#section-entete-doc" class="charte-tab-btn">📑 4. Formats En-tête (A, B, C)</a>
-                <a href="#section-affiche-html" class="charte-tab-btn">🖼️ 5. Charte Affiches HTML Print</a>
-                <a href="#section-cobranding" class="charte-tab-btn">🤝 6. Co-branding & Sponsors</a>
-                <a href="#section-pied-page" class="charte-tab-btn">🦶 7. Standards Pieds de Page</a>
-                <a href="#section-compo-ui" class="charte-tab-btn">🧩 8. Composants UI Web</a>
-                <a href="#section-planning" class="charte-tab-btn">📅 9. Plannings & Vacances</a>
-                <a href="#section-code-master" class="charte-tab-btn">⚡ 10. Matrice CSS / HTML</a>
+            <!-- BARRE DE PILOTAGE & SOMMAIRE INTERNE (17 SECTIONS) -->
+            <div class="charte-nav-cockpit">
+                <div class="pole-filter-bar">
+                    <div class="pole-pills">
+                        <button class="pole-pill active" onclick="filterByPole('all', this)">🔥 Tout afficher (17 Sections)</button>
+                        <button class="pole-pill" onclick="filterByPole('socle', this)">🏛️ Socle de Base (1 à 10)</button>
+                        <button class="pole-pill" onclick="filterByPole('print', this)">📑 Documents, Print & Compta</button>
+                        <button class="pole-pill" onclick="filterByPole('judo', this)">🥋 Pédagogie, Ceintures & Diplômes</button>
+                        <button class="pole-pill" onclick="filterByPole('studios', this)">🎴 Studios Visuels, Kalisport & Hajime</button>
+                        <button class="pole-pill" onclick="filterByPole('intranet', this)">🧭 Intranet, Cockpit & Code</button>
+                    </div>
+                    <span style="font-size:0.75rem; color:var(--gris-moyen); font-weight:500;">💡 Astuce : cliquez sur une couleur ou un code pour le copier</span>
+                </div>
+
+                <div class="charte-tabs-bar">
+                    <!-- Les 10 sections d'origine préservées -->
+                    <a href="#section-infos-legales" class="charte-tab-btn">🏛️ 1. Identité SIRENE</a>
+                    <a href="#section-fondations" class="charte-tab-btn">🎨 2. Couleurs & Typos</a>
+                    <a href="#section-logo-rules" class="charte-tab-btn">📐 3. Usage Logo & Causes</a>
+                    <a href="#section-entete-doc" class="charte-tab-btn">📑 4. En-têtes (A, B, C)</a>
+                    <a href="#section-affiche-html" class="charte-tab-btn">🖼️ 5. Affiches HTML Print</a>
+                    <a href="#section-cobranding" class="charte-tab-btn">🤝 6. Co-branding</a>
+                    <a href="#section-pied-page" class="charte-tab-btn">🦶 7. Pieds de Page</a>
+                    <a href="#section-compo-ui" class="charte-tab-btn">🧩 8. Composants UI Web</a>
+                    <a href="#section-planning" class="charte-tab-btn">📅 9. Plannings & Modale</a>
+                    <a href="#section-code-master" class="charte-tab-btn">⚡ 10. Matrice CSS / HTML</a>
+                    <!-- Les 7 nouvelles sections encyclopédiques V10.0 -->
+                    <a href="#section-editions-print" class="charte-tab-btn">🏷️ 11. Avery, Invitat'amis & Mécénat</a>
+                    <a href="#section-gabarits-metiers" class="charte-tab-btn">📜 12. Règlement, TER, CCNS & Frais</a>
+                    <a href="#section-grades-diplomes" class="charte-tab-btn">🥋 13. Ceintures Obi & Diplômes</a>
+                    <a href="#section-studios-kalisport" class="charte-tab-btn">🎴 14. Kalisport, Drive & Hajime</a>
+                    <a href="#section-sumup-boutique" class="charte-tab-btn">💳 15. SumUp & Boutique Textile</a>
+                    <a href="#section-cockpit-intranet" class="charte-tab-btn">🧭 16. Cockpit 32 Outils, QR & Tatamis</a>
+                    <a href="#section-snippets-v10" class="charte-tab-btn">💻 17. Bibliothèque Snippets V10</a>
+                </div>
             </div>
 
-            <!-- SECTION 1 : IDENTITÉ & INFORMATIONS LÉGALES OFFICIELLES (INSEE SIRENE) -->
-            <div class="card" id="section-infos-legales">
-                <h3>🏛️ 1. Identité Officielle, INSEE SIRENE & Coordonnées</h3>
-                <p>Informations légales exactes (mises à jour d'après l'Avis de Situation SIRENE du 30/07/2026) devant figurer sur tous les documents officiels.</p>
+            <!-- =========================================================================
+                 SECTION 1 : IDENTITÉ & INFORMATIONS LÉGALES OFFICIELLES (BASE INTACTE + 1-CLIC)
+                 ========================================================================= -->
+            <div class="card" id="section-infos-legales" data-pole="socle print">
+                <div class="card-title-row">
+                    <h3>🏛️ 1. Identité Officielle, INSEE SIRENE & Coordonnées</h3>
+                    <span class="card-pole-badge">Socle V7.0 + Copie 1-Clic</span>
+                </div>
+                <p>Informations légales exactes (mises à jour d'après l'Avis de Situation SIRENE du 30/07/2026) devant figurer sur tous les documents officiels. <em>Cliquez sur n'importe quelle carte pour copier la valeur.</em></p>
 
                 <div class="grid-3" style="margin-top:16px;">
-                    <div class="kpi-card" style="border-left-color: var(--rouge);">
+                    <div class="kpi-card" style="border-left-color: var(--rouge);" onclick="copyToClipboard('DOJO DORNOIS')">
                         <div class="kpi-title">Dénomination Officielle</div>
                         <div class="kpi-value" style="font-size:16px;">DOJO DORNOIS</div>
                         <div style="font-size:0.75rem; color:var(--gris-moyen); margin-top:4px;">Catégorie : Association déclarée (9220)</div>
                     </div>
-                    <div class="kpi-card" style="border-left-color: var(--noir-doux);">
+                    <div class="kpi-card" style="border-left-color: var(--noir-doux);" onclick="copyToClipboard('W583001220')">
                         <div class="kpi-title">Répertoire National (RNA)</div>
                         <div class="kpi-value" style="font-size:16px;">W583001220</div>
                         <div style="font-size:0.75rem; color:var(--gris-moyen); margin-top:4px;">Préfecture de la Nièvre</div>
                     </div>
-                    <div class="kpi-card" style="border-left-color: var(--bleu-info);">
+                    <div class="kpi-card" style="border-left-color: var(--bleu-info);" onclick="copyToClipboard('451 928 410 00013')">
                         <div class="kpi-title">Identifiants SIREN & SIRET</div>
                         <div class="kpi-value" style="font-size:15px;">451 928 410 00013</div>
                         <div style="font-size:0.75rem; color:var(--gris-moyen); margin-top:4px;">SIREN : 451 928 410 • APE : 93.12Z</div>
@@ -669,6 +1071,7 @@
                         <h4 style="color:var(--noir-doux); margin-bottom:8px;">📍 Adresses & Affiliations</h4>
                         <ul style="margin:0; padding-left:18px; line-height:1.6;">
                             <li><strong>Siège Administratif (SIRENE) :</strong> 11 Rue d'Ettringen, 58390 DORNES</li>
+                            <li><strong>Adresse Courrier / Mairie :</strong> 1 Place de la Mairie - 58390 Dornes</li>
                             <li><strong>Lieu de Pratique (Dojo Henri Pierrehumbert) :</strong> 38 Route de Decize, 58390 Dornes</li>
                             <li><strong>Affiliation FFJDA :</strong> N° CE 08.58.067.0</li>
                             <li><strong>Agrément Jeunesse & Sports :</strong> N° 58.S.471</li>
@@ -677,8 +1080,9 @@
                     <div style="background:var(--gris-fond-input); padding:14px; border-radius:var(--radius-sm); border:1px solid var(--gris-tres-clair);">
                         <h4 style="color:var(--noir-doux); margin-bottom:8px;">📞 Contacts & Régime Fiscal</h4>
                         <ul style="margin:0; padding-left:18px; line-height:1.6;">
-                            <li><strong>Courriel Officiel :</strong> contact@dojodornois.fr</li>
-                            <li><strong>Téléphone Présidence :</strong> 06.07.13.91.86</li>
+                            <li><strong>Courriel Officiel :</strong> contact@dojodornois.fr (et dojodornois@gmail.com)</li>
+                            <li><strong>Téléphone Présidence (Jordan Loudenot) :</strong> 06.07.13.91.86</li>
+                            <li><strong>Code Application Kalisport :</strong> <code>U3AMYA</code> • Site : dojodornois.fr</li>
                             <li><strong>Économie Sociale & Solidaire (ESS) :</strong> Oui</li>
                             <li><strong>Mention TVA :</strong> "Non assujetti à la TVA art. 293-B du CGI"</li>
                         </ul>
@@ -686,67 +1090,106 @@
                 </div>
             </div>
 
-            <!-- SECTION 2 : FONDATIONS & COULEURS MASTER -->
-            <div class="card" id="section-fondations">
-                <h3>🎨 2. Palette des Couleurs Master & Typographies</h3>
-                <p>Identité visuelle universelle du Dojo Dornois. Intégration complète des couleurs socles, nuances de gris et blancs d'arrière-plan :</p>
+            <!-- =========================================================================
+                 SECTION 2 : FONDATIONS & COULEURS MASTER (BASE INTACTE + ÉTENDUE)
+                 ========================================================================= -->
+            <div class="card" id="section-fondations" data-pole="socle">
+                <div class="card-title-row">
+                    <h3>🎨 2. Palette des Couleurs Master & Typographies</h3>
+                    <span class="card-pole-badge">Socle V7.0 + Codes Dossiers</span>
+                </div>
+                <p>Identité visuelle universelle du Dojo Dornois. Intégration complète des couleurs socles, nuances de gris et blancs d'arrière-plan (cliquez sur une boîte pour copier son code HEX) :</p>
 
                 <h4>1. Couleurs Principales (Socles)</h4>
                 <div class="palette-grid">
-                    <div class="color-box">
-                        <div class="color-view" style="background: #C41E3A;"></div>
+                    <div class="color-box" onclick="copyToClipboard('#C41E3A')">
+                        <div class="color-view" style="background: #C41E3A;"><span class="copy-chip">Copier</span></div>
                         <div class="color-details"><strong>Rouge Dojo</strong><code>#C41E3A</code><br>Couleur signature</div>
                     </div>
-                    <div class="color-box">
-                        <div class="color-view" style="background: #1A1A1A;"></div>
+                    <div class="color-box" onclick="copyToClipboard('#1A1A1A')">
+                        <div class="color-view" style="background: #1A1A1A;"><span class="copy-chip">Copier</span></div>
                         <div class="color-details"><strong>Noir Doux</strong><code>#1A1A1A</code><br>Textes & fonds sombres</div>
+                    </div>
+                    <div class="color-box" onclick="copyToClipboard('#A3182E')">
+                        <div class="color-view" style="background: #A3182E;"><span class="copy-chip">Copier</span></div>
+                        <div class="color-details"><strong>Rouge Hover</strong><code>#A3182E</code><br>Survol boutons</div>
+                    </div>
+                    <div class="color-box" onclick="copyToClipboard('#8B1429')">
+                        <div class="color-view" style="background: #8B1429;"><span class="copy-chip">Copier</span></div>
+                        <div class="color-details"><strong>Rouge Deep</strong><code>#8B1429</code><br>Fonds prestige / Mécénat</div>
+                    </div>
+                    <div class="color-box" onclick="copyToClipboard('#FFEBEF')">
+                        <div class="color-view" style="background: #FFEBEF;"><span class="copy-chip">Copier</span></div>
+                        <div class="color-details"><strong>Rouge Clair</strong><code>#FFEBEF</code><br>Encarts & survols</div>
                     </div>
                 </div>
 
                 <h4 style="margin-top:14px;">2. Nuances de Gris</h4>
                 <div class="palette-grid">
-                    <div class="color-box">
-                        <div class="color-view" style="background: #3D3D3D;"></div>
+                    <div class="color-box" onclick="copyToClipboard('#3D3D3D')">
+                        <div class="color-view" style="background: #3D3D3D;"><span class="copy-chip">Copier</span></div>
                         <div class="color-details"><strong>Gris Foncé</strong><code>#3D3D3D</code><br>Corps de texte</div>
                     </div>
-                    <div class="color-box">
-                        <div class="color-view" style="background: #6B6B6B;"></div>
+                    <div class="color-box" onclick="copyToClipboard('#6B6B6B')">
+                        <div class="color-view" style="background: #6B6B6B;"><span class="copy-chip">Copier</span></div>
                         <div class="color-details"><strong>Gris Moyen</strong><code>#6B6B6B</code><br>Légendes & notes</div>
                     </div>
-                    <div class="color-box">
-                        <div class="color-view" style="background: #B8B8B8;"></div>
+                    <div class="color-box" onclick="copyToClipboard('#B8B8B8')">
+                        <div class="color-view" style="background: #B8B8B8;"><span class="copy-chip">Copier</span></div>
                         <div class="color-details"><strong>Gris Clair</strong><code>#B8B8B8</code><br>Bordures & séparateurs</div>
                     </div>
-                    <div class="color-box">
-                        <div class="color-view" style="background: #E8E8E8;"></div>
+                    <div class="color-box" onclick="copyToClipboard('#E8E8E8')">
+                        <div class="color-view" style="background: #E8E8E8;"><span class="copy-chip">Copier</span></div>
                         <div class="color-details"><strong>Gris Très Clair</strong><code>#E8E8E8</code><br>Fonds alternés</div>
                     </div>
                 </div>
 
-                <h4 style="margin-top:14px;">3. Blancs & Arrière-plans</h4>
+                <h4 style="margin-top:14px;">3. Blancs, Arrière-plans & Statuts Sémantiques</h4>
                 <div class="palette-grid">
-                    <div class="color-box">
-                        <div class="color-view" style="background: #F5F5F5; border: 1px solid #E8E8E8;"></div>
+                    <div class="color-box" onclick="copyToClipboard('#F5F5F5')">
+                        <div class="color-view" style="background: #F5F5F5; border: 1px solid #E8E8E8;"><span class="copy-chip">Copier</span></div>
                         <div class="color-details"><strong>Blanc Cassé</strong><code>#F5F5F5</code><br>Fond principal</div>
                     </div>
-                    <div class="color-box">
-                        <div class="color-view" style="background: #FFFFFF; border: 1px solid #E8E8E8;"></div>
+                    <div class="color-box" onclick="copyToClipboard('#FFFFFF')">
+                        <div class="color-view" style="background: #FFFFFF; border: 1px solid #E8E8E8;"><span class="copy-chip">Copier</span></div>
                         <div class="color-details"><strong>Blanc Pur</strong><code>#FFFFFF</code><br>Cartes & zones à contraste</div>
+                    </div>
+                    <div class="color-box" onclick="copyToClipboard('#F4F6F9')">
+                        <div class="color-view" style="background: #F4F6F9; border: 1px solid #E8E8E8;"><span class="copy-chip">Copier</span></div>
+                        <div class="color-details"><strong>Fond Intranet</strong><code>#F4F6F9</code><br>Arrière-plan outils web</div>
+                    </div>
+                    <div class="color-box" onclick="copyToClipboard('#2ECC71')">
+                        <div class="color-view" style="background: #2ECC71;"><span class="copy-chip">Copier</span></div>
+                        <div class="color-details"><strong>Vert Succès</strong><code>#2ECC71</code><br>Validation & Recettes</div>
+                    </div>
+                    <div class="color-box" onclick="copyToClipboard('#3498DB')">
+                        <div class="color-view" style="background: #3498DB;"><span class="copy-chip">Copier</span></div>
+                        <div class="color-details"><strong>Bleu Info</strong><code>#3498DB</code><br>Indicateurs & Banque</div>
+                    </div>
+                    <div class="color-box" onclick="copyToClipboard('#F39C12')">
+                        <div class="color-view" style="background: #F39C12;"><span class="copy-chip">Copier</span></div>
+                        <div class="color-details"><strong>Orange Warning</strong><code>#F39C12</code><br>Vigilance & Attente</div>
                     </div>
                 </div>
 
                 <h4 style="margin-top:16px;">Règles Typographiques & Rédactionnelles</h4>
                 <ul>
-                    <li><strong>Titres (Fredoka 600/700) :</strong> Tous les titres principaux, noms de modules, badges d'en-tête et affiches.</li>
+                    <li><strong>Titres (Fredoka 600/700) :</strong> Tous les titres principaux, noms de modules, badges d'en-tête et affiches. Toujours conserver « DOJO DORNOIS » sur une seule ligne (<code>white-space: nowrap</code>).</li>
                     <li><strong>Texte (Roboto 400/500/700) :</strong> Corps de texte, tableaux, formulaires et contrôles.</li>
                     <li><strong>Pas de tirets quadratin :</strong> Utiliser exclusivement des tirets simples (-) ou des puces (•).</li>
+                    <li><strong>Interdiction des thèmes bleus génériques :</strong> Les interfaces sombres type éditeur de code ou bleues hors charte sont proscrites au profit du couple Rouge Dojo (<code>#C41E3A</code>) / Noir Doux (<code>#1A1A1A</code>) sur fond clair (<code>#F4F6F9</code>).</li>
                 </ul>
             </div>
 
-            <!-- SECTION 3 : RÈGLES D'USAGE DU LOGO & INTERDITS -->
-            <div class="card" id="section-logo-rules">
-                <h3>📐 3. Règles d'Usage du Logo & Interdits (Do's & Don'ts)</h3>
-                <p>Standards de protection visuelle du logo officiel. Le logo du Dojo Dornois doit obligatoirement être inséré au sein de son <strong>carré arrondi rouge signature</strong> (fond `#C41E3A`, radius `12px` à `14px`).</p>
+            <!-- =========================================================================
+                 SECTION 3 : RÈGLES D'USAGE DU LOGO & INTERDITS (BASE INTACTE + CAUSES)
+                 ========================================================================= -->
+            <div class="card" id="section-logo-rules" data-pole="socle studios">
+                <div class="card-title-row">
+                    <h3>📐 3. Règles d'Usage du Logo & Interdits (Do's & Don'ts)</h3>
+                    <span class="card-pole-badge">Socle V7.0 + Studio Carré Signature</span>
+                </div>
+                <p>Standards de protection visuelle du logo officiel. Le logo du Dojo Dornois doit obligatoirement être inséré au sein de son <strong>carré arrondi rouge signature</strong> (fond <code>#C41E3A</code>, radius <code>12px</code> à <code>14px</code>).</p>
 
                 <div class="grid-2" style="margin-top:16px;">
                     <div>
@@ -764,6 +1207,7 @@
                             <li><strong>Impression Print (A4 / Flyers) :</strong> Largeur minimale du bloc carré = <code>18 mm</code>.</li>
                             <li><strong>Outils Web & Intranet :</strong> Dimensions minimales du conteneur = <code>32 px x 32 px</code>.</li>
                             <li><strong>Format Favicon / Icône Réseaux :</strong> Utiliser le monogramme seul centré dans le carré rouge.</li>
+                            <li><strong>Gourde & Merchandising :</strong> Conserver le contour blanc net détaché autour du lettrage brush du logo et du prénom personnalisé.</li>
                         </ul>
                     </div>
                 </div>
@@ -780,15 +1224,36 @@
                     </div>
                     <div class="forbidden-card">
                         <div class="forbidden-title">❌ Pas d'altération couleur</div>
-                        <p>Ne pas modifier la couleur de fond du carré (#C41E3A) ni du logo.</p>
+                        <p>Ne pas modifier la couleur de fond du carré (#C41E3A) ni du logo (hors causes officielles ci-dessous).</p>
                     </div>
                     <div class="forbidden-card">
                         <div class="forbidden-title">❌ Pas d'effets / contours</div>
-                        <p>Interdiction d'ajouter des ombres portées, contours ou biseaux.</p>
+                        <p>Interdiction d'ajouter des ombres portées internes, contours parasites ou biseaux.</p>
                     </div>
                 </div>
 
-                <!-- NOUVELLE SECTION TÉLÉCHARGEMENT DYNAMIQUE -->
+                <!-- DÉCLINAISONS CAUSES OFFICIELLES -->
+                <h4 style="margin-top:20px;">Déclinaisons Événementielles Autorisées (Studio Carré Signature)</h4>
+                <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:8px;">
+                    <div style="display:flex; align-items:center; gap:8px; background:var(--gris-fond-input); padding:6px 12px; border-radius:var(--radius-sm); border:1px solid var(--gris-tres-clair);">
+                        <div class="logo-box-wrapper" style="width:38px; height:38px; background:#C41E3A; border-radius:8px;"><img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="club-logo-img" alt="Logo"></div>
+                        <div><strong style="font-family:'Fredoka'; font-size:0.8rem;">Rouge Officiel</strong><br><code>#C41E3A</code></div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px; background:var(--gris-fond-input); padding:6px 12px; border-radius:var(--radius-sm); border:1px solid var(--gris-tres-clair);">
+                        <div class="logo-box-wrapper" style="width:38px; height:38px; background:linear-gradient(135deg,#EC4899,#BE185D); border-radius:8px;"><img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="club-logo-img" alt="Logo"></div>
+                        <div><strong style="font-family:'Fredoka'; font-size:0.8rem; color:#BE185D;">Octobre Rose</strong><br><code>#EC4899</code></div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px; background:var(--gris-fond-input); padding:6px 12px; border-radius:var(--radius-sm); border:1px solid var(--gris-tres-clair);">
+                        <div class="logo-box-wrapper" style="width:38px; height:38px; background:linear-gradient(135deg,#F59E0B,#D97706); border-radius:8px;"><img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="club-logo-img" alt="Logo"></div>
+                        <div><strong style="font-family:'Fredoka'; font-size:0.8rem; color:#B45309;">Téléthon</strong><br><code>#F59E0B</code></div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px; background:var(--gris-fond-input); padding:6px 12px; border-radius:var(--radius-sm); border:1px solid var(--gris-tres-clair);">
+                        <div class="logo-box-wrapper" style="width:38px; height:38px; background:linear-gradient(135deg,#2563EB,#1E3A8A); border-radius:8px;"><img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="club-logo-img" alt="Logo"></div>
+                        <div><strong style="font-family:'Fredoka'; font-size:0.8rem; color:#1E3A8A;">Movember</strong><br><code>#1E3A8A</code></div>
+                    </div>
+                </div>
+
+                <!-- SECTION TÉLÉCHARGEMENT DYNAMIQUE D'ORIGINE -->
                 <h4 style="margin-top:24px; color:var(--rouge);">📥 Générateur & Téléchargement du Logo (Pack Signature)</h4>
                 <p>Générez le logo officiel dans son carré rouge aux formats standards. Si le téléchargement échoue (blocage CORS de l'image externe), utilisez le lien pour charger le fichier source manuellement.</p>
                 <div style="background:var(--gris-fond-input); padding:16px; border-radius:var(--radius-sm); border:1px solid var(--gris-tres-clair);">
@@ -804,12 +1269,16 @@
                         <span id="cors-status" style="margin-left:8px;"></span>
                     </div>
                 </div>
-
             </div>
 
-            <!-- SECTION 4 : FORMATS D'EN-TÊTE OFFICIELS -->
-            <div class="card" id="section-entete-doc">
-                <h3>📑 4. Formats d'En-tête Officiels des Documents (A, B, C)</h3>
+            <!-- =========================================================================
+                 SECTION 4 : FORMATS D'EN-TÊTE OFFICIELS (A, B, C) - SOCLE V7.0 INTACT
+                 ========================================================================= -->
+            <div class="card" id="section-entete-doc" data-pole="socle print">
+                <div class="card-title-row">
+                    <h3>📑 4. Formats d'En-tête Officiels des Documents (A, B, C)</h3>
+                    <span class="card-pole-badge">Socle V7.0 Intact</span>
+                </div>
                 <p>Les 3 structures d'en-tête normalisées selon le type de document généré. Note : l'encart de référence encadré (badge) est modulaire et peut s'intégrer à droite des formats A ou B si le document requiert un numéro de suivi.</p>
 
                 <div class="doc-preview-container">
@@ -913,10 +1382,15 @@
                 </div>
             </div>
 
-            <!-- SECTION 5 : CHARTE DE CRÉATION D'AFFICHES & PLANNNGS A4 HTML -->
-            <div class="card" id="section-affiche-html">
-                <h3>🖼️ 5. Charte de Création d'Affiches & Plannings A4 (HTML Print)</h3>
-                <p>Nomenclature visuelle officielle dédiée à la création d'affiches, événements et plannings hebdomadaires directement en code HTML / CSS Print (remplaçant Canva) :</p>
+            <!-- =========================================================================
+                 SECTION 5 : CHARTE DE CRÉATION D'AFFICHES & PLANNINGS A4 HTML (SOCLE V7.0 INTACT)
+                 ========================================================================= -->
+            <div class="card" id="section-affiche-html" data-pole="socle print studios">
+                <div class="card-title-row">
+                    <h3>🖼️ 5. Charte de Création d'Affiches & Plannings A4 / 4:5 (HTML Print)</h3>
+                    <span class="card-pole-badge">Socle V7.0 + Matrice 4:5</span>
+                </div>
+                <p>Nomenclature visuelle officielle dédiée à la création d'affiches (formats A4 et 4:5 strict <code>200mm × 250mm</code>), événements et plannings hebdomadaires directement en code HTML / CSS Print (remplaçant Canva) :</p>
 
                 <div class="grid-2" style="margin-top:14px;">
                     <div>
@@ -938,7 +1412,7 @@
 
                     <div>
                         <h4>2. Bandeau Horizontal des Disciplines</h4>
-                        <p>Ruban rouge officiel à insérer directement sous l'en-tête pour rappeler les disciplines fondamentales :</p>
+                        <p>Ruban rouge officiel (hauteur 11 mm en affiche) à insérer directement sous l'en-tête pour rappeler les 6 tags fondamentaux :</p>
                         <div class="poster-banner-disciplines" style="margin-top:8px;">
                             <span>🥋 Judo</span>
                             <span>🤝 Jujitsu</span>
@@ -977,6 +1451,32 @@
                         </div>
                         <span class="badge badge-info">10 € / jour</span>
                     </div>
+
+                    <div class="poster-card-demo" style="border-left-color: var(--jour-jeudi-txt);">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div class="poster-badge-date" style="background:var(--jour-jeudi-bg); border:1px solid var(--jour-jeudi-border); color:var(--jour-jeudi-txt);">
+                                Jeudi 30 Juillet
+                            </div>
+                            <div>
+                                <strong style="font-family:'Fredoka', sans-serif; font-size:1rem;">🏫 Judo à l'École (TER)</strong><br>
+                                <span style="font-size:0.8rem; color:var(--gris-moyen);">09h00 - 16h30</span>
+                            </div>
+                        </div>
+                        <span class="badge badge-success">École de Dornes</span>
+                    </div>
+
+                    <div class="poster-card-demo" style="border-left-color: var(--jour-samedi-txt);">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div class="poster-badge-date" style="background:var(--jour-samedi-bg); border:1px solid var(--jour-samedi-border); color:var(--jour-samedi-txt);">
+                                Samedi 1er Août
+                            </div>
+                            <div>
+                                <strong style="font-family:'Fredoka', sans-serif; font-size:1rem;">🥋 Gala & Remise de Ceintures</strong><br>
+                                <span style="font-size:0.8rem; color:var(--gris-moyen);">10h00 - 12h30</span>
+                            </div>
+                        </div>
+                        <span class="badge badge-danger">Dojo</span>
+                    </div>
                 </div>
 
                 <h4 style="margin-top:18px;">4. Pied de Page Officiel d'Affiche</h4>
@@ -993,10 +1493,15 @@
                 </div>
             </div>
 
-            <!-- SECTION 6 : CO-BRANDING & PARTENAIRES -->
-            <div class="card" id="section-cobranding">
-                <h3>🤝 6. Standards de Co-Branding & Partenaires / Sponsors</h3>
-                <p>Règles d'association du logo du club avec des entités partenaires (Collectivités locales, Territoire Éducatif Rural, Sponsors) :</p>
+            <!-- =========================================================================
+                 SECTION 6 : CO-BRANDING & PARTENAIRES (SOCLE V7.0 + COLOSSE & ÉCOLES)
+                 ========================================================================= -->
+            <div class="card" id="section-cobranding" data-pole="socle print">
+                <div class="card-title-row">
+                    <h3>🤝 6. Standards de Co-Branding & Partenaires / Sponsors</h3>
+                    <span class="card-pole-badge">Socle V7.0 + Institutions</span>
+                </div>
+                <p>Règles d'association du logo du club avec des entités partenaires (Collectivités locales, Territoire Éducatif Rural, France Judo, Association Colosse aux pieds d'argile, Sponsors) :</p>
 
                 <div class="cobrand-box" style="margin-top:12px;">
                     <div>
@@ -1015,15 +1520,20 @@
                     <div>
                         <div class="cobrand-tag">PARTENAIRE OFFICIEL / SPONSOR</div>
                         <div style="background:var(--gris-fond-input); border:1px dashed var(--gris-clair); padding:8px 16px; border-radius:var(--radius-sm); font-family:'Fredoka', sans-serif; color:var(--noir-doux); font-weight:bold;">
-                            MAIRIE DE DORNES / TER
+                            MAIRIE DE DORNES / TER / COLOSSE AUX PIEDS D'ARGILE
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION 7 : STANDARDS DE PIEDS DE PAGE -->
-            <div class="card" id="section-pied-page">
-                <h3>🦶 7. Standards de Pieds de Page (Page Unique vs Multi-Pages)</h3>
+            <!-- =========================================================================
+                 SECTION 7 : STANDARDS DE PIEDS DE PAGE (SOCLE V7.0 INTACT + RÈGLE ANTI-DOUBLON)
+                 ========================================================================= -->
+            <div class="card" id="section-pied-page" data-pole="socle print">
+                <div class="card-title-row">
+                    <h3>🦶 7. Standards de Pieds de Page (Page Unique vs Multi-Pages)</h3>
+                    <span class="card-pole-badge">Socle V7.0 + Règle @page</span>
+                </div>
                 <p>Modèles visuels et règles CSS Print pour le bas de page des documents officiels :</p>
 
                 <h4>A. Pied de Page - Document Page Unique</h4>
@@ -1043,15 +1553,21 @@
                 </div>
             </div>
 
-            <!-- SECTION 8 : COMPOSANTS UI INTERACTIFS -->
-            <div class="card" id="section-compo-ui">
-                <h3>🧩 8. Galerie des Composants UI (Formulaires, Boutons, Badges & Tableaux)</h3>
+            <!-- =========================================================================
+                 SECTION 8 : COMPOSANTS UI INTERACTIFS (SOCLE V7.0 INTACT)
+                 ========================================================================= -->
+            <div class="card" id="section-compo-ui" data-pole="socle intranet">
+                <div class="card-title-row">
+                    <h3>🧩 8. Galerie des Composants UI (Formulaires, Boutons, Badges & Tableaux)</h3>
+                    <span class="card-pole-badge">Socle V7.0 Intact</span>
+                </div>
                 
                 <h4>Boutons d'Action</h4>
-                <div style="display:flex; gap:10px; margin-bottom:16px;">
+                <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
                     <button class="btn btn-primary">+ Action Rouge</button>
                     <button class="btn btn-dark">Action Sombre</button>
                     <button class="btn btn-secondary">Annuler / Neutre</button>
+                    <button class="btn btn-outline-red">✏️ Mode Édition</button>
                 </div>
 
                 <h4>Champs de Saisie & Filtres par Badges</h4>
@@ -1111,9 +1627,14 @@
                 </table>
             </div>
 
-            <!-- SECTION 9 : PLANNINGS & VACANCES -->
-            <div class="card" id="section-planning">
-                <h3>📅 9. Composant Planning, Cours & Stages Vacances</h3>
+            <!-- =========================================================================
+                 SECTION 9 : PLANNINGS & VACANCES (SOCLE V7.0 INTACT)
+                 ========================================================================= -->
+            <div class="card" id="section-planning" data-pole="socle intranet">
+                <div class="card-title-row">
+                    <h3>📅 9. Composant Planning, Cours & Stages Vacances</h3>
+                    <span class="card-pole-badge">Socle V7.0 Intact</span>
+                </div>
                 <p>Structure visuelle officielle pour l'affichage des plannings de cours, événements du club et stages d'été / vacances :</p>
                 
                 <div class="planning-grid">
@@ -1156,11 +1677,16 @@
                 </div>
             </div>
 
-            <!-- SECTION 10 : CODE MASTER -->
-            <div class="card" id="section-code-master">
-                <h3>⚡ 10. Code CSS / HTML Indispensable</h3>
+            <!-- =========================================================================
+                 SECTION 10 : CODE MASTER (SOCLE V7.0 INTACT)
+                 ========================================================================= -->
+            <div class="card" id="section-code-master" data-pole="socle intranet">
+                <div class="card-title-row">
+                    <h3>⚡ 10. Code CSS / HTML Indispensable</h3>
+                    <button class="btn btn-primary" onclick="copyToClipboard(document.getElementById('socleCodeV7').innerText)">📋 Copier ce bloc</button>
+                </div>
                 <p>Copie-colle ce bloc pour alimenter le CSS de n'importe quel nouvel outil ou affiche du club :</p>
-                <pre>:root {
+                <pre id="socleCodeV7">:root {
     --rouge: #C41E3A; --rouge-hover: #A3182E; --rouge-clair: #FFEBEF;
     --noir-doux: #1A1A1A; --gris-fonce: #3D3D3D; --gris-moyen: #6B6B6B;
     --gris-clair: #B8B8B8; --gris-tres-clair: #E8E8E8; --blanc-casse: #F5F5F5;
@@ -1169,6 +1695,343 @@
 }
 body { font-family: 'Roboto', sans-serif; background: var(--blanc-casse); margin: 0; display: flex; height: 100vh; }
 h1, h2, h3, h4 { font-family: 'Fredoka', sans-serif; }</pre>
+            </div>
+
+            <!-- =========================================================================
+                 SECTION 11 : ÉTIQUETTES AVERY J8159, INVITAT'AMIS & LIVRET MÉCÉNAT
+                 ========================================================================= -->
+            <div class="card" id="section-editions-print" data-pole="print studios">
+                <div class="card-title-row">
+                    <h3>🏷️ 11. Supports d'Édition Spéciaux : Avery J8159, Invitat'amis & Mécénat A4</h3>
+                    <span class="card-pole-badge">Nouveau V10.0 • Print Spécialisé</span>
+                </div>
+                <p>Gabarits d'impression calibrés au millimètre pour les fournitures administratives, le recrutement d'adhérents et les dossiers partenaires :</p>
+
+                <div class="grid-3" style="margin-top:14px; align-items:stretch;">
+                    <!-- AVERY J8159 -->
+                    <div class="ri-section-card" style="display:flex; flex-direction:column; justify-content:space-between;">
+                        <div>
+                            <div class="ri-section-title">1. Planche Étiquettes Avery J8159 (24/page)</div>
+                            <p style="font-size:0.78rem; margin:0 0 10px 0;">Dimensions strictes <code>63,5 × 33,9 mm</code> (grille 3×8, gap 2,5 mm, marges 13 mm H/B et 7,2 mm G/D, option « sauter X étiquettes ») :</p>
+                        </div>
+                        <div class="avery-label-demo" style="margin:0 auto;">
+                            <div class="logo-box-wrapper" style="width:42px; height:42px; border-radius:8px;">
+                                <img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="club-logo-img" alt="Logo">
+                            </div>
+                            <div style="line-height:1.25;">
+                                <div style="font-family:'Fredoka'; font-size:10.5pt; color:var(--rouge); font-weight:700;">DOJO DORNOIS</div>
+                                <div style="font-family:'Fredoka'; font-size:8.5pt; color:var(--noir-doux);">POCHETTE CHÈQUES</div>
+                                <div style="font-size:7pt; color:var(--gris-moyen);">Saison 2026-2027 • Trésorerie</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INVITAT'AMIS -->
+                    <div class="ri-section-card" style="display:flex; flex-direction:column; justify-content:space-between;">
+                        <div>
+                            <div class="ri-section-title">2. Coupon « Invitat'amis » (2×A5 / Page A4)</div>
+                            <p style="font-size:0.78rem; margin:0 0 10px 0;">Deux invitations par feuille A4 avec repère de coupe central (✂️ COUPER ICI) et mention du prêt gratuit du kimono :</p>
+                        </div>
+                        <div class="cut-coupon-box">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                <span style="font-family:'Fredoka'; color:var(--rouge); font-weight:700; font-size:0.9rem;">🥋 INVITAT'AMIS • DOJO DORNOIS</span>
+                                <span class="badge badge-success">Essai Gratuit</span>
+                            </div>
+                            <div style="font-size:0.78rem; line-height:1.4;">
+                                <strong>Prénom de l'élève :</strong> .......................... invite son ami(e) ..........................<br>
+                                <span style="color:var(--rouge); font-weight:600;">✓ Le club prête le judogi (kimono) !</span> Prévoir claquettes & gourde.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LIVRET MÉCÉNAT & TABLEAU A3 KANO -->
+                    <div class="mecenat-cover-demo">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <div class="logo-box-wrapper" style="width:36px; height:36px; border-radius:8px;"><img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="club-logo-img" alt="Logo"></div>
+                                <span style="font-family:'Fredoka'; font-size:0.9rem;">DOJO DORNOIS</span>
+                            </div>
+                            <span class="badge badge-warning">Mécénat & A3</span>
+                        </div>
+                        <div>
+                            <div style="font-family:'Fredoka'; font-size:1.05rem; color:#FFF;">LIVRET DE MÉCÉNAT & TABLEAUX A3</div>
+                            <div style="font-size:0.76rem; color:#E8E8E8; margin-top:3px;">Couverture sombre prestige (#1A1A1A / #8B1429) • Tableaux A3 Portrait d'entrée (Jigoro Kano) sans SIRET ni texte parasite sous la citation.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =========================================================================
+                 SECTION 12 : INGÉNIERIE DOCUMENTAIRE (RI, STATUTS, TER, CCNS, COURSES)
+                 ========================================================================= -->
+            <div class="card" id="section-gabarits-metiers" data-pole="print judo">
+                <div class="card-title-row">
+                    <h3>📜 12. Gabarits Documentaires : Règlement, Statuts, TER, CCNS, Séances & Courses</h3>
+                    <span class="card-pole-badge">Nouveau V10.0 • Documents Club</span>
+                </div>
+                <p>Composants structurels utilisés dans nos documents officiels A4 Portrait et Paysage afin d'éviter tout effet de « gros bloc pavé » :</p>
+
+                <div class="grid-2" style="margin-top:12px;">
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <div class="ri-intro-box">
+                            <strong>.intro-box (Règlement Intérieur 2p / Statuts France Judo 3p / Rapport Sportif 2p) :</strong> Encart d'introduction rose clair bordé de rouge à gauche, texte justifié et aéré.
+                        </div>
+                        <div class="ri-section-card">
+                            <div class="ri-section-title">.section-card & .section-card-title (Rubriques & Articles)</div>
+                            <p style="margin:0; font-size:0.8rem;">Chaque thématique (<em>Sécurité, Hygiène, Obligations parentales, Mandat olympique 4 ans, Projet Associatif TER 4 pages</em>) est isolée dans une carte gris très clair (<code>#FAFAFA</code>) avec titre Fredoka rouge.</p>
+                        </div>
+                        <div class="ri-nb-box">
+                            .nb-box / Alerte Juridique CCNS : "NB: Le règlement intérieur complet a été signé lors de votre inscription."
+                        </div>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <!-- FICHE SÉANCE JUDO ÉCOLE A4 PAYSAGE -->
+                        <div class="ri-section-card">
+                            <div class="ri-section-title">🏫 Fiche Séance Judo École (A4 Paysage) & Termes Japonais</div>
+                            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:0.8rem;">
+                                <span class="badge badge-danger">10 min • Échauffement</span>
+                                <span>Termes mis en valeur : <strong>Rei</strong> (Salut), <strong>Hajimé</strong> (Commencez), <strong>Maté</strong> (Arrêtez).</span>
+                            </div>
+                        </div>
+
+                        <!-- LISTE DE COURSES FANNY & NOTES DE FRAIS -->
+                        <div class="ri-section-card">
+                            <div class="ri-section-title">🛒 Checklist Courses (Fanny) & 🚗 Notes de Frais Kilométriques</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; padding:3px 0; border-bottom:1px dashed var(--gris-tres-clair);">
+                                <label style="cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--rouge);"> Gobelets & Café (Buvette Stage / Tournoi)</label>
+                                <span class="badge badge-danger">× 4 lots</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; padding-top:4px;">
+                                <span>Indemnités kilométriques (calcul auto <code>km × barème</code> + convertisseur en toutes lettres)</span>
+                                <span class="badge badge-info">Visa Président</span>
+                            </div>
+                        </div>
+
+                        <!-- COUPON PROCURATION AG -->
+                        <div class="cut-coupon-box" style="border-color:var(--gris-moyen); background:#FAFAFA; padding:8px 12px;">
+                            <strong style="font-family:'Fredoka'; color:var(--rouge); font-size:0.8rem;">✂️ COUPON DE PROCURATION / POUVOIR AG (Bas de Convocation A4)</strong>
+                            <div style="font-size:0.75rem; color:var(--gris-fonce);">Bon pour pouvoir détachable intégré en bas de la page unique de convocation AG.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =========================================================================
+                 SECTION 13 : CEINTURES (OBI CSS), CODE MORAL & DIPLÔMES A4
+                 ========================================================================= -->
+            <div class="card" id="section-grades-diplomes" data-pole="judo print">
+                <div class="card-title-row">
+                    <h3>🥋 13. Ceintures Réalistes (Obi CSS), 8 Piliers Kanji & Diplômes de Grade</h3>
+                    <span class="card-pole-badge">Nouveau V10.0 • Suivi des Grades v2.0</span>
+                </div>
+                <p>Représentation officielle des grades du Carnet de Passage de Grade (textures de ceintures avec nœud central, liserés et bicolores) et frise des 8 piliers du Code Moral :</p>
+
+                <div class="obi-grid" style="margin-top:10px;">
+                    <div class="obi-item"><div class="obi-bar" style="background:#FFFFFF;"><div class="obi-knot" style="background:#FFFFFF;"></div></div><strong style="font-family:'Fredoka'; font-size:0.78rem;">Blanche</strong></div>
+                    <div class="obi-item"><div class="obi-bar" style="background:linear-gradient(180deg,#FFF 35%,#FACC15 35%,#FACC15 65%,#FFF 65%);"><div class="obi-knot" style="background:#FACC15;"></div></div><strong style="font-family:'Fredoka'; font-size:0.78rem;">1 / 2 Liserés</strong></div>
+                    <div class="obi-item"><div class="obi-bar" style="background:linear-gradient(180deg,#FFFFFF 50%,#FACC15 50%);"><div class="obi-knot" style="background:linear-gradient(180deg,#FFFFFF 50%,#FACC15 50%);"></div></div><strong style="font-family:'Fredoka'; font-size:0.78rem;">Blanche-Jaune</strong></div>
+                    <div class="obi-item"><div class="obi-bar" style="background:#FACC15;"><div class="obi-knot" style="background:#FACC15;"></div></div><strong style="font-family:'Fredoka'; font-size:0.78rem;">Jaune</strong></div>
+                    <div class="obi-item"><div class="obi-bar" style="background:linear-gradient(180deg,#FACC15 50%,#F97316 50%);"><div class="obi-knot" style="background:linear-gradient(180deg,#FACC15 50%,#F97316 50%);"></div></div><strong style="font-family:'Fredoka'; font-size:0.78rem;">Jaune-Orange</strong></div>
+                    <div class="obi-item"><div class="obi-bar" style="background:#F97316;"><div class="obi-knot" style="background:#F97316;"></div></div><strong style="font-family:'Fredoka'; font-size:0.78rem;">Orange</strong></div>
+                    <div class="obi-item"><div class="obi-bar" style="background:linear-gradient(180deg,#F97316 50%,#16A34A 50%);"><div class="obi-knot" style="background:linear-gradient(180deg,#F97316 50%,#16A34A 50%);"></div></div><strong style="font-family:'Fredoka'; font-size:0.78rem;">Orange-Verte</strong></div>
+                    <div class="obi-item"><div class="obi-bar" style="background:#16A34A;"><div class="obi-knot" style="background:#16A34A;"></div></div><strong style="font-family:'Fredoka'; font-size:0.78rem;">Verte</strong></div>
+                    <div class="obi-item"><div class="obi-bar" style="background:#2563EB;"><div class="obi-knot" style="background:#2563EB;"></div></div><strong style="font-family:'Fredoka'; font-size:0.78rem;">Bleue</strong></div>
+                    <div class="obi-item"><div class="obi-bar" style="background:#78350F;"><div class="obi-knot" style="background:#78350F;"></div></div><strong style="font-family:'Fredoka'; font-size:0.78rem;">Marron</strong></div>
+                    <div class="obi-item"><div class="obi-bar" style="background:#1A1A1A;"><div class="obi-knot" style="background:#1A1A1A;"></div></div><strong style="font-family:'Fredoka'; font-size:0.78rem;">Noire (Dan)</strong></div>
+                </div>
+
+                <h4 style="margin-top:16px;">Frise des 8 Piliers du Code Moral (Diplômes A4 Paysage & Entrée du Dojo)</h4>
+                <div class="kanji-8-grid">
+                    <div class="kanji-box"><div class="kanji-symbol">礼</div><div class="kanji-name">Politesse</div></div>
+                    <div class="kanji-box"><div class="kanji-symbol">勇</div><div class="kanji-name">Courage</div></div>
+                    <div class="kanji-box"><div class="kanji-symbol">誠</div><div class="kanji-name">Sincérité</div></div>
+                    <div class="kanji-box"><div class="kanji-symbol">名</div><div class="kanji-name">Honneur</div></div>
+                    <div class="kanji-box"><div class="kanji-symbol">謙</div><div class="kanji-name">Modestie</div></div>
+                    <div class="kanji-box"><div class="kanji-symbol">尊</div><div class="kanji-name">Respect</div></div>
+                    <div class="kanji-box"><div class="kanji-symbol">制</div><div class="kanji-name">Contrôle</div></div>
+                    <div class="kanji-box"><div class="kanji-symbol">友</div><div class="kanji-name">Amitié</div></div>
+                </div>
+
+                <div class="diploma-preview-card" style="margin-top:14px;">
+                    <div style="font-family:'Fredoka'; color:var(--rouge); font-size:1.1rem; letter-spacing:1px;">DIPLÔME DE PASSAGE DE GRADE • DOJO DORNOIS</div>
+                    <div style="font-size:0.8rem; color:var(--gris-fonce); margin-top:4px;">Double cadre à coins techniques, filigrane kanji <strong>柔道</strong>, rappel automatique des valeurs de l'étape (ex. <em>Amitié & Respect</em>), signatures Professeur & Président, <strong>sans SIRET en pied de page</strong>.</div>
+                </div>
+            </div>
+
+            <!-- =========================================================================
+                 SECTION 14 : KALISPORT (500x500 & 128x128), DRIVE & CARTE HAJIME
+                 ========================================================================= -->
+            <div class="card" id="section-studios-kalisport" data-pole="studios judo">
+                <div class="card-title-row">
+                    <h3>🎴 14. Studios Visuels : Kalisport (500×500 & 128×128), Dossiers Drive & Carte Hajime</h3>
+                    <span class="card-pole-badge">Nouveau V10.0 • Studios Graphiques</span>
+                </div>
+                <p>Formats d'export PNG créés pour l'administration Kalisport, l'arborescence Google Drive / PC et l'Opération Hajime :</p>
+
+                <div class="grid-3" style="margin-top:14px; align-items:center;">
+                    <!-- 500x500 KALISPORT -->
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div class="kalisport-500-demo">
+                            <div style="padding:8px 10px; background:#FFF; border-bottom:1px solid #E8E8E8; display:flex; justify-content:space-between; align-items:center;">
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <div style="background:var(--rouge); width:22px; height:22px; border-radius:5px; padding:2px;"><img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width:100%; height:100%; object-fit:contain;" alt="Logo"></div>
+                                    <span style="font-family:'Fredoka'; font-size:8.5px; font-weight:700;">DOJO <span style="color:var(--rouge);">DORNOIS</span></span>
+                                </div>
+                                <span class="badge badge-danger" style="font-size:7px;">Boutique</span>
+                            </div>
+                            <div style="flex:1; display:flex; align-items:center; justify-content:center; font-size:2.8rem; position:relative;">
+                                <span style="position:absolute; font-size:4.2rem; color:rgba(196,30,58,0.06); font-weight:bold;">道</span>
+                                🥋
+                            </div>
+                            <div style="background:var(--noir-doux); color:#FFF; padding:8px 10px; border-top:3px solid var(--rouge); display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <div style="font-family:'Fredoka'; font-size:10.5px;">JUDOGIS & KIMONOS</div>
+                                    <div style="font-size:7.5px; color:var(--gris-clair);">Enfants & Adultes</div>
+                                </div>
+                                <span style="background:var(--rouge); width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:9px;">➔</span>
+                            </div>
+                        </div>
+                        <div style="text-align:center; font-size:0.78rem;"><strong>Vignettes Kalisport & Icônes Drive</strong><br>Format Carré <code>500 × 500 px</code> (3 variantes : Racine, Sous-dossier, Mois)</div>
+                    </div>
+
+                    <!-- 128x128 ROND SANS FIORITURES -->
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+                        <div class="kalisport-128-round">
+                            <div style="font-size:28px; line-height:1;">🏆</div>
+                            <div style="font-family:'Fredoka'; font-size:14px; font-weight:700; color:var(--rouge); text-transform:uppercase; line-height:1.05; margin-top:4px;">STAGE</div>
+                            <div style="font-family:'Fredoka'; font-size:9.5px; color:var(--noir-doux); font-weight:600;">VACANCES</div>
+                        </div>
+                        <div style="text-align:center; font-size:0.78rem;"><strong>Icône Événement Kalisport</strong><br>Rond PNG transparent <code>128 × 128 px</code><br><span style="color:var(--rouge); font-weight:600;">Règle UX : Zéro fioriture, pas de mention "Dojo Dornois", texte grossi au max !</span></div>
+                    </div>
+
+                    <!-- CARTE COLLECTOR HAJIME -->
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div class="hajime-collector-demo">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="background:var(--rouge); width:26px; height:26px; border-radius:6px; padding:3px;"><img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" style="width:100%; height:100%; object-fit:contain;" alt="Logo"></div>
+                                <span style="font-family:'Fredoka'; font-size:7.5px; letter-spacing:0.8px; text-transform:uppercase; color:#FDE68A;">Opération Hajime</span>
+                            </div>
+                            <div style="text-align:center; font-size:3.4rem; filter:drop-shadow(0 6px 10px rgba(0,0,0,0.5));">🥋</div>
+                            <div style="background:rgba(255,255,255,0.1); backdrop-filter:blur(6px); border-radius:8px; padding:7px; text-align:center; border:1px solid rgba(255,255,255,0.15);">
+                                <div style="font-family:'Fredoka'; font-size:12px; font-weight:700;">PRÉNOM ENFANT</div>
+                                <div style="height:7px; background:linear-gradient(90deg,#FFF 50%,#FACC15 50%); border-radius:3px; margin:4px auto; width:80%;"></div>
+                                <div style="font-size:7.5px; color:#E8E8E8;">3 Thèmes • Tirage A5 / Magnet</div>
+                            </div>
+                        </div>
+                        <div style="text-align:center; font-size:0.78rem;"><strong>Opération Hajime : Carte Collector</strong><br>Export HD <code>1200 × 1800 px</code> (300 DPI)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =========================================================================
+                 SECTION 15 : PAIEMENTS SUMUP (75PX) & BOUTIQUE TEXTILE KALISPORT
+                 ========================================================================= -->
+            <div class="card" id="section-sumup-boutique" data-pole="studios print">
+                <div class="card-title-row">
+                    <h3>💳 15. Bandeau Paiement SumUp (75px), Fiches Produits Kalisport & Grille Textile</h3>
+                    <span class="card-pole-badge">Nouveau V10.0 • Boutique & Tarifs</span>
+                </div>
+                <p>Composants dédiés aux affiches de tarifs, à la boutique en ligne Kalisport (100 % styles inline responsive) et au catalogue textile à double niveau de gamme (Mizuno Kodomo Plus, Erima, broderie cœur & dos) :</p>
+
+                <div style="background:var(--noir-doux); color:var(--blanc); border-radius:var(--radius-main); padding:16px 20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; border-left:6px solid var(--rouge); margin-top:10px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="logo-box-wrapper" style="width:48px; height:48px;"><img src="https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png" class="club-logo-img" alt="Logo"></div>
+                        <div>
+                            <div style="font-family:'Fredoka'; font-size:1.05rem;">TERMINAL SUMUP OFFICIEL • PAIEMENT CB & SANS CONTACT</div>
+                            <div style="font-size:0.78rem; color:var(--gris-clair);">Encart des logos de cartes calibré à <strong>75 px de hauteur</strong> (<code>max-height: 65px</code>) pour éviter tout effet timbre-poste.</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <span class="badge badge-success" style="font-size:11px; padding:6px 10px;">💳 CB / Visa / Mastercard</span>
+                        <span class="badge badge-info" style="font-size:11px; padding:6px 10px;">📱 Apple Pay / Sans Contact</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =========================================================================
+                 SECTION 16 : COCKPIT INTRANET (32 OUTILS), QR CODE & PLAN TATAMIS
+                 ========================================================================= -->
+            <div class="card" id="section-cockpit-intranet" data-pole="intranet">
+                <div class="card-title-row">
+                    <h3>🧭 16. Cockpit Intranet (32 Outils / 6 Pôles), Générateur QR Code & Plan des Tatamis</h3>
+                    <span class="card-pole-badge">Nouveau V10.0 • Architecture Intranet</span>
+                </div>
+                <p>Architecture officielle du Dashboard Central (`index.html` synchronisé avec `dd_catalog_structure_v7` et `js/sidebar.js`), du générateur `qr-code.html` et de la jauge des surfaces de combat :</p>
+
+                <div class="grid-3" style="margin-top:12px;">
+                    <div class="intranet-tool-card">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:1.4rem; background:var(--rouge-clair); width:38px; height:38px; border-radius:8px; display:flex; align-items:center; justify-content:center;">🪙</span>
+                            <div>
+                                <div style="font-family:'Fredoka'; font-size:0.9rem; color:var(--noir-doux);">Trésorerie & Compta</div>
+                                <div style="font-size:0.72rem; color:var(--gris-moyen);">Pôle 1 • Outil Épinglé ★</div>
+                            </div>
+                        </div>
+                        <span style="color:#F59E0B; font-size:1.1rem;">★</span>
+                    </div>
+
+                    <div class="intranet-tool-card">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:1.4rem; background:var(--rouge-clair); width:38px; height:38px; border-radius:8px; display:flex; align-items:center; justify-content:center;">📱</span>
+                            <div>
+                                <div style="font-family:'Fredoka'; font-size:0.9rem; color:var(--noir-doux);">QR Code Officiel</div>
+                                <div style="font-size:0.72rem; color:var(--gris-moyen);">Points arrondis #C41E3A + Logo 40%</div>
+                            </div>
+                        </div>
+                        <span class="badge badge-danger">300×300</span>
+                    </div>
+
+                    <div class="intranet-tool-card">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:1.4rem; background:var(--rouge-clair); width:38px; height:38px; border-radius:8px; display:flex; align-items:center; justify-content:center;">🔐</span>
+                            <div>
+                                <div style="font-family:'Fredoka'; font-size:0.9rem; color:var(--noir-doux);">Coffre-Fort Accès</div>
+                                <div style="font-size:0.72rem; color:var(--gris-moyen);">Bouton 👁️ Révéler + Export A4 1p</div>
+                            </div>
+                        </div>
+                        <span class="badge badge-info">Sécurisé</span>
+                    </div>
+                </div>
+
+                <h4 style="margin-top:16px;">Standards des 3 Configurations du Plan des Tatamis</h4>
+                <div class="grid-3" style="margin-top:8px;">
+                    <div class="ri-section-card" style="border-left:4px solid var(--rouge);">
+                        <div class="ri-section-title">Disposition 1 : Dojo (56 Tapis)</div>
+                        <div style="font-size:0.78rem;">Configuration permanente Henri Pierrehumbert : <strong>16 Rouges, 20 Jaunes, 10 Bleus, 10 Verts</strong>.</div>
+                    </div>
+                    <div class="ri-section-card" style="border-left:4px solid var(--bleu-info);">
+                        <div class="ri-section-title">Disposition 2 : Salle des Fêtes (49 Tapis)</div>
+                        <div style="font-size:0.78rem;">Configuration événementielle numérotée : <strong>29 Bleu Ciel + 20 Jaunes</strong>.</div>
+                    </div>
+                    <div class="ri-section-card" style="border-left:4px solid var(--vert-succes);">
+                        <div class="ri-section-title">Disposition 3 : Surface Maître (84 Tapis)</div>
+                        <div style="font-size:0.78rem;">Surface maximale 12m × 14m (168 m²) combinant les 56 tapis + 28 bleu ciel.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =========================================================================
+                 SECTION 17 : BIBLIOTHÈQUE DE SNIPPETS CSS / HTML V10.0
+                 ========================================================================= -->
+            <div class="card" id="section-snippets-v10" data-pole="intranet print">
+                <div class="card-title-row">
+                    <h3>💻 17. Bibliothèque de Snippets Prêts à l'Emploi (A4 Print, Pavage Hexagonal & En-tête)</h3>
+                    <button class="btn btn-primary" onclick="copyToClipboard(document.getElementById('snippetPrintV10').innerText)">📋 Copier le Squelette Print A4</button>
+                </div>
+                <p>Extrait CSS/HTML standardisé pour créer instantanément un nouveau document A4 Multi-Pages ou Recto-Verso certifié conforme à la Charte V10.0 :</p>
+                <pre id="snippetPrintV10">@page {
+    size: A4 portrait;
+    margin: 10mm 12mm 14mm 12mm;
+    @bottom-left {
+        content: "Dojo Dornois • Loi 1901 • RNA : W583001220 • SIRET : 451 928 410 00013";
+        font-family: 'Roboto', sans-serif; font-size: 7.5pt; color: #6B6B6B;
+    }
+    @bottom-right {
+        content: "Page " counter(page) " / " counter(pages);
+        font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 8.5pt; color: #C41E3A;
+    }
+}</pre>
             </div>
 
         </div>
@@ -1184,6 +2047,51 @@ h1, h2, h3, h4 { font-family: 'Fredoka', sans-serif; }</pre>
     <script src="../js/sidebar.js"></script>
 
     <script>
+        // NOTIFICATION TOAST & COPIE 1-CLIC
+        function showToast(message) {
+            const toast = document.getElementById('charte-toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2200);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const shortText = text.length > 40 ? text.substring(0, 40) + "..." : text;
+                showToast("✅ Copié : " + shortText);
+            });
+        }
+
+        // RECHERCHE INSTANTANÉE (CTRL + K)
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                document.getElementById('searchCharteInput').focus();
+            }
+        });
+
+        function filterCharteCards(query) {
+            const q = query.toLowerCase().trim();
+            document.querySelectorAll('.app-body > .card').forEach(card => {
+                const match = card.innerText.toLowerCase().includes(q);
+                card.style.display = match ? '' : 'none';
+            });
+        }
+
+        function filterByPole(pole, btn) {
+            document.querySelectorAll('.pole-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.app-body > .card').forEach(card => {
+                if (pole === 'all') {
+                    card.style.display = '';
+                } else {
+                    const poles = (card.getAttribute('data-pole') || '').split(' ');
+                    card.style.display = poles.includes(pole) ? '' : 'none';
+                }
+            });
+        }
+
+        // EXPORT DUAL A5 D'ORIGINE
         function exportDualA5Charte() {
             const activeCard = document.querySelector('.card:not(.hidden)') || document.querySelector('.card');
             const leftBlock = document.getElementById('dual-a5-left-charte');
@@ -1196,14 +2104,14 @@ h1, h2, h3, h4 { font-family: 'Fredoka', sans-serif; }</pre>
 
             document.body.classList.add('page-dual-a5');
             window.print();
+            setTimeout(() => document.body.classList.remove('page-dual-a5'), 1000);
         }
     </script>
 
-    <!-- SCRIPT DE GÉNÉRATION DU LOGO SIGNATURE (CANVAS) -->
+    <!-- SCRIPT DE GÉNÉRATION DU LOGO SIGNATURE (CANVAS D'ORIGINE CONSERVÉ) -->
     <script>
         let logoSource = new Image();
         logoSource.crossOrigin = "anonymous";
-        // On tente de charger l'image d'origine par défaut
         logoSource.src = "https://dojodornois.fr/public/10057/upload/files/base-de-donnees/logo-dojo-dornois-transparent-contour-blanc_2.png";
 
         function handleLocalImage(event) {
@@ -1225,11 +2133,9 @@ h1, h2, h3, h4 { font-family: 'Fredoka', sans-serif; }</pre>
             canvas.height = size;
             const ctx = canvas.getContext("2d");
 
-            // Variables du design system en fonction de la taille demandée
-            const radius = size * 0.16; // Rayon dynamique (16% de la taille)
-            const padding = size * 0.08; // Marge interne pour respirer
+            const radius = size * 0.16;
+            const padding = size * 0.08;
 
-            // Tracé du carré rouge arrondi
             ctx.fillStyle = "#C41E3A";
             ctx.beginPath();
             ctx.moveTo(radius, 0);
@@ -1244,7 +2150,6 @@ h1, h2, h3, h4 { font-family: 'Fredoka', sans-serif; }</pre>
             ctx.closePath();
             ctx.fill();
 
-            // Ajout de l'image au centre
             if (logoSource.complete && logoSource.naturalWidth > 0) {
                 const drawSize = size - (padding * 2);
                 ctx.drawImage(logoSource, padding, padding, drawSize, drawSize);
@@ -1255,6 +2160,7 @@ h1, h2, h3, h4 { font-family: 'Fredoka', sans-serif; }</pre>
                     link.download = "logo-dojo-dornois-carre-" + size + "x" + size + ".png";
                     link.href = dataURL;
                     link.click();
+                    showToast("📥 Logo " + size + "x" + size + " téléchargé !");
                 } catch (e) {
                     alert("Erreur de sécurité CORS du navigateur bloquant le téléchargement automatique. Veuillez utiliser le lien 'Sélectionner l'image source' pour charger manuellement le logo vierge depuis votre ordinateur, puis réessayez de télécharger.");
                 }
