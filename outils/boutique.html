@@ -1351,6 +1351,16 @@
                             <label for="rds-item-color">Coloris commandé</label>
                             <input type="text" id="rds-item-color" class="input-field" value="Blanc" placeholder="Ex: Blanc, Noir, Rouge...">
                         </div>
+
+                        <div class="form-field full">
+                            <label for="rds-item-club-logo">Marquage Logo Club (Colonne correspondante)</label>
+                            <select id="rds-item-club-logo" class="select-field">
+                                <option value="AUTO">Selon fiche article (par défaut)</option>
+                                <option value="Sans logo club">Sans logo club (Vierge / Étiquette fabricant)</option>
+                                <option value="Avec logo club (Broderie)">Avec logo club — Broderie</option>
+                                <option value="Avec logo club (Transfert)">Avec logo club — Transfert</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Mode de saisie : Ligne Nominative OU Grille Multi-Tailles -->
@@ -1940,7 +1950,11 @@
 
         function getMarquageBadge(marquage) {
             const m = String(marquage || 'Logo Club');
-            const isTransfert = m.toLowerCase().includes('transfert');
+            const lower = m.toLowerCase();
+            if (lower.includes('sans logo') || lower.includes('vierge') || lower === 'aucun') {
+                return `<span class="badge" style="background:#F1F5F9;color:#64748B;border:1px solid #CBD5E1;">${escapeHtml(m)}</span>`;
+            }
+            const isTransfert = lower.includes('transfert');
             return `<span class="badge ${isTransfert ? 'badge-transfert' : 'badge-broderie'}">${escapeHtml(m)}</span>`;
         }
 
@@ -2522,6 +2536,16 @@
             else if (art.ref.includes('ERIMA')) colorInp.value = 'Noir / Rouge';
             else colorInp.value = 'Noir';
 
+            const clubLogoSel = document.getElementById('rds-item-club-logo');
+            if (clubLogoSel) {
+                clubLogoSel.options[0].textContent = `Selon fiche article (${art.marquage || 'Logo Club'})`;
+                if (art.famille.toLowerCase().includes('ceinture') || art.ref.includes('OBI')) {
+                    clubLogoSel.value = 'Sans logo club';
+                } else {
+                    clubLogoSel.value = 'AUTO';
+                }
+            }
+
             const persoSel = document.getElementById('rds-item-perso-type');
             if (art.marquage.toLowerCase().includes('prénom')) {
                 persoSel.value = 'Inclus (Prénom)';
@@ -2557,6 +2581,8 @@
             const persoPos = document.getElementById('rds-item-perso-pos').value.trim();
             const persoText = document.getElementById('rds-item-perso-text').value.trim();
             const qty = Math.max(1, parseInt(document.getElementById('rds-item-qty').value, 10) || 1);
+            const clubLogoChoice = document.getElementById('rds-item-club-logo').value;
+            const resolvedMarquageClub = clubLogoChoice === 'AUTO' ? art.marquage : clubLogoChoice;
 
             let unitCostInternal = Number(art.achat || 0);
             let unitSellInternal = Number(art.vente || 0);
@@ -2572,7 +2598,7 @@
                 cut,
                 color,
                 size,
-                marquageClub: art.marquage,
+                marquageClub: resolvedMarquageClub,
                 persoType,
                 persoPos,
                 persoText,
@@ -2595,6 +2621,8 @@
 
             const cut = document.getElementById('rds-item-cut').value;
             const color = document.getElementById('rds-item-color').value.trim() || 'Standard';
+            const clubLogoChoice = document.getElementById('rds-item-club-logo').value;
+            const resolvedMarquageClub = clubLogoChoice === 'AUTO' ? art.marquage : clubLogoChoice;
             const inputs = document.querySelectorAll('#multi-size-grid input[data-multi-size]');
 
             let addedCount = 0;
@@ -2610,7 +2638,7 @@
                         cut,
                         color,
                         size,
-                        marquageClub: art.marquage,
+                        marquageClub: resolvedMarquageClub,
                         persoType: art.marquage.toLowerCase().includes('prénom') ? 'Inclus (Prénom)' : 'Aucune',
                         persoPos: '',
                         persoText: '',
@@ -2649,6 +2677,8 @@
             let totalPerso = 0;
             let internalCostTotal = 0;
 
+            let totalClubMark = 0;
+
             if (rdsOrderLines.length === 0) {
                 tbody.innerHTML = `
                     <tr>
@@ -2661,6 +2691,10 @@
                 tbody.innerHTML = rdsOrderLines.map((l, idx) => {
                     totalQty += Number(l.qty);
                     internalCostTotal += Number(l.qty) * Number(l.unitCostInternal || 0);
+                    const mcLower = String(l.marquageClub || '').toLowerCase();
+                    if (!mcLower.includes('sans logo') && !mcLower.includes('vierge') && mcLower !== 'aucun') {
+                        totalClubMark += Number(l.qty);
+                    }
                     const hasPerso = (l.persoType && l.persoType !== 'Aucune') || (l.persoText && l.persoText.length > 0);
                     if (hasPerso) totalPerso += Number(l.qty);
 
@@ -2683,7 +2717,7 @@
                             <td style="text-align:center;">
                                 <span style="font-family:'Roboto Mono',monospace; font-size:11px; font-weight:700; background:#F1F5F9; padding:3px 5px; border-radius:4px; border:1px solid var(--gris-bordure); display:inline-block;">${escapeHtml(l.size)}</span>
                             </td>
-                            <td>${getMarquageBadge(l.marquageClub)}</td>
+                            <td style="cursor:pointer;" data-rds-act="toggle-logo" data-lid="${escapeHtml(l.lineId)}" title="Cliquer pour basculer Avec / Sans logo club">${getMarquageBadge(l.marquageClub)}</td>
                             <td style="font-size:11.5px;">${persoHtml}</td>
                             <td style="text-align:center; font-family:'Fredoka',sans-serif; font-size:15px; font-weight:700; color:var(--noir);">${l.qty}</td>
                             <td style="text-align:center; white-space:nowrap;">
@@ -2698,7 +2732,7 @@
 
             document.getElementById('stat-total-lines').textContent = rdsOrderLines.length;
             document.getElementById('stat-total-qty').textContent = totalQty;
-            document.getElementById('stat-total-club-mark').textContent = totalQty;
+            document.getElementById('stat-total-club-mark').textContent = totalClubMark;
             document.getElementById('stat-total-perso').textContent = totalPerso;
 
             document.getElementById('internal-cost-val').textContent = formatPrice(internalCostTotal);
@@ -2982,8 +3016,9 @@
             const totalPieces = rdsOrderLines.reduce((s, l) => s + Number(l.qty || 0), 0);
 
             const summaryLines = rdsOrderLines.map((l, i) => {
+                const logoInfo = l.marquageClub ? ` — Marquage : ${l.marquageClub}` : '';
                 const perso = (l.persoType !== 'Aucune' || l.persoText) ? ` | Prénom : ${l.persoText || 'à préciser'} (${l.persoType})` : '';
-                return `${i + 1}. [${l.ref}] ${l.nom} (${l.cut}) — Coloris : ${l.color} — Taille : ${l.size} — Qté : ${l.qty}${perso}`;
+                return `${i + 1}. [${l.ref}] ${l.nom} (${l.cut}) — Coloris : ${l.color} — Taille : ${l.size}${logoInfo} — Qté : ${l.qty}${perso}`;
             }).join('\n');
 
             const billingAddr = document.getElementById('rds-billing-address').value.trim();
@@ -3364,15 +3399,19 @@ Président — Dojo Dornois
 
             // Délégation clics lignes RDS
             document.getElementById('rds-order-tbody').addEventListener('click', (e) => {
-                const btn = e.target.closest('button[data-rds-act]');
-                if (!btn) return;
-                const act = btn.getAttribute('data-rds-act');
-                const lid = btn.getAttribute('data-lid');
+                const target = e.target.closest('[data-rds-act]');
+                if (!target) return;
+                const act = target.getAttribute('data-rds-act');
+                const lid = target.getAttribute('data-lid');
                 const line = rdsOrderLines.find(l => l.lineId === lid);
                 if (!line) return;
                 if (act === 'inc') line.qty = Number(line.qty) + 1;
                 if (act === 'dec') line.qty = Math.max(1, Number(line.qty) - 1);
                 if (act === 'rem') rdsOrderLines = rdsOrderLines.filter(l => l.lineId !== lid);
+                if (act === 'toggle-logo') {
+                    const isSans = String(line.marquageClub || '').toLowerCase().includes('sans logo');
+                    line.marquageClub = isSans ? 'Avec logo club (Broderie)' : 'Sans logo club';
+                }
                 renderRDSOrderSheet();
                 renderAchatCodirView();
             });
