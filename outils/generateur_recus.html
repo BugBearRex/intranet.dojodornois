@@ -406,8 +406,9 @@
                         <div class="form-group">
                             <label>Compte émetteur (débité) :</label>
                             <select id="mvt_source" class="form-control" onchange="majComptesMouvement()">
+                                <option value="Compte HelloAsso" selected>Compte HelloAsso</option>
                                 <option value="Crédit Agricole (Compte Courant)">Crédit Agricole (Compte Courant)</option>
-                                <option value="Crédit Agricole Livret A" selected>Crédit Agricole Livret A</option>
+                                <option value="Crédit Agricole Livret A">Crédit Agricole Livret A</option>
                                 <option value="Caisse">Caisse</option>
                                 <option value="Crédit Agricole Parts sociales">Crédit Agricole Parts sociales</option>
                                 <option value="Dépôt à Terme 12 mois">Dépôt à Terme 12 mois</option>
@@ -417,6 +418,7 @@
                             <label>Compte destinataire (crédité) :</label>
                             <select id="mvt_dest" class="form-control" onchange="majComptesMouvement()">
                                 <option value="Crédit Agricole (Compte Courant)" selected>Crédit Agricole (Compte Courant)</option>
+                                <option value="Compte HelloAsso">Compte HelloAsso</option>
                                 <option value="Crédit Agricole Livret A">Crédit Agricole Livret A</option>
                                 <option value="Caisse">Caisse</option>
                                 <option value="Crédit Agricole Parts sociales">Crédit Agricole Parts sociales</option>
@@ -464,12 +466,12 @@
 
                     <div class="form-group">
                         <label id="lbl-rec-objet">Nature du mouvement de fonds :</label>
-                        <input type="text" id="rec_objet" class="form-control" value="Virement interne de fonds de Crédit Agricole Livret A vers Crédit Agricole (Compte Courant)" oninput="majApercuRecu()">
+                        <input type="text" id="rec_objet" class="form-control" value="Virement interne de fonds de Compte HelloAsso vers Crédit Agricole (Compte Courant)" oninput="majApercuRecu()">
                     </div>
 
                     <div class="form-group">
                         <label id="lbl-rec-remarques">Complément d'information / Contexte :</label>
-                        <textarea id="rec_remarques" class="form-control" rows="2" oninput="majApercuRecu()">Ajustement de trésorerie pour couvrir les dépenses courantes et les prochains règlements.</textarea>
+                        <textarea id="rec_remarques" class="form-control" rows="2" oninput="majApercuRecu()">Reversement périodique des encaissements effectués via la plateforme HelloAsso vers le compte courant du club.</textarea>
                     </div>
 
                     <button class="btn btn-primary" onclick="imprimerRecu()">🖨️ Imprimer le Document (A4)</button>
